@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ApplicationPackage SchemaVersion="1.0"
+                    AutodeskProduct="AutoCAD"
+                    Name="iSurvey"
+                    Description="iSurvey — Google Earth + VN-2000 cho AutoCAD / Civil 3D"
+                    AppVersion="1.0.0"
+                    ProductCode="{8F3E2A1B-4C5D-6E7F-9012-3456789ABCDE}"
+                    UpgradeCode="{1D2E3F4A-5B6C-7D8E-9F0A-1B2C3D4E5F6A}"
+                    Author="iSurvey">
+  <CompanyDetails Name="iSurvey" />
+
+  <!-- AutoCAD / Civil 3D 2026 (.NET 8) — R25.1 -->
+  <Components Description="iSurvey for AutoCAD / Civil 3D 2026">
+    <RuntimeRequirements OS="Win64" Platform="AutoCAD|Civil3D" SeriesMin="R25.1" SeriesMax="R25.1" />
+    <ComponentEntry AppName="iSurvey.2026"
+                    Version="1.0.0"
+                    ModuleName="./Contents/Win64/2026/iSurvey.dll"
+                    LoadOnAutoCADStartup="True"
+                    LoadOnCommandInvocation="True">
+      <Commands GroupName="ISURVEY">
+        <Command Local="ISURVEY_MAP" Global="ISURVEY_MAP" />
+        <Command Local="ISURVEY_MAP_SAT" Global="ISURVEY_MAP_SAT" />
+        <Command Local="ISURVEY_DELETE_GE" Global="ISURVEY_DELETE_GE" />
+      </Commands>
+    </ComponentEntry>
+  </Components>
+</ApplicationPackage>

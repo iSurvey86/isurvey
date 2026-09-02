@@ -1,0 +1,109 @@
+<Window x:Class="iSurvey.UI.MapInsert.MapInsertWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="iSurvey — Chọn tỉnh / VN-2000"
+        Width="400"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#F4F6F8"
+        Foreground="#1F2937"
+        FontFamily="Segoe UI"
+        FontSize="13">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="TextPrimary" Color="#1F2937"/>
+        <SolidColorBrush x:Key="TextSecondary" Color="#6B7280"/>
+        <SolidColorBrush x:Key="Accent" Color="#2563EB"/>
+        <SolidColorBrush x:Key="CardBg" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="Border" Color="#E5E7EB"/>
+        <SolidColorBrush x:Key="Danger" Color="#DC2626"/>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Border}"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Border}"/>
+            <Setter Property="Padding" Value="8,4"/>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="MinWidth" Value="88"/>
+            <Setter Property="Padding" Value="14,0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+    </Window.Resources>
+
+    <Border Padding="20">
+        <StackPanel>
+            <TextBlock Text="Chọn tỉnh để iSurvey cấu hình VN-2000 và tải basemap."
+                       TextWrapping="Wrap" FontSize="12" Margin="0,0,0,14"/>
+
+            <TextBlock Text="Tỉnh / thành" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+            <ComboBox x:Name="ProvinceCombo"
+                      DisplayMemberPath="ProvinceName"
+                      SelectionChanged="ProvinceCombo_SelectionChanged"/>
+
+            <TextBlock x:Name="AreaLabel" Text="Khu vực" Visibility="Collapsed"
+                       FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+            <ComboBox x:Name="AreaCombo"
+                      DisplayMemberPath="Label"
+                      Visibility="Collapsed"
+                      SelectionChanged="AreaCombo_SelectionChanged"/>
+
+            <TextBlock Text="Kinh tuyến trục" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+            <Grid Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="MeridianBox" Grid.Column="0"/>
+                <TextBlock Grid.Column="1" Text="°" VerticalAlignment="Center" Margin="8,0,0,8"/>
+            </Grid>
+            <TextBlock x:Name="MeridianHint" FontSize="11" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Loại ảnh" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+            <ComboBox x:Name="BasemapCombo" DisplayMemberPath="Name" SelectedValuePath="Id"/>
+
+            <TextBlock Text="Phạm vi" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" Margin="0,8,0,0"/>
+            <StackPanel Margin="0,0,0,8">
+                <RadioButton x:Name="ViewportRadio" Content="Khung nhìn hiện tại" IsChecked="True" Margin="0,2"/>
+                <RadioButton x:Name="BoundaryRadio" Content="Theo đường bao (Polyline đóng)" Margin="0,2"/>
+            </StackPanel>
+
+            <Grid Margin="0,16,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button x:Name="DeleteButton" Grid.Column="0" Content="Xóa GE"
+                        Click="Delete_Click"
+                        Background="#FEF2F2" Foreground="{StaticResource Danger}" BorderBrush="#FECACA"/>
+
+                <Button x:Name="ApplyButton" Grid.Column="2" Content="Áp dụng"
+                        Click="Apply_Click" Margin="0,0,8,0"
+                        Background="{StaticResource Accent}" Foreground="White"
+                        BorderBrush="{StaticResource Accent}" FontWeight="SemiBold"/>
+
+                <Button Grid.Column="3" Content="Hủy" Click="Cancel_Click"
+                        Background="White" Foreground="{StaticResource TextPrimary}" BorderBrush="{StaticResource Border}"/>
+            </Grid>
+        </StackPanel>
+    </Border>
+</Window>

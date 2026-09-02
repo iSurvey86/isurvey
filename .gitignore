@@ -1,0 +1,26 @@
+# Build
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Deploy output (tạo lại bằng deploy/build-bundle.ps1)
+deploy/output/
+
+# IDE / OS
+.vs/
+.idea/
+*.swp
+Thumbs.db
+Desktop.ini
+
+# Local secrets / machine settings
+.env
+*.pfx
+*.snk
+
+# AutoCAD / local caches (không commit)
+**/__pycache__/
+*.log

@@ -1,0 +1,12 @@
+[
+  {
+    "id": "google-satellite",
+    "name": "Google Satellite",
+    "url": "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
+  },
+  {
+    "id": "google-satellite-hybrid",
+    "name": "Google Satellite Hybrid",
+    "url": "https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
+  }
+]

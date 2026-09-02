@@ -1,0 +1,632 @@
+[
+  {
+    "id": "8420001",
+    "name": "VN_2000_HaNoi_Mui_Chieu_3do",
+    "sourceProvinceKey": "HaNoi",
+    "centralMeridian": 105.0,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_HaNoi_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.0],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420002",
+    "name": "VN_2000_HaGiang_Mui_Chieu_3do",
+    "sourceProvinceKey": "HaGiang",
+    "centralMeridian": 105.5,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_HaGiang_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.5],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420004",
+    "name": "VN_2000_CaoBang_Mui_Chieu_3do",
+    "sourceProvinceKey": "CaoBang",
+    "centralMeridian": 105.75,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_CaoBang_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.75],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420006",
+    "name": "VN_2000_BacKan_Mui_Chieu_3do",
+    "sourceProvinceKey": "BacKan",
+    "centralMeridian": 106.5,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_BacKan_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",106.5],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420008",
+    "name": "VN_2000_TuyenQuang_Mui_Chieu_3do",
+    "sourceProvinceKey": "TuyenQuang",
+    "centralMeridian": 106.0,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_TuyenQuang_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",106.0],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420010",
+    "name": "VN_2000_LaoCai_Mui_Chieu_3do",
+    "sourceProvinceKey": "LaoCai",
+    "centralMeridian": 104.75,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_LaoCai_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",104.75],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420011",
+    "name": "VN_2000_DienBien_Mui_Chieu_3do",
+    "sourceProvinceKey": "DienBien",
+    "centralMeridian": 103.0,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_DienBien_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",103.0],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420012",
+    "name": "VN_2000_LaiChau_Mui_Chieu_3do",
+    "sourceProvinceKey": "LaiChau",
+    "centralMeridian": 103.0,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_LaiChau_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",103.0],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420014",
+    "name": "VN_2000_SonLa_Mui_Chieu_3do",
+    "sourceProvinceKey": "SonLa",
+    "centralMeridian": 104.0,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_SonLa_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",104.0],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420015",
+    "name": "VN_2000_YenBai_Mui_Chieu_3do",
+    "sourceProvinceKey": "YenBai",
+    "centralMeridian": 104.75,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_YenBai_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",104.75],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420017",
+    "name": "VN_2000_HoaBinh_Mui_Chieu_3do",
+    "sourceProvinceKey": "HoaBinh",
+    "centralMeridian": 106.0,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_HoaBinh_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",106.0],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420019",
+    "name": "VN_2000_ThaiNguyen_Mui_Chieu_3do",
+    "sourceProvinceKey": "ThaiNguyen",
+    "centralMeridian": 106.5,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_ThaiNguyen_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",106.5],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420020",
+    "name": "VN_2000_LangSon_Mui_Chieu_3do",
+    "sourceProvinceKey": "LangSon",
+    "centralMeridian": 107.25,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_LangSon_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",107.25],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420022",
+    "name": "VN_2000_QuangNinh_Mui_Chieu_3do",
+    "sourceProvinceKey": "QuangNinh",
+    "centralMeridian": 107.75,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_QuangNinh_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",107.75],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420024",
+    "name": "VN_2000_BacGiang_Mui_Chieu_3do",
+    "sourceProvinceKey": "BacGiang",
+    "centralMeridian": 107.0,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_BacGiang_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",107.0],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420025",
+    "name": "VN_2000_PhuTho_Mui_Chieu_3do",
+    "sourceProvinceKey": "PhuTho",
+    "centralMeridian": 104.75,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_PhuTho_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",104.75],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420026",
+    "name": "VN_2000_VinhPhuc_Mui_Chieu_3do",
+    "sourceProvinceKey": "VinhPhuc",
+    "centralMeridian": 105.0,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_VinhPhuc_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.0],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420027",
+    "name": "VN_2000_BacNinh_Mui_Chieu_3do",
+    "sourceProvinceKey": "BacNinh",
+    "centralMeridian": 105.5,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_BacNinh_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.5],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420030",
+    "name": "VN_2000_HaiDuong_Mui_Chieu_3do",
+    "sourceProvinceKey": "HaiDuong",
+    "centralMeridian": 105.5,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_HaiDuong_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.5],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420031",
+    "name": "VN_2000_HaiPhong_Mui_Chieu_3do",
+    "sourceProvinceKey": "HaiPhong",
+    "centralMeridian": 105.75,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_HaiPhong_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.75],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420033",
+    "name": "VN_2000_HungYen_Mui_Chieu_3do",
+    "sourceProvinceKey": "HungYen",
+    "centralMeridian": 105.5,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_HungYen_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.5],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420034",
+    "name": "VN_2000_ThaiBinh_Mui_Chieu_3do",
+    "sourceProvinceKey": "ThaiBinh",
+    "centralMeridian": 105.5,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_ThaiBinh_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.5],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420035",
+    "name": "VN_2000_HaNam_Mui_Chieu_3do",
+    "sourceProvinceKey": "HaNam",
+    "centralMeridian": 105.0,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_HaNam_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.0],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420036",
+    "name": "VN_2000_NamDinh_Mui_Chieu_3do",
+    "sourceProvinceKey": "NamDinh",
+    "centralMeridian": 105.5,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_NamDinh_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.5],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420037",
+    "name": "VN_2000_NinhBinh_Mui_Chieu_3do",
+    "sourceProvinceKey": "NinhBinh",
+    "centralMeridian": 105.0,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_NinhBinh_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.0],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420038",
+    "name": "VN_2000_ThanhHoa_Mui_Chieu_3do",
+    "sourceProvinceKey": "ThanhHoa",
+    "centralMeridian": 105.0,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_ThanhHoa_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.0],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420040",
+    "name": "VN_2000_NgheAn_Mui_Chieu_3do",
+    "sourceProvinceKey": "NgheAn",
+    "centralMeridian": 104.75,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_NgheAn_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",104.75],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420042",
+    "name": "VN_2000_HaTinh_Mui_Chieu_3do",
+    "sourceProvinceKey": "HaTinh",
+    "centralMeridian": 105.5,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_HaTinh_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.5],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420044",
+    "name": "VN_2000_QuangBinh_Mui_Chieu_3do",
+    "sourceProvinceKey": "QuangBinh",
+    "centralMeridian": 106.0,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_QuangBinh_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",106.0],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420045",
+    "name": "VN_2000_QuangTri_Mui_Chieu_3do",
+    "sourceProvinceKey": "QuangTri",
+    "centralMeridian": 106.25,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_QuangTri_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",106.25],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420046",
+    "name": "VN_2000_TT-Hue_Mui_Chieu_3do",
+    "sourceProvinceKey": "TT-Hue",
+    "centralMeridian": 107.0,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_TT-Hue_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",107.0],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420048",
+    "name": "VN_2000_DaNang_Mui_Chieu_3do",
+    "sourceProvinceKey": "DaNang",
+    "centralMeridian": 107.75,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_DaNang_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",107.75],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420049",
+    "name": "VN_2000_QuangNam_Mui_Chieu_3do",
+    "sourceProvinceKey": "QuangNam",
+    "centralMeridian": 107.75,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_QuangNam_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",107.75],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420051",
+    "name": "VN_2000_QuangNgai_Mui_Chieu_3do",
+    "sourceProvinceKey": "QuangNgai",
+    "centralMeridian": 108.0,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_QuangNgai_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",108.0],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420052",
+    "name": "VN_2000_BinhDinh_Mui_Chieu_3do",
+    "sourceProvinceKey": "BinhDinh",
+    "centralMeridian": 108.25,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_BinhDinh_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",108.25],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420054",
+    "name": "VN_2000_PhuYen_Mui_Chieu_3do",
+    "sourceProvinceKey": "PhuYen",
+    "centralMeridian": 108.5,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_PhuYen_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",108.50],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420056",
+    "name": "VN_2000_KhanhHoa_Mui_Chieu_3do",
+    "sourceProvinceKey": "KhanhHoa",
+    "centralMeridian": 108.25,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_KhanhHoa_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",108.25],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420058",
+    "name": "VN_2000_NinhThuan_Mui_Chieu_3do",
+    "sourceProvinceKey": "NinhThuan",
+    "centralMeridian": 108.25,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_NinhThuan_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",108.25],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420060",
+    "name": "VN_2000_BinhThuan_Mui_Chieu_3do",
+    "sourceProvinceKey": "BinhThuan",
+    "centralMeridian": 108.5,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_BinhThuan_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",108.5],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420062",
+    "name": "VN_2000_KonTum_Mui_Chieu_3do",
+    "sourceProvinceKey": "KonTum",
+    "centralMeridian": 107.5,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_KonTum_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",107.5],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420064",
+    "name": "VN_2000_GiaLai_Mui_Chieu_3do",
+    "sourceProvinceKey": "GiaLai",
+    "centralMeridian": 108.5,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_GiaLai_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",108.5],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420066",
+    "name": "VN_2000_DakLak_Mui_Chieu_3do",
+    "sourceProvinceKey": "DakLak",
+    "centralMeridian": 108.5,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_DakLak_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",108.5],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420067",
+    "name": "VN_2000_DakNong_Mui_Chieu_3do",
+    "sourceProvinceKey": "DakNong",
+    "centralMeridian": 108.5,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_DakNong_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",108.50],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420068",
+    "name": "VN_2000_LamDong_Mui_Chieu_3do",
+    "sourceProvinceKey": "LamDong",
+    "centralMeridian": 107.75,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_LamDong_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",107.75],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420070",
+    "name": "VN_2000_BinhPhuoc_Mui_Chieu_3do",
+    "sourceProvinceKey": "BinhPhuoc",
+    "centralMeridian": 106.25,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_BinhPhuoc_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",106.25],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420072",
+    "name": "VN_2000_TayNinh_Mui_Chieu_3do",
+    "sourceProvinceKey": "TayNinh",
+    "centralMeridian": 105.5,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_TayNinh_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.5],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420074",
+    "name": "VN_2000_BinhDuong_Mui_Chieu_3do",
+    "sourceProvinceKey": "BinhDuong",
+    "centralMeridian": 105.75,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_BinhDuong_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.75],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420075",
+    "name": "VN_2000_DongNai_Mui_Chieu_3do",
+    "sourceProvinceKey": "DongNai",
+    "centralMeridian": 107.75,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_DongNai_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",107.75],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420077",
+    "name": "VN_2000_BR-VungTau_Mui_Chieu_3do",
+    "sourceProvinceKey": "BR-VungTau",
+    "centralMeridian": 107.75,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_BR-VungTau_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",107.75],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420079",
+    "name": "VN_2000_TP.HCM_Mui_Chieu_3do",
+    "sourceProvinceKey": "TP.HCM",
+    "centralMeridian": 105.75,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_TP.HCM_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.75],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420080",
+    "name": "VN_2000_LongAn_Mui_Chieu_3do",
+    "sourceProvinceKey": "LongAn",
+    "centralMeridian": 105.75,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_LongAn_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.75],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420082",
+    "name": "VN_2000_TienGiang_Mui_Chieu_3do",
+    "sourceProvinceKey": "TienGiang",
+    "centralMeridian": 105.75,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_TienGiang_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.75],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420083",
+    "name": "VN_2000_BenTre_Mui_Chieu_3do",
+    "sourceProvinceKey": "BenTre",
+    "centralMeridian": 105.75,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_BenTre_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.75],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420084",
+    "name": "VN_2000_TraVinh_Mui_Chieu_3do",
+    "sourceProvinceKey": "TraVinh",
+    "centralMeridian": 105.5,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_TraVinh_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.5],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420086",
+    "name": "VN_2000_VinhLong_Mui_Chieu_3do",
+    "sourceProvinceKey": "VinhLong",
+    "centralMeridian": 105.5,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_VinhLong_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.5],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420087",
+    "name": "VN_2000_DongThap_Mui_Chieu_3do",
+    "sourceProvinceKey": "DongThap",
+    "centralMeridian": 105.0,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_DongThap_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.0],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420089",
+    "name": "VN_2000_AnGiang_Mui_Chieu_3do",
+    "sourceProvinceKey": "AnGiang",
+    "centralMeridian": 104.75,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_AnGiang_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",104.75],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420091",
+    "name": "VN_2000_KienGiang_Mui_Chieu_3do",
+    "sourceProvinceKey": "KienGiang",
+    "centralMeridian": 104.5,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_KienGiang_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",104.5],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420092",
+    "name": "VN_2000_CanTho_Mui_Chieu_3do",
+    "sourceProvinceKey": "CanTho",
+    "centralMeridian": 105.0,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_CanTho_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.0],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420093",
+    "name": "VN_2000_HauGiang_Mui_Chieu_3do",
+    "sourceProvinceKey": "HauGiang",
+    "centralMeridian": 105.0,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_HauGiang_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.0],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420094",
+    "name": "VN_2000_SocTrang_Mui_Chieu_3do",
+    "sourceProvinceKey": "SocTrang",
+    "centralMeridian": 105.5,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_SocTrang_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.5],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420095",
+    "name": "VN_2000_BacLieu_Mui_Chieu_3do",
+    "sourceProvinceKey": "BacLieu",
+    "centralMeridian": 105.0,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_BacLieu_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",105.0],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  },
+  {
+    "id": "8420096",
+    "name": "VN_2000_CaMau_Mui_Chieu_3do",
+    "sourceProvinceKey": "CaMau",
+    "centralMeridian": 104.5,
+    "scaleFactor": 0.9999,
+    "falseEasting": 500000.0,
+    "falseNorthing": 0.0,
+    "wkt": "PROJCS[\"VN_2000_CaMau_Mui_Chieu_3do\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563],TOWGS84[-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",104.5],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]"
+  }
+]

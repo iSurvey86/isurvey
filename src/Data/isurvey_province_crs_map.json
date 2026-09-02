@@ -1,0 +1,424 @@
+[
+  {
+    "provinceName": "An Giang",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "AnGiang",
+        "label": "An Giang"
+      },
+      {
+        "sourceProvinceKey": "KienGiang",
+        "label": "Kiên Giang"
+      }
+    ]
+  },
+  {
+    "provinceName": "Bắc Ninh",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "BacNinh",
+        "label": "Bắc Ninh"
+      },
+      {
+        "sourceProvinceKey": "BacGiang",
+        "label": "Bắc Giang"
+      }
+    ]
+  },
+  {
+    "provinceName": "Cao Bằng",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "CaoBang",
+        "label": "Cao Bằng"
+      }
+    ]
+  },
+  {
+    "provinceName": "Cà Mau",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "CaMau",
+        "label": "Cà Mau"
+      },
+      {
+        "sourceProvinceKey": "BacLieu",
+        "label": "Bạc Liêu"
+      }
+    ]
+  },
+  {
+    "provinceName": "Cần Thơ",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "CanTho",
+        "label": "Cần Thơ"
+      },
+      {
+        "sourceProvinceKey": "HauGiang",
+        "label": "Hậu Giang"
+      },
+      {
+        "sourceProvinceKey": "SocTrang",
+        "label": "Sóc Trăng"
+      }
+    ]
+  },
+  {
+    "provinceName": "Gia Lai",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "GiaLai",
+        "label": "Gia Lai"
+      },
+      {
+        "sourceProvinceKey": "BinhDinh",
+        "label": "Bình Định"
+      }
+    ]
+  },
+  {
+    "provinceName": "Huế",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "TT-Hue",
+        "label": "Huế"
+      }
+    ]
+  },
+  {
+    "provinceName": "Hà Nội",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "HaNoi",
+        "label": "Hà Nội"
+      }
+    ]
+  },
+  {
+    "provinceName": "Hà Tĩnh",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "HaTinh",
+        "label": "Hà Tĩnh"
+      }
+    ]
+  },
+  {
+    "provinceName": "Hưng Yên",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "HungYen",
+        "label": "Hưng Yên"
+      },
+      {
+        "sourceProvinceKey": "ThaiBinh",
+        "label": "Thái Bình"
+      }
+    ]
+  },
+  {
+    "provinceName": "Hải Phòng",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "HaiPhong",
+        "label": "Hải Phòng"
+      },
+      {
+        "sourceProvinceKey": "HaiDuong",
+        "label": "Hải Dương"
+      }
+    ]
+  },
+  {
+    "provinceName": "Hồ Chí Minh",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "TP.HCM",
+        "label": "Hồ Chí Minh"
+      },
+      {
+        "sourceProvinceKey": "BinhDuong",
+        "label": "Bình Dương"
+      },
+      {
+        "sourceProvinceKey": "BR-VungTau",
+        "label": "Bà Rịa - Vũng Tàu"
+      }
+    ]
+  },
+  {
+    "provinceName": "Khánh Hòa",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "KhanhHoa",
+        "label": "Khánh Hòa"
+      },
+      {
+        "sourceProvinceKey": "NinhThuan",
+        "label": "Ninh Thuận"
+      }
+    ]
+  },
+  {
+    "provinceName": "Lai Châu",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "LaiChau",
+        "label": "Lai Châu"
+      }
+    ]
+  },
+  {
+    "provinceName": "Lào Cai",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "LaoCai",
+        "label": "Lào Cai"
+      },
+      {
+        "sourceProvinceKey": "YenBai",
+        "label": "Yên Bái"
+      }
+    ]
+  },
+  {
+    "provinceName": "Lâm Đồng",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "LamDong",
+        "label": "Lâm Đồng"
+      },
+      {
+        "sourceProvinceKey": "DakNong",
+        "label": "Đắk Nông"
+      },
+      {
+        "sourceProvinceKey": "BinhThuan",
+        "label": "Bình Thuận"
+      }
+    ]
+  },
+  {
+    "provinceName": "Lạng Sơn",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "LangSon",
+        "label": "Lạng Sơn"
+      }
+    ]
+  },
+  {
+    "provinceName": "Nghệ An",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "NgheAn",
+        "label": "Nghệ An"
+      }
+    ]
+  },
+  {
+    "provinceName": "Ninh Bình",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "NinhBinh",
+        "label": "Ninh Bình"
+      },
+      {
+        "sourceProvinceKey": "NamDinh",
+        "label": "Nam Định"
+      },
+      {
+        "sourceProvinceKey": "HaNam",
+        "label": "Hà Nam"
+      }
+    ]
+  },
+  {
+    "provinceName": "Phú Thọ",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "PhuTho",
+        "label": "Phú Thọ"
+      },
+      {
+        "sourceProvinceKey": "VinhPhuc",
+        "label": "Vĩnh Phúc"
+      },
+      {
+        "sourceProvinceKey": "HoaBinh",
+        "label": "Hòa Bình"
+      }
+    ]
+  },
+  {
+    "provinceName": "Quảng Ngãi",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "QuangNgai",
+        "label": "Quảng Ngãi"
+      },
+      {
+        "sourceProvinceKey": "KonTum",
+        "label": "Kon Tum"
+      }
+    ]
+  },
+  {
+    "provinceName": "Quảng Ninh",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "QuangNinh",
+        "label": "Quảng Ninh"
+      }
+    ]
+  },
+  {
+    "provinceName": "Quảng Trị",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "QuangTri",
+        "label": "Quảng Trị"
+      },
+      {
+        "sourceProvinceKey": "QuangBinh",
+        "label": "Quảng Bình"
+      }
+    ]
+  },
+  {
+    "provinceName": "Sơn La",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "SonLa",
+        "label": "Sơn La"
+      }
+    ]
+  },
+  {
+    "provinceName": "Thanh Hóa",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "ThanhHoa",
+        "label": "Thanh Hóa"
+      }
+    ]
+  },
+  {
+    "provinceName": "Thái Nguyên",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "ThaiNguyen",
+        "label": "Thái Nguyên"
+      },
+      {
+        "sourceProvinceKey": "BacKan",
+        "label": "Bắc Kạn"
+      }
+    ]
+  },
+  {
+    "provinceName": "Tuyên Quang",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "TuyenQuang",
+        "label": "Tuyên Quang"
+      },
+      {
+        "sourceProvinceKey": "HaGiang",
+        "label": "Hà Giang"
+      }
+    ]
+  },
+  {
+    "provinceName": "Tây Ninh",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "TayNinh",
+        "label": "Tây Ninh"
+      },
+      {
+        "sourceProvinceKey": "LongAn",
+        "label": "Long An"
+      }
+    ]
+  },
+  {
+    "provinceName": "Vĩnh Long",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "VinhLong",
+        "label": "Vĩnh Long"
+      },
+      {
+        "sourceProvinceKey": "BenTre",
+        "label": "Bến Tre"
+      },
+      {
+        "sourceProvinceKey": "TraVinh",
+        "label": "Trà Vinh"
+      }
+    ]
+  },
+  {
+    "provinceName": "Điện Biên",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "DienBien",
+        "label": "Điện Biên"
+      }
+    ]
+  },
+  {
+    "provinceName": "Đà Nẵng",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "DaNang",
+        "label": "Đà Nẵng"
+      },
+      {
+        "sourceProvinceKey": "QuangNam",
+        "label": "Quảng Nam"
+      }
+    ]
+  },
+  {
+    "provinceName": "Đắk Lắk",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "DakLak",
+        "label": "Đắk Lắk"
+      },
+      {
+        "sourceProvinceKey": "PhuYen",
+        "label": "Phú Yên"
+      }
+    ]
+  },
+  {
+    "provinceName": "Đồng Nai",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "DongNai",
+        "label": "Đồng Nai"
+      },
+      {
+        "sourceProvinceKey": "BinhPhuoc",
+        "label": "Bình Phước"
+      }
+    ]
+  },
+  {
+    "provinceName": "Đồng Tháp",
+    "legacyAreas": [
+      {
+        "sourceProvinceKey": "DongThap",
+        "label": "Đồng Tháp"
+      },
+      {
+        "sourceProvinceKey": "TienGiang",
+        "label": "Tiền Giang"
+      }
+    ]
+  }
+]
