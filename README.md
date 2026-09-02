@@ -2,6 +2,10 @@
 
 Add-in .NET 8 chèn ảnh vệ tinh Google Satellite vào Model Space, georeference theo hệ VN2000 (múi chiếu 3°).
 
+**Phiên bản bundle:** `1.0.0` (`deploy/iSurvey.bundle/PackageContents.xml`)
+
+**Đồng bộ phiên làm việc (Cursor / đa máy):** đọc [docs/phien-lam-viec/HANDOFF.md](docs/phien-lam-viec/HANDOFF.md). Quy tắc cuối phiên: [docs/phien-lam-viec/README.md](docs/phien-lam-viec/README.md). Changelog: [docs/changelog/CHANGELOG.md](docs/changelog/CHANGELOG.md).
+
 ## Yêu cầu
 
 - Windows x64
