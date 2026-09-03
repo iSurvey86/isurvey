@@ -1,8 +1,8 @@
 ﻿# iSurvey — Add-in AutoCAD / Civil 3D
 
-Add-in .NET 10 cho AutoCAD / Civil 3D **2026**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), xuất CAD → **KML/KMZ** Google Earth.
+Add-in .NET 8 cho AutoCAD / Civil 3D **2026**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), xuất CAD → **KML/KMZ** Google Earth.
 
-**Phiên bản bundle:** `1.1.0` (`deploy/iSurvey.bundle/PackageContents.xml`)
+**Phiên bản bundle:** `1.1.1` (`deploy/iSurvey.bundle/PackageContents.xml`)
 
 **Đồng bộ phiên làm việc (Cursor / đa máy):** đọc [docs/phien-lam-viec/HANDOFF.md](docs/phien-lam-viec/HANDOFF.md). Quy tắc cuối phiên: [docs/phien-lam-viec/README.md](docs/phien-lam-viec/README.md). Changelog: [docs/changelog/CHANGELOG.md](docs/changelog/CHANGELOG.md).
 
@@ -10,7 +10,7 @@ Add-in .NET 10 cho AutoCAD / Civil 3D **2026**: chèn tile Google Earth georefer
 
 - Windows x64
 - AutoCAD hoặc Civil 3D 2026 (đường dẫn mặc định trong `iSurvey.csproj`: `C:\Program Files\Autodesk\AutoCAD 2026\`)
-- .NET SDK **10** (Civil 3D 2026 R25.1 dùng .NET 10)
+- .NET SDK **8** (AutoCAD / Civil 3D 2026 host .NET 8)
 
 ## Lệnh chính
 
@@ -38,7 +38,7 @@ dotnet build iSurvey.csproj -c Release "-p:AcadDir=D:\Autodesk\AutoCAD 2026"
 
 File đầu ra:
 
-`bin\Release\net10.0-windows\iSurvey.dll`
+`bin\Release\net8.0-windows\iSurvey.dll`
 
 (kèm `Data\isurvey_vn2000_tm3.json`, `Data\isurvey_map_sources.json` và các dependency ProjNet)
 
@@ -101,7 +101,7 @@ Tab **iSurvey** xuất hiện tự động. Gõ **IG** / **ISURVEY_MAP** hoặc 
 2. Chạy lại `.\deploy\build-bundle.ps1 -Install` (hoặc thay file trong `ApplicationPlugins\iSurvey.bundle\Contents\Win64\2026\`)
 3. Mở lại Civil 3D
 
-> Bundle target **AutoCAD / Civil 3D 2026** (R25.1, .NET 10).
+> Bundle target **AutoCAD / Civil 3D 2026** (R25.1, .NET 8).
 
 ---
 
@@ -109,7 +109,7 @@ Tab **iSurvey** xuất hiện tự động. Gõ **IG** / **ISURVEY_MAP** hoặc 
 
 1. Mở AutoCAD / Civil 3D.
 2. Gõ lệnh **NETLOAD**.
-3. Chọn file `iSurvey.dll` trong thư mục `bin\Release\net10.0-windows\`.
+3. Chọn file `iSurvey.dll` trong thư mục `bin\Release\net8.0-windows\`.
 4. Tab **iSurvey** → **Chèn Google Earth**, hoặc gõ **IG** / **ISURVEY_MAP**.
 5. Hộp thoại: chọn **Tỉnh** → **Múi 3°/6°** → **Loại ảnh** → **Áp dụng**.
 
@@ -130,7 +130,7 @@ Tab **iSurvey** xuất hiện tự động. Gõ **IG** / **ISURVEY_MAP** hoặc 
 - **ChooseZoom** theo kích thước màn hình; tự hạ zoom đến ≤ **128 tile**.
 - **AutoRefresh** khi pan/zoom.
 - **Clip đường bao:** popup → *Theo đường bao* → chọn Polyline đóng.
-- **TM-6:** kinh tuyến trục snap **99 / 105 / 111** (cùng TOWGS84 với TM-3).
+- **TM-6:** kinh tuyến trục snap **105 / 111 / 117** theo Thông tư 973/2001/TT-TCĐC (cùng TOWGS84 với TM-3).
 - **Export KML:** màu CAD 1:1; không Dim / layer ẩn; block = điểm insert.
 - **Layout / in ấn:** phủ đủ vùng cần in ở Model rồi mới sang Layout.
 - **Xóa GE:** xác nhận Yes/No → xóa toàn bộ tile iSurvey.
@@ -157,7 +157,7 @@ Build **Debug** của iSurvey đã bật cờ `DEVRELOAD` (dùng `NoCommands` th
 
 | Tình huống | Cách xử lý |
 |------------|------------|
-| Build báo không copy được DLL (file bị khóa) | DLL vẫn có tại `obj\Release\net10.0-windows\iSurvey.dll` nhưng **không reload được** trong phiên hiện tại |
+| Build báo không copy được DLL (file bị khóa) | DLL vẫn có tại `obj\Release\net8.0-windows\iSurvey.dll` nhưng **không reload được** trong phiên hiện tại |
 | Cần test bản mới | Thoát Civil 3D → build → mở lại → `NETLOAD` |
 | Sửa nhỏ, đang debug VS | Attach debugger vào `acad.exe`, bật **Edit and Continue** |
 

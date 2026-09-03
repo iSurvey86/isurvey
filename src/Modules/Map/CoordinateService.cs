@@ -12,8 +12,8 @@ namespace iSurvey.Modules.Map;
 /// </summary>
 public sealed class CoordinateService
 {
-    /// <summary>Kinh tuyến chuẩn múi 6° VN-2000.</summary>
-    public static readonly double[] Tm6CentralMeridians = [99.0, 105.0, 111.0];
+    /// <summary>Kinh tuyến chuẩn múi 6° VN-2000 theo Thông tư 973/2001/TT-TCĐC.</summary>
+    public static readonly double[] Tm6CentralMeridians = [105.0, 111.0, 117.0];
 
     private const string Towgs84 =
         "-191.90441429,-39.30318279,-111.45032835,0.00928836,-0.01975479,0.00427372,0.252906278";
@@ -51,12 +51,22 @@ public sealed class CoordinateService
             .First();
     }
 
-    /// <summary>Làm tròn kinh tuyến về 99 / 105 / 111 (múi 6°).</summary>
+    /// <summary>Làm tròn kinh tuyến về 105 / 111 / 117 (múi 6°).</summary>
     public static double SnapToTm6CentralMeridian(double centralMeridian) =>
         Tm6CentralMeridians.OrderBy(m => Math.Abs(m - centralMeridian)).First();
 
     public static int NormalizeZoneWidth(int zoneWidthDegrees) =>
         zoneWidthDegrees == 6 ? 6 : 3;
+
+    /// <summary>
+    /// TM-6: chỉ 105 / 111 / 117. TM-3: kinh tuyến tỉnh trong khoảng 102°–117° (TT 973).
+    /// </summary>
+    public static bool IsValidCentralMeridian(double centralMeridian, int zoneWidthDegrees)
+    {
+        if (NormalizeZoneWidth(zoneWidthDegrees) == 6)
+            return Tm6CentralMeridians.Contains(centralMeridian);
+        return centralMeridian is >= 102 and <= 117;
+    }
 
     /// <summary>Chuyển điểm VN2000 (E, N) sang WGS84.</summary>
     public GeoPoint ToWgs84(PlanePoint plane, double centralMeridian, int zoneWidthDegrees = 3)

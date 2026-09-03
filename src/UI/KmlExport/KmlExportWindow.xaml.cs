@@ -44,12 +44,7 @@ public partial class KmlExportWindow : Window
 
     private void RestoreSavedProvince(IReadOnlyList<ProvinceCrsGroup> sorted)
     {
-        ProvinceCrsGroup? group = null;
-        if (!string.IsNullOrWhiteSpace(_saved.ProvinceName))
-        {
-            group = sorted.FirstOrDefault(g =>
-                g.ProvinceName.Equals(_saved.ProvinceName, StringComparison.CurrentCultureIgnoreCase));
-        }
+        var group = FindSavedGroup(sorted);
 
         group ??= sorted.FirstOrDefault(g =>
                       g.ProvinceName.Contains("Hà Nội", StringComparison.OrdinalIgnoreCase))
@@ -59,6 +54,32 @@ public partial class KmlExportWindow : Window
             return;
 
         ProvinceCombo.SelectedItem = group;
+    }
+
+    private ProvinceCrsGroup? FindSavedGroup(IReadOnlyList<ProvinceCrsGroup> groups)
+    {
+        if (!string.IsNullOrWhiteSpace(_saved.AreaLabel))
+        {
+            var byArea = groups.FirstOrDefault(g =>
+                g.LegacyAreas.Any(a =>
+                    a.Label.Equals(_saved.AreaLabel, StringComparison.CurrentCultureIgnoreCase)));
+            if (byArea is not null)
+                return byArea;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_saved.ProvinceName))
+        {
+            var byProvince = groups.FirstOrDefault(g =>
+                g.ProvinceName.Equals(_saved.ProvinceName, StringComparison.CurrentCultureIgnoreCase));
+            if (byProvince is not null)
+                return byProvince;
+
+            return groups.FirstOrDefault(g =>
+                g.LegacyAreas.Any(a =>
+                    a.Label.Equals(_saved.ProvinceName, StringComparison.CurrentCultureIgnoreCase)));
+        }
+
+        return null;
     }
 
     private void ProvinceCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -134,9 +155,12 @@ public partial class KmlExportWindow : Window
         var zone = Zone6Radio.IsChecked == true ? 6 : 3;
         RefreshMeridianLabel();
 
-        if (_centralMeridian is < 99 or > 111)
+        if (!CoordinateService.IsValidCentralMeridian(_centralMeridian, zone))
         {
-            System.Windows.MessageBox.Show(this, "Kinh tuyến trục không hợp lệ — chọn lại tỉnh.", "iSurvey",
+            var msg = zone == 6
+                ? "TM-6 chỉ dùng các kinh tuyến 105°, 111°, 117° theo Thông tư 973."
+                : "Kinh tuyến trục TM-3 không hợp lệ — chọn lại tỉnh.";
+            System.Windows.MessageBox.Show(this, msg, "iSurvey",
                 MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }

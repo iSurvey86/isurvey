@@ -129,20 +129,7 @@ public partial class MapInsertWindow : Window
     private void RestoreSavedProvince(IReadOnlyList<ProvinceCrsGroup> sorted)
 
     {
-
-        ProvinceCrsGroup? group = null;
-
-        if (!string.IsNullOrWhiteSpace(_savedSettings.ProvinceName))
-
-        {
-
-            group = sorted.FirstOrDefault(g =>
-
-                g.ProvinceName.Equals(_savedSettings.ProvinceName, StringComparison.CurrentCultureIgnoreCase));
-
-        }
-
-
+        var group = FindSavedGroup(sorted);
 
         group ??= sorted.FirstOrDefault(g =>
 
@@ -182,7 +169,7 @@ public partial class MapInsertWindow : Window
 
 
 
-        if (_savedSettings.CentralMeridian is >= 102 and <= 111)
+        if (_savedSettings.CentralMeridian is >= 102 and <= 117)
 
         {
 
@@ -190,6 +177,32 @@ public partial class MapInsertWindow : Window
 
         }
 
+    }
+
+    private ProvinceCrsGroup? FindSavedGroup(IReadOnlyList<ProvinceCrsGroup> groups)
+    {
+        if (!string.IsNullOrWhiteSpace(_savedSettings.AreaLabel))
+        {
+            var byArea = groups.FirstOrDefault(g =>
+                g.LegacyAreas.Any(a =>
+                    a.Label.Equals(_savedSettings.AreaLabel, StringComparison.CurrentCultureIgnoreCase)));
+            if (byArea is not null)
+                return byArea;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_savedSettings.ProvinceName))
+        {
+            var byProvince = groups.FirstOrDefault(g =>
+                g.ProvinceName.Equals(_savedSettings.ProvinceName, StringComparison.CurrentCultureIgnoreCase));
+            if (byProvince is not null)
+                return byProvince;
+
+            return groups.FirstOrDefault(g =>
+                g.LegacyAreas.Any(a =>
+                    a.Label.Equals(_savedSettings.ProvinceName, StringComparison.CurrentCultureIgnoreCase)));
+        }
+
+        return null;
     }
 
 
@@ -334,7 +347,7 @@ public partial class MapInsertWindow : Window
 
         MeridianBox.Text = meridian.ToString("0.##", CultureInfo.InvariantCulture);
         MeridianHint.Text = zone == 6
-            ? $"{label} — TM-6, kinh tuyến {meridian:0.##}° (99/105/111)"
+            ? $"{label} — TM-6, kinh tuyến {meridian:0.##}° (105/111/117)"
             : $"{label} — TM-3, kinh tuyến trục {meridian:0.##}°";
     }
 
@@ -450,16 +463,15 @@ public partial class MapInsertWindow : Window
 
 
 
-        if (meridian is < 99 or > 111)
-
+        var zone = Zone6Radio.IsChecked == true ? 6 : 3;
+        if (!CoordinateService.IsValidCentralMeridian(meridian, zone))
         {
-
-            System.Windows.MessageBox.Show(this, "Kinh tuyến trục nên trong khoảng 99°–111°.", "iSurvey",
-
+            var msg = zone == 6
+                ? "TM-6 chỉ dùng các kinh tuyến 105°, 111°, 117° theo Thông tư 973."
+                : "Kinh tuyến trục TM-3 nên trong khoảng 102°–117°.";
+            System.Windows.MessageBox.Show(this, msg, "iSurvey",
                 MessageBoxButton.OK, MessageBoxImage.Warning);
-
             return false;
-
         }
 
 

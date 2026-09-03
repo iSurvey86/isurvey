@@ -50,8 +50,8 @@ finally {
     Pop-Location
 }
 
-$BinDir = Join-Path $Root "bin\Release\net10.0-windows"
-$ObjDir = Join-Path $Root "obj\Release\net10.0-windows"
+$BinDir = Join-Path $Root "bin\Release\net8.0-windows"
+$ObjDir = Join-Path $Root "obj\Release\net8.0-windows"
 $BuildDir = $BinDir
 $DllFromObj = $false
 

@@ -5,9 +5,53 @@
 
 ---
 
-## 2026-09-03 — Export KML/KMZ + TM-6 + .NET 10 (1.1.0)
+## 2026-09-03 — net8 autoload + vá KML TM-3 + TM-6 TT973 (1.1.1)
 
-**Máy / ngữ cảnh:** Cursor — máy văn phòng (Civil 3D 2026 / .NET 10); cuối phiên đầy đủ; bump **1.1.0**.
+**Máy / ngữ cảnh:** Cursor — máy văn phòng (Civil 3D 2026 / .NET 8); cuối phiên đầy đủ; bump **1.1.1**.
+
+### Đã chốt / đã làm
+
+**Sản phẩm (AppVersion 1.1.1):**
+- **Retarget `net8.0-windows`:** plugin autoload trên Civil 3D 2026 (tab **iSurvey** trên Ribbon); `build-bundle.ps1` path net8.
+- **TM-6 kinh tuyến chuẩn TT 973:** 105 / 111 / 117 — `CoordinateService`, Map + Export UI.
+- **63 tỉnh/thành:** `isurvey_province_crs_map.json`; `FindSavedGroup` tương thích settings nhóm tỉnh cũ.
+- **Vá Export KML TM-3:** `IsValidCentralMeridian(cm, zone)` — TM-3 102°–117° (vd Lào Cai 104.75°); TM-6 chỉ 105/111/117. Map Insert dùng chung.
+
+**Debug phiên:** NETLOAD im lặng (evtx không có lỗi .NET) → xác định mismatch net10 vs host net8. Video + Event Viewer đã phân tích.
+
+**Hoãn:** test EG Lào Cai sau cài lại bundle (Civil 3D phải thoát khi `-Install`).
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Deploy / runtime | `iSurvey.csproj`, `deploy/build-bundle.ps1`, `PackageContents.xml` |
+| CRS / validation | `CoordinateService.cs` (`Tm6CentralMeridians`, `IsValidCentralMeridian`) |
+| UI Map + Export | `MapInsertWindow.*`, `KmlExportWindow.xaml.cs` |
+| Dữ liệu tỉnh | `src/Data/isurvey_province_crs_map.json` |
+| Docs | `README.md`, `docs/changelog/CHANGELOG.md` |
+
+### Việc tiếp
+
+- [ ] Cài bundle 1.1.1 (`build-bundle.ps1 -Install`) và xác nhận EG Lào Cai TM-3 xuất được.
+- [ ] (Tuỳ) Mosaic lớn phục vụ Layout / in.
+- [ ] (Tuỳ) Palette dọc khi có thêm module.
+- [ ] (Tuỳ) Lưu settings trong DWG; toggle AutoRefresh trên UI.
+- [ ] Bổ sung HDSD / workflow Map + Export.
+
+### Câu mở phiên sau
+
+```text
+Đọc docs/phien-lam-viec/HANDOFF.md (block đầu). iSurvey 1.1.1 — net8 autoload Civil 3D 2026, TM-6 105/111/117, 63 tỉnh, vá EG TM-3. Tiếp: test EG sau cài bundle, hoặc tính năng mới theo Mẫu_Tư_Vấn / vá lỗi theo Mẫu_Vá_Lỗi.
+```
+
+**Lưu trữ ngày:** [2026-09-03-net8-load-va-kml-tm3.md](./2026-09-03-net8-load-va-kml-tm3.md)
+
+---
+
+## 2026-09-03 — Export KML/KMZ + TM-6 + .NET 8 (1.1.0)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng (Civil 3D 2026 / .NET 8); cuối phiên đầy đủ; bump **1.1.0**.
 
 ### Đã chốt / đã làm
 
@@ -16,10 +60,10 @@
   - Mặc định KMZ; phạm vi toàn bản vẽ / selection; group-by-layer; Use Z tắt mặc định; mở file sau xuất.
   - Không Dim / layer ẩn-đóng băng; block = điểm insert (không explode).
   - Style: màu CAD **1:1 RGB** → KML `aabbggrr` (không remap đen→trắng); outline không fill; strip MText; ẩn pin vàng; LineWeight → width.
-- **Múi chiếu TM-3 / TM-6** (Map + Export): radio UI; mặc định TM-3; TM-6 snap kinh tuyến **99 / 105 / 111**; cùng TOWGS84; `ZoneWidthDegrees` trong settings / session / pipeline CRS.
+- **Múi chiếu TM-3 / TM-6** (Map + Export): radio UI; mặc định TM-3; TM-6 snap kinh tuyến **105 / 111 / 117** theo Thông tư 973/2001/TT-TCĐC; cùng TOWGS84; `ZoneWidthDegrees` trong settings / session / pipeline CRS.
 - **Alias lệnh:** `IG`=MAP, `SG`=MAP_SAT, `XG`=DELETE_GE, `EG`=EXPORT_KML (`CommandAliases.cs` + PackageContents).
 - **Ribbon:** nút xuất KML/KMZ.
-- **Target:** `net10.0-windows` (Civil R25.1 .NET 10); `deploy/build-bundle.ps1` path net10; `System.Drawing.Common` optional/framework.
+- **Target:** `net8.0-windows` (Civil R25.1 .NET 8); `deploy/build-bundle.ps1` path net8; `System.Drawing.Common` optional/framework.
 - **Catalog lệnh:** `docs/Danh_sach_lenh_iSurvey.xlsx` (shortcut 2 ký tự ưu tiên, tránh xung đột acad.pgp / Telex).
 
 **Nghiên cứu (không copy code):** HHMaps `C:\Hhmaps2019` — style KMZ tách loại, province/zone ini.
@@ -33,7 +77,7 @@
 | Export KML | `src/Modules/Export/*`, `src/UI/KmlExport/*`, `src/Models/KmlExportSettings.cs` |
 | CRS / múi | `CoordinateService.cs`, `BasemapSession.cs`, Map + Export UI |
 | Alias / ribbon | `src/CommandAliases.cs`, `RibbonBuilder.cs`, `PackageContents.xml` |
-| Deploy | `iSurvey.csproj` (net10), `deploy/build-bundle.ps1` |
+| Deploy | `iSurvey.csproj` (net8), `deploy/build-bundle.ps1` |
 | Catalog | `docs/Danh_sach_lenh_iSurvey.xlsx` |
 
 ### Việc tiếp
@@ -46,7 +90,7 @@
 ### Câu mở phiên sau
 
 ```text
-Đọc docs/phien-lam-viec/HANDOFF.md (block đầu). iSurvey 1.1.0 — Export KML/KMZ (EG), TM-3/TM-6 Map+Export, alias IG/SG/XG/EG, net10. Tiếp: tính năng mới theo Mẫu_Tư_Vấn hoặc vá lỗi theo Mẫu_Vá_Lỗi.
+Đọc docs/phien-lam-viec/HANDOFF.md (block đầu). iSurvey 1.1.0 — Export KML/KMZ (EG), TM-3/TM-6 Map+Export, alias IG/SG/XG/EG. Tiếp: tính năng mới theo Mẫu_Tư_Vấn hoặc vá lỗi theo Mẫu_Vá_Lỗi.
 ```
 
 **Lưu trữ ngày:** [2026-09-03-export-kml-tm6.md](./2026-09-03-export-kml-tm6.md)
