@@ -16,18 +16,19 @@ public sealed class BasemapRefreshService
     {
         var ed = doc.Editor;
         var db = doc.Database;
+        var zone = BasemapSession.ZoneWidthDegrees;
 
         if (!MapModule.IsModelSpace(db))
             throw new InvalidOperationException("Chỉ làm việc trong Model Space.");
 
         var viewport = ViewportSnapshot.Capture(doc);
-        var viewWgs = viewport.ToWgs84Bounds(_coordinates, centralMeridian);
+        var viewWgs = viewport.ToWgs84Bounds(_coordinates, centralMeridian, zone);
         var wgsBounds = viewWgs;
 
         if (BasemapSession.HasBoundaryClip)
         {
             var boundaryWgs = BoundaryBoundsHelper.ToWgs84Bounds(
-                BasemapSession.ClipPolygonWcs!, _coordinates, centralMeridian);
+                BasemapSession.ClipPolygonWcs!, _coordinates, centralMeridian, zone);
             wgsBounds = BoundaryBoundsHelper.Intersect(viewWgs, boundaryWgs);
             if (!BoundaryBoundsHelper.IsValid(wgsBounds))
                 throw new InvalidOperationException("Đường bao không giao với khung nhìn hiện tại.");
@@ -41,7 +42,7 @@ public sealed class BasemapRefreshService
             var clip = BasemapSession.ClipPolygonWcs!;
             tileList = tileList
                 .Where(t => TileBoundaryFilter.IntersectsTile(
-                    t.X, t.Y, zoom, _coordinates, centralMeridian, clip))
+                    t.X, t.Y, zoom, _coordinates, centralMeridian, clip, zone))
                 .ToList();
         }
 
@@ -53,7 +54,8 @@ public sealed class BasemapRefreshService
         var latMid = (wgsBounds.MinLatitude + wgsBounds.MaxLatitude) / 2.0;
         var mpp = TileMath.MetersPerPixelAtZoom(zoom, latMid);
         var scopeLabel = BasemapSession.HasBoundaryClip ? "đường bao" : "khung nhìn";
-        ed.WriteMessage($"\n[iSurvey] Refresh ({scopeLabel}) — {basemapId}, zoom {zoom}, {total} tile (~{mpp:0.##} m/px).");
+        ed.WriteMessage(
+            $"\n[iSurvey] Refresh ({scopeLabel}) — {basemapId}, TM-{zone}, zoom {zoom}, {total} tile (~{mpp:0.##} m/px).");
 
         ed.WriteMessage("\n[iSurvey] Đang tải tile...");
         IReadOnlyList<(int X, int Y, int Z, string Path)> ready;
@@ -85,7 +87,7 @@ public sealed class BasemapRefreshService
         ed.WriteMessage("\n[iSurvey] Gắn tile...");
         RasterClearService.ClearAll(db);
         var attach = TileAttachService.AttachTiles(
-            db, basemapId, ready, _coordinates, centralMeridian, BasemapSession.ClipPolygonWcs);
+            db, basemapId, ready, _coordinates, centralMeridian, BasemapSession.ClipPolygonWcs, zone);
         ed.Regen();
 
         var clipNote = BasemapSession.HasBoundaryClip ? " (clip đường bao)" : string.Empty;

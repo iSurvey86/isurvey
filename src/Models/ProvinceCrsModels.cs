@@ -28,6 +28,8 @@ public sealed class MapInsertSettings
     public required string ProvinceName { get; init; }
     public required string AreaLabel { get; init; }
     public required double CentralMeridian { get; init; }
+    /// <summary>3 = TM-3; 6 = TM-6.</summary>
+    public int ZoneWidthDegrees { get; init; } = 3;
     public required string BasemapId { get; init; }
     public bool AutoRefresh { get; init; } = true;
     public bool UseBoundaryClip { get; init; }

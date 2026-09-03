@@ -1,4 +1,5 @@
 using Autodesk.AutoCAD.Runtime;
+using iSurvey.Modules.Export;
 using iSurvey.Modules.Map;
 using iSurvey.UI;
 
@@ -7,6 +8,8 @@ using iSurvey.UI;
 [assembly: CommandClass(typeof(iSurvey.NoCommands))]
 #else
 [assembly: CommandClass(typeof(MapModule))]
+[assembly: CommandClass(typeof(ExportModule))]
+[assembly: CommandClass(typeof(iSurvey.CommandAliases))]
 #endif
 
 namespace iSurvey;
@@ -15,16 +18,21 @@ namespace iSurvey;
 public sealed class Main : IExtensionApplication
 {
     private MapModule? _mapModule;
+    private ExportModule? _exportModule;
 
     public void Initialize()
     {
         _mapModule = new MapModule();
         _mapModule.Initialize();
+        _exportModule = new ExportModule();
+        _exportModule.Initialize();
         RibbonBuilder.EnsureRibbon();
     }
 
     public void Terminate()
     {
+        _exportModule?.Terminate();
+        _exportModule = null;
         _mapModule?.Terminate();
         _mapModule = null;
         RibbonBuilder.Cleanup();

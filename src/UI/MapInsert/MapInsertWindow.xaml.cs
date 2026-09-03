@@ -30,6 +30,8 @@ public partial class MapInsertWindow : Window
 
     private readonly MapUserSettings _savedSettings;
 
+    private double _provinceMeridian = 105;
+
     private bool _updating;
 
 
@@ -81,7 +83,10 @@ public partial class MapInsertWindow : Window
         BoundaryRadio.IsChecked = _savedSettings.UseBoundaryClip;
         ViewportRadio.IsChecked = !_savedSettings.UseBoundaryClip;
 
-
+        if (_savedSettings.ZoneWidthDegrees == 6)
+            Zone6Radio.IsChecked = true;
+        else
+            Zone3Radio.IsChecked = true;
 
         var sorted = _catalog.Groups
 
@@ -293,11 +298,8 @@ public partial class MapInsertWindow : Window
 
         {
 
-            var meridian = _catalog.GetCentralMeridian(area.SourceProvinceKey);
-
-            MeridianBox.Text = meridian.ToString("0.##", CultureInfo.InvariantCulture);
-
-            MeridianHint.Text = $"{area.Label} — kinh tuyến trục {meridian:0.##}°";
+            _provinceMeridian = _catalog.GetCentralMeridian(area.SourceProvinceKey);
+            ApplyMeridianValue(_provinceMeridian, area.Label);
 
         }
 
@@ -311,7 +313,30 @@ public partial class MapInsertWindow : Window
 
     }
 
+    private void Zone_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!IsLoaded)
+            return;
 
+        var label = AreaCombo.SelectedItem is LegacyAreaEntry a
+            ? a.Label
+            : (ProvinceCombo.SelectedItem as ProvinceCrsGroup)?.ProvinceName ?? "";
+        ApplyMeridianValue(_provinceMeridian, label);
+    }
+
+    private void ApplyMeridianValue(double provinceMeridian, string label)
+    {
+        _provinceMeridian = provinceMeridian;
+        var zone = Zone6Radio.IsChecked == true ? 6 : 3;
+        var meridian = zone == 6
+            ? CoordinateService.SnapToTm6CentralMeridian(provinceMeridian)
+            : provinceMeridian;
+
+        MeridianBox.Text = meridian.ToString("0.##", CultureInfo.InvariantCulture);
+        MeridianHint.Text = zone == 6
+            ? $"{label} — TM-6, kinh tuyến {meridian:0.##}° (99/105/111)"
+            : $"{label} — TM-3, kinh tuyến trục {meridian:0.##}°";
+    }
 
     private void Cancel_Click(object sender, RoutedEventArgs e)
 
@@ -359,7 +384,9 @@ public partial class MapInsertWindow : Window
 
             return;
 
-
+        var zone = Zone6Radio.IsChecked == true ? 6 : 3;
+        if (zone == 6)
+            meridian = CoordinateService.SnapToTm6CentralMeridian(meridian);
 
         LegacyAreaEntry? area = group.LegacyAreas.Count > 1
 
@@ -378,6 +405,8 @@ public partial class MapInsertWindow : Window
             AreaLabel = area?.Label ?? group.ProvinceName,
 
             CentralMeridian = meridian,
+
+            ZoneWidthDegrees = zone,
 
             BasemapId = BasemapCombo.SelectedValue as string ?? TileCacheService.DefaultSourceId,
 
@@ -421,11 +450,11 @@ public partial class MapInsertWindow : Window
 
 
 
-        if (meridian is < 102 or > 111)
+        if (meridian is < 99 or > 111)
 
         {
 
-            System.Windows.MessageBox.Show(this, "Kinh tuyến trục nên trong khoảng 102°–111°.", "iSurvey",
+            System.Windows.MessageBox.Show(this, "Kinh tuyến trục nên trong khoảng 99°–111°.", "iSurvey",
 
                 MessageBoxButton.OK, MessageBoxImage.Warning);
 

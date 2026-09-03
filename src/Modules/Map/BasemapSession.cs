@@ -7,6 +7,7 @@ public static class BasemapSession
 {
     public static bool IsActive { get; private set; }
     public static double CentralMeridian { get; private set; }
+    public static int ZoneWidthDegrees { get; private set; } = 3;
     public static string BasemapId { get; private set; } = string.Empty;
     public static bool AutoRefresh { get; private set; }
 
@@ -19,9 +20,13 @@ public static class BasemapSession
         double centralMeridian,
         string basemapId,
         bool autoRefresh = true,
-        IReadOnlyList<Point2d>? clipPolygonWcs = null)
+        IReadOnlyList<Point2d>? clipPolygonWcs = null,
+        int zoneWidthDegrees = 3)
     {
-        CentralMeridian = centralMeridian;
+        ZoneWidthDegrees = CoordinateService.NormalizeZoneWidth(zoneWidthDegrees);
+        CentralMeridian = ZoneWidthDegrees == 6
+            ? CoordinateService.SnapToTm6CentralMeridian(centralMeridian)
+            : centralMeridian;
         BasemapId = basemapId;
         AutoRefresh = autoRefresh;
         ClipPolygonWcs = clipPolygonWcs is { Count: >= 3 }
@@ -35,6 +40,7 @@ public static class BasemapSession
         IsActive = false;
         BasemapId = string.Empty;
         AutoRefresh = false;
+        ZoneWidthDegrees = 3;
         ClipPolygonWcs = null;
     }
 }

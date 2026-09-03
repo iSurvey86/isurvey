@@ -13,7 +13,8 @@ internal static class TileBoundaryFilter
         int z,
         CoordinateService coordinates,
         double centralMeridian,
-        IReadOnlyList<Point2d> clipPolygonWcs)
+        IReadOnlyList<Point2d> clipPolygonWcs,
+        int zoneWidthDegrees = 3)
     {
         if (clipPolygonWcs.Count < 3)
             return true;
@@ -22,9 +23,9 @@ internal static class TileBoundaryFilter
         var ne = TileMath.TileTopLeft(x + 1, y, z);
         var sw = TileMath.TileTopLeft(x, y + 1, z);
 
-        var pNw = coordinates.ToVn2000(nw, centralMeridian);
-        var pNe = coordinates.ToVn2000(ne, centralMeridian);
-        var pSw = coordinates.ToVn2000(sw, centralMeridian);
+        var pNw = coordinates.ToVn2000(nw, centralMeridian, zoneWidthDegrees);
+        var pNe = coordinates.ToVn2000(ne, centralMeridian, zoneWidthDegrees);
+        var pSw = coordinates.ToVn2000(sw, centralMeridian, zoneWidthDegrees);
 
         var origin = new Point3d(pSw.Easting, pSw.Northing, 0);
         var xAxis = new Vector3d(

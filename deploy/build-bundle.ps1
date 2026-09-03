@@ -50,8 +50,8 @@ finally {
     Pop-Location
 }
 
-$BinDir = Join-Path $Root "bin\Release\net8.0-windows"
-$ObjDir = Join-Path $Root "obj\Release\net8.0-windows"
+$BinDir = Join-Path $Root "bin\Release\net10.0-windows"
+$ObjDir = Join-Path $Root "obj\Release\net10.0-windows"
 $BuildDir = $BinDir
 $DllFromObj = $false
 
@@ -85,7 +85,9 @@ $files = @(
     "iSurvey.dll",
     "iSurvey.deps.json",
     "iSurvey.runtimeconfig.json",
-    "ProjNET.dll",
+    "ProjNET.dll"
+)
+$optionalFiles = @(
     "System.Drawing.Common.dll"
 )
 foreach ($f in $files) {
@@ -99,6 +101,15 @@ foreach ($f in $files) {
         throw "Thieu file build: $f"
     }
     Copy-Item $src $PayloadDir
+}
+foreach ($f in $optionalFiles) {
+    $src = Join-Path $BuildDir $f
+    if (Test-Path $src) {
+        Copy-Item $src $PayloadDir
+    }
+    else {
+        Write-Host "==> Bo qua (framework cung cap): $f"
+    }
 }
 
 $srcData = Join-Path $BuildDir "Data"

@@ -112,6 +112,27 @@ public static class RibbonBuilder
 
             panelSource.Items.Add(deleteButton);
 
+            var exportButton = new RibbonButton
+            {
+                Text = "Xuất GE",
+                ShowText = true,
+                Size = RibbonItemSize.Large,
+                Orientation = System.Windows.Controls.Orientation.Vertical,
+                CommandHandler = new RibbonCommandHandler("ISURVEY_EXPORT_KML\n")
+            };
+
+            try
+            {
+                exportButton.LargeImage = RibbonIcons.ExportGe(32);
+                exportButton.Image = RibbonIcons.ExportGe(16);
+            }
+            catch
+            {
+                // Icon tuỳ chọn
+            }
+
+            panelSource.Items.Add(exportButton);
+
             var panel = new RibbonPanel { Source = panelSource };
             tab.Panels.Add(panel);
             ribbon.Tabs.Add(tab);

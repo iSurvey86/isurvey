@@ -1,8 +1,8 @@
 ﻿# iSurvey — Add-in AutoCAD / Civil 3D
 
-Add-in .NET 8 chèn ảnh vệ tinh Google Satellite vào Model Space, georeference theo hệ VN2000 (múi chiếu 3°).
+Add-in .NET 10 cho AutoCAD / Civil 3D **2026**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), xuất CAD → **KML/KMZ** Google Earth.
 
-**Phiên bản bundle:** `1.0.0` (`deploy/iSurvey.bundle/PackageContents.xml`)
+**Phiên bản bundle:** `1.1.0` (`deploy/iSurvey.bundle/PackageContents.xml`)
 
 **Đồng bộ phiên làm việc (Cursor / đa máy):** đọc [docs/phien-lam-viec/HANDOFF.md](docs/phien-lam-viec/HANDOFF.md). Quy tắc cuối phiên: [docs/phien-lam-viec/README.md](docs/phien-lam-viec/README.md). Changelog: [docs/changelog/CHANGELOG.md](docs/changelog/CHANGELOG.md).
 
@@ -10,12 +10,23 @@ Add-in .NET 8 chèn ảnh vệ tinh Google Satellite vào Model Space, georefere
 
 - Windows x64
 - AutoCAD hoặc Civil 3D 2026 (đường dẫn mặc định trong `iSurvey.csproj`: `C:\Program Files\Autodesk\AutoCAD 2026\`)
-- .NET SDK 8.0
+- .NET SDK **10** (Civil 3D 2026 R25.1 dùng .NET 10)
+
+## Lệnh chính
+
+| Lệnh | Alias | Mô tả |
+|------|-------|--------|
+| `ISURVEY_MAP` | **IG** | Chèn basemap Google Earth (hộp thoại tỉnh / múi / loại ảnh) |
+| `ISURVEY_MAP_SAT` | **SG** | Chèn nhanh Google Satellite |
+| `ISURVEY_DELETE_GE` | **XG** | Xóa toàn bộ tile GE (xác nhận) |
+| `ISURVEY_EXPORT_KML` | **EG** | Xuất CAD → KML/KMZ Google Earth |
+
+Catalog đầy đủ: [docs/Danh_sach_lenh_iSurvey.xlsx](docs/Danh_sach_lenh_iSurvey.xlsx).
 
 ## Biên dịch
 
 ```powershell
-cd D:\AIPoject\isurvey
+cd D:\AIProject\isurvey
 dotnet build iSurvey.sln -c Release
 ```
 
@@ -27,7 +38,7 @@ dotnet build iSurvey.csproj -c Release "-p:AcadDir=D:\Autodesk\AutoCAD 2026"
 
 File đầu ra:
 
-`bin\Release\net8.0-windows\iSurvey.dll`
+`bin\Release\net10.0-windows\iSurvey.dll`
 
 (kèm `Data\isurvey_vn2000_tm3.json`, `Data\isurvey_map_sources.json` và các dependency ProjNet)
 
@@ -36,7 +47,7 @@ File đầu ra:
 ### Bước 1: Tạo bundle
 
 ```powershell
-cd D:\AIPoject\isurvey
+cd D:\AIProject\isurvey
 .\deploy\build-bundle.ps1
 ```
 
@@ -82,7 +93,7 @@ Sau đó **mở lại** Civil 3D.
 
 ### Bước 3: Mở Civil 3D 2026
 
-Tab **iSurvey** xuất hiện tự động. Gõ **ISURVEY_MAP** hoặc bấm **Chèn Google Earth**.
+Tab **iSurvey** xuất hiện tự động. Gõ **IG** / **ISURVEY_MAP** hoặc bấm ribbon tương ứng.
 
 ### Cập nhật bản mới
 
@@ -90,7 +101,7 @@ Tab **iSurvey** xuất hiện tự động. Gõ **ISURVEY_MAP** hoặc bấm **C
 2. Chạy lại `.\deploy\build-bundle.ps1 -Install` (hoặc thay file trong `ApplicationPlugins\iSurvey.bundle\Contents\Win64\2026\`)
 3. Mở lại Civil 3D
 
-> Bundle hiện target **AutoCAD / Civil 3D 2026** (R25.1, .NET 8).
+> Bundle target **AutoCAD / Civil 3D 2026** (R25.1, .NET 10).
 
 ---
 
@@ -98,26 +109,30 @@ Tab **iSurvey** xuất hiện tự động. Gõ **ISURVEY_MAP** hoặc bấm **C
 
 1. Mở AutoCAD / Civil 3D.
 2. Gõ lệnh **NETLOAD**.
-3. Chọn file `iSurvey.dll` trong thư mục `bin\Release\net8.0-windows\`.
-4. Tab **iSurvey** → **Chèn Google Earth**, hoặc gõ **ISURVEY_MAP**.
-5. Hộp thoại: chọn **Tỉnh** → **Kinh tuyến trục** → **Loại ảnh** → **Áp dụng** (tự tải full khung nhìn).
+3. Chọn file `iSurvey.dll` trong thư mục `bin\Release\net10.0-windows\`.
+4. Tab **iSurvey** → **Chèn Google Earth**, hoặc gõ **IG** / **ISURVEY_MAP**.
+5. Hộp thoại: chọn **Tỉnh** → **Múi 3°/6°** → **Loại ảnh** → **Áp dụng**.
 
-**Xóa ảnh:** Nút **Xóa GE** hoặc lệnh **ISURVEY_DELETE_GE** → xác nhận → xóa toàn bộ tile iSurvey.
+**Xóa ảnh:** **XG** / **ISURVEY_DELETE_GE** → xác nhận → xóa toàn bộ tile iSurvey.
+
+**Xuất Google Earth:** **EG** / **ISURVEY_EXPORT_KML** → chọn tỉnh / múi / phạm vi / KML|KMZ.
 
 ## Cài đặt được nhớ
 
 - Bản vẽ đã lưu: file `.isurvey.json` cùng thư mục với bản vẽ
 - Bản vẽ chưa lưu: `%AppData%\iSurvey\settings.json`
+- Gồm tỉnh, kinh tuyến, **múi (3/6)**, loại basemap, clip biên.
 
 ## Lưu ý
 
 - Chỉ hỗ trợ Model Space (`TILEMODE=1` hoặc `MSPACE=1` trong viewport Layout).
 - Mỗi tile Google 256×256 = một `RasterImage`, cache tại `%LocalAppData%\iSurvey\tiles\`.
-- **ChooseZoom** theo kích thước màn hình; tự hạ zoom đến ≤ **128 tile** (không báo lỗi “vùng quá rộng”).
-- **AutoRefresh** khi pan/zoom — zoom in sẽ tự nét hơn.
-- **Clip đường bao:** popup → *Theo đường bao* → chọn Polyline đóng; tile gốc 256px clip CAD (không mosaic/resize).
-- Hỗ trợ **Google Satellite Hybrid** (`lyrs=y`).
-- **Layout / in ấn:** phủ đủ vùng cần in ở Model rồi mới sang Layout (tile chỉ tồn tại vùng đã refresh).
+- **ChooseZoom** theo kích thước màn hình; tự hạ zoom đến ≤ **128 tile**.
+- **AutoRefresh** khi pan/zoom.
+- **Clip đường bao:** popup → *Theo đường bao* → chọn Polyline đóng.
+- **TM-6:** kinh tuyến trục snap **99 / 105 / 111** (cùng TOWGS84 với TM-3).
+- **Export KML:** màu CAD 1:1; không Dim / layer ẩn; block = điểm insert.
+- **Layout / in ấn:** phủ đủ vùng cần in ở Model rồi mới sang Layout.
 - **Xóa GE:** xác nhận Yes/No → xóa toàn bộ tile iSurvey.
 
 ## Phát triển — reload DLL không cần tắt Civil 3D
@@ -132,7 +147,7 @@ Tab **iSurvey** xuất hiện tự động. Gõ **ISURVEY_MAP** hoặc bấm **C
    - Clone repo, build bundle Release, copy `DevReload.bundle` vào  
      `%APPDATA%\Autodesk\ApplicationPlugins\`
    - Hoặc `NETLOAD` → chọn `DevReload.dll`
-2. Trong Civil 3D gõ **DEVRELOAD** → **+ Add Plugin** → chọn `D:\AIPoject\isurvey\iSurvey.csproj`
+2. Trong Civil 3D gõ **DEVRELOAD** → **+ Add Plugin** → chọn `D:\AIProject\isurvey\iSurvey.csproj`
 3. Prefix gợi ý: `ISURVEY` → lệnh **ISURVEYDEV** (build + reload), **ISURVEYLOAD**, **ISURVEYUNLOAD**
 4. Sửa code → `dotnet build -c Debug` hoặc gõ **ISURVEYDEV** → test ngay, **không tắt Civil 3D**
 
@@ -142,7 +157,7 @@ Build **Debug** của iSurvey đã bật cờ `DEVRELOAD` (dùng `NoCommands` th
 
 | Tình huống | Cách xử lý |
 |------------|------------|
-| Build báo không copy được DLL (file bị khóa) | DLL vẫn có tại `obj\Release\net8.0-windows\iSurvey.dll` nhưng **không reload được** trong phiên hiện tại |
+| Build báo không copy được DLL (file bị khóa) | DLL vẫn có tại `obj\Release\net10.0-windows\iSurvey.dll` nhưng **không reload được** trong phiên hiện tại |
 | Cần test bản mới | Thoát Civil 3D → build → mở lại → `NETLOAD` |
 | Sửa nhỏ, đang debug VS | Attach debugger vào `acad.exe`, bật **Edit and Continue** |
 

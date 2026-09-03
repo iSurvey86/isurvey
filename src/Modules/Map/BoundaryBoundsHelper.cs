@@ -9,10 +9,11 @@ internal static class BoundaryBoundsHelper
     public static GeoBounds ToWgs84Bounds(
         IReadOnlyList<Point2d> polygonWcs,
         CoordinateService coordinates,
-        double centralMeridian)
+        double centralMeridian,
+        int zoneWidthDegrees = 3)
     {
         var wgs = polygonWcs
-            .Select(p => coordinates.ToWgs84(new PlanePoint(p.X, p.Y), centralMeridian))
+            .Select(p => coordinates.ToWgs84(new PlanePoint(p.X, p.Y), centralMeridian, zoneWidthDegrees))
             .ToList();
 
         return new GeoBounds(

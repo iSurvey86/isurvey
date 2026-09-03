@@ -17,6 +17,9 @@ internal static class RibbonIcons
     public static BitmapSource MapDelete(int size) =>
         Render(size, new SolidColorBrush(WpfColor.FromRgb(0xB7, 0x1C, 0x1C)), DrawTrash);
 
+    public static BitmapSource ExportGe(int size) =>
+        Render(size, new SolidColorBrush(WpfColor.FromRgb(0x0D, 0x47, 0xA1)), DrawExport);
+
     private static BitmapSource Render(int size, System.Windows.Media.Brush background, Action<DrawingContext, double> draw)
     {
         var visual = new DrawingVisual();
@@ -75,5 +78,28 @@ internal static class RibbonIcons
 
         dc.DrawLine(pen, new WpfPoint(s * 0.44, s * 0.38), new WpfPoint(s * 0.46, s * 0.70));
         dc.DrawLine(pen, new WpfPoint(s * 0.56, s * 0.38), new WpfPoint(s * 0.54, s * 0.70));
+    }
+
+    /// <summary>Mũi tên xuất / quả địa cầu đơn giản (Xuất GE).</summary>
+    private static void DrawExport(DrawingContext dc, double s)
+    {
+        var pen = new WpfPen(WpfBrushes.White, s * 0.045)
+        {
+            LineJoin = PenLineJoin.Round,
+            StartLineCap = PenLineCap.Round,
+            EndLineCap = PenLineCap.Round
+        };
+
+        dc.DrawEllipse(null, pen, new WpfPoint(s * 0.42, s * 0.48), s * 0.22, s * 0.28);
+        dc.DrawLine(pen, new WpfPoint(s * 0.20, s * 0.48), new WpfPoint(s * 0.64, s * 0.48));
+        dc.DrawLine(pen, new WpfPoint(s * 0.42, s * 0.20), new WpfPoint(s * 0.42, s * 0.76));
+
+        var arrow = new PathGeometry();
+        var fig = new PathFigure(new WpfPoint(s * 0.58, s * 0.32), [], false);
+        fig.Segments.Add(new LineSegment(new WpfPoint(s * 0.82, s * 0.48), true));
+        fig.Segments.Add(new LineSegment(new WpfPoint(s * 0.58, s * 0.64), true));
+        fig.IsClosed = true;
+        arrow.Figures.Add(fig);
+        dc.DrawGeometry(WpfBrushes.White, null, arrow);
     }
 }

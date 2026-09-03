@@ -23,10 +23,12 @@ public static class TileAttachService
         IEnumerable<(int X, int Y, int Z, string ImagePath)> tiles,
         CoordinateService coordinates,
         double centralMeridian,
-        IReadOnlyList<Point2d>? clipPolygonWcs = null)
+        IReadOnlyList<Point2d>? clipPolygonWcs = null,
+        int zoneWidthDegrees = 3)
     {
         var attached = 0;
         var failed = 0;
+        var zone = CoordinateService.NormalizeZoneWidth(zoneWidthDegrees);
 
         using var docLock = AcadApp.DocumentManager.MdiActiveDocument?.LockDocument();
 
@@ -67,9 +69,9 @@ public static class TileAttachService
                 var ne = TileMath.TileTopLeft(x + 1, y, z);
                 var sw = TileMath.TileTopLeft(x, y + 1, z);
 
-                var pNw = coordinates.ToVn2000(nw, centralMeridian);
-                var pNe = coordinates.ToVn2000(ne, centralMeridian);
-                var pSw = coordinates.ToVn2000(sw, centralMeridian);
+                var pNw = coordinates.ToVn2000(nw, centralMeridian, zone);
+                var pNe = coordinates.ToVn2000(ne, centralMeridian, zone);
+                var pSw = coordinates.ToVn2000(sw, centralMeridian, zone);
 
                 var origin = new Point3d(pSw.Easting, pSw.Northing, 0);
                 var xAxis = new Vector3d(

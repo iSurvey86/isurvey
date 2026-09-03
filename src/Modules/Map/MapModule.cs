@@ -72,6 +72,7 @@ public sealed class MapModule : ISurveyModule
             ProvinceName = settings.ProvinceName,
             AreaLabel = settings.AreaLabel,
             CentralMeridian = settings.CentralMeridian,
+            ZoneWidthDegrees = settings.ZoneWidthDegrees,
             BasemapId = settings.BasemapId,
             AutoRefresh = settings.AutoRefresh,
             UseBoundaryClip = settings.UseBoundaryClip
@@ -89,7 +90,7 @@ public sealed class MapModule : ISurveyModule
             }
         }
 
-        ApplyBasemap(doc, settings.CentralMeridian, settings.BasemapId, settings.AutoRefresh, boundary);
+        ApplyBasemap(doc, settings.CentralMeridian, settings.BasemapId, settings.AutoRefresh, boundary, settings.ZoneWidthDegrees);
     }
 
     private void ApplyBasemap(string basemapId)
@@ -105,7 +106,7 @@ public sealed class MapModule : ISurveyModule
 
         var drawingPath = string.IsNullOrWhiteSpace(doc.Database.Filename) ? null : doc.Database.Filename;
         var saved = UserSettingsStore.Load(drawingPath);
-        ApplyBasemap(doc, saved.CentralMeridian, basemapId, saved.AutoRefresh, null);
+        ApplyBasemap(doc, saved.CentralMeridian, basemapId, saved.AutoRefresh, null, saved.ZoneWidthDegrees);
     }
 
     private void ApplyBasemap(
@@ -113,20 +114,26 @@ public sealed class MapModule : ISurveyModule
         double centralMeridian,
         string basemapId,
         bool autoRefresh,
-        BoundarySelection? boundary)
+        BoundarySelection? boundary,
+        int zoneWidthDegrees = 3)
     {
         var ed = doc.Editor;
-        ed.WriteMessage($"\n[iSurvey] Kinh tuyến {centralMeridian:0.##}° — {basemapId}");
+        var zone = CoordinateService.NormalizeZoneWidth(zoneWidthDegrees);
+        var cm = zone == 6
+            ? CoordinateService.SnapToTm6CentralMeridian(centralMeridian)
+            : centralMeridian;
+        ed.WriteMessage($"\n[iSurvey] Kinh tuyến {cm:0.##}° — TM-{zone} — {basemapId}");
 
         try
         {
             BasemapSession.Activate(
-                centralMeridian,
+                cm,
                 basemapId,
                 autoRefresh,
-                boundary?.ClipPolygonWcs);
+                boundary?.ClipPolygonWcs,
+                zone);
             AutoRefreshController.ResetViewSignature();
-            _refresh.Refresh(doc, centralMeridian, basemapId);
+            _refresh.Refresh(doc, cm, basemapId);
         }
         catch (System.Exception ex)
         {
@@ -135,7 +142,7 @@ public sealed class MapModule : ISurveyModule
     }
 
     private void ApplyBasemap(Document doc, double centralMeridian, string basemapId, bool autoRefresh)
-        => ApplyBasemap(doc, centralMeridian, basemapId, autoRefresh, null);
+        => ApplyBasemap(doc, centralMeridian, basemapId, autoRefresh, null, 3);
 
     internal static bool IsModelSpace(Database db)
     {

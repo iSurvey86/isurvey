@@ -73,7 +73,15 @@
                 <TextBox x:Name="MeridianBox" Grid.Column="0"/>
                 <TextBlock Grid.Column="1" Text="°" VerticalAlignment="Center" Margin="8,0,0,8"/>
             </Grid>
-            <TextBlock x:Name="MeridianHint" FontSize="11" Margin="0,0,0,10"/>
+            <TextBlock x:Name="MeridianHint" FontSize="11" Margin="0,0,0,8"/>
+
+            <TextBlock Text="Múi chiếu" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                <RadioButton x:Name="Zone3Radio" Content="Múi 3°" IsChecked="True"
+                             GroupName="ZoneWidth" Checked="Zone_Changed" Margin="0,2,16,2"/>
+                <RadioButton x:Name="Zone6Radio" Content="Múi 6° (99° / 105° / 111°)"
+                             GroupName="ZoneWidth" Checked="Zone_Changed" Margin="0,2"/>
+            </StackPanel>
 
             <TextBlock Text="Loại ảnh" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
             <ComboBox x:Name="BasemapCombo" DisplayMemberPath="Name" SelectedValuePath="Id"/>

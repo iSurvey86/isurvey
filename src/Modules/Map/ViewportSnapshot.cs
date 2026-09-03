@@ -70,12 +70,13 @@ public sealed class ViewportSnapshot
         };
     }
 
-    public GeoBounds ToWgs84Bounds(CoordinateService coordinates, double centralMeridian)
+    public GeoBounds ToWgs84Bounds(
+        CoordinateService coordinates, double centralMeridian, int zoneWidthDegrees = 3)
     {
         var points = new List<GeoPoint>(CornersWcs.Length);
         foreach (var pt in CornersWcs)
         {
-            var wgs = coordinates.ToWgs84(new PlanePoint(pt.X, pt.Y), centralMeridian);
+            var wgs = coordinates.ToWgs84(new PlanePoint(pt.X, pt.Y), centralMeridian, zoneWidthDegrees);
             points.Add(wgs);
         }
 
