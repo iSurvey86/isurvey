@@ -1,14 +1,24 @@
 using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using Autodesk.Windows;
+using iSurvey.Auth;
 using System.Windows.Media.Imaging;
 
 namespace iSurvey.UI;
 
-/// <summary>Tạo tab Ribbon iSurvey (5 panel) — khởi tạo an toàn khi Ribbon chưa sẵn sàng.</summary>
+/// <summary>Tạo tab Ribbon iSurvey (6 panel) — khởi tạo an toàn khi Ribbon chưa sẵn sàng.</summary>
 public static class RibbonBuilder
 {
     private const string TabId = "ISURVEY_RIBBON_TAB";
+    private const string LoginCommand = "ISURVEY_LOGIN";
+    private const string LogoutCommand = "ISURVEY_LOGOUT";
+
     private static bool _subscribed;
+
+    /// <summary>Nút Panel 1–5: bị khóa (IsEnabled=false) khi chưa đăng nhập.</summary>
+    private static readonly List<RibbonButton> GatedButtons = [];
+
+    private static RibbonButton? _accountButton;
+    private static RibbonButton? _logoutButton;
 
     /// <summary>Mô tả một nút. Implemented=true: gửi lệnh thật; false: in thông báo "đang cập nhật".</summary>
     private sealed record Btn(string Text, string Command, Func<int, BitmapSource> Icon, bool Implemented);
@@ -18,6 +28,7 @@ public static class RibbonBuilder
         if (!_subscribed)
         {
             ComponentManager.ItemInitialized += OnItemInitialized!;
+            AuthManager.StateChanged += UpdateAuthState;
             _subscribed = true;
         }
 
@@ -30,6 +41,7 @@ public static class RibbonBuilder
         if (_subscribed)
         {
             ComponentManager.ItemInitialized -= OnItemInitialized!;
+            AuthManager.StateChanged -= UpdateAuthState;
             _subscribed = false;
         }
 
@@ -44,6 +56,10 @@ public static class RibbonBuilder
         {
             // Ribbon có thể đã bị hủy khi thoát AutoCAD
         }
+
+        GatedButtons.Clear();
+        _accountButton = null;
+        _logoutButton = null;
     }
 
     private static void OnItemInitialized(object? sender, RibbonItemEventArgs e)
@@ -61,6 +77,10 @@ public static class RibbonBuilder
 
             if (ribbon.FindTab(TabId) is not null)
                 return;
+
+            GatedButtons.Clear();
+            _accountButton = null;
+            _logoutButton = null;
 
             var tab = new RibbonTab
             {
@@ -122,7 +142,20 @@ public static class RibbonBuilder
                     new Btn("Xuất Thống Kê Excel", "XUATEXCEL", RibbonIcons.XuatExcel, false)
                 ]);
 
+            // Panel 6 — Tài khoản & Hệ thống (luôn bật; nút Đăng xuất chỉ bật khi đã đăng nhập)
+            AddPanel(tab, "Tài khoản & Hệ thống",
+                [
+                    new Btn("Đăng Nhập\nKích Hoạt", LoginCommand, AuthIcons.UserLocked, true)
+                ],
+                [
+                    new Btn("Kiểm Tra Cập Nhật", "ISURVEY_UPDATE", AuthIcons.Refresh, true),
+                    new Btn("Thông Tin & Giấy Phép", "ISURVEY_ABOUT", AuthIcons.Info, true),
+                    new Btn("Đăng Xuất / Đổi Máy", LogoutCommand, AuthIcons.Power, true)
+                ],
+                gated: false);
+
             ribbon.Tabs.Add(tab);
+            UpdateAuthState();
         }
         catch (System.Exception ex)
         {
@@ -131,13 +164,76 @@ public static class RibbonBuilder
         }
     }
 
-    /// <summary>Một panel: các nút Large (32x32, dọc) + một cụm 3 nút nhỏ (16x16, ngang) xếp 3 dòng.</summary>
-    private static void AddPanel(RibbonTab tab, string title, IReadOnlyList<Btn> large, IReadOnlyList<Btn>? small)
+    /// <summary>
+    /// Đồng bộ Ribbon với trạng thái đăng nhập (không cần khởi động lại Civil):
+    /// khóa/mở Panel 1–5, đổi nút tài khoản (nhãn, icon, tooltip), bật/tắt nút Đăng xuất.
+    /// </summary>
+    public static void UpdateAuthState()
+    {
+        try
+        {
+            var license = AuthManager.License;
+            var authed = license is not null;
+
+            foreach (var button in GatedButtons)
+                button.IsEnabled = authed;
+
+            if (_logoutButton is not null)
+                _logoutButton.IsEnabled = authed;
+
+            if (_accountButton is null)
+                return;
+
+            if (license is null)
+            {
+                _accountButton.Text = "Đăng Nhập\nKích Hoạt";
+                _accountButton.ToolTip = "Click để đăng nhập Gmail và kích hoạt bản quyền iSurvey";
+                SetIcons(_accountButton, AuthIcons.UserLocked);
+            }
+            else
+            {
+                _accountButton.Text = $"{ShortName(license.Email)}\n● Đã kích hoạt";
+                _accountButton.ToolTip =
+                    $"Tài khoản: {license.Email} | Trạng thái: Đã kích hoạt | " +
+                    $"Mã thiết bị (HWID): {license.HardwareId} | Phiên bản: {AuthManager.AppVersion}";
+                SetIcons(_accountButton, AuthIcons.UserActive);
+            }
+        }
+        catch (System.Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine("[iSurvey] UpdateAuthState: " + ex.Message);
+        }
+    }
+
+    /// <summary>Phần trước '@', cắt gọn để nút Ribbon không bị quá rộng.</summary>
+    private static string ShortName(string email)
+    {
+        var at = email.IndexOf('@');
+        var name = at > 0 ? email[..at] : email;
+        return name.Length > 12 ? name[..11] + "…" : name;
+    }
+
+    private static void SetIcons(RibbonButton button, Func<int, BitmapSource> icon)
+    {
+        try
+        {
+            button.LargeImage = icon(32);
+            button.Image = icon(16);
+        }
+        catch
+        {
+            // Icon tùy chọn — bỏ qua nếu lỗi
+        }
+    }
+
+    /// <summary>Một panel: các nút Large (32x32, dọc) + một cụm nút nhỏ (16x16, ngang) xếp nhiều dòng.</summary>
+    private static void AddPanel(RibbonTab tab, string title, IReadOnlyList<Btn> large, IReadOnlyList<Btn>? small,
+        bool gated = true)
     {
         var source = new RibbonPanelSource { Title = title };
 
         foreach (var b in large)
-            source.Items.Add(CreateButton(b, isLarge: true));
+            source.Items.Add(CreateButton(b, isLarge: true, gated));
 
         if (small is { Count: > 0 })
         {
@@ -146,7 +242,7 @@ public static class RibbonBuilder
             {
                 if (i > 0)
                     rows.Items.Add(new RibbonRowBreak());
-                rows.Items.Add(CreateButton(small[i], isLarge: false));
+                rows.Items.Add(CreateButton(small[i], isLarge: false, gated));
             }
 
             source.Items.Add(rows);
@@ -155,7 +251,7 @@ public static class RibbonBuilder
         tab.Panels.Add(new RibbonPanel { Source = source });
     }
 
-    private static RibbonButton CreateButton(Btn b, bool isLarge)
+    private static RibbonButton CreateButton(Btn b, bool isLarge, bool gated)
     {
         var button = new RibbonButton
         {
@@ -171,15 +267,14 @@ public static class RibbonBuilder
             ToolTip = $"{b.Text.Replace("\n", " ")} ({b.Command})"
         };
 
-        try
-        {
-            button.LargeImage = b.Icon(32);
-            button.Image = b.Icon(16);
-        }
-        catch
-        {
-            // Icon tùy chọn — bỏ qua nếu lỗi
-        }
+        SetIcons(button, b.Icon);
+
+        if (gated)
+            GatedButtons.Add(button);
+        else if (b.Command == LoginCommand)
+            _accountButton = button;
+        else if (b.Command == LogoutCommand)
+            _logoutButton = button;
 
         return button;
     }

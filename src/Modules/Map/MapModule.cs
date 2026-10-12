@@ -3,6 +3,7 @@ using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
+using iSurvey.Auth;
 using iSurvey.Core;
 using iSurvey.Models;
 using iSurvey.UI.MapInsert;
@@ -21,14 +22,23 @@ public sealed class MapModule : ISurveyModule
     public void Terminate() => AutoRefreshController.Unsubscribe();
 
     [CommandMethod("ISURVEY_MAP")]
-    public void InsertMapCommand() => RunMapWorkflow(MapInsertAction.Insert);
+    public void InsertMapCommand()
+    {
+        if (!AuthManager.EnsureAuthenticated()) return;
+        RunMapWorkflow(MapInsertAction.Insert);
+    }
 
     [CommandMethod("ISURVEY_MAP_SAT")]
-    public void InsertSatelliteCommand() => ApplyBasemap("google-satellite");
+    public void InsertSatelliteCommand()
+    {
+        if (!AuthManager.EnsureAuthenticated()) return;
+        ApplyBasemap("google-satellite");
+    }
 
     [CommandMethod("ISURVEY_DELETE_GE")]
     public void DeleteGeCommand()
     {
+        if (!AuthManager.EnsureAuthenticated()) return;
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
         if (doc is null) return;
         GeDeleteWorkflow.Run(doc);

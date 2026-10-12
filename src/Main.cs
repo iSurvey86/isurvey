@@ -1,4 +1,5 @@
 using Autodesk.AutoCAD.Runtime;
+using iSurvey.Auth;
 using iSurvey.Modules.Export;
 using iSurvey.Modules.Map;
 using iSurvey.Modules.Plan;
@@ -13,6 +14,7 @@ using iSurvey.UI;
 [assembly: CommandClass(typeof(ExportModule))]
 [assembly: CommandClass(typeof(PlanModule))]
 [assembly: CommandClass(typeof(ScanModule))]
+[assembly: CommandClass(typeof(AuthModule))]
 [assembly: CommandClass(typeof(iSurvey.CommandAliases))]
 #endif
 
@@ -26,11 +28,16 @@ public sealed class Main : IExtensionApplication
 
     public void Initialize()
     {
+        // Chỉ đọc license.dat (không mạng, không dialog) — Ribbon dựa vào trạng thái này để khóa/mở nút.
+        AuthManager.Initialize();
         _mapModule = new MapModule();
         _mapModule.Initialize();
         _exportModule = new ExportModule();
         _exportModule.Initialize();
         RibbonBuilder.EnsureRibbon();
+
+        // Kiểm tra lại giấy phép (24 giờ/lần) chạy NỀN, timeout ngắn: không chặn Initialize() / thời gian mở Civil.
+        AuthManager.StartBackgroundRecheck();
     }
 
     public void Terminate()

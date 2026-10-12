@@ -3,6 +3,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
+using iSurvey.Auth;
 using iSurvey.Core;
 using iSurvey.Modules.Map;
 
@@ -44,6 +45,9 @@ public sealed class PlanModule : ISurveyModule
     [CommandMethod("CATBD")]
     public void CutPlanCommand()
     {
+        if (!AuthManager.EnsureAuthenticated())
+            return;
+
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
         if (doc is null)
             return;

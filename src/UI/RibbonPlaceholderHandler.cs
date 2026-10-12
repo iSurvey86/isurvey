@@ -1,9 +1,10 @@
 using System.Windows.Input;
 using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
+using iSurvey.Auth;
 
 namespace iSurvey.UI;
 
-/// <summary>Nút Ribbon chưa có lệnh thật — chỉ in thông báo lên Command Line (ASCII).</summary>
+/// <summary>Nút Ribbon chưa có lệnh thật — chỉ in thông báo lên Command Line (ASCII). Vẫn yêu cầu đăng nhập.</summary>
 public sealed class RibbonPlaceholderHandler : ICommand
 {
     private readonly string _commandName;
@@ -21,6 +22,9 @@ public sealed class RibbonPlaceholderHandler : ICommand
 
     public void Execute(object? parameter)
     {
+        if (!AuthManager.EnsureAuthenticated())
+            return;
+
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
         doc?.Editor.WriteMessage($"\n[iSurvey] Tinh nang {_commandName} dang duoc cap nhat...");
     }

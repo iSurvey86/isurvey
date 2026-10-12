@@ -1,4 +1,5 @@
 using Autodesk.AutoCAD.Runtime;
+using iSurvey.Auth;
 using iSurvey.Modules.Export;
 using iSurvey.Modules.Map;
 using iSurvey.Modules.Plan;
@@ -12,7 +13,8 @@ namespace iSurvey;
 /// </summary>
 /// <remarks>
 /// IG = Insert Google, SG = Satellite Google, XG = Xóa Google, EG = Export Google,
-/// CBD = Cắt Bình Đồ (CATBD), SCN = Scan (AUTOSCAN; "ASC" bị Telex thành "ác" nên dùng SCN).
+/// CBD = Cắt Bình Đồ (CATBD), SCN = Scan (AUTOSCAN; "ASC" bị Telex thành "ác" nên dùng SCN),
+/// LGI = Login (ISURVEY_LOGIN), UPD = Update, ABT = About, LGO = Logout.
 /// </remarks>
 public sealed class CommandAliases
 {
@@ -20,6 +22,7 @@ public sealed class CommandAliases
     private readonly ExportModule _export = new();
     private readonly PlanModule _plan = new();
     private readonly ScanModule _scan = new();
+    private readonly AuthModule _auth = new();
 
     [CommandMethod("IG")]
     public void AliasInsertMap() => _map.InsertMapCommand();
@@ -38,4 +41,17 @@ public sealed class CommandAliases
 
     [CommandMethod("SCN")]
     public void AliasAutoScan() => _scan.AutoScanCommand();
+
+    // Tài khoản & hệ thống — tránh Telex: không dùng tiền tố IS (í) và đuôi s/f/r/x/j sau nguyên âm.
+    [CommandMethod("LGI")]
+    public void AliasLogin() => _auth.LoginCommand();
+
+    [CommandMethod("UPD")]
+    public void AliasUpdate() => _auth.UpdateCommand();
+
+    [CommandMethod("ABT")]
+    public void AliasAbout() => _auth.AboutCommand();
+
+    [CommandMethod("LGO")]
+    public void AliasLogout() => _auth.LogoutCommand();
 }

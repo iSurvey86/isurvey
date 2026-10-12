@@ -4,6 +4,7 @@ using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
+using iSurvey.Auth;
 using iSurvey.Core;
 using Win32SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
@@ -24,6 +25,9 @@ public sealed class ScanModule : ISurveyModule
     [CommandMethod("AUTOSCAN")]
     public void AutoScanCommand()
     {
+        if (!AuthManager.EnsureAuthenticated())
+            return;
+
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
         if (doc is null)
             return;

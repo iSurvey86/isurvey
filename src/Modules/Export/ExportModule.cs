@@ -1,5 +1,6 @@
 using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using Autodesk.AutoCAD.Runtime;
+using iSurvey.Auth;
 using iSurvey.Core;
 using iSurvey.Modules.Map;
 using iSurvey.UI.KmlExport;
@@ -20,6 +21,9 @@ public sealed class ExportModule : ISurveyModule
     [CommandMethod("ISURVEY_EXPORT_KML")]
     public void ExportKmlCommand()
     {
+        if (!AuthManager.EnsureAuthenticated())
+            return;
+
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
         if (doc is null)
             return;

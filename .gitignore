@@ -24,3 +24,7 @@ Desktop.ini
 # AutoCAD / local caches (không commit)
 **/__pycache__/
 *.log
+
+# Auth: khoa bi mat/SMTP cua may (khong commit)
+auth.config.json
+license.dat

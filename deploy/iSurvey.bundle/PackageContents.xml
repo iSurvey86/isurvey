@@ -30,6 +30,15 @@
         <Command Local="CBD" Global="CBD" />
         <Command Local="AUTOSCAN" Global="AUTOSCAN" />
         <Command Local="SCN" Global="SCN" />
+        <Command Local="ISURVEY_LOGIN" Global="ISURVEY_LOGIN" />
+        <Command Local="ISURVEY_UPDATE" Global="ISURVEY_UPDATE" />
+        <Command Local="ISURVEY_ABOUT" Global="ISURVEY_ABOUT" />
+        <Command Local="ISURVEY_LOGOUT" Global="ISURVEY_LOGOUT" />
+        <Command Local="ISURVEY_GENOTP" Global="ISURVEY_GENOTP" />
+        <Command Local="LGI" Global="LGI" />
+        <Command Local="UPD" Global="UPD" />
+        <Command Local="ABT" Global="ABT" />
+        <Command Local="LGO" Global="LGO" />
       </Commands>
     </ComponentEntry>
   </Components>

@@ -1,0 +1,22 @@
+﻿{
+  // Sao chép thành %AppData%\iSurvey\auth.config.json rồi điền giá trị thật. KHÔNG commit file thật.
+  // Gửi OTP: ưu tiên WebhookUrl; nếu trống dùng SMTP. Gmail cần "App Password" (không dùng mật khẩu thường).
+  "SmtpHost": "smtp.gmail.com",
+  "SmtpPort": 587,
+  "SmtpEnableSsl": true,
+  "SmtpUser": "your-sender@gmail.com",
+  "SmtpPassword": "app-password-16-ky-tu",
+  "FromAddress": "your-sender@gmail.com",
+  "FromName": "iSurvey",
+
+  "WebhookUrl": "",
+
+  // Supabase (cách chính): Project URL + Publishable/anon key (KHÔNG BAO GIỜ dùng service_role/secret key).
+  // Để trống nếu đã gán hằng DefaultSupabaseUrl/DefaultSupabaseKey trong AuthConfig.cs. Xem docs/Huong_dan_Supabase.md
+  "SupabaseUrl": "",
+  "SupabaseKey": "",
+
+  // Chỉ khai báo trên máy Admin (hoặc máy được phép kích hoạt offline).
+  // Cùng khóa này phải có ở máy người dùng thì mã quản trị theo ngày mới được chấp nhận.
+  "AdminSecret": ""
+}
