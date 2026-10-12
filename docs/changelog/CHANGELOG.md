@@ -1,5 +1,16 @@
 # Changelog — iSurvey
 
+## 1.3.0 — 2026-10-12
+
+### Sản phẩm
+- Đăng nhập Gmail bằng mã OTP 6 số (Supabase). Nhập đủ 6 số là tự xác thực. Panel 1–5 khóa cho tới khi kích hoạt.
+- Tối đa 2 thiết bị mỗi Gmail. Đăng xuất / Đổi máy trả suất thiết bị. Admin khóa bằng `is_active = false` trên bảng `isurvey_licenses`.
+- Giấy phép cục bộ mã hóa theo máy. Mất mạng vẫn dùng 7 ngày kể từ lần xác minh cuối. Kiểm tra lại chạy ngầm, không chặn lúc mở Civil.
+- Lệnh: `ISURVEY_LOGIN` / **LGI**, `ISURVEY_UPDATE` / **UPD**, `ISURVEY_ABOUT` / **ABT**, `ISURVEY_LOGOUT` / **LGO**, `ISURVEY_GENOTP` (máy Admin).
+
+### Docs / quy trình
+- `docs/Huong_dan_Supabase.md`, `deploy/supabase/schema.sql`. HANDOFF + changelog phiên 1.3.0.
+
 ## 1.2.0 — 2026-10-12
 
 ### Sản phẩm

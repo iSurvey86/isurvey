@@ -31,7 +31,7 @@ Mặc định Supabase gửi *magic link*. **Authentication → Emails → Templ
 <p>Nhập mã này vào cửa sổ kích hoạt iSurvey. Không chia sẻ mã cho người khác.</p>
 ```
 
-Nếu dự án mới người dùng cũ chưa có tài khoản, mẫu **Confirm signup** cũng nên đặt tương tự (chứa `{{ .Token }}`).
+Mẫu **Confirm signup** cũng bắt buộc đặt cùng nội dung (chứa `{{ .Token }}`). Lần kích hoạt đầu của mỗi Gmail đi qua mẫu này; nếu còn link mặc định thì người dùng nhận link thay vì mã 6 số.
 
 ## 5. Thời hạn mã
 **Authentication → Sign In / Providers → Email → Email OTP expiration**: đặt **300–600** giây (mặc định 3600).

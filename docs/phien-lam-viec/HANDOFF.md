@@ -5,6 +5,52 @@
 
 ---
 
+## 2026-10-12 — Đăng nhập OTP Supabase (1.3.0)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng (Civil 3D 2026 host .NET 10); cuối phiên đầy đủ; bump **1.3.0**. Project Supabase đã chạy; user nhận mail OTP và Ribbon hiện **Đã kích hoạt**.
+
+### Đã chốt / đã làm
+
+**Sản phẩm (AppVersion 1.3.0):**
+- **Panel 6 Tài khoản & Hệ thống.** Panel 1–5 khóa khi chưa kích hoạt. Nút tài khoản: "Đăng Nhập / Kích Hoạt" hoặc email + "Đã kích hoạt".
+- **Đăng nhập Gmail + OTP 6 số**, tự xác thực khi đủ 6 số. Sai: "Mã không đúng hoặc đã hết hạn. Còn N lần thử." Sai 5 lần thì khóa 5 phút.
+- **Supabase** (HttpClient, không NuGet): gửi OTP, verify, RPC `isurvey_activate` / `isurvey_check` / `isurvey_release_device`. Tối đa **2 thiết bị / Gmail**.
+- **Giấy phép cục bộ** `license.dat` (DPAPI + MachineGuid). Trực tuyến: kiểm tra ngầm mỗi 24 giờ (timeout 5 giây, không chặn lúc mở Civil); mất mạng vẫn dùng tới 7 ngày. Mã Admin / Debug: giấy phép ngoại tuyến 7 ngày.
+- **Đăng xuất / Đổi máy** trả suất thiết bị (dòng đang active). Dòng Admin đã khóa không tự xóa được.
+- Alias: **LGI**, **UPD**, **ABT**, **LGO**. Lệnh admin `ISURVEY_GENOTP` (cần `AdminSecret` trên máy đó, không nằm trong repo).
+- URL + publishable key nằm trong `AuthConfig.cs` để máy khác pull về là kích hoạt được. SMTP App Password chỉ nằm trên Supabase.
+
+**Đã kiểm:** test lõi offline (Debug 114, Release 118) và harness cửa sổ đăng nhập. Trên Civil thật: gửi mã, nhận mail, kích hoạt, Ribbon mở khóa.
+
+**Chưa test trên Civil:** thu hồi (`is_active = false`), đủ 2 thiết bị, đăng xuất trả suất, kiểm tra lại sau 24 giờ.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Auth | `src/Auth/` (`AuthManager`, `OtpAuthService`, `SupabaseAuthClient`, `LicenseStorage`, `LicenseRechecker`) |
+| UI | `src/UI/Account/LoginWindow`, `DarkDialog`, `src/UI/RibbonBuilder.cs` |
+| Supabase | `deploy/supabase/schema.sql`, `docs/Huong_dan_Supabase.md` |
+| Lệnh / deploy | `src/Auth/AuthModule.cs`, `CommandAliases.cs`, `PackageContents.xml`, `iSurvey.csproj` |
+
+### Việc tiếp
+
+- [ ] Test khóa thiết bị, hết suất 2 máy, và `LGO` trả suất trên Supabase.
+- [ ] Bổ sung lệnh Auth vào `docs/Danh_sach_lenh_iSurvey.xlsx`.
+- [ ] Test `CBD` trên bản sao DWG có TIN và đồng mức Z>0.
+- [ ] Test `SCN` trên vùng nhỏ, đọc file `.txt`.
+- [ ] Xác nhận EG Lào Cai TM-3 xuất KMZ được.
+
+### Câu mở phiên sau
+
+```text
+Đọc docs/phien-lam-viec/HANDOFF.md (block đầu). iSurvey 1.3.0 — đăng nhập Gmail OTP qua Supabase, tối đa 2 thiết bị, Ribbon panel Tài khoản. Đã kích hoạt thành công trên Civil máy văn phòng. Tiếp: test thu hồi / hết suất / đăng xuất, hoặc tính năng mới theo Mẫu_Tư_Vấn / vá lỗi theo Mẫu_Vá_Lỗi.
+```
+
+**Lưu trữ ngày:** [2026-10-12-dang-nhap-otp-supabase.md](./2026-10-12-dang-nhap-otp-supabase.md)
+
+---
+
 ## 2026-10-12 — Ribbon 5 panel + CATBD + AUTOSCAN (1.2.0)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng (Civil 3D 2026 host .NET 10); cuối phiên đầy đủ; bump **1.2.0**.

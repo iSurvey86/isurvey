@@ -1,8 +1,8 @@
 ﻿# iSurvey — Add-in AutoCAD / Civil 3D
 
-Add-in cho AutoCAD / Civil 3D **2026**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), xuất CAD → **KML/KMZ**, cắt bình đồ theo biên (`CATBD`) và quét cấu trúc bản vẽ (`AUTOSCAN`).
+Add-in cho AutoCAD / Civil 3D **2026**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), xuất CAD → **KML/KMZ**, cắt bình đồ theo biên (`CATBD`), quét cấu trúc bản vẽ (`AUTOSCAN`). Các lệnh nghiệp vụ khóa cho tới khi kích hoạt bằng Gmail + mã OTP.
 
-**Phiên bản bundle:** `1.2.0` (`deploy/iSurvey.bundle/PackageContents.xml`)
+**Phiên bản bundle:** `1.3.0` (`deploy/iSurvey.bundle/PackageContents.xml`)
 
 **Đồng bộ phiên làm việc (Cursor / đa máy):** đọc [docs/phien-lam-viec/HANDOFF.md](docs/phien-lam-viec/HANDOFF.md). Quy tắc cuối phiên: [docs/phien-lam-viec/README.md](docs/phien-lam-viec/README.md). Changelog: [docs/changelog/CHANGELOG.md](docs/changelog/CHANGELOG.md).
 
@@ -22,8 +22,13 @@ Add-in cho AutoCAD / Civil 3D **2026**: chèn tile Google Earth georeference **V
 | `ISURVEY_EXPORT_KML` | **EG** | Xuất CAD → KML/KMZ Google Earth |
 | `CATBD` | **CBD** | Cắt bình đồ theo đường biên (giữ Z, không dùng TRIM) |
 | `AUTOSCAN` | **SCN** | Quét cấu trúc bản vẽ, xuất `CAD_AutoScan_Report.txt` |
+| `ISURVEY_LOGIN` | **LGI** | Đăng nhập / kích hoạt (Gmail + OTP 6 số) |
+| `ISURVEY_ABOUT` | **ABT** | Thông tin tài khoản và giấy phép trên máy |
+| `ISURVEY_LOGOUT` | **LGO** | Đăng xuất / đổi máy (trả suất thiết bị nếu đang trực tuyến) |
+| `ISURVEY_UPDATE` | **UPD** | Kiểm tra cập nhật |
+| `ISURVEY_GENOTP` |  | In mã kích hoạt trong ngày (chỉ máy Admin có `AdminSecret`) |
 
-Catalog đầy đủ: [docs/Danh_sach_lenh_iSurvey.xlsx](docs/Danh_sach_lenh_iSurvey.xlsx).
+Catalog đầy đủ: [docs/Danh_sach_lenh_iSurvey.xlsx](docs/Danh_sach_lenh_iSurvey.xlsx). Thiết lập Supabase (một lần, Admin): [docs/Huong_dan_Supabase.md](docs/Huong_dan_Supabase.md).
 
 ## Biên dịch
 
@@ -105,7 +110,9 @@ Tab **iSurvey** xuất hiện tự động. Gõ **IG** / **ISURVEY_MAP** hoặc 
 
 > Bundle target **AutoCAD / Civil 3D 2026** (R25.1). Framework theo host (.NET 8 hoặc .NET 10).
 
-Tab **iSurvey** có 5 panel: Bản đồ, Khung & Cắt Bình Đồ, Biên tập Địa hình, Tuyến & Cột Điện, Hồ sơ & QA/QC. Nút chưa có lệnh in thông báo đang cập nhật trên dòng lệnh.
+Tab **iSurvey** có 6 panel: Bản đồ, Khung & Cắt Bình Đồ, Biên tập Địa hình, Tuyến & Cột Điện, Hồ sơ & QA/QC, Tài khoản & Hệ thống. Năm panel đầu chỉ bật sau khi kích hoạt. Nút chưa có lệnh in thông báo đang cập nhật trên dòng lệnh.
+
+Kích hoạt: **LGI** → Gmail → **Gửi mã** → nhập 6 số. Giấy phép lưu tại `%AppData%\iSurvey\license.dat` và gắn với máy này; máy khác phải kích hoạt lại (tối đa 2 máy mỗi Gmail).
 
 ---
 
