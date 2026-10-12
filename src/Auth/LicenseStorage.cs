@@ -74,16 +74,16 @@ public sealed class LicenseStorage
 
     private string CurrentHwid => Auth.HardwareId.FromMachineGuid(_machineGuid);
 
-    private byte[] Entropy => SHA256.HashData(Encoding.UTF8.GetBytes("iSurvey|license-entropy|" + _machineGuid));
+    private byte[] Entropy => Digest.Sha256(Encoding.UTF8.GetBytes("iSurvey|license-entropy|" + _machineGuid));
 
-    private byte[] HmacKey => SHA256.HashData(Encoding.UTF8.GetBytes("iSurvey|license-hmac|" + _machineGuid));
+    private byte[] HmacKey => Digest.Sha256(Encoding.UTF8.GetBytes("iSurvey|license-hmac|" + _machineGuid));
 
     private string Sign(Payload p)
     {
         var text = p.V >= 2
             ? $"{p.V}|{p.Email}|{p.HardwareId}|{p.ActivatedAt}|{p.Mode}|{p.VerifiedAt}|{p.UserId}|{p.RefreshToken}"
             : $"{p.V}|{p.Email}|{p.HardwareId}|{p.ActivatedAt}";
-        return Convert.ToHexString(HMACSHA256.HashData(HmacKey, Encoding.UTF8.GetBytes(text)));
+        return Digest.Hex(Digest.HmacSha256(HmacKey, Encoding.UTF8.GetBytes(text)));
     }
 
     /// <summary>Kích hoạt mới (hoặc ghi đè). HWID luôn là của máy hiện tại.</summary>
@@ -119,7 +119,9 @@ public sealed class LicenseStorage
 
         var tmp = _path + ".tmp";
         File.WriteAllBytes(tmp, cipher);
-        File.Move(tmp, _path, overwrite: true);
+        if (File.Exists(_path))
+            File.Delete(_path);
+        File.Move(tmp, _path);
 
         return info with
         {
@@ -158,7 +160,7 @@ public sealed class LicenseStorage
 
             var expected = Encoding.UTF8.GetBytes(Sign(p));
             var actual = Encoding.UTF8.GetBytes(p.SignatureHash ?? "");
-            if (!CryptographicOperations.FixedTimeEquals(expected, actual))
+            if (!Digest.FixedEquals(expected, actual))
             {
                 failReason = "bad-signature";
                 return null;

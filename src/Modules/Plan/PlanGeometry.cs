@@ -61,7 +61,7 @@ internal sealed class ClipPolygon
         if (len2 < 1e-24)
             return Math.Abs(px - ax) <= Eps && Math.Abs(py - ay) <= Eps;
 
-        var t = Math.Clamp(((px - ax) * dx + (py - ay) * dy) / len2, 0, 1);
+        var t = Mathx.Clamp(((px - ax) * dx + (py - ay) * dy) / len2, 0, 1);
         var cx = ax + t * dx - px;
         var cy = ay + t * dy - py;
         return cx * cx + cy * cy <= Eps * Eps;
@@ -93,7 +93,7 @@ internal sealed class ClipPolygon
             var t = (wx * ey - wy * ex) / denom;
             var u = (wx * dy - wy * dx) / denom;
             if (t >= -TEps && t <= 1 + TEps && u >= -TEps && u <= 1 + TEps)
-                ts.Add(Math.Clamp(t, 0, 1));
+                ts.Add(Mathx.Clamp(t, 0, 1));
         }
     }
 
@@ -141,7 +141,7 @@ internal sealed class ClipPolygon
 
                 var s = delta / absTheta;
                 if (s <= 1 + TEps)
-                    ts.Add(Math.Clamp(s, 0, 1));
+                    ts.Add(Mathx.Clamp(s, 0, 1));
             }
         }
     }

@@ -36,8 +36,9 @@ public static class TileCacheService
         var path = GetTilePath(sourceId, x, y, zoom);
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
 
+        ct.ThrowIfCancellationRequested();
         var temp = path + ".tmp";
-        await File.WriteAllBytesAsync(temp, bytes, ct).ConfigureAwait(false);
+        File.WriteAllBytes(temp, bytes);
 
         if (File.Exists(path))
             File.Delete(path);

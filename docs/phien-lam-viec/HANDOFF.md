@@ -5,6 +5,53 @@
 
 ---
 
+## 2026-10-12 — Hỗ trợ CAD/Civil 2023–2027 (1.4.0)
+
+**Máy / ngữ cảnh:** Cursor — máy có AutoCAD 2023 (R24.2, .NET Framework 4.8). Cuối phiên đầy đủ; bump **1.4.0**. Không đóng MSI (user hoãn).
+
+### Đã chốt / đã làm
+
+**Sản phẩm (AppVersion 1.4.0):**
+- **Một bundle, ba DLL.** AutoCAD/Civil tự chọn theo series:
+  - 2023–2024 (R24.2–R24.3): `Contents/Win64/2023`, .NET Framework 4.8, API 2023. 2024 tương thích nhị phân với plugin 2023.
+  - 2025–2026 (R25.0–R25.1): `Contents/Win64/2025`, .NET 8, API 2025. 2026 nạp được plugin build cho 2025.
+  - 2027 (R26.0): `Contents/Win64/2027`, .NET 10, build riêng. Không dùng DLL của 2025/2026.
+- Cùng mã nguồn build được cả ba target. API lấy từ NuGet `AutoCAD.NET`, không copy DLL AutoCAD vào bundle.
+- Bản 2023 nạp ProjNET và System.Text.Json từ thư mục plugin (`AssemblyResolve`). Trusted Location trỏ `Contents\Win64\...`.
+- Catalog Excel bổ sung `CATBD`/`CBD`, `AUTOSCAN`/`SCN`, `LGI`/`UPD`/`ABT`/`LGO`, `ISURVEY_GENOTP`.
+
+**Đã kiểm:** build Release cả `net48`, `net8.0-windows`, `net10.0-windows`. Trên AutoCAD 2023 máy này: bundle tự nạp, `ISURVEY_GENOTP` chạy (máy không có AdminSecret).
+
+**Chưa chạy thử:** AutoCAD/Civil 2024, 2025, 2026, 2027 (không cài trên máy này).
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Target / API | `iSurvey.csproj` |
+| Bundle | `deploy/iSurvey.bundle/PackageContents.xml`, `deploy/build-bundle.ps1`, `deploy/Set-iSurveyTrustedPath.ps1` |
+| .NET Framework | `src/FrameworkAssemblyResolve.cs`, `src/Compat/FrameworkString.cs`, `src/Core/Digest.cs` |
+| Catalog | `docs/Danh_sach_lenh_iSurvey.xlsx` |
+
+### Việc tiếp
+
+- [ ] Mở thử AutoCAD/Civil 2024, 2025, 2026, 2027 khi có bản cài (xác nhận tab iSurvey và một lệnh).
+- [ ] Test khóa thiết bị, hết suất 2 máy, và `LGO` trả suất trên Supabase.
+- [ ] Test `CBD` trên bản sao DWG có TIN và đồng mức Z>0.
+- [ ] Test `SCN` trên vùng nhỏ, đọc file `.txt`.
+- [ ] Xác nhận EG Lào Cai TM-3 xuất KMZ được.
+- [ ] MSI phát hành nội bộ — user hoãn, làm khi được yêu cầu.
+
+### Câu mở phiên sau
+
+```text
+Đọc docs/phien-lam-viec/HANDOFF.md (block đầu). iSurvey 1.4.0 — một bundle cho AutoCAD/Civil 2023–2027 (net48 / net8 / net10). Đã tự nạp trên AutoCAD 2023 máy này. Tiếp: chạy thử 2024–2027 khi có CAD, hoặc test thu hồi/hết suất/LGO, hoặc tính năng mới theo Mẫu_Tư_Vấn / vá lỗi theo Mẫu_Vá_Lỗi.
+```
+
+**Lưu trữ ngày:** [2026-10-12-ho-tro-cad-2023-2027.md](./2026-10-12-ho-tro-cad-2023-2027.md)
+
+---
+
 ## 2026-10-12 — Đăng nhập OTP Supabase (1.3.0)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng (Civil 3D 2026 host .NET 10); cuối phiên đầy đủ; bump **1.3.0**. Project Supabase đã chạy; user nhận mail OTP và Ribbon hiện **Đã kích hoạt**.
@@ -36,7 +83,7 @@
 ### Việc tiếp
 
 - [ ] Test khóa thiết bị, hết suất 2 máy, và `LGO` trả suất trên Supabase.
-- [ ] Bổ sung lệnh Auth vào `docs/Danh_sach_lenh_iSurvey.xlsx`.
+- [x] Bổ sung lệnh Auth, `CATBD`/`CBD` và `AUTOSCAN`/`SCN` vào `docs/Danh_sach_lenh_iSurvey.xlsx` (catalog trước đó dừng ở 1.1.0).
 - [ ] Test `CBD` trên bản sao DWG có TIN và đồng mức Z>0.
 - [ ] Test `SCN` trên vùng nhỏ, đọc file `.txt`.
 - [ ] Xác nhận EG Lào Cai TM-3 xuất KMZ được.

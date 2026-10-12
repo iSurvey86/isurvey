@@ -180,7 +180,7 @@ public sealed class OtpAuthService
     public static string ComputeAdminCode(string secret, string email, DateTime date)
     {
         var msg = Encoding.UTF8.GetBytes($"iSurvey-OTP|{email.Trim().ToLowerInvariant()}|{date:yyyyMMdd}");
-        var mac = HMACSHA256.HashData(Encoding.UTF8.GetBytes(secret), msg);
+        var mac = Digest.HmacSha256(Encoding.UTF8.GetBytes(secret), msg);
         var n = (uint)((mac[0] << 24) | (mac[1] << 16) | (mac[2] << 8) | mac[3]);
         return (n % 1_000_000u).ToString("D6");
     }
@@ -216,8 +216,8 @@ public sealed class OtpAuthService
             };
         }
 
-        var code = RandomNumberGenerator.GetInt32(0, 1_000_000).ToString("D6");
-        var salt = RandomNumberGenerator.GetBytes(16);
+        var code = NextRandomInt(1_000_000).ToString("D6");
+        var salt = NextRandomBytes(16);
         _pending = new Pending
         {
             Email = email,
@@ -269,7 +269,7 @@ public sealed class OtpAuthService
             return new VerifyResult(VerifyOutcome.LockedOut, 0, (int)Math.Ceiling((_lockedUntil - now).TotalMinutes));
 
         if (!TryNormalizeGmail(emailInput, out email) || codeInput is null || codeInput.Length != CodeLength
-            || !codeInput.All(char.IsAsciiDigit))
+            || !codeInput.All(Ascii.IsDigit))
             return new VerifyResult(VerifyOutcome.InvalidFormat);
 
         return null;
@@ -417,11 +417,40 @@ public sealed class OtpAuthService
         };
     }
 
-    private static byte[] HashCode(byte[] salt, string code) =>
-        SHA256.HashData([.. salt, .. Encoding.ASCII.GetBytes(code)]);
+    private static byte[] HashCode(byte[] salt, string code)
+    {
+        var text = Encoding.ASCII.GetBytes(code);
+        var buf = new byte[salt.Length + text.Length];
+        Buffer.BlockCopy(salt, 0, buf, 0, salt.Length);
+        Buffer.BlockCopy(text, 0, buf, salt.Length, text.Length);
+        return Digest.Sha256(buf);
+    }
 
-    private static bool FixedEquals(byte[] a, byte[] b) =>
-        a.Length == b.Length && CryptographicOperations.FixedTimeEquals(a, b);
+    private static bool FixedEquals(byte[] a, byte[] b)
+    {
+        if (a.Length != b.Length)
+            return false;
+        var diff = 0;
+        for (var i = 0; i < a.Length; i++)
+            diff |= a[i] ^ b[i];
+        return diff == 0;
+    }
+
+    private static int NextRandomInt(int maxExclusive)
+    {
+        var buf = new byte[4];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(buf);
+        return (int)(BitConverter.ToUInt32(buf, 0) % (uint)maxExclusive);
+    }
+
+    private static byte[] NextRandomBytes(int count)
+    {
+        var buf = new byte[count];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(buf);
+        return buf;
+    }
 
     // ---------- Kênh gửi cũ (chỉ khi không có Supabase) ----------
     private sealed class DefaultTransport(Func<AuthConfig> getConfig) : IOtpTransport
@@ -461,7 +490,8 @@ public sealed class OtpAuthService
                 IsBodyHtml = false
             };
             msg.To.Add(email);
-            await smtp.SendMailAsync(msg, ct).ConfigureAwait(false);
+            ct.ThrowIfCancellationRequested();
+            await smtp.SendMailAsync(msg).ConfigureAwait(false);
         }
     }
 }

@@ -16,8 +16,8 @@ public static class HardwareId
 
     public static string FromMachineGuid(string machineGuid)
     {
-        var hash = SHA256.HashData(Encoding.UTF8.GetBytes("iSurvey|hwid|" + machineGuid));
-        return "PC-SURVEY-" + Convert.ToHexString(hash, 0, 4);
+        var hash = Digest.Sha256(Encoding.UTF8.GetBytes("iSurvey|hwid|" + machineGuid));
+        return "PC-SURVEY-" + Digest.Hex(hash, 0, 4);
     }
 
     private static string ReadMachineGuid()

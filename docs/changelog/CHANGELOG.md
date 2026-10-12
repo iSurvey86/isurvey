@@ -1,5 +1,14 @@
 # Changelog — iSurvey
 
+## 1.4.0 — 2026-10-12
+
+### Sản phẩm
+- Một bundle cho AutoCAD / Civil 3D **2023–2027**. CAD tự nạp đúng DLL: `Contents/Win64/2023` (.NET Framework 4.8, 2023–2024), `2025` (.NET 8, 2025–2026), `2027` (.NET 10).
+- API biên dịch từ gói `AutoCAD.NET` (24.2.0 / 25.0.1 / 26.0.0). Bản 2023–2024 nạp DLL phụ (ProjNET, System.Text.Json) từ thư mục plugin.
+
+### Docs / quy trình
+- Catalog lệnh bổ sung `CATBD`/`CBD`, `AUTOSCAN`/`SCN` và nhóm Tài khoản. HANDOFF + changelog phiên 1.4.0.
+
 ## 1.3.0 — 2026-10-12
 
 ### Sản phẩm

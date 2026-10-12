@@ -1,16 +1,19 @@
 ﻿# iSurvey — Add-in AutoCAD / Civil 3D
 
-Add-in cho AutoCAD / Civil 3D **2026**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), xuất CAD → **KML/KMZ**, cắt bình đồ theo biên (`CATBD`), quét cấu trúc bản vẽ (`AUTOSCAN`). Các lệnh nghiệp vụ khóa cho tới khi kích hoạt bằng Gmail + mã OTP.
+Add-in cho AutoCAD / Civil 3D **2023–2027**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), xuất CAD → **KML/KMZ**, cắt bình đồ theo biên (`CATBD`), quét cấu trúc bản vẽ (`AUTOSCAN`). Các lệnh nghiệp vụ khóa cho tới khi kích hoạt bằng Gmail + mã OTP.
 
-**Phiên bản bundle:** `1.3.0` (`deploy/iSurvey.bundle/PackageContents.xml`)
+**Phiên bản bundle:** `1.4.0` (`deploy/iSurvey.bundle/PackageContents.xml`)
 
 **Đồng bộ phiên làm việc (Cursor / đa máy):** đọc [docs/phien-lam-viec/HANDOFF.md](docs/phien-lam-viec/HANDOFF.md). Quy tắc cuối phiên: [docs/phien-lam-viec/README.md](docs/phien-lam-viec/README.md). Changelog: [docs/changelog/CHANGELOG.md](docs/changelog/CHANGELOG.md).
 
 ## Yêu cầu
 
 - Windows x64
-- AutoCAD hoặc Civil 3D 2026 (đường dẫn mặc định trong `iSurvey.csproj`: `C:\Program Files\Autodesk\AutoCAD 2026\`)
-- .NET SDK **8 hoặc 10**, khớp host AutoCAD. `iSurvey.csproj` đọc `acdbmgd.runtimeconfig.json` và chọn `net8.0-windows` hoặc `net10.0-windows`. Ghi đè bằng `-p:TargetFramework=net8.0-windows` nếu cần.
+- AutoCAD hoặc Civil 3D **2023, 2024, 2025, 2026 hoặc 2027** (64-bit). Một bundle chứa đúng DLL cho từng nhóm:
+  - 2023–2024: .NET Framework 4.8, build từ API 2023 (2024 tương thích nhị phân)
+  - 2025–2026: .NET 8, build từ API 2025 (2026 nạp được plugin 2025)
+  - 2027: .NET 10, build riêng (không nạp DLL của 2025/2026)
+- Máy build cần .NET SDK 8 và 10. API AutoCAD lấy từ gói `AutoCAD.NET` (không cần cài đủ các năm CAD để biên dịch).
 
 ## Lệnh chính
 
@@ -37,15 +40,9 @@ cd D:\AIProject\isurvey
 dotnet build iSurvey.sln -c Release
 ```
 
-Nếu AutoCAD cài ở thư mục khác:
+Lệnh trên build cả ba bản. File đầu ra:
 
-```powershell
-dotnet build iSurvey.csproj -c Release "-p:AcadDir=D:\Autodesk\AutoCAD 2026"
-```
-
-File đầu ra:
-
-`bin\Release\net8.0-windows\iSurvey.dll` hoặc `bin\Release\net10.0-windows\iSurvey.dll` (theo host)
+`bin\Release\net48\iSurvey.dll` (2023–2024), `bin\Release\net8.0-windows\iSurvey.dll` (2025–2026), `bin\Release\net10.0-windows\iSurvey.dll` (2027)
 
 (kèm `Data\isurvey_vn2000_tm3.json`, `Data\isurvey_map_sources.json` và các dependency ProjNet)
 
@@ -94,21 +91,21 @@ Từ **AutoCAD 2026**, `%AppData%\ApplicationPlugins` **không còn được tin
 
 1. Chạy `Set-iSurveyTrustedPath.ps1` (hoặc `build-bundle.ps1 -Install`), **hoặc**
 2. Vào **OPTIONS → Files → Trusted Locations** → thêm:
-   `%AppData%\Autodesk\ApplicationPlugins\iSurvey.bundle\Contents\Win64\2026\...`
+   `%AppData%\Autodesk\ApplicationPlugins\iSurvey.bundle\Contents\Win64\...`
 
 Sau đó **mở lại** Civil 3D.
 
-### Bước 3: Mở Civil 3D 2026
+### Bước 3: Mở AutoCAD hoặc Civil 3D (2023–2027)
 
 Tab **iSurvey** xuất hiện tự động. Gõ **IG** / **ISURVEY_MAP** hoặc bấm ribbon tương ứng.
 
 ### Cập nhật bản mới
 
 1. **Thoát** Civil 3D
-2. Chạy lại `.\deploy\build-bundle.ps1 -Install` (hoặc thay file trong `ApplicationPlugins\iSurvey.bundle\Contents\Win64\2026\`)
+2. Chạy lại `.\deploy\build-bundle.ps1 -Install` (hoặc thay cả thư mục `ApplicationPlugins\iSurvey.bundle`)
 3. Mở lại Civil 3D
 
-> Bundle target **AutoCAD / Civil 3D 2026** (R25.1). Framework theo host (.NET 8 hoặc .NET 10).
+> Bundle hỗ trợ **AutoCAD / Civil 3D 2023–2027**. CAD tự chọn DLL trong `Contents\Win64\2023`, `2025` hoặc `2027` theo phiên bản.
 
 Tab **iSurvey** có 6 panel: Bản đồ, Khung & Cắt Bình Đồ, Biên tập Địa hình, Tuyến & Cột Điện, Hồ sơ & QA/QC, Tài khoản & Hệ thống. Năm panel đầu chỉ bật sau khi kích hoạt. Nút chưa có lệnh in thông báo đang cập nhật trên dòng lệnh.
 
@@ -120,7 +117,7 @@ Kích hoạt: **LGI** → Gmail → **Gửi mã** → nhập 6 số. Giấy phé
 
 1. Mở AutoCAD / Civil 3D.
 2. Gõ lệnh **NETLOAD**.
-3. Chọn file `iSurvey.dll` trong thư mục `bin\Release\net8.0-windows\` hoặc `net10.0-windows\`.
+3. Chọn `iSurvey.dll` đúng năm: `bin\Release\net48\` (2023–2024), `net8.0-windows\` (2025–2026), `net10.0-windows\` (2027).
 4. Tab **iSurvey** → **Chèn GE**, hoặc gõ **IG** / **ISURVEY_MAP**.
 5. Hộp thoại: chọn **Tỉnh** → **Múi 3°/6°** → **Loại ảnh** → **Áp dụng**.
 

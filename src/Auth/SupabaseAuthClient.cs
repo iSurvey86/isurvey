@@ -204,7 +204,7 @@ public sealed class SupabaseAuthClient : ISupabaseAuth
             cts.CancelAfter(MaxCallDuration);
 
             using var resp = await _http.SendAsync(req, cts.Token).ConfigureAwait(false);
-            var text = await resp.Content.ReadAsStringAsync(cts.Token).ConfigureAwait(false);
+            var text = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
             var json = TryParse(text);
             var status = (int)resp.StatusCode;
 

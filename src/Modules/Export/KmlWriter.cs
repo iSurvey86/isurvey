@@ -180,8 +180,8 @@ internal static class KmlWriter
 
     private static string FormatCoord(GeoPoint3 p, bool useZ) =>
         useZ
-            ? string.Create(CultureInfo.InvariantCulture, $"{p.Longitude},{p.Latitude},{p.Elevation}")
-            : string.Create(CultureInfo.InvariantCulture, $"{p.Longitude},{p.Latitude},0");
+            ? string.Format(CultureInfo.InvariantCulture, "{0},{1},{2}", p.Longitude, p.Latitude, p.Elevation)
+            : string.Format(CultureInfo.InvariantCulture, "{0},{1},0", p.Longitude, p.Latitude);
 
     private static string FormatCoordList(IReadOnlyList<GeoPoint3> pts, bool useZ)
     {

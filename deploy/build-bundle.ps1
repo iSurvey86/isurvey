@@ -1,135 +1,83 @@
-# Build Release và đóng gói iSurvey.bundle (tự nạp ApplicationPlugins).
+# Build Release và đóng gói iSurvey.bundle cho AutoCAD / Civil 3D 2023-2027.
 # Usage:
-#   .\deploy\build-bundle.ps1              # chỉ tạo bundle trong deploy\output
-#   .\deploy\build-bundle.ps1 -Install     # copy AppData + them TRUSTEDPATHS
-#   .\deploy\build-bundle.ps1 -Install -InstallAllUsers  # copy Program Files (can admin, tu tin)
+#   .\deploy\build-bundle.ps1              # bundle trong deploy\output
+#   .\deploy\build-bundle.ps1 -Install     # copy AppData + TRUSTEDPATHS
+#   .\deploy\build-bundle.ps1 -Install -InstallAllUsers
 
 param(
     [switch]$Install,
-    [switch]$InstallAllUsers,
-    [string]$AcadDir = ""
+    [switch]$InstallAllUsers
 )
-
-function Resolve-AcadDir {
-    param([string]$Candidate)
-    if ($Candidate -and (Test-Path (Join-Path $Candidate "accoremgd.dll"))) {
-        if (-not $Candidate.EndsWith("\")) { $Candidate += "\" }
-        return $Candidate
-    }
-    $candidates = @(
-        "C:\Program Files\Autodesk\AutoCAD 2026",
-        "D:\Autodesk\AutoCAD 2026"
-    )
-    foreach ($dir in $candidates) {
-        if (Test-Path (Join-Path $dir "accoremgd.dll")) {
-            return ($dir + "\")
-        }
-    }
-    throw "Khong tim thay AutoCAD 2026 (accoremgd.dll). Truyen -AcadDir 'C:\...\AutoCAD 2026\'"
-}
-
-if (-not $AcadDir) {
-    $AcadDir = Resolve-AcadDir ""
-} else {
-    $AcadDir = Resolve-AcadDir $AcadDir
-}
 
 $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $OutDir = Join-Path $Root "deploy\output\iSurvey.bundle"
-$PayloadDir = Join-Path $OutDir "Contents\Win64\2026"
 $TemplateBundle = Join-Path $Root "deploy\iSurvey.bundle"
 
-Write-Host "==> Build Release (AcadDir: $($AcadDir.TrimEnd('\')))..."
+function Copy-Payload {
+    param(
+        [string]$BuildDir,
+        [string]$DestDir,
+        [bool]$Framework
+    )
+    New-Item -ItemType Directory -Force -Path $DestDir | Out-Null
+    $names = @("iSurvey.dll", "ProjNET.dll")
+    if (-not $Framework) {
+        $names += @("iSurvey.deps.json", "iSurvey.runtimeconfig.json")
+    }
+    foreach ($name in $names) {
+        $src = Join-Path $BuildDir $name
+        if (-not (Test-Path $src)) { throw "Thieu file build: $src" }
+        Copy-Item $src $DestDir
+    }
+    if ($Framework) {
+        $blocked = @(
+            "accoremgd.dll", "acdbmgd.dll", "acmgd.dll", "AdWindows.dll",
+            "AcCoreMgd.dll", "AcDbMgd.dll", "AcMgd.dll"
+        )
+        Get-ChildItem $BuildDir -Filter "*.dll" | Where-Object { $blocked -notcontains $_.Name } | ForEach-Object {
+            Copy-Item $_.FullName $DestDir -Force
+        }
+    }
+    $srcData = Join-Path $BuildDir "Data"
+    if (-not (Test-Path $srcData)) { throw "Thieu thu muc Data: $srcData" }
+    Copy-Item $srcData (Join-Path $DestDir "Data") -Recurse -Force
+}
+
+$targets = @(
+    @{ Tfm = "net48"; Year = "2023"; Framework = $true },
+    @{ Tfm = "net8.0-windows"; Year = "2025"; Framework = $false },
+    @{ Tfm = "net10.0-windows"; Year = "2027"; Framework = $false }
+)
+
+Write-Host "==> Build Release (net48 + net8 + net10)..."
 Push-Location $Root
 try {
-    dotnet build (Join-Path $Root "iSurvey.sln") -c Release "-p:AcadDir=$($AcadDir.TrimEnd('\'))"
-    $buildExit = $LASTEXITCODE
+    dotnet build (Join-Path $Root "iSurvey.csproj") -c Release
+    if ($LASTEXITCODE -ne 0) { throw "dotnet build failed." }
 }
 finally {
     Pop-Location
 }
 
-# Target framework theo host AutoCAD (khop logic trong iSurvey.csproj): net10 hoac net8.
-$Tfm = "net8.0-windows"
-$hostCfg = Join-Path $AcadDir "acdbmgd.runtimeconfig.json"
-if ((Test-Path $hostCfg) -and ((Get-Content $hostCfg -Raw) -match '"tfm"\s*:\s*"net10\.0"')) {
-    $Tfm = "net10.0-windows"
-}
-Write-Host "==> Target framework: $Tfm"
-
-$BinDir = Join-Path $Root "bin\Release\$Tfm"
-$ObjDir = Join-Path $Root "obj\Release\$Tfm"
-$BuildDir = $BinDir
-$DllFromObj = $false
-
-if ($buildExit -ne 0) {
-    if (Test-Path (Join-Path $ObjDir "iSurvey.dll")) {
-        Write-Host "==> Build copy failed (AutoCAD lock?) - dung iSurvey.dll tu obj"
-        $DllFromObj = $true
-    }
-    else {
-        throw "dotnet build failed."
-    }
-}
-elseif (-not (Test-Path (Join-Path $BinDir "iSurvey.dll"))) {
-    if (Test-Path (Join-Path $ObjDir "iSurvey.dll")) {
-        $DllFromObj = $true
-    }
-    else {
-        throw "Khong tim thay iSurvey.dll sau build."
-    }
-}
-
 Write-Host "==> Tao bundle..."
-if (Test-Path $OutDir) {
-    Remove-Item $OutDir -Recurse -Force
-}
-New-Item -ItemType Directory -Force -Path $PayloadDir | Out-Null
-
+if (Test-Path $OutDir) { Remove-Item $OutDir -Recurse -Force }
+New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 Copy-Item (Join-Path $TemplateBundle "PackageContents.xml") (Join-Path $OutDir "PackageContents.xml")
 
-$files = @(
-    "iSurvey.dll",
-    "iSurvey.deps.json",
-    "iSurvey.runtimeconfig.json",
-    "ProjNET.dll"
-)
-$optionalFiles = @(
-    "System.Drawing.Common.dll"
-)
-foreach ($f in $files) {
-    if ($DllFromObj -and $f -eq "iSurvey.dll") {
-        $src = Join-Path $ObjDir $f
-    }
-    else {
-        $src = Join-Path $BuildDir $f
-    }
-    if (-not (Test-Path $src)) {
-        throw "Thieu file build: $f"
-    }
-    Copy-Item $src $PayloadDir
+foreach ($t in $targets) {
+    $buildDir = Join-Path $Root "bin\Release\$($t.Tfm)"
+    $dest = Join-Path $OutDir "Contents\Win64\$($t.Year)"
+    Copy-Payload -BuildDir $buildDir -DestDir $dest -Framework $t.Framework
+    Write-Host "    $($t.Year) <= $($t.Tfm)"
 }
-foreach ($f in $optionalFiles) {
-    $src = Join-Path $BuildDir $f
-    if (Test-Path $src) {
-        Copy-Item $src $PayloadDir
-    }
-    else {
-        Write-Host "==> Bo qua (framework cung cap): $f"
-    }
-}
-
-$srcData = Join-Path $BuildDir "Data"
-$dstData = Join-Path $PayloadDir "Data"
-Copy-Item $srcData $dstData -Recurse
 
 Write-Host "==> Bundle san sang: $OutDir"
 
 if ($Install) {
     if ($InstallAllUsers) {
         $plugins = Join-Path ${env:ProgramFiles} "Autodesk\ApplicationPlugins"
-        Write-Host "==> Cai cho tat ca user (Program Files - tu dong trusted)"
+        Write-Host "==> Cai cho tat ca user (Program Files)"
     }
     else {
         $plugins = Join-Path $env:APPDATA "Autodesk\ApplicationPlugins"
@@ -137,9 +85,7 @@ if ($Install) {
 
     $target = Join-Path $plugins "iSurvey.bundle"
     New-Item -ItemType Directory -Force -Path $plugins | Out-Null
-    if (Test-Path $target) {
-        Remove-Item $target -Recurse -Force
-    }
+    if (Test-Path $target) { Remove-Item $target -Recurse -Force }
     Copy-Item $OutDir $target -Recurse
     Write-Host "==> Da cai vao: $target"
 
@@ -148,17 +94,13 @@ if ($Install) {
         & $trustScript -BundleRoot $target
     }
     else {
-        Write-Host "    Program Files\Autodesk\ApplicationPlugins da duoc AutoCAD 2026 tin cay mac dinh."
+        Write-Host "    Program Files\Autodesk\ApplicationPlugins duoc AutoCAD tin cay mac dinh."
     }
 
-    Write-Host "    Mo lai Civil 3D / AutoCAD 2026 de tu nap iSurvey."
+    Write-Host "    Mo lai AutoCAD / Civil 3D 2023-2027 de tu nap iSurvey."
 }
 else {
     Write-Host ""
-    Write-Host "Cai thu cong: copy folder"
-    Write-Host "  $OutDir"
-    Write-Host "vao:"
-    Write-Host "  $env:APPDATA\Autodesk\ApplicationPlugins\"
-    Write-Host ""
+    Write-Host "Copy folder $OutDir vao %AppData%\Autodesk\ApplicationPlugins\"
     Write-Host "Hoac chay lai voi -Install"
 }

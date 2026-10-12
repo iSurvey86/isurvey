@@ -120,8 +120,8 @@ public partial class KmlExportWindow : Window
             : _provinceMeridian;
 
         var tag = zone == 6 ? "TM-6" : "TM-3";
-        MeridianLabel.Text = string.Create(CultureInfo.InvariantCulture,
-            $"Kinh tuyến trục: {_centralMeridian:0.##}° ({tag})");
+        MeridianLabel.Text = string.Format(CultureInfo.InvariantCulture,
+            "Kinh tuyến trục: {0:0.##}° ({1})", _centralMeridian, tag);
     }
 
     private LegacyAreaEntry? ResolveArea(ProvinceCrsGroup group)

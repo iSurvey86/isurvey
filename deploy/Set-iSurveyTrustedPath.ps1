@@ -11,7 +11,11 @@ if (-not (Test-Path $BundleRoot)) {
     throw "Khong tim thay bundle: $BundleRoot"
 }
 
-$trustPath = (Join-Path $BundleRoot "Contents\Win64\2026") + '\...'
+$win64 = Join-Path $BundleRoot "Contents\Win64"
+if (-not (Test-Path $win64)) {
+    throw "Khong tim thay Contents\Win64 trong bundle: $BundleRoot"
+}
+$trustPath = $win64 + '\...'
 Write-Host "==> Them TRUSTEDPATHS: $trustPath"
 
 $acadRoot = "HKCU:\Software\Autodesk\AutoCAD"

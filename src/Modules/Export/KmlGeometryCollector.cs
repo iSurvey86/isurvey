@@ -445,7 +445,7 @@ internal sealed class KmlGeometryCollector
     }
 
     private static string ToKmlAabbggrr(byte r, byte g, byte b) =>
-        string.Create(CultureInfo.InvariantCulture, $"ff{b:x2}{g:x2}{r:x2}");
+        string.Format(CultureInfo.InvariantCulture, "ff{0:x2}{1:x2}{2:x2}", b, g, r);
 
 
     private static string? SafeMtextPlain(MText mtext)
@@ -635,8 +635,9 @@ internal sealed class KmlGeometryCollector
     public string FormatReport()
     {
         var sb = new StringBuilder();
-        sb.Append(CultureInfo.InvariantCulture,
-            $"xuất {ExportedCount}; bỏ layer ẩn/đóng băng {SkippedHiddenLayer}; Dim/Leader {SkippedDimension}; raster {SkippedRaster}; không hỗ trợ {SkippedUnsupported}");
+        sb.Append(string.Format(CultureInfo.InvariantCulture,
+            "xuất {0}; bỏ layer ẩn/đóng băng {1}; Dim/Leader {2}; raster {3}; không hỗ trợ {4}",
+            ExportedCount, SkippedHiddenLayer, SkippedDimension, SkippedRaster, SkippedUnsupported));
         return sb.ToString();
     }
 }

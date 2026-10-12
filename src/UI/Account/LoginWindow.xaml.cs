@@ -424,7 +424,7 @@ public partial class LoginWindow : Window
     private void Box_PreviewTextInput(object sender, TextCompositionEventArgs e)
     {
         e.Handled = true;
-        if (_inputLocked || e.Text.Length != 1 || !char.IsAsciiDigit(e.Text[0]))
+        if (_inputLocked || e.Text.Length != 1 || !Ascii.IsDigit(e.Text[0]))
             return;
 
         BeginNewInput();
@@ -490,7 +490,7 @@ public partial class LoginWindow : Window
         if (string.IsNullOrEmpty(raw))
             return;
 
-        var digits = new string(raw.Where(char.IsAsciiDigit).ToArray());
+        var digits = new string(raw.Where(Ascii.IsDigit).ToArray());
         if (digits.Length == 0)
             return;
 

@@ -56,19 +56,16 @@ public sealed class TileDownloader : IDisposable
         var results = new (int X, int Y, int Z, string Path)[tiles.Count];
         var done = 0;
 
-        await Parallel.ForEachAsync(
-            Enumerable.Range(0, tiles.Count),
-            new ParallelOptions { MaxDegreeOfParallelism = MaxConcurrent, CancellationToken = ct },
-            async (i, token) =>
-            {
-                var (x, y) = tiles[i];
-                var (path, _) = await EnsureTileAsync(x, y, zoom, token).ConfigureAwait(false);
-                if (path is not null)
-                    results[i] = (x, y, zoom, path);
+        await ForEachIndexAsync(tiles.Count, MaxConcurrent, ct, async (i, token) =>
+        {
+            var (x, y) = tiles[i];
+            var (path, _) = await EnsureTileAsync(x, y, zoom, token).ConfigureAwait(false);
+            if (path is not null)
+                results[i] = (x, y, zoom, path);
 
-                var n = Interlocked.Increment(ref done);
-                progress?.Report((n, tiles.Count));
-            }).ConfigureAwait(false);
+            var n = Interlocked.Increment(ref done);
+            progress?.Report((n, tiles.Count));
+        }).ConfigureAwait(false);
 
         return results.Where(r => r.Path is not null).ToList();
     }
@@ -86,7 +83,7 @@ public sealed class TileDownloader : IDisposable
             using var response = await _http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct)
                 .ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsByteArrayAsync(ct).ConfigureAwait(false);
+            return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
         }
         catch
         {
@@ -118,6 +115,33 @@ public sealed class TileDownloader : IDisposable
             throw new InvalidOperationException($"URL nguồn {sourceId} rỗng.");
 
         return source.UrlTemplate;
+    }
+
+    /// <summary>Parallel.ForEachAsync chỉ có từ .NET 6. Giới hạn số tải cùng lúc trên cả .NET Framework 4.8.</summary>
+    private static async Task ForEachIndexAsync(int count, int dop, CancellationToken ct, Func<int, CancellationToken, Task> body)
+    {
+        using var gate = new SemaphoreSlim(dop);
+        var tasks = new Task[count];
+        for (var i = 0; i < count; i++)
+        {
+            var index = i;
+            tasks[i] = RunOne();
+
+            async Task RunOne()
+            {
+                await gate.WaitAsync(ct).ConfigureAwait(false);
+                try
+                {
+                    await body(index, ct).ConfigureAwait(false);
+                }
+                finally
+                {
+                    gate.Release();
+                }
+            }
+        }
+
+        await Task.WhenAll(tasks).ConfigureAwait(false);
     }
 
     public void Dispose() => _http.Dispose();
