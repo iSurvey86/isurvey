@@ -50,8 +50,16 @@ finally {
     Pop-Location
 }
 
-$BinDir = Join-Path $Root "bin\Release\net8.0-windows"
-$ObjDir = Join-Path $Root "obj\Release\net8.0-windows"
+# Target framework theo host AutoCAD (khop logic trong iSurvey.csproj): net10 hoac net8.
+$Tfm = "net8.0-windows"
+$hostCfg = Join-Path $AcadDir "acdbmgd.runtimeconfig.json"
+if ((Test-Path $hostCfg) -and ((Get-Content $hostCfg -Raw) -match '"tfm"\s*:\s*"net10\.0"')) {
+    $Tfm = "net10.0-windows"
+}
+Write-Host "==> Target framework: $Tfm"
+
+$BinDir = Join-Path $Root "bin\Release\$Tfm"
+$ObjDir = Join-Path $Root "obj\Release\$Tfm"
 $BuildDir = $BinDir
 $DllFromObj = $false
 

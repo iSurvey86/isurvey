@@ -1,5 +1,16 @@
 # Changelog — iSurvey
 
+## 1.2.0 — 2026-10-12
+
+### Sản phẩm
+- Ribbon tab iSurvey: 5 panel, icon vector (nền gradient, nét trắng). Nút chưa có lệnh báo "dang duoc cap nhat".
+- `CATBD` / **CBD**: cắt bình đồ theo biên khép kín. Layer khung được bảo vệ; CIRCLE ngoài whitelist bị xóa; điểm/chữ/block xét trong-ngoài; LINE và polyline cắt từng đoạn, nội suy Z, tách cung. Không dùng TRIM. Một transaction, `UNDO` một lần.
+- `AUTOSCAN` / **SCN**: quét bản vẽ, xuất `CAD_AutoScan_Report.txt` (thống kê nhóm, mẫu chữ, mẫu đại diện) rồi mở Notepad.
+- Build tự chọn `net8.0-windows` hoặc `net10.0-windows` theo `acdbmgd.runtimeconfig.json` của AutoCAD.
+
+### Docs / quy trình
+- HANDOFF + changelog phiên 1.2.0. README cập nhật lệnh và target framework.
+
 ## 1.1.1 — 2026-09-03
 
 ### Sản phẩm

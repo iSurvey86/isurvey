@@ -1,6 +1,8 @@
 using Autodesk.AutoCAD.Runtime;
 using iSurvey.Modules.Export;
 using iSurvey.Modules.Map;
+using iSurvey.Modules.Plan;
+using iSurvey.Modules.Scan;
 using iSurvey.UI;
 
 [assembly: ExtensionApplication(typeof(iSurvey.Main))]
@@ -9,6 +11,8 @@ using iSurvey.UI;
 #else
 [assembly: CommandClass(typeof(MapModule))]
 [assembly: CommandClass(typeof(ExportModule))]
+[assembly: CommandClass(typeof(PlanModule))]
+[assembly: CommandClass(typeof(ScanModule))]
 [assembly: CommandClass(typeof(iSurvey.CommandAliases))]
 #endif
 

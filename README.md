@@ -1,8 +1,8 @@
 ﻿# iSurvey — Add-in AutoCAD / Civil 3D
 
-Add-in .NET 8 cho AutoCAD / Civil 3D **2026**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), xuất CAD → **KML/KMZ** Google Earth.
+Add-in cho AutoCAD / Civil 3D **2026**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), xuất CAD → **KML/KMZ**, cắt bình đồ theo biên (`CATBD`) và quét cấu trúc bản vẽ (`AUTOSCAN`).
 
-**Phiên bản bundle:** `1.1.1` (`deploy/iSurvey.bundle/PackageContents.xml`)
+**Phiên bản bundle:** `1.2.0` (`deploy/iSurvey.bundle/PackageContents.xml`)
 
 **Đồng bộ phiên làm việc (Cursor / đa máy):** đọc [docs/phien-lam-viec/HANDOFF.md](docs/phien-lam-viec/HANDOFF.md). Quy tắc cuối phiên: [docs/phien-lam-viec/README.md](docs/phien-lam-viec/README.md). Changelog: [docs/changelog/CHANGELOG.md](docs/changelog/CHANGELOG.md).
 
@@ -10,7 +10,7 @@ Add-in .NET 8 cho AutoCAD / Civil 3D **2026**: chèn tile Google Earth georefere
 
 - Windows x64
 - AutoCAD hoặc Civil 3D 2026 (đường dẫn mặc định trong `iSurvey.csproj`: `C:\Program Files\Autodesk\AutoCAD 2026\`)
-- .NET SDK **8** (AutoCAD / Civil 3D 2026 host .NET 8)
+- .NET SDK **8 hoặc 10**, khớp host AutoCAD. `iSurvey.csproj` đọc `acdbmgd.runtimeconfig.json` và chọn `net8.0-windows` hoặc `net10.0-windows`. Ghi đè bằng `-p:TargetFramework=net8.0-windows` nếu cần.
 
 ## Lệnh chính
 
@@ -20,6 +20,8 @@ Add-in .NET 8 cho AutoCAD / Civil 3D **2026**: chèn tile Google Earth georefere
 | `ISURVEY_MAP_SAT` | **SG** | Chèn nhanh Google Satellite |
 | `ISURVEY_DELETE_GE` | **XG** | Xóa toàn bộ tile GE (xác nhận) |
 | `ISURVEY_EXPORT_KML` | **EG** | Xuất CAD → KML/KMZ Google Earth |
+| `CATBD` | **CBD** | Cắt bình đồ theo đường biên (giữ Z, không dùng TRIM) |
+| `AUTOSCAN` | **SCN** | Quét cấu trúc bản vẽ, xuất `CAD_AutoScan_Report.txt` |
 
 Catalog đầy đủ: [docs/Danh_sach_lenh_iSurvey.xlsx](docs/Danh_sach_lenh_iSurvey.xlsx).
 
@@ -38,7 +40,7 @@ dotnet build iSurvey.csproj -c Release "-p:AcadDir=D:\Autodesk\AutoCAD 2026"
 
 File đầu ra:
 
-`bin\Release\net8.0-windows\iSurvey.dll`
+`bin\Release\net8.0-windows\iSurvey.dll` hoặc `bin\Release\net10.0-windows\iSurvey.dll` (theo host)
 
 (kèm `Data\isurvey_vn2000_tm3.json`, `Data\isurvey_map_sources.json` và các dependency ProjNet)
 
@@ -101,7 +103,9 @@ Tab **iSurvey** xuất hiện tự động. Gõ **IG** / **ISURVEY_MAP** hoặc 
 2. Chạy lại `.\deploy\build-bundle.ps1 -Install` (hoặc thay file trong `ApplicationPlugins\iSurvey.bundle\Contents\Win64\2026\`)
 3. Mở lại Civil 3D
 
-> Bundle target **AutoCAD / Civil 3D 2026** (R25.1, .NET 8).
+> Bundle target **AutoCAD / Civil 3D 2026** (R25.1). Framework theo host (.NET 8 hoặc .NET 10).
+
+Tab **iSurvey** có 5 panel: Bản đồ, Khung & Cắt Bình Đồ, Biên tập Địa hình, Tuyến & Cột Điện, Hồ sơ & QA/QC. Nút chưa có lệnh in thông báo đang cập nhật trên dòng lệnh.
 
 ---
 
@@ -109,13 +113,17 @@ Tab **iSurvey** xuất hiện tự động. Gõ **IG** / **ISURVEY_MAP** hoặc 
 
 1. Mở AutoCAD / Civil 3D.
 2. Gõ lệnh **NETLOAD**.
-3. Chọn file `iSurvey.dll` trong thư mục `bin\Release\net8.0-windows\`.
-4. Tab **iSurvey** → **Chèn Google Earth**, hoặc gõ **IG** / **ISURVEY_MAP**.
+3. Chọn file `iSurvey.dll` trong thư mục `bin\Release\net8.0-windows\` hoặc `net10.0-windows\`.
+4. Tab **iSurvey** → **Chèn GE**, hoặc gõ **IG** / **ISURVEY_MAP**.
 5. Hộp thoại: chọn **Tỉnh** → **Múi 3°/6°** → **Loại ảnh** → **Áp dụng**.
 
 **Xóa ảnh:** **XG** / **ISURVEY_DELETE_GE** → xác nhận → xóa toàn bộ tile iSurvey.
 
 **Xuất Google Earth:** **EG** / **ISURVEY_EXPORT_KML** → chọn tỉnh / múi / phạm vi / KML|KMZ.
+
+**Cắt bình đồ:** **CBD** / **CATBD** → chọn đường biên khép kín → quét vùng cần cắt. Một lần `UNDO` hoàn tác cả lần cắt.
+
+**Quét cấu trúc:** **SCN** / **AUTOSCAN** → quét vùng → lưu `.txt` → Notepad mở file.
 
 ## Cài đặt được nhớ
 
@@ -157,7 +165,7 @@ Build **Debug** của iSurvey đã bật cờ `DEVRELOAD` (dùng `NoCommands` th
 
 | Tình huống | Cách xử lý |
 |------------|------------|
-| Build báo không copy được DLL (file bị khóa) | DLL vẫn có tại `obj\Release\net8.0-windows\iSurvey.dll` nhưng **không reload được** trong phiên hiện tại |
+| Build báo không copy được DLL (file bị khóa) | DLL vẫn có tại `obj\Release\net8.0-windows\` hoặc `net10.0-windows\` nhưng **không reload được** trong phiên hiện tại |
 | Cần test bản mới | Thoát Civil 3D → build → mở lại → `NETLOAD` |
 | Sửa nhỏ, đang debug VS | Attach debugger vào `acad.exe`, bật **Edit and Continue** |
 

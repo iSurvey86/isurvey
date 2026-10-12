@@ -5,6 +5,51 @@
 
 ---
 
+## 2026-10-12 — Ribbon 5 panel + CATBD + AUTOSCAN (1.2.0)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng (Civil 3D 2026 host .NET 10); cuối phiên đầy đủ; bump **1.2.0**.
+
+### Đã chốt / đã làm
+
+**Sản phẩm (AppVersion 1.2.0):**
+- **Ribbon 5 panel:** Bản đồ, Khung & Cắt Bình Đồ, Biên tập Địa hình, Tuyến & Cột Điện, Hồ sơ & QA/QC. Icon vector (gradient, nét trắng). Nhãn đã chỉnh: **Chèn GE**, **Cắt Bình Đồ**. User đã xem trên Civil.
+- **`CATBD` / alias `CBD`:** cắt bình đồ theo biên khép kín. Whitelist layer khung; CIRCLE ngoài whitelist xóa; TEXT dùng AlignmentPoint khi căn lề; INSERT dùng tâm GeometricExtents; LINE/polyline cắt từng đoạn, nội suy Z; cung LWPOLYLINE tách bulge; Polyline3d spline-fit bỏ ControlVertex rồi tạo SimplePoly. Không dùng TRIM. Một transaction — `UNDO` một lần.
+- **`AUTOSCAN` / alias `SCN`:** quét vùng, xuất `CAD_AutoScan_Report.txt` (3 phần), mở Notepad. Mã DXF mô phỏng từ thuộc tính .NET (không EntGet). Alias không dùng `ASC` (Telex ra "ác").
+- **Nút chưa có lệnh:** `RibbonPlaceholderHandler` in ASCII, không đăng ký lệnh giả.
+- **Target tự chọn:** `iSurvey.csproj` và `build-bundle.ps1` đọc `acdbmgd.runtimeconfig.json` → net8 hoặc net10. Máy này host net10; máy host net8 vẫn build net8.
+
+**Đã kiểm:** lõi cắt hình học 18 ca (dự án thử tạm, không nằm trong repo). Ribbon đã cài và user xác nhận giao diện.
+
+**Chưa test trên DWG thật:** `CBD` với TIN/đồng mức; `SCN` file báo cáo; EG Lào Cai xuất KMZ sau bundle mới.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Ribbon | `src/UI/RibbonBuilder.cs`, `RibbonIcons.cs`, `RibbonPlaceholderHandler.cs` |
+| Cắt bình đồ | `src/Modules/Plan/PlanModule.cs`, `PlanGeometry.cs`, `PlanPaths.cs` |
+| Quét cấu trúc | `src/Modules/Scan/ScanModule.cs`, `ScanReport.cs` |
+| Lệnh / deploy | `src/Main.cs`, `CommandAliases.cs`, `PackageContents.xml`, `iSurvey.csproj`, `deploy/build-bundle.ps1` |
+
+### Việc tiếp
+
+- [ ] Test `CBD` trên bản sao DWG có TIN và đồng mức Z>0.
+- [ ] Test `SCN` trên vùng nhỏ, đọc file `.txt`.
+- [ ] Xác nhận EG Lào Cai TM-3 xuất KMZ được (bundle đã cài lại trong phiên).
+- [ ] (Tuỳ) Mosaic lớn phục vụ Layout / in.
+- [ ] (Tuỳ) Lưu settings trong DWG; toggle AutoRefresh trên UI.
+- [ ] Bổ sung HDSD / workflow.
+
+### Câu mở phiên sau
+
+```text
+Đọc docs/phien-lam-viec/HANDOFF.md (block đầu). iSurvey 1.2.0 — ribbon 5 panel, CATBD/CBD, AUTOSCAN/SCN, target net8 hoặc net10 theo host. Tiếp: test CBD và SCN trên DWG thật, hoặc tính năng mới theo Mẫu_Tư_Vấn / vá lỗi theo Mẫu_Vá_Lỗi.
+```
+
+**Lưu trữ ngày:** [2026-10-12-ribbon-catbd-autoscan.md](./2026-10-12-ribbon-catbd-autoscan.md)
+
+---
+
 ## 2026-09-03 — net8 autoload + vá KML TM-3 + TM-6 TT973 (1.1.1)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng (Civil 3D 2026 / .NET 8); cuối phiên đầy đủ; bump **1.1.1**.
