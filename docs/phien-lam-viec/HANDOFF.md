@@ -5,6 +5,51 @@
 
 ---
 
+## 2026-10-13 — Nhập KML/KMZ + hộp thoại VN-2000 (1.5.0)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; bump **1.5.0**. User đã nhập KML địa giới trên Civil và chốt luồng xuất.
+
+### Đã chốt / đã làm
+
+**Sản phẩm (AppVersion 1.5.0):**
+- **Panel Bản đồ:** hai nút lớn Nhập (`INK`) và Xuất (`EXK`, giữ `EG`). Ba nút nhỏ: Chèn ảnh vệ tinh, Cập nhật ảnh (`ISURVEY_UPDATE_GE`), Xóa ảnh. Lệnh `IG` vẫn còn, không còn nút trên ribbon.
+- **`Vn2000SetupWindow`:** chọn kinh tuyến trục (63 tỉnh, Độ/Phút), múi 3°/6°. Tùy chọn nhập hoặc xuất hiện theo lệnh. Nền tối. Ghi vào `UserSettingsStore`.
+- **Nhập:** chọn file trước. KMZ lấy file `.kml` đầu tiên. Chiếu bằng `CoordinateService.ToVn2000`. Layer `KML_IMPORT`. Xong thì phóng vừa vùng vừa nhập.
+- **Douglas-Peucker** tắt mặc định. Bật mới lọc đỉnh đường/vùng, sai số mét trên mặt phẳng. Điểm không lọc. Dưới 3 đỉnh thì giữ nguyên vòng.
+- **Xuất:** thiết lập → chọn đối tượng (hoặc cả bản vẽ) → hỏi tên file → ghi → mở Google Earth nếu đã tick. Hủy chọn hoặc không có hình thì không hỏi lưu.
+
+**Đã kiểm:** build ba target. Trên Civil 3D 2026: nhập KML chạy, user xác nhận. Ô tỉnh đã hiện tên tỉnh, không còn tên lớp C#.
+
+**Chưa test:** lọc đỉnh trên file địa giới dày; xuất theo thứ tự mới trên bản vẽ thật; CAD 2024, 2025, 2027.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Nhập | `src/Modules/Import/`, `src/Core/GeoMath.cs` |
+| Hộp thoại | `src/UI/Vn2000/Vn2000SetupWindow.xaml` |
+| Xuất | `src/Modules/Export/ExportModule.cs`, `KmlExportService.cs` |
+| Ribbon | `src/UI/RibbonBuilder.cs`, `RibbonIcons.cs`, `CommandAliases.cs`, `PackageContents.xml` |
+
+### Việc tiếp
+
+- [ ] Test lọc đỉnh trên file địa giới dày (bật Douglas-Peucker, đối chiếu với lần tắt).
+- [ ] Test `EXK`: chọn đối tượng rồi mới hộp lưu file; hủy chọn thì không hỏi lưu.
+- [ ] Mở thử AutoCAD/Civil 2024, 2025, 2027 khi có bản cài.
+- [ ] Test khóa thiết bị, hết suất 2 máy, và `LGO` trả suất trên Supabase.
+- [ ] Test `CBD`, `SCN`, EG Lào Cai TM-3 trên DWG thật.
+- [ ] MSI phát hành nội bộ — làm khi được yêu cầu.
+
+### Câu mở phiên sau
+
+```text
+Đọc docs/phien-lam-viec/HANDOFF.md (block đầu). iSurvey 1.5.0 — nhập KML/KMZ (INK), xuất EXK theo thứ tự thiết lập → chọn đối tượng → lưu file, hộp thoại Chọn kinh tuyến trục. Đã nhập thử trên Civil 2026. Tiếp: test lọc đỉnh và EXK, hoặc CAD 2024–2027, hoặc tính năng mới theo Mẫu_Tư_Vấn / vá lỗi theo Mẫu_Vá_Lỗi.
+```
+
+**Lưu trữ ngày:** [2026-10-13-nhap-kml-vn2000.md](./2026-10-13-nhap-kml-vn2000.md)
+
+---
+
 ## 2026-10-12 — Hỗ trợ CAD/Civil 2023–2027 (1.4.0)
 
 **Máy / ngữ cảnh:** Cursor — máy có AutoCAD 2023 (R24.2, .NET Framework 4.8). Cuối phiên đầy đủ; bump **1.4.0**. Không đóng MSI (user hoãn).

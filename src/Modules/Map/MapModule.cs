@@ -7,6 +7,7 @@ using iSurvey.Auth;
 using iSurvey.Core;
 using iSurvey.Models;
 using iSurvey.UI.MapInsert;
+using iSurvey.UI.Vn2000;
 
 namespace iSurvey.Modules.Map;
 
@@ -32,7 +33,81 @@ public sealed class MapModule : ISurveyModule
     public void InsertSatelliteCommand()
     {
         if (!AuthManager.EnsureAuthenticated()) return;
+
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null) return;
+        var drawingPath = string.IsNullOrWhiteSpace(doc.Database.Filename) ? null : doc.Database.Filename;
+        var saved = UserSettingsStore.Load(drawingPath);
+        if (string.IsNullOrWhiteSpace(saved.ProvinceName))
+        {
+            Vn2000SetupResult? setup;
+            try
+            {
+                setup = Vn2000SetupDialog.Show(drawingPath, Vn2000SetupMode.InsertImage);
+            }
+            catch (System.Exception ex)
+            {
+                doc.Editor.WriteMessage($"\n[iSurvey] Không mở được hộp thoại: {ex.Message}");
+                return;
+            }
+
+            if (setup is null)
+            {
+                doc.Editor.WriteMessage("\n[iSurvey] Đã hủy.");
+                return;
+            }
+
+            if (Math.Abs(setup.CentralMeridian - setup.EnteredMeridian) > 1e-6)
+            {
+                doc.Editor.WriteMessage(
+                    $"\n[iSurvey] Múi 6°: kinh tuyến {setup.EnteredMeridian:0.###}° được đưa về {setup.CentralMeridian:0.#}°.");
+            }
+        }
+
         ApplyBasemap("google-satellite");
+    }
+
+    [CommandMethod("ISURVEY_UPDATE_GE")]
+    public void UpdateGeCommand()
+    {
+        if (!AuthManager.EnsureAuthenticated()) return;
+
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null) return;
+
+        if (!IsModelSpace(doc.Database))
+        {
+            doc.Editor.WriteMessage("\n[iSurvey] Hãy mở Model Space.");
+            return;
+        }
+
+        try
+        {
+            if (!BasemapSession.IsActive)
+            {
+                var drawingPath = string.IsNullOrWhiteSpace(doc.Database.Filename) ? null : doc.Database.Filename;
+                var saved = UserSettingsStore.Load(drawingPath);
+                if (string.IsNullOrWhiteSpace(saved.ProvinceName))
+                {
+                    doc.Editor.WriteMessage("\n[iSurvey] Chưa có ảnh GE trong phiên này. Hãy chèn ảnh vệ tinh trước.");
+                    return;
+                }
+
+                var basemap = string.IsNullOrWhiteSpace(saved.BasemapId) ? "google-satellite" : saved.BasemapId;
+                BasemapSession.Activate(
+                    saved.CentralMeridian,
+                    basemap,
+                    saved.AutoRefresh,
+                    null,
+                    saved.ZoneWidthDegrees);
+            }
+
+            _refresh.Refresh(doc, BasemapSession.CentralMeridian, BasemapSession.BasemapId);
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage($"\n[iSurvey] {ex.Message}");
+        }
     }
 
     [CommandMethod("ISURVEY_DELETE_GE")]

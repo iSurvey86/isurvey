@@ -1,8 +1,8 @@
 ﻿# iSurvey — Add-in AutoCAD / Civil 3D
 
-Add-in cho AutoCAD / Civil 3D **2023–2027**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), xuất CAD → **KML/KMZ**, cắt bình đồ theo biên (`CATBD`), quét cấu trúc bản vẽ (`AUTOSCAN`). Các lệnh nghiệp vụ khóa cho tới khi kích hoạt bằng Gmail + mã OTP.
+Add-in cho AutoCAD / Civil 3D **2023–2027**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), nhập và xuất **KML/KMZ**, cắt bình đồ theo biên (`CATBD`), quét cấu trúc bản vẽ (`AUTOSCAN`). Các lệnh nghiệp vụ khóa cho tới khi kích hoạt bằng Gmail + mã OTP.
 
-**Phiên bản bundle:** `1.4.0` (`deploy/iSurvey.bundle/PackageContents.xml`)
+**Phiên bản bundle:** `1.5.0` (`deploy/iSurvey.bundle/PackageContents.xml`)
 
 **Đồng bộ phiên làm việc (Cursor / đa máy):** đọc [docs/phien-lam-viec/HANDOFF.md](docs/phien-lam-viec/HANDOFF.md). Quy tắc cuối phiên: [docs/phien-lam-viec/README.md](docs/phien-lam-viec/README.md). Changelog: [docs/changelog/CHANGELOG.md](docs/changelog/CHANGELOG.md).
 
@@ -21,8 +21,10 @@ Add-in cho AutoCAD / Civil 3D **2023–2027**: chèn tile Google Earth georefere
 |------|-------|--------|
 | `ISURVEY_MAP` | **IG** | Chèn basemap Google Earth (hộp thoại tỉnh / múi / loại ảnh) |
 | `ISURVEY_MAP_SAT` | **SG** | Chèn nhanh Google Satellite |
+| `ISURVEY_UPDATE_GE` |  | Làm mới ảnh GE theo khung nhìn hiện tại |
 | `ISURVEY_DELETE_GE` | **XG** | Xóa toàn bộ tile GE (xác nhận) |
-| `ISURVEY_EXPORT_KML` | **EG** | Xuất CAD → KML/KMZ Google Earth |
+| `ISURVEY_IMPORT_KML` | **INK** | Nhập KML/KMZ vào layer `KML_IMPORT` (VN-2000), rồi phóng vừa vùng vừa nhập |
+| `ISURVEY_EXPORT_KML` | **EXK**, **EG** | Xuất CAD → KML/KMZ. Thiết lập → chọn đối tượng → lưu file → mở Google Earth nếu đã chọn |
 | `CATBD` | **CBD** | Cắt bình đồ theo đường biên (giữ Z, không dùng TRIM) |
 | `AUTOSCAN` | **SCN** | Quét cấu trúc bản vẽ, xuất `CAD_AutoScan_Report.txt` |
 | `ISURVEY_LOGIN` | **LGI** | Đăng nhập / kích hoạt (Gmail + OTP 6 số) |
@@ -118,12 +120,14 @@ Kích hoạt: **LGI** → Gmail → **Gửi mã** → nhập 6 số. Giấy phé
 1. Mở AutoCAD / Civil 3D.
 2. Gõ lệnh **NETLOAD**.
 3. Chọn `iSurvey.dll` đúng năm: `bin\Release\net48\` (2023–2024), `net8.0-windows\` (2025–2026), `net10.0-windows\` (2027).
-4. Tab **iSurvey** → **Chèn GE**, hoặc gõ **IG** / **ISURVEY_MAP**.
+4. Tab **iSurvey** → **Nhập File KML/KMZ**, hoặc gõ **INK** / **IG**.
 5. Hộp thoại: chọn **Tỉnh** → **Múi 3°/6°** → **Loại ảnh** → **Áp dụng**.
 
 **Xóa ảnh:** **XG** / **ISURVEY_DELETE_GE** → xác nhận → xóa toàn bộ tile iSurvey.
 
-**Xuất Google Earth:** **EG** / **ISURVEY_EXPORT_KML** → chọn tỉnh / múi / phạm vi / KML|KMZ.
+**Nhập KML/KMZ:** **INK** → chọn file → hộp thoại **Chọn kinh tuyến trục** → vẽ layer `KML_IMPORT` → phóng vừa vùng vừa nhập. Lọc đỉnh Douglas-Peucker tắt mặc định.
+
+**Xuất Google Earth:** **EXK** hoặc **EG** → thiết lập tỉnh / múi / phạm vi → chọn đối tượng (nếu không xuất cả bản vẽ) → lưu file → mở Google Earth nếu đã tick.
 
 **Cắt bình đồ:** **CBD** / **CATBD** → chọn đường biên khép kín → quét vùng cần cắt. Một lần `UNDO` hoàn tác cả lần cắt.
 

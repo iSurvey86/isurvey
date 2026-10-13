@@ -3,7 +3,8 @@ using Autodesk.AutoCAD.Runtime;
 using iSurvey.Auth;
 using iSurvey.Core;
 using iSurvey.Modules.Map;
-using iSurvey.UI.KmlExport;
+using iSurvey.Models;
+using iSurvey.UI.Vn2000;
 
 namespace iSurvey.Modules.Export;
 
@@ -39,24 +40,105 @@ public sealed class ExportModule : ISurveyModule
 
         var drawingPath = string.IsNullOrWhiteSpace(db.Filename) ? null : db.Filename;
 
-        var settings = KmlExportDialog.Show(drawingPath);
-        if (settings is null)
+        Vn2000SetupResult? setup;
+        try
+        {
+            setup = Vn2000SetupDialog.Show(drawingPath, Vn2000SetupMode.Export);
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage($"\n[iSurvey] Không mở được hộp thoại: {ex.Message}");
+            return;
+        }
+
+        if (setup is null)
         {
             ed.WriteMessage("\n[iSurvey] Đã hủy xuất.");
             return;
         }
 
+        if (Math.Abs(setup.CentralMeridian - setup.EnteredMeridian) > 1e-6)
+        {
+            ed.WriteMessage(
+                $"\n[iSurvey] Múi 6°: kinh tuyến {setup.EnteredMeridian:0.###}° được đưa về {setup.CentralMeridian:0.#}°.");
+        }
+
+        var settings = new KmlExportSettings
+        {
+            CentralMeridian = setup.CentralMeridian,
+            ZoneWidthDegrees = setup.ZoneWidthDegrees,
+            SelectionOnly = setup.SelectionOnly,
+            UseKmz = setup.UseKmz,
+            GroupByLayer = setup.GroupByLayer,
+            UseElevationZ = setup.UseElevationZ,
+            OpenAfterExport = setup.OpenAfterExport
+        };
+
+        KmlExportService.KmlCollected collected;
+        try
+        {
+            collected = _service.Collect(doc, settings);
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage($"\n[iSurvey] Xuất thất bại: {ex.Message}");
+            return;
+        }
+
+        if (collected.Cancelled)
+        {
+            ed.WriteMessage("\n[iSurvey] Đã hủy xuất.");
+            return;
+        }
+
+        if (collected.Features.Count == 0)
+        {
+            ed.WriteMessage($"\n[iSurvey] Không có hình học nào xuất được ({collected.Report}).");
+            return;
+        }
+
+        var path = AskOutputPath(setup.UseKmz);
+        if (path is null)
+        {
+            ed.WriteMessage("\n[iSurvey] Đã hủy xuất.");
+            return;
+        }
+
+        settings.OutputPath = path;
+
         try
         {
             ed.WriteMessage(
                 $"\n[iSurvey] Đang xuất (kinh tuyến {settings.CentralMeridian:0.##}°, TM-{settings.ZoneWidthDegrees})...");
-            var report = _service.Run(doc, settings);
+            _service.Write(db, settings, collected.Features);
             ed.WriteMessage($"\n[iSurvey] Đã lưu: {settings.OutputPath}");
-            ed.WriteMessage($"\n[iSurvey] {report}");
+            ed.WriteMessage($"\n[iSurvey] {collected.Report}");
         }
         catch (System.Exception ex)
         {
             ed.WriteMessage($"\n[iSurvey] Xuất thất bại: {ex.Message}");
         }
+    }
+
+    private static string? AskOutputPath(bool useKmz)
+    {
+        var stamp = DateTime.Now.ToString("yyyyMMdd_HHmmss", System.Globalization.CultureInfo.InvariantCulture);
+        var dialog = new System.Windows.Forms.SaveFileDialog
+        {
+            Title = "Lưu file Google Earth",
+            Filter = useKmz ? "Google Earth KMZ (*.kmz)|*.kmz" : "Google Earth KML (*.kml)|*.kml",
+            DefaultExt = useKmz ? "kmz" : "kml",
+            AddExtension = true,
+            FileName = useKmz ? $"isurvey_export_{stamp}.kmz" : $"isurvey_export_{stamp}.kml"
+        };
+
+        var owner = new AcadWindow(AcadApp.MainWindow.Handle);
+        return dialog.ShowDialog(owner) == System.Windows.Forms.DialogResult.OK ? dialog.FileName : null;
+    }
+
+    private sealed class AcadWindow : System.Windows.Forms.IWin32Window
+    {
+        public IntPtr Handle { get; }
+        public AcadWindow(IntPtr handle) => Handle = handle;
     }
 }

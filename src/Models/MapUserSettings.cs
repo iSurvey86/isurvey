@@ -17,6 +17,29 @@ public sealed class MapUserSettings
     public bool AutoRefresh { get; set; } = true;
 
     public bool UseBoundaryClip { get; set; }
+
+    public bool ImportInsertPoints { get; set; } = true;
+
+    public bool ImportLabelNames { get; set; } = true;
+
+    /// <summary>Cỡ chữ ghi chú điểm, đơn vị bản vẽ.</summary>
+    public double ImportTextHeight { get; set; } = 2.0;
+
+    /// <summary>Tắt mặc định: giữ 100% đỉnh gốc của ranh giới.</summary>
+    public bool ImportSimplifyVertices { get; set; }
+
+    /// <summary>Sai số Douglas-Peucker, mét trên mặt phẳng VN-2000.</summary>
+    public double ImportSimplifyTolerance { get; set; } = 0.2;
+
+    public bool ExportSelectionOnly { get; set; } = true;
+
+    public bool ExportUseKmz { get; set; } = true;
+
+    public bool ExportGroupByLayer { get; set; } = true;
+
+    public bool ExportUseElevationZ { get; set; }
+
+    public bool ExportOpenAfter { get; set; } = true;
 }
 
 /// <summary>Hành động từ hộp thoại chèn bản đồ.</summary>

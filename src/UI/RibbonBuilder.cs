@@ -91,11 +91,14 @@ public static class RibbonBuilder
             // Panel 1 — Bản đồ
             AddPanel(tab, "Bản đồ",
                 [
-                    new Btn("Chèn GE", "ISURVEY_MAP", RibbonIcons.MapInsert, true),
-                    new Btn("Xóa GE", "ISURVEY_DELETE_GE", RibbonIcons.MapDelete, true),
-                    new Btn("Xuất GE", "ISURVEY_EXPORT_KML", RibbonIcons.ExportGe, true)
+                    new Btn("Nhập File\nKML/KMZ", "ISURVEY_IMPORT_KML", RibbonIcons.ImportKml, true),
+                    new Btn("Xuất File\nKML/KMZ", "ISURVEY_EXPORT_KML", RibbonIcons.ExportKml, true)
                 ],
-                null);
+                [
+                    new Btn("Chèn Ảnh Vệ Tinh (GE)", "ISURVEY_MAP_SAT", RibbonIcons.MapInsert, true),
+                    new Btn("Cập Nhật Ảnh GE", "ISURVEY_UPDATE_GE", RibbonIcons.UpdateGe, true),
+                    new Btn("Xóa Ảnh Vệ Tinh", "ISURVEY_DELETE_GE", RibbonIcons.MapDelete, true)
+                ]);
 
             // Panel 2 — Khung & Cắt Bình Đồ
             AddPanel(tab, "Khung & Cắt Bình Đồ",

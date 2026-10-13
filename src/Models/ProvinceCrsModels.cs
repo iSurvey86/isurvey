@@ -10,6 +10,8 @@ public sealed class ProvinceCrsGroup
 
     [JsonPropertyName("legacyAreas")]
     public List<LegacyAreaEntry> LegacyAreas { get; set; } = [];
+
+    public override string ToString() => ProvinceName;
 }
 
 /// <summary>Một khu vực hành chính cũ gắn với kinh tuyến trục TM-3.</summary>

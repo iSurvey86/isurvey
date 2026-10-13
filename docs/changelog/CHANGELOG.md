@@ -1,5 +1,17 @@
 # Changelog — iSurvey
 
+## 1.5.0 — 2026-10-13
+
+### Sản phẩm
+- Panel Bản đồ: nhập KML/KMZ (`INK`), xuất KML/KMZ (`EXK`, giữ `EG`), và ba nút ảnh (chèn vệ tinh, cập nhật, xóa).
+- Hộp thoại VN-2000 dùng chung cho nhập, xuất và chèn ảnh. Nhãn **Chọn kinh tuyến trục**. Nhớ tỉnh, múi và tùy chọn trong `.isurvey.json`.
+- Nhập: chọn file trước, rồi thiết lập. Vẽ `Point` / `LineString` / `Polygon` vào layer `KML_IMPORT`, phóng vừa vùng vừa nhập. Vòng trong và `gx:Track` bỏ qua.
+- Lọc đỉnh Douglas-Peucker tắt mặc định (sai số 0,2 m). Bật khi nhập đường nền dày đỉnh.
+- Xuất: thiết lập → chọn đối tượng hoặc cả bản vẽ → lưu file → mở Google Earth nếu đã chọn.
+
+### Docs / quy trình
+- HANDOFF + changelog phiên 1.5.0. README cập nhật lệnh nhập/xuất.
+
 ## 1.4.0 — 2026-10-12
 
 ### Sản phẩm

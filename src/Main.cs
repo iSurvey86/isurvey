@@ -1,6 +1,7 @@
 using Autodesk.AutoCAD.Runtime;
 using iSurvey.Auth;
 using iSurvey.Modules.Export;
+using iSurvey.Modules.Import;
 using iSurvey.Modules.Map;
 using iSurvey.Modules.Plan;
 using iSurvey.Modules.Scan;
@@ -12,6 +13,7 @@ using iSurvey.UI;
 #else
 [assembly: CommandClass(typeof(MapModule))]
 [assembly: CommandClass(typeof(ExportModule))]
+[assembly: CommandClass(typeof(KmlImportModule))]
 [assembly: CommandClass(typeof(PlanModule))]
 [assembly: CommandClass(typeof(ScanModule))]
 [assembly: CommandClass(typeof(AuthModule))]

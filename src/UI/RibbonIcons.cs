@@ -19,6 +19,9 @@ internal static class RibbonIcons
     public static BitmapSource MapInsert(int size) => Render(size, Solid(0x3B7D3B), DrawMapLayers);
     public static BitmapSource MapDelete(int size) => Render(size, Solid(0xB82318), DrawTrash);
     public static BitmapSource ExportGe(int size) => Render(size, Solid(0x0C59CF), DrawExport);
+    public static BitmapSource ImportKml(int size) => Render(size, Grad(0x2B9348, 0x1B6CA8), DrawFileDown);
+    public static BitmapSource ExportKml(int size) => Render(size, Grad(0x0C59CF, 0x023E8A), DrawFileUp);
+    public static BitmapSource UpdateGe(int size) => Render(size, Solid(0x0096C7), DrawRefresh);
 
     // ---------- Panel 2: Khung & Cáº¯t BÃ¬nh Äá»“ ----------
     public static BitmapSource TaoKhung(int size) => Render(size, Grad(0x0096C7, 0x023E8A), DrawFrames);
@@ -152,6 +155,45 @@ internal static class RibbonIcons
         dc.DrawLine(pen, new WpfPoint(s * 0.42, s * 0.20), new WpfPoint(s * 0.42, s * 0.76));
 
         Poly(dc, WpfBrushes.White, null, s, true, 0.58, 0.32, 0.82, 0.48, 0.58, 0.64);
+    }
+
+    /// <summary>Tờ giấy và mũi tên xuống.</summary>
+    private static void DrawFileDown(DrawingContext dc, double s) => DrawFileArrow(dc, s, down: true);
+
+    /// <summary>Tờ giấy và mũi tên lên.</summary>
+    private static void DrawFileUp(DrawingContext dc, double s) => DrawFileArrow(dc, s, down: false);
+
+    private static void DrawFileArrow(DrawingContext dc, double s, bool down)
+    {
+        var pen = Stroke(s, 0.045);
+        Poly(dc, null, pen, s, true, 0.18, 0.14, 0.58, 0.14, 0.74, 0.30, 0.74, 0.86, 0.18, 0.86);
+        Seg(dc, pen, s, 0.58, 0.14, 0.58, 0.30);
+        Seg(dc, pen, s, 0.58, 0.30, 0.74, 0.30);
+        if (down)
+        {
+            Seg(dc, pen, s, 0.46, 0.40, 0.46, 0.66);
+            Poly(dc, WpfBrushes.White, null, s, true, 0.32, 0.58, 0.60, 0.58, 0.46, 0.76);
+        }
+        else
+        {
+            Seg(dc, pen, s, 0.46, 0.76, 0.46, 0.50);
+            Poly(dc, WpfBrushes.White, null, s, true, 0.32, 0.52, 0.60, 0.52, 0.46, 0.34);
+        }
+    }
+
+    /// <summary>Mũi tên vòng — làm mới ảnh.</summary>
+    private static void DrawRefresh(DrawingContext dc, double s)
+    {
+        var pen = Stroke(s, 0.07);
+        var fig = new PathFigure { StartPoint = new WpfPoint(s * 0.72, s * 0.28), IsClosed = false };
+        fig.Segments.Add(new ArcSegment(
+            new WpfPoint(s * 0.28, s * 0.36),
+            new System.Windows.Size(s * 0.24, s * 0.24),
+            0, true, SweepDirection.Counterclockwise, true));
+        var geo = new PathGeometry();
+        geo.Figures.Add(fig);
+        dc.DrawGeometry(null, pen, geo);
+        Poly(dc, WpfBrushes.White, null, s, true, 0.62, 0.18, 0.84, 0.22, 0.70, 0.38);
     }
 
     // ---------- Glyph: Panel 2 ----------

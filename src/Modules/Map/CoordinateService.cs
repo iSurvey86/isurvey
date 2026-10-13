@@ -173,15 +173,30 @@ public sealed class CoordinateService
         }
 
         var entry = ResolveByCentralMeridian(centralMeridian);
-        cm = entry.CentralMeridian;
-        var key3 = (cm, 3);
-        if (_csCache.TryGetValue(key3, out var cached3))
-            return cached3;
+        // Trùng kinh tuyến tỉnh: dùng WKT catalog để khớp tile GE. Người dùng sửa Độ/Phút thì chiếu đúng số đã nhập.
+        if (Math.Abs(entry.CentralMeridian - centralMeridian) < 1e-4)
+        {
+            cm = entry.CentralMeridian;
+            var key3 = (cm, 3);
+            if (_csCache.TryGetValue(key3, out var cached3))
+                return cached3;
 
-        var cs3 = _csFactory.CreateFromWkt(entry.Wkt) as CoordinateSystem
-                  ?? throw new InvalidOperationException($"WKT không hợp lệ: {entry.Name}");
-        _csCache[key3] = cs3;
-        return cs3;
+            var cs3 = _csFactory.CreateFromWkt(entry.Wkt) as CoordinateSystem
+                      ?? throw new InvalidOperationException($"WKT không hợp lệ: {entry.Name}");
+            _csCache[key3] = cs3;
+            return cs3;
+        }
+
+        cm = centralMeridian;
+        var keyCustom = (Math.Round(cm, 6), 3);
+        if (_csCache.TryGetValue(keyCustom, out var cachedCustom))
+            return cachedCustom;
+
+        wkt = BuildVn2000TmWkt(cm, scaleFactor: 0.9999, name: $"VN_2000_TM3_{cm.ToString(CultureInfo.InvariantCulture)}");
+        var csCustom = _csFactory.CreateFromWkt(wkt) as CoordinateSystem
+                       ?? throw new InvalidOperationException($"WKT TM-3 không hợp lệ (CM={cm}).");
+        _csCache[keyCustom] = csCustom;
+        return csCustom;
     }
 
     /// <summary>WKT VN-2000 Transverse Mercator (cùng GEOGCS/TOWGS84 với bộ TM-3).</summary>

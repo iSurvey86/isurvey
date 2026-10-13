@@ -12,12 +12,13 @@ internal sealed class KmlExportService
 {
     private readonly CoordinateService _coordinates = new();
 
-    public string Run(Document doc, KmlExportSettings settings)
+    /// <summary>Chọn đối tượng (nếu cần) rồi thu hình. Cancelled = người dùng hủy chọn.</summary>
+    public KmlCollected Collect(Document doc, KmlExportSettings settings)
     {
         var ed = doc.Editor;
         var db = doc.Database;
-
         List<ObjectId> ids;
+
         if (settings.SelectionOnly)
         {
             var peo = new PromptSelectionOptions
@@ -26,7 +27,7 @@ internal sealed class KmlExportService
             };
             var sel = ed.GetSelection(peo);
             if (sel.Status != PromptStatus.OK || sel.Value is null || sel.Value.Count == 0)
-                throw new InvalidOperationException("Không có đối tượng nào được chọn.");
+                return new KmlCollected { Cancelled = true, Features = new List<KmlFeature>(), Report = "" };
 
             ids = sel.Value.GetObjectIds().ToList();
         }
@@ -51,10 +52,16 @@ internal sealed class KmlExportService
         var features = collector.Collect(tr, db, ids);
         tr.Commit();
 
-        if (features.Count == 0)
-            throw new InvalidOperationException(
-                $"Không có hình học nào xuất được ({collector.FormatReport()}).");
+        return new KmlCollected
+        {
+            Cancelled = false,
+            Features = features,
+            Report = collector.FormatReport()
+        };
+    }
 
+    public void Write(Database db, KmlExportSettings settings, IReadOnlyList<KmlFeature> features)
+    {
         var docName = string.IsNullOrWhiteSpace(db.Filename)
             ? "iSurvey"
             : Path.GetFileNameWithoutExtension(db.Filename);
@@ -69,8 +76,13 @@ internal sealed class KmlExportService
 
         if (settings.OpenAfterExport)
             TryOpen(settings.OutputPath);
+    }
 
-        return collector.FormatReport();
+    internal sealed class KmlCollected
+    {
+        public bool Cancelled { get; init; }
+        public required List<KmlFeature> Features { get; init; }
+        public required string Report { get; init; }
     }
 
     private static void TryOpen(string path)
