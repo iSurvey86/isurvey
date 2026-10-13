@@ -1,5 +1,13 @@
 # Changelog — iSurvey
 
+## 1.5.1 — 2026-10-13
+
+### Sản phẩm
+- Hộp thoại **Chọn kinh tuyến trục** mở lại. Bản 1.5.0 gắn cả `DisplayMemberPath` và `ItemTemplate` trên ô tỉnh, nên WPF ném lỗi và lệnh `INK` / `EXK` dừng trước khi cửa sổ hiện.
+
+### Docs / quy trình
+- HANDOFF + changelog phiên 1.5.1.
+
 ## 1.5.0 — 2026-10-13
 
 ### Sản phẩm

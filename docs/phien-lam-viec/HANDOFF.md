@@ -5,6 +5,47 @@
 
 ---
 
+## 2026-10-13 — Vá hộp thoại kinh tuyến trục (1.5.1)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; bump **1.5.1**. User mở `INK` sau 1.5.0 và hộp thoại không hiện.
+
+### Đã chốt / đã làm
+
+**Sản phẩm (AppVersion 1.5.1):**
+- Ô chọn tỉnh chỉ còn `DisplayMemberPath="ProvinceName"`. Đã bỏ `ItemTemplate`. WPF không cho đặt cả hai, nên `InitializeComponent` ném `Set property 'ItemTemplate'` và lệnh in `Không mở được hộp thoại`.
+- Nhãn vẫn **Chọn kinh tuyến trục**. Tên tỉnh vẫn hiện trong danh sách. `INK`, `EXK` và lần chèn ảnh đầu tiên dùng chung cửa sổ này.
+
+**Đã kiểm:** build ba target và cài bundle. Chưa mở lại Civil để bấm `INK`.
+
+**Chưa test:** user sẽ đóng Civil, mở lại, chạy `INK`. Các mục test của 1.5.0 vẫn mở.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Hộp thoại | `src/UI/Vn2000/Vn2000SetupWindow.xaml` |
+| Phiên bản | `iSurvey.csproj`, `deploy/iSurvey.bundle/PackageContents.xml` |
+
+### Việc tiếp
+
+- [ ] User test: đóng Civil, mở lại, `INK` — hộp thoại hiện, danh sách là tên tỉnh.
+- [ ] Test lọc đỉnh trên file địa giới dày (bật Douglas-Peucker, đối chiếu với lần tắt).
+- [ ] Test `EXK`: chọn đối tượng rồi mới hộp lưu file; hủy chọn thì không hỏi lưu.
+- [ ] Mở thử AutoCAD/Civil 2024, 2025, 2027 khi có bản cài.
+- [ ] Test khóa thiết bị, hết suất 2 máy, và `LGO` trả suất trên Supabase.
+- [ ] Test `CBD`, `SCN`, EG Lào Cai TM-3 trên DWG thật.
+- [ ] MSI phát hành nội bộ — làm khi được yêu cầu.
+
+### Câu mở phiên sau
+
+```text
+Đọc docs/phien-lam-viec/HANDOFF.md (block đầu). iSurvey 1.5.1 — vá hộp thoại Chọn kinh tuyến trục (bỏ ItemTemplate trùng DisplayMemberPath). User sắp test INK trên Civil 2026. Tiếp theo kết quả test đó, hoặc lọc đỉnh / EXK, hoặc tính năng mới theo Mẫu_Tư_Vấn / vá lỗi theo Mẫu_Vá_Lỗi.
+```
+
+**Lưu trữ ngày:** [2026-10-13-sua-hop-thoai-tinh.md](./2026-10-13-sua-hop-thoai-tinh.md)
+
+---
+
 ## 2026-10-13 — Nhập KML/KMZ + hộp thoại VN-2000 (1.5.0)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; bump **1.5.0**. User đã nhập KML địa giới trên Civil và chốt luồng xuất.

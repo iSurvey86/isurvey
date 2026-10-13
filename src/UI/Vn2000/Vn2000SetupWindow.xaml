@@ -224,13 +224,7 @@
                 <TextBlock Text="Chọn kinh tuyến trục" Style="{StaticResource FieldLabel}"/>
                 <ComboBox x:Name="ProvinceCombo" Style="{StaticResource DarkCombo}" Margin="0,0,0,12"
                           DisplayMemberPath="ProvinceName"
-                          SelectionChanged="ProvinceCombo_SelectionChanged">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding ProvinceName}"/>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+                          SelectionChanged="ProvinceCombo_SelectionChanged"/>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
