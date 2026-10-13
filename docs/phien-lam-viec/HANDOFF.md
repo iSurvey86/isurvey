@@ -5,6 +5,53 @@
 
 ---
 
+## 2026-10-13 — Ảnh HD ghép một raster (1.5.2)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; bump **1.5.2**. User muốn hết rãnh ô vuông và ảnh mờ khi in, mà vẫn giữ xem lướt AutoRefresh.
+
+### Đã chốt / đã làm
+
+**Sản phẩm (AppVersion 1.5.2):**
+- `ISURVEY_MAP_SAT` hỏi `[1. Xem luot (AutoRefresh) / 2. Ghep anh HD (Chon duong bao)]`. Enter = 1, luồng cũ.
+- Chế độ 2: chọn Polyline đóng / Region / Circle. In số ô zoom 18, 19 (khuyên dùng), 20. Chặn mức nào vượt 400 ô hoặc cạnh ảnh vượt 32768 px.
+- Tải `google-satellite` thêm `scale=2` (512×512), cache riêng `google-satellite-x2`. Ghép một JPEG chất lượng 93 vào `%LocalAppData%\iSurvey\mosaic\`.
+- Gắn một `RasterImage` (`ISURVEY_HD_`), clip đường bao, DrawOrder xuống dưới cùng. Không bật AutoRefresh cho ảnh này.
+- Refresh xem lướt không xóa ảnh HD. `ISURVEY_DELETE_GE` xóa cả tile xem lướt và ảnh HD.
+
+**Đã kiểm:** build ba target. Bundle đã cài vào AppData sau khi user tắt Civil.
+
+**Chưa test trên Civil:** user chưa chạy chế độ 2 trên đường bao thật.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Lệnh | `src/Modules/Map/MapModule.cs` |
+| Ghép ảnh | `src/Modules/Map/HdMosaicWorkflow.cs` |
+| Tải scale=2 | `src/Modules/Map/TileDownloader.cs`, `TileCacheService.cs` |
+| Giữ ảnh HD khi refresh | `src/Modules/Map/RasterClearService.cs`, `SurveyRasterHelper.cs` |
+
+### Việc tiếp
+
+- [ ] User test chế độ 2 trên Civil 2026: đường bao vừa, zoom 19, hết rãnh ô, nét hơn xem lướt, pan/zoom không đổi ảnh HD.
+- [ ] User test: đóng Civil, mở lại, `INK` — hộp thoại hiện, danh sách là tên tỉnh.
+- [ ] Test lọc đỉnh trên file địa giới dày (bật Douglas-Peucker, đối chiếu với lần tắt).
+- [ ] Test `EXK`: chọn đối tượng rồi mới hộp lưu file; hủy chọn thì không hỏi lưu.
+- [ ] Mở thử AutoCAD/Civil 2024, 2025, 2027 khi có bản cài.
+- [ ] Test khóa thiết bị, hết suất 2 máy, và `LGO` trả suất trên Supabase.
+- [ ] Test `CBD`, `SCN`, EG Lào Cai TM-3 trên DWG thật.
+- [ ] MSI phát hành nội bộ — làm khi được yêu cầu.
+
+### Câu mở phiên sau
+
+```text
+Đọc docs/phien-lam-viec/HANDOFF.md (block đầu). iSurvey 1.5.2 — ISURVEY_MAP_SAT có chế độ xem lướt và ghép ảnh HD (một raster, scale=2, clip đường bao). Bundle đã cài. Tiếp: test ảnh HD trên Civil 2026, hoặc INK / EXK, hoặc tính năng mới theo Mẫu_Tư_Vấn / vá lỗi theo Mẫu_Vá_Lỗi.
+```
+
+**Lưu trữ ngày:** [2026-10-13-anh-hd-ghep-raster.md](./2026-10-13-anh-hd-ghep-raster.md)
+
+---
+
 ## 2026-10-13 — Vá hộp thoại kinh tuyến trục (1.5.1)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; bump **1.5.1**. User mở `INK` sau 1.5.0 và hộp thoại không hiện.

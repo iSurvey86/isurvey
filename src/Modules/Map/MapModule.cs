@@ -36,35 +36,83 @@ public sealed class MapModule : ISurveyModule
 
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
         if (doc is null) return;
-        var drawingPath = string.IsNullOrWhiteSpace(doc.Database.Filename) ? null : doc.Database.Filename;
-        var saved = UserSettingsStore.Load(drawingPath);
-        if (string.IsNullOrWhiteSpace(saved.ProvinceName))
+
+        if (!IsModelSpace(doc.Database))
         {
-            Vn2000SetupResult? setup;
-            try
-            {
-                setup = Vn2000SetupDialog.Show(drawingPath, Vn2000SetupMode.InsertImage);
-            }
-            catch (System.Exception ex)
-            {
-                doc.Editor.WriteMessage($"\n[iSurvey] Không mở được hộp thoại: {ex.Message}");
-                return;
-            }
-
-            if (setup is null)
-            {
-                doc.Editor.WriteMessage("\n[iSurvey] Đã hủy.");
-                return;
-            }
-
-            if (Math.Abs(setup.CentralMeridian - setup.EnteredMeridian) > 1e-6)
-            {
-                doc.Editor.WriteMessage(
-                    $"\n[iSurvey] Múi 6°: kinh tuyến {setup.EnteredMeridian:0.###}° được đưa về {setup.CentralMeridian:0.#}°.");
-            }
+            doc.Editor.WriteMessage("\n[iSurvey] Hãy mở Model Space.");
+            return;
         }
 
-        ApplyBasemap("google-satellite");
+        if (!EnsureProvince(doc))
+            return;
+
+        var mode = PromptSatelliteMode(doc.Editor);
+        if (mode is null)
+        {
+            doc.Editor.WriteMessage("\n[iSurvey] Đã hủy.");
+            return;
+        }
+
+        if (mode == 2)
+            HdMosaicWorkflow.Run(doc);
+        else
+            ApplyBasemap("google-satellite");
+    }
+
+    private static bool EnsureProvince(Document doc)
+    {
+        var drawingPath = string.IsNullOrWhiteSpace(doc.Database.Filename) ? null : doc.Database.Filename;
+        var saved = UserSettingsStore.Load(drawingPath);
+        if (!string.IsNullOrWhiteSpace(saved.ProvinceName))
+            return true;
+
+        Vn2000SetupResult? setup;
+        try
+        {
+            setup = Vn2000SetupDialog.Show(drawingPath, Vn2000SetupMode.InsertImage);
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage($"\n[iSurvey] Không mở được hộp thoại: {ex.Message}");
+            return false;
+        }
+
+        if (setup is null)
+        {
+            doc.Editor.WriteMessage("\n[iSurvey] Đã hủy.");
+            return false;
+        }
+
+        if (Math.Abs(setup.CentralMeridian - setup.EnteredMeridian) > 1e-6)
+        {
+            doc.Editor.WriteMessage(
+                $"\n[iSurvey] Múi 6°: kinh tuyến {setup.EnteredMeridian:0.###}° được đưa về {setup.CentralMeridian:0.#}°.");
+        }
+
+        return true;
+    }
+
+    private static int? PromptSatelliteMode(Editor ed)
+    {
+        var opts = new PromptKeywordOptions(
+            "\n[iSurvey] Chon che do chen anh: [1. Xem luot (AutoRefresh) / 2. Ghep anh HD (Chon duong bao)] <1>:")
+        {
+            AllowNone = true,
+            AppendKeywordsToMessage = false
+        };
+        opts.Keywords.Add("1");
+        opts.Keywords.Add("2");
+        opts.Keywords.Default = "1";
+
+        var res = ed.GetKeywords(opts);
+        if (res.Status == PromptStatus.Cancel)
+            return null;
+        if (res.Status == PromptStatus.None || res.StringResult == "1")
+            return 1;
+        if (res.StringResult == "2")
+            return 2;
+
+        return 1;
     }
 
     [CommandMethod("ISURVEY_UPDATE_GE")]

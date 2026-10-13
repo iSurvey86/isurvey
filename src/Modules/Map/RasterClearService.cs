@@ -9,7 +9,8 @@ public static class RasterClearService
     /// <summary>Layer wipeout cũ (phiên bản thử nghiệm) — dọn khi xóa GE.</summary>
     private const string LegacyExclusionLayer = "ISURVEY_EXCL";
 
-    public static int ClearAll(Database db)
+    /// <param name="includeHd">true khi xóa GE; false khi refresh xem lướt để giữ ảnh HD.</param>
+    public static int ClearAll(Database db, bool includeHd = false)
     {
         var erased = 0;
 
@@ -25,7 +26,7 @@ public static class RasterClearService
             imgDict = (DBDictionary)tr.GetObject(nod.GetAt(ImageDictName), OpenMode.ForWrite);
             foreach (DBDictionaryEntry entry in imgDict)
             {
-                if (!entry.Key.StartsWith(SurveyRasterHelper.DefPrefix, StringComparison.OrdinalIgnoreCase))
+                if (!IsManagedImageKey(entry.Key, includeHd))
                     continue;
 
                 defKeys.Add(entry.Key);
@@ -84,5 +85,13 @@ public static class RasterClearService
 
         tr.Commit();
         return erased;
+    }
+
+    private static bool IsManagedImageKey(string key, bool includeHd)
+    {
+        if (key.StartsWith(SurveyRasterHelper.HdDefPrefix, StringComparison.OrdinalIgnoreCase))
+            return includeHd;
+
+        return key.StartsWith(SurveyRasterHelper.DefPrefix, StringComparison.OrdinalIgnoreCase);
     }
 }

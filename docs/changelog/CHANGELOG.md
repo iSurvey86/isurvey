@@ -1,5 +1,14 @@
 # Changelog — iSurvey
 
+## 1.5.2 — 2026-10-13
+
+### Sản phẩm
+- `ISURVEY_MAP_SAT` hỏi chế độ: **1** xem lướt (nhiều tile, AutoRefresh) hoặc **2** ghép một ảnh HD.
+- Ảnh HD: chọn đường bao, zoom 18/19/20, tối đa 400 ô. Tải Google Satellite `scale=2` (512×512), ghép một JPEG, clip đúng đường bao, gửi xuống dưới cùng. AutoRefresh không thay ảnh này. **Xóa ảnh** vẫn xóa được.
+
+### Docs / quy trình
+- HANDOFF + changelog phiên 1.5.2. README mô tả hai chế độ chèn ảnh.
+
 ## 1.5.1 — 2026-10-13
 
 ### Sản phẩm

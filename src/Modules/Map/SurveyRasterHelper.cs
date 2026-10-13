@@ -8,6 +8,9 @@ internal static class SurveyRasterHelper
     private const string ImageDictName = "ACAD_IMAGE_DICT";
     public const string DefPrefix = "ISURVEY_";
 
+    /// <summary>Ảnh HD đã ghép — không bị AutoRefresh xóa.</summary>
+    public const string HdDefPrefix = "ISURVEY_HD_";
+
     public static bool HasAnySurveyRaster(Database db)
     {
         using var tr = db.TransactionManager.StartTransaction();

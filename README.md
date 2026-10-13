@@ -2,7 +2,7 @@
 
 Add-in cho AutoCAD / Civil 3D **2023–2027**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), nhập và xuất **KML/KMZ**, cắt bình đồ theo biên (`CATBD`), quét cấu trúc bản vẽ (`AUTOSCAN`). Các lệnh nghiệp vụ khóa cho tới khi kích hoạt bằng Gmail + mã OTP.
 
-**Phiên bản bundle:** `1.5.1` (`deploy/iSurvey.bundle/PackageContents.xml`)
+**Phiên bản bundle:** `1.5.2` (`deploy/iSurvey.bundle/PackageContents.xml`)
 
 **Đồng bộ phiên làm việc (Cursor / đa máy):** đọc [docs/phien-lam-viec/HANDOFF.md](docs/phien-lam-viec/HANDOFF.md). Quy tắc cuối phiên: [docs/phien-lam-viec/README.md](docs/phien-lam-viec/README.md). Changelog: [docs/changelog/CHANGELOG.md](docs/changelog/CHANGELOG.md).
 
@@ -20,7 +20,7 @@ Add-in cho AutoCAD / Civil 3D **2023–2027**: chèn tile Google Earth georefere
 | Lệnh | Alias | Mô tả |
 |------|-------|--------|
 | `ISURVEY_MAP` | **IG** | Chèn basemap Google Earth (hộp thoại tỉnh / múi / loại ảnh) |
-| `ISURVEY_MAP_SAT` | **SG** | Chèn nhanh Google Satellite |
+| `ISURVEY_MAP_SAT` | **SG** | Chèn Google Satellite: 1 xem lướt (AutoRefresh) hoặc 2 ghép một ảnh HD theo đường bao |
 | `ISURVEY_UPDATE_GE` |  | Làm mới ảnh GE theo khung nhìn hiện tại |
 | `ISURVEY_DELETE_GE` | **XG** | Xóa toàn bộ tile GE (xác nhận) |
 | `ISURVEY_IMPORT_KML` | **INK** | Nhập KML/KMZ vào layer `KML_IMPORT` (VN-2000), rồi phóng vừa vùng vừa nhập |
@@ -144,7 +144,8 @@ Kích hoạt: **LGI** → Gmail → **Gửi mã** → nhập 6 số. Giấy phé
 - Chỉ hỗ trợ Model Space (`TILEMODE=1` hoặc `MSPACE=1` trong viewport Layout).
 - Mỗi tile Google 256×256 = một `RasterImage`, cache tại `%LocalAppData%\iSurvey\tiles\`.
 - **ChooseZoom** theo kích thước màn hình; tự hạ zoom đến ≤ **128 tile**.
-- **AutoRefresh** khi pan/zoom.
+- **AutoRefresh** khi pan/zoom (chế độ xem lướt).
+- **Ảnh HD** (`ISURVEY_MAP_SAT` chọn 2): một JPEG ghép từ ô 512×512 (`scale=2`), zoom 18/19/20, tối đa 400 ô, clip theo đường bao. Không bị AutoRefresh thay. File nằm ở `%LocalAppData%\iSurvey\mosaic\`.
 - **Clip đường bao:** popup → *Theo đường bao* → chọn Polyline đóng.
 - **TM-6:** kinh tuyến trục snap **105 / 111 / 117** theo Thông tư 973/2001/TT-TCĐC (cùng TOWGS84 với TM-3).
 - **Export KML:** màu CAD 1:1; không Dim / layer ẩn; block = điểm insert.

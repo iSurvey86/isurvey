@@ -5,7 +5,7 @@ namespace iSurvey.Modules.Map;
 /// <summary>Xóa toàn bộ tile iSurvey (và wipeout thử nghiệm cũ nếu còn).</summary>
 public static class RasterDeleteService
 {
-    public static int DeleteAll(Database db) => RasterClearService.ClearAll(db);
+    public static int DeleteAll(Database db) => RasterClearService.ClearAll(db, includeHd: true);
 
     /// <summary>Giữ tương thích lệnh cũ.</summary>
     public enum DeleteScope

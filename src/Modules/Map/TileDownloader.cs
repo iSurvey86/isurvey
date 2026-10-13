@@ -26,17 +26,20 @@ public sealed class TileDownloader : IDisposable
         _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("image/png"));
     }
 
-    public async Task<(string? Path, bool FromCache)> EnsureTileAsync(int x, int y, int zoom, CancellationToken ct = default)
+    public Task<(string? Path, bool FromCache)> EnsureTileAsync(int x, int y, int zoom, CancellationToken ct = default)
+        => EnsureTileAsync(x, y, zoom, 1, ct);
+
+    public async Task<(string? Path, bool FromCache)> EnsureTileAsync(int x, int y, int zoom, int scale, CancellationToken ct = default)
     {
-        if (TileCacheService.TryGetCached(_sourceId, x, y, zoom, out var cached))
+        if (TileCacheService.TryGetCached(_sourceId, x, y, zoom, scale, out var cached))
             return (cached, true);
 
         for (var attempt = 1; attempt <= RetryAttempts; attempt++)
         {
-            var bytes = await TryDownloadBytesAsync(x, y, zoom, ct).ConfigureAwait(false);
+            var bytes = await TryDownloadBytesAsync(x, y, zoom, scale, ct).ConfigureAwait(false);
             if (bytes is not null)
             {
-                var path = await TileCacheService.SaveAsync(_sourceId, x, y, zoom, bytes, ct).ConfigureAwait(false);
+                var path = await TileCacheService.SaveAsync(_sourceId, x, y, zoom, bytes, scale, ct).ConfigureAwait(false);
                 return (path, false);
             }
 
@@ -47,9 +50,17 @@ public sealed class TileDownloader : IDisposable
         return (null, false);
     }
 
+    public Task<IReadOnlyList<(int X, int Y, int Z, string Path)>> EnsureTilesAsync(
+        IReadOnlyList<(int X, int Y)> tiles,
+        int zoom,
+        IProgress<(int Done, int Total)>? progress = null,
+        CancellationToken ct = default)
+        => EnsureTilesAsync(tiles, zoom, 1, progress, ct);
+
     public async Task<IReadOnlyList<(int X, int Y, int Z, string Path)>> EnsureTilesAsync(
         IReadOnlyList<(int X, int Y)> tiles,
         int zoom,
+        int scale,
         IProgress<(int Done, int Total)>? progress = null,
         CancellationToken ct = default)
     {
@@ -59,7 +70,7 @@ public sealed class TileDownloader : IDisposable
         await ForEachIndexAsync(tiles.Count, MaxConcurrent, ct, async (i, token) =>
         {
             var (x, y) = tiles[i];
-            var (path, _) = await EnsureTileAsync(x, y, zoom, token).ConfigureAwait(false);
+            var (path, _) = await EnsureTileAsync(x, y, zoom, scale, token).ConfigureAwait(false);
             if (path is not null)
                 results[i] = (x, y, zoom, path);
 
@@ -70,12 +81,14 @@ public sealed class TileDownloader : IDisposable
         return results.Where(r => r.Path is not null).ToList();
     }
 
-    private async Task<byte[]?> TryDownloadBytesAsync(int x, int y, int z, CancellationToken ct)
+    private async Task<byte[]?> TryDownloadBytesAsync(int x, int y, int z, int scale, CancellationToken ct)
     {
         var url = _urlTemplate
             .Replace("{x}", x.ToString(), StringComparison.OrdinalIgnoreCase)
             .Replace("{y}", y.ToString(), StringComparison.OrdinalIgnoreCase)
             .Replace("{z}", z.ToString(), StringComparison.OrdinalIgnoreCase);
+        if (scale > 1 && url.IndexOf("scale=", StringComparison.OrdinalIgnoreCase) < 0)
+            url += (url.IndexOf('?') >= 0 ? "&" : "?") + "scale=" + scale.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
         await Gate.WaitAsync(ct).ConfigureAwait(false);
         try

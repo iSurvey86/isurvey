@@ -10,14 +10,20 @@ public static class TileCacheService
         "iSurvey",
         "tiles");
 
-    public static string GetTilePath(string sourceId, int x, int y, int zoom)
+    public static string GetTilePath(string sourceId, int x, int y, int zoom, int scale = 1)
     {
-        return Path.Combine(RootDir, sourceId, zoom.ToString(), x.ToString(), $"{y}.jpg");
+        var folder = scale <= 1
+            ? sourceId
+            : sourceId + "-x" + scale.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        return Path.Combine(RootDir, folder, zoom.ToString(), x.ToString(), $"{y}.jpg");
     }
 
     public static bool TryGetCached(string sourceId, int x, int y, int zoom, out string path)
+        => TryGetCached(sourceId, x, y, zoom, 1, out path);
+
+    public static bool TryGetCached(string sourceId, int x, int y, int zoom, int scale, out string path)
     {
-        path = GetTilePath(sourceId, x, y, zoom);
+        path = GetTilePath(sourceId, x, y, zoom, scale);
         if (!File.Exists(path))
             return false;
 
@@ -31,9 +37,12 @@ public static class TileCacheService
         }
     }
 
-    public static async Task<string> SaveAsync(string sourceId, int x, int y, int zoom, byte[] bytes, CancellationToken ct = default)
+    public static Task<string> SaveAsync(string sourceId, int x, int y, int zoom, byte[] bytes, CancellationToken ct = default)
+        => SaveAsync(sourceId, x, y, zoom, bytes, 1, ct);
+
+    public static async Task<string> SaveAsync(string sourceId, int x, int y, int zoom, byte[] bytes, int scale, CancellationToken ct = default)
     {
-        var path = GetTilePath(sourceId, x, y, zoom);
+        var path = GetTilePath(sourceId, x, y, zoom, scale);
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
 
         ct.ThrowIfCancellationRequested();
