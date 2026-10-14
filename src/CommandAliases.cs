@@ -1,5 +1,6 @@
 using Autodesk.AutoCAD.Runtime;
 using iSurvey.Auth;
+using iSurvey.Dgn;
 using iSurvey.Modules.Export;
 using iSurvey.Modules.Import;
 using iSurvey.Modules.Map;
@@ -15,6 +16,7 @@ namespace iSurvey;
 /// <remarks>
 /// IG = Insert Google, SG = Satellite Google, XG = Xóa Google, EG = Export Google,
 /// INK = Import KML, EXK = Export KML (EG vẫn dùng được),
+/// D2C = DGN to CAD, C2D = CAD to DGN, DGNCFG = Cấu hình DGN,
 /// CBD = Cắt Bình Đồ (CATBD), SCN = Scan (AUTOSCAN; "ASC" bị Telex thành "ác" nên dùng SCN),
 /// LGI = Login (ISURVEY_LOGIN), UPD = Update, ABT = About, LGO = Logout.
 /// </remarks>
@@ -23,6 +25,7 @@ public sealed class CommandAliases
     private readonly MapModule _map = new();
     private readonly ExportModule _export = new();
     private readonly KmlImportModule _import = new();
+    private readonly DgnModule _dgn = new();
     private readonly PlanModule _plan = new();
     private readonly ScanModule _scan = new();
     private readonly AuthModule _auth = new();
@@ -44,6 +47,15 @@ public sealed class CommandAliases
 
     [CommandMethod("EXK")]
     public void AliasExportKmlShort() => _export.ExportKmlCommand();
+
+    [CommandMethod("D2C")]
+    public void AliasDgnToCad() => _dgn.DgnToCadCommand();
+
+    [CommandMethod("C2D")]
+    public void AliasCadToDgn() => _dgn.CadToDgnCommand();
+
+    [CommandMethod("DGNCFG")]
+    public void AliasDgnConfig() => _dgn.DgnConfigCommand();
 
     [CommandMethod("CBD")]
     public void AliasCutPlan() => _plan.CutPlanCommand();

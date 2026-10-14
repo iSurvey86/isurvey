@@ -21,7 +21,8 @@ public static class RibbonBuilder
     private static RibbonButton? _logoutButton;
 
     /// <summary>Mô tả một nút. Implemented=true: gửi lệnh thật; false: in thông báo "đang cập nhật".</summary>
-    private sealed record Btn(string Text, string Command, Func<int, BitmapSource> Icon, bool Implemented);
+    private sealed record Btn(string Text, string Command, Func<int, BitmapSource> Icon, bool Implemented,
+        string? Tip = null);
 
     public static void EnsureRibbon()
     {
@@ -95,9 +96,18 @@ public static class RibbonBuilder
                     new Btn("Xuất File\nKML/KMZ", "ISURVEY_EXPORT_KML", RibbonIcons.ExportKml, true)
                 ],
                 [
-                    new Btn("Chèn Ảnh Vệ Tinh (GE)", "ISURVEY_MAP_SAT", RibbonIcons.MapInsert, true),
+                    new Btn("Chèn Ảnh Vệ Tinh", "ISURVEY_MAP_SAT", RibbonIcons.MapInsert, true),
                     new Btn("Cập Nhật Ảnh GE", "ISURVEY_UPDATE_GE", RibbonIcons.UpdateGe, true),
                     new Btn("Xóa Ảnh Vệ Tinh", "ISURVEY_DELETE_GE", RibbonIcons.MapDelete, true)
+                ],
+                secondSmall:
+                [
+                    new Btn("Nhập DGN ➔ CAD", "ISURVEY_DGN_TO_CAD", RibbonIcons.DgnToCad, true,
+                        "Nhập file MicroStation (.dgn V7/V8) vào bản vẽ hiện hành hoặc chuyển hàng loạt sang .dwg (Lệnh tắt: D2C)"),
+                    new Btn("Xuất CAD ➔ DGN", "ISURVEY_CAD_TO_DGN", RibbonIcons.CadToDgn, true,
+                        "Xuất bản vẽ AutoCAD (.dwg) sang MicroStation (.dgn V8) chuẩn Seed VN-2000 (Lệnh tắt: C2D)"),
+                    new Btn("Cấu Hình DGN", "ISURVEY_DGN_CONFIG", RibbonIcons.DgnConfig, true,
+                        "Thiết lập mặc định Đơn vị DGN, Ánh xạ Level ➔ Layer và Chuyển mã Font TCVN3 ➔ Unicode (Lệnh tắt: DGNCFG)")
                 ]);
 
             // Panel 2 — Khung & Cắt Bình Đồ
@@ -231,7 +241,7 @@ public static class RibbonBuilder
 
     /// <summary>Một panel: các nút Large (32x32, dọc) + một cụm nút nhỏ (16x16, ngang) xếp nhiều dòng.</summary>
     private static void AddPanel(RibbonTab tab, string title, IReadOnlyList<Btn> large, IReadOnlyList<Btn>? small,
-        bool gated = true)
+        bool gated = true, IReadOnlyList<Btn>? secondSmall = null)
     {
         var source = new RibbonPanelSource { Title = title };
 
@@ -239,19 +249,29 @@ public static class RibbonBuilder
             source.Items.Add(CreateButton(b, isLarge: true, gated));
 
         if (small is { Count: > 0 })
-        {
-            var rows = new RibbonRowPanel();
-            for (var i = 0; i < small.Count; i++)
-            {
-                if (i > 0)
-                    rows.Items.Add(new RibbonRowBreak());
-                rows.Items.Add(CreateButton(small[i], isLarge: false, gated));
-            }
+            source.Items.Add(CreateRows(small, gated));
 
-            source.Items.Add(rows);
+        // Nhóm thứ hai (ví dụ DGN) ngăn cách bằng vạch đứng.
+        if (secondSmall is { Count: > 0 })
+        {
+            source.Items.Add(new RibbonSeparator());
+            source.Items.Add(CreateRows(secondSmall, gated));
         }
 
         tab.Panels.Add(new RibbonPanel { Source = source });
+    }
+
+    private static RibbonRowPanel CreateRows(IReadOnlyList<Btn> buttons, bool gated)
+    {
+        var rows = new RibbonRowPanel();
+        for (var i = 0; i < buttons.Count; i++)
+        {
+            if (i > 0)
+                rows.Items.Add(new RibbonRowBreak());
+            rows.Items.Add(CreateButton(buttons[i], isLarge: false, gated));
+        }
+
+        return rows;
     }
 
     private static RibbonButton CreateButton(Btn b, bool isLarge, bool gated)
@@ -267,7 +287,7 @@ public static class RibbonBuilder
             CommandHandler = b.Implemented
                 ? new RibbonCommandHandler(b.Command + "\n")
                 : new RibbonPlaceholderHandler(b.Command),
-            ToolTip = $"{b.Text.Replace("\n", " ")} ({b.Command})"
+            ToolTip = b.Tip ?? $"{b.Text.Replace("\n", " ")} ({b.Command})"
         };
 
         SetIcons(button, b.Icon);

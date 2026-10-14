@@ -1,0 +1,12 @@
+{
+  "description": "Bảng ánh xạ Level MicroStation ➔ Layer AutoCAD (bản đồ địa chính VN). Sửa file bản sao trong %AppData%\\iSurvey\\dgn_layer_mapping.json.",
+  "levels": [
+    { "level": 10, "layer": "DC_RANHTHUA", "note": "Ranh giới thửa đất" },
+    { "level": 20, "layer": "DC_NHANTHUA", "note": "Nhãn thửa, diện tích, loại đất" },
+    { "level": 23, "layer": "DC_THUYHE", "note": "Thủy hệ, sông suối" },
+    { "level": 31, "layer": "DC_GIAOTHONG", "note": "Giao thông" },
+    { "level": 45, "layer": "DC_DIAGIOI", "note": "Địa giới hành chính" },
+    { "level": 46, "layer": "DC_HANHLANG", "note": "Chỉ giới, hành lang bảo vệ" },
+    { "level": 63, "layer": "DC_KHUNGBANDO", "note": "Khung bản đồ, lưới tọa độ" }
+  ]
+}

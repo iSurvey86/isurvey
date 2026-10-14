@@ -72,6 +72,20 @@ foreach ($t in $targets) {
     Write-Host "    $($t.Year) <= $($t.Tfm)"
 }
 
+# Seed DGN cho C2D: Contents\Seeds (DgnSeedLocator tim o ..\..\Seeds so voi iSurvey.dll)
+$seedSrc = Join-Path $Root "src\Seeds"
+$seedFiles = @()
+if (Test-Path $seedSrc) { $seedFiles = @(Get-ChildItem $seedSrc -Filter "*.dgn") }
+if ($seedFiles.Count -gt 0) {
+    $seedDest = Join-Path $OutDir "Contents\Seeds"
+    New-Item -ItemType Directory -Force -Path $seedDest | Out-Null
+    foreach ($f in $seedFiles) { Copy-Item $f.FullName $seedDest -Force }
+    Write-Host "    Seeds: $($seedFiles.Name -join ', ')"
+}
+else {
+    Write-Host "    (Chua co src\Seeds\*.dgn - C2D se dung seed metric co san cua Civil 3D)"
+}
+
 Write-Host "==> Bundle san sang: $OutDir"
 
 if ($Install) {

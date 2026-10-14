@@ -2,7 +2,7 @@
 
 Add-in cho AutoCAD / Civil 3D **2023–2027**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), nhập và xuất **KML/KMZ**, cắt bình đồ theo biên (`CATBD`), quét cấu trúc bản vẽ (`AUTOSCAN`). Các lệnh nghiệp vụ khóa cho tới khi kích hoạt bằng Gmail + mã OTP.
 
-**Phiên bản bundle:** `1.5.2` (`deploy/iSurvey.bundle/PackageContents.xml`)
+**Phiên bản bundle:** `1.6.0` (`deploy/iSurvey.bundle/PackageContents.xml`)
 
 **Đồng bộ phiên làm việc (Cursor / đa máy):** đọc [docs/phien-lam-viec/HANDOFF.md](docs/phien-lam-viec/HANDOFF.md). Quy tắc cuối phiên: [docs/phien-lam-viec/README.md](docs/phien-lam-viec/README.md). Changelog: [docs/changelog/CHANGELOG.md](docs/changelog/CHANGELOG.md).
 
@@ -25,6 +25,9 @@ Add-in cho AutoCAD / Civil 3D **2023–2027**: chèn tile Google Earth georefere
 | `ISURVEY_DELETE_GE` | **XG** | Xóa toàn bộ tile GE (xác nhận) |
 | `ISURVEY_IMPORT_KML` | **INK** | Nhập KML/KMZ vào layer `KML_IMPORT` (VN-2000), rồi phóng vừa vùng vừa nhập |
 | `ISURVEY_EXPORT_KML` | **EXK**, **EG** | Xuất CAD → KML/KMZ. Thiết lập → chọn đối tượng → lưu file → mở Google Earth nếu đã chọn |
+| `ISURVEY_DGN_TO_CAD` | **D2C** | Nhập một file MicroStation `.dgn` (V7/V8) vào Model Space bằng engine DGN của Civil 3D, hoặc **Batch** nhiều file (ghép vào một bản vẽ mới / mỗi file một `.dwg`); hậu xử lý layer, font TCVN3 ➔ Unicode, Explode cell, dọn rác, zoom. `UNDO` hai lần để hoàn tác (hậu xử lý + DGNIMPORT) |
+| `ISURVEY_CAD_TO_DGN` | **C2D** | Xuất CAD ➔ MicroStation DGN V8/V7: toàn bộ Model Space hoặc đối tượng đang chọn; Purge trên bản sao tạm (bản vẽ gốc không đổi); tự chọn seed 2D/3D, tự điền hộp thoại seed |
+| `ISURVEY_DGN_CONFIG` | **DGNCFG** | Thiết lập mặc định đơn vị DGN, ánh xạ Level ➔ Layer (`dgn_layer_mapping.json`), chuyển mã font |
 | `CATBD` | **CBD** | Cắt bình đồ theo đường biên (giữ Z, không dùng TRIM) |
 | `AUTOSCAN` | **SCN** | Quét cấu trúc bản vẽ, xuất `CAD_AutoScan_Report.txt` |
 | `ISURVEY_LOGIN` | **LGI** | Đăng nhập / kích hoạt (Gmail + OTP 6 số) |

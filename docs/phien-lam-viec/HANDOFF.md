@@ -5,6 +5,69 @@
 
 ---
 
+## ⏰ NHẮC USER — việc tồn đọng (đầu mỗi phiên, hỏi user có làm không)
+
+**Chuẩn hóa DGN ➔ CAD theo quy định (user hoãn 2026-10-14, "làm sau"):**
+- Tài liệu đã đọc: `cspl_dc/` (TT 26/2024/TT-BTNMT, Phụ lục 21 bảng Level 1–63, Phụ lục 22 màu/ký hiệu) và `cspl_dh/` (QCVN 72:2023/BTNMT địa hình 1:2.000/1:5.000: font Times New Roman, màu CMYK, không có bảng Level).
+- Bảng `src/Data/dgn_layer_mapping.json` mặc định đang LỆCH Phụ lục 21 (level 20/23/31/45/46 sai nghĩa) ➔ thay bằng bảng đủ 63 Level.
+- Cần user chốt: phạm vi (địa chính trước / cả địa hình), quy ước tên layer (`10_RANH_THUA` hay `DC_...`), có áp màu RGB Phụ lục 22 không (tùy chọn / luôn), font địa chính (Arial / Times New Roman / chờ ảnh Phụ lục 22).
+- Giới hạn đã biết: chữ in hoa (font `.VnTimeH`) của DGN V8 ra chữ thường vì tên font gốc mất; Phụ lục 22 địa chính là hình ảnh (không có font/cỡ chữ dạng text).
+- User sẽ gửi thêm QCVN về biên tập bản đồ địa hình / địa chính.
+- Áp dụng cả hướng CAD ➔ DGN (C2D): mapping layer ➔ Level khi xuất hiện là `Standard` mặc định của Civil (layer `0` ➔ level 63).
+- Seed V8 chuẩn VN-2000 (2D và 3D): user lưu từ MicroStation vào `src\Seeds\`.
+
+---
+
+## 2026-10-15 — DGN ➔ CAD (V7/V8, Batch) và CAD ➔ DGN (1.6.0)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; **1.6.0** (HEAD trước đó là 1.5.2, nên 1.6.0 là bản phát hành duy nhất gồm D2C + Batch + C2D).
+
+### Đã chốt / đã làm
+
+**D2C (đã user kiểm chứng "rất tốt, đúng ý"):**
+- Nhập V7/V8 bằng `-DGNIMPORT` + `DGNIMPORTMODE=2`; hoàn tất bất đồng bộ nên chờ `Handseed` ngừng đổi. `UNDO` 2 lần.
+- V8: layer `<file> - Model$0$Level N` ➔ `Level N`; text V8 giải mã `N/64`, `∅`, `±` rồi TCVN3. Chữ hoa `.VnTimeH` ra chữ thường (giới hạn đã biết).
+- **Batch**: Ghép (một bản vẽ mới chưa lưu, các mảnh liền nhau theo tọa độ) / Không ghép (mỗi file một `.dwg` cùng thư mục; trùng tên: đánh số / bỏ qua / ghi đè).
+- Chế độ `DGNIMPORTMODE=0` lệch tọa độ +5×10⁸ / +10⁹ ➔ không dùng.
+
+**C2D (`ISURVEY_CAD_TO_DGN`) — user đã xuất thành công trên DWG thật (Hải Dương, 1182 đối tượng, 3D):**
+- Trình tự prompt `-DGNEXPORT`: `[V7/V8]` ➔ tên file ➔ `[Master/Sub]` ➔ mapping setup ➔ seed. Prompt seed chỉ nhận keyword hoặc `~` (hộp thoại modal) ➔ `SeedDialogDriver` luồng nền tự điền đường dẫn seed và bấm Open (ComboBox 13006 + IDOK).
+- Seed: `Contents\Seeds\VN2000_Seed{2D|3D}_{V7|V8}.dgn` ➔ fallback seed metric của Civil. Bản vẽ có Z ≠ 0 bắt buộc seed 3D (`Detect3D`). Kẹt ở bước seed > 90 s ➔ tự hủy.
+- Seed V7 2D tạo từ 5 element đầu của `DC2.dgn`; seed V7 3D = bản 2D vá byte TCB theo khác biệt 2D/3D của Civil. **Chưa có seed V8** chuẩn VN-2000 (V8 là OLE nén, không tạo được nếu không có MicroStation).
+- `DgnExportService`: xuất từ bản sao tạm (Wblock) khi chọn "đối tượng đang chọn" hoặc bật Purge ➔ bản vẽ gốc không đổi. Có hộp thoại báo kết quả (nút mở thư mục).
+- Headless test (Civil 2026): V7/V8 × chọn/toàn bộ × 2D/3D, nhập lại giữ đúng X/Y/Z.
+
+**Build/cài:** `deploy\build-bundle.ps1 -Install` (Civil phải đóng). Bản 1.6.0 đã cài, kèm hộp thoại báo kết quả (user chưa xác nhận hộp thoại này).
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Lệnh | `src/Dgn/DgnModule.cs` |
+| D2C | `DgnImportService.cs`, `DgnBatchService.cs`, `DgnImportWindow.xaml(.cs)`, `Tcvn3Converter.cs` |
+| C2D | `DgnExportService.cs`, `DgnExportWindow.xaml(.cs)`, `DgnExportDialog.cs`, `DgnExportOptions.cs`, `DgnSeedLocator.cs`, `SeedDialogDriver.cs` |
+| Seed | `src/Seeds/VN2000_Seed2D_V7.dgn`, `VN2000_Seed3D_V7.dgn` (+ build-bundle.ps1 copy vào `Contents\Seeds`) |
+| Log | `%LocalAppData%\iSurvey\logs\dgn_*.log`, `c2d_*.log` |
+
+### Việc tiếp
+
+- [ ] **Nhắc user (đầu phiên):** chuẩn hóa theo quy chuẩn (xem khối nhắc ở đầu file) + user gửi thêm QCVN địa hình/địa chính.
+- [ ] Seed V8 chuẩn VN-2000: user lưu từ MicroStation (`DC1.dgn` xóa hết đối tượng ➔ Save As `VN2000_Seed2D_V8.dgn`; thêm bản 3D) vào `src\Seeds\`, rồi build lại.
+- [ ] User mở file DGN xuất trong MicroStation: kiểm Level (layer `0` ➔ level 63 theo mapping `Standard`), đơn vị, text tiếng Việt (font khi xuất chưa kiểm), view 3D của seed V7 3D (nếu ẩn đối tượng: Fit View).
+- [ ] User xác nhận hộp thoại báo kết quả C2D hiện đúng.
+- [ ] Batch xuất nhiều bản vẽ ➔ DGN (chưa có).
+- [ ] Các mục test cũ: INK/EXK, lọc đỉnh, CAD 2024/2025/2027, khóa thiết bị Supabase, CBD/SCN, EG Lào Cai TM-3, MSI (khi được yêu cầu).
+
+### Câu mở phiên sau
+
+```text
+Đọc docs/phien-lam-viec/HANDOFF.md (block đầu và khối NHẮC USER). iSurvey 1.6.0 — D2C (V7/V8, Batch) và C2D (xuất DGN V7/V8, seed tự động 2D/3D) đã chạy trên Civil 2026. Tiếp: nhắc user về chuẩn hóa theo quy chuẩn (Phụ lục 21/22, QCVN), seed V8 VN-2000, kiểm file DGN trong MicroStation, hoặc việc mới.
+```
+
+**Lưu trữ ngày:** [2026-10-15-dgn-d2c-c2d.md](./2026-10-15-dgn-d2c-c2d.md)
+
+---
+
 ## 2026-10-13 — Ảnh HD ghép một raster (1.5.2)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; bump **1.5.2**. User muốn hết rãnh ô vuông và ảnh mờ khi in, mà vẫn giữ xem lướt AutoRefresh.

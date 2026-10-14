@@ -3,7 +3,7 @@
                     AutodeskProduct="AutoCAD"
                     Name="iSurvey"
                     Description="iSurvey — Google Earth + VN-2000 cho AutoCAD / Civil 3D"
-                    AppVersion="1.5.2"
+                    AppVersion="1.6.0"
                     ProductCode="{8F3E2A1B-4C5D-6E7F-9012-3456789ABCDE}"
                     UpgradeCode="{1D2E3F4A-5B6C-7D8E-9F0A-1B2C3D4E5F6A}"
                     Author="iSurvey">
@@ -13,7 +13,7 @@
   <Components Description="iSurvey for AutoCAD / Civil 3D 2023-2024">
     <RuntimeRequirements OS="Win64" Platform="AutoCAD|Civil3D" SeriesMin="R24.2" SeriesMax="R24.3" />
     <ComponentEntry AppName="iSurvey.2023"
-                    Version="1.5.2"
+                    Version="1.6.0"
                     ModuleName="./Contents/Win64/2023/iSurvey.dll"
                     LoadOnAutoCADStartup="True"
                     LoadOnCommandInvocation="True">
@@ -24,12 +24,18 @@
         <Command Local="ISURVEY_EXPORT_KML" Global="ISURVEY_EXPORT_KML" />
         <Command Local="ISURVEY_IMPORT_KML" Global="ISURVEY_IMPORT_KML" />
         <Command Local="ISURVEY_UPDATE_GE" Global="ISURVEY_UPDATE_GE" />
+        <Command Local="ISURVEY_DGN_TO_CAD" Global="ISURVEY_DGN_TO_CAD" />
+        <Command Local="ISURVEY_CAD_TO_DGN" Global="ISURVEY_CAD_TO_DGN" />
+        <Command Local="ISURVEY_DGN_CONFIG" Global="ISURVEY_DGN_CONFIG" />
         <Command Local="IG" Global="IG" />
         <Command Local="SG" Global="SG" />
         <Command Local="XG" Global="XG" />
         <Command Local="EG" Global="EG" />
         <Command Local="INK" Global="INK" />
         <Command Local="EXK" Global="EXK" />
+        <Command Local="D2C" Global="D2C" />
+        <Command Local="C2D" Global="C2D" />
+        <Command Local="DGNCFG" Global="DGNCFG" />
         <Command Local="CATBD" Global="CATBD" />
         <Command Local="CBD" Global="CBD" />
         <Command Local="AUTOSCAN" Global="AUTOSCAN" />
@@ -51,7 +57,7 @@
   <Components Description="iSurvey for AutoCAD / Civil 3D 2025-2026">
     <RuntimeRequirements OS="Win64" Platform="AutoCAD|Civil3D" SeriesMin="R25.0" SeriesMax="R25.1" />
     <ComponentEntry AppName="iSurvey.2025"
-                    Version="1.5.2"
+                    Version="1.6.0"
                     ModuleName="./Contents/Win64/2025/iSurvey.dll"
                     LoadOnAutoCADStartup="True"
                     LoadOnCommandInvocation="True">
@@ -62,12 +68,18 @@
         <Command Local="ISURVEY_EXPORT_KML" Global="ISURVEY_EXPORT_KML" />
         <Command Local="ISURVEY_IMPORT_KML" Global="ISURVEY_IMPORT_KML" />
         <Command Local="ISURVEY_UPDATE_GE" Global="ISURVEY_UPDATE_GE" />
+        <Command Local="ISURVEY_DGN_TO_CAD" Global="ISURVEY_DGN_TO_CAD" />
+        <Command Local="ISURVEY_CAD_TO_DGN" Global="ISURVEY_CAD_TO_DGN" />
+        <Command Local="ISURVEY_DGN_CONFIG" Global="ISURVEY_DGN_CONFIG" />
         <Command Local="IG" Global="IG" />
         <Command Local="SG" Global="SG" />
         <Command Local="XG" Global="XG" />
         <Command Local="EG" Global="EG" />
         <Command Local="INK" Global="INK" />
         <Command Local="EXK" Global="EXK" />
+        <Command Local="D2C" Global="D2C" />
+        <Command Local="C2D" Global="C2D" />
+        <Command Local="DGNCFG" Global="DGNCFG" />
         <Command Local="CATBD" Global="CATBD" />
         <Command Local="CBD" Global="CBD" />
         <Command Local="AUTOSCAN" Global="AUTOSCAN" />
@@ -89,7 +101,7 @@
   <Components Description="iSurvey for AutoCAD / Civil 3D 2027">
     <RuntimeRequirements OS="Win64" Platform="AutoCAD|Civil3D" SeriesMin="R26.0" SeriesMax="R26.0" />
     <ComponentEntry AppName="iSurvey.2027"
-                    Version="1.5.2"
+                    Version="1.6.0"
                     ModuleName="./Contents/Win64/2027/iSurvey.dll"
                     LoadOnAutoCADStartup="True"
                     LoadOnCommandInvocation="True">
@@ -100,12 +112,18 @@
         <Command Local="ISURVEY_EXPORT_KML" Global="ISURVEY_EXPORT_KML" />
         <Command Local="ISURVEY_IMPORT_KML" Global="ISURVEY_IMPORT_KML" />
         <Command Local="ISURVEY_UPDATE_GE" Global="ISURVEY_UPDATE_GE" />
+        <Command Local="ISURVEY_DGN_TO_CAD" Global="ISURVEY_DGN_TO_CAD" />
+        <Command Local="ISURVEY_CAD_TO_DGN" Global="ISURVEY_CAD_TO_DGN" />
+        <Command Local="ISURVEY_DGN_CONFIG" Global="ISURVEY_DGN_CONFIG" />
         <Command Local="IG" Global="IG" />
         <Command Local="SG" Global="SG" />
         <Command Local="XG" Global="XG" />
         <Command Local="EG" Global="EG" />
         <Command Local="INK" Global="INK" />
         <Command Local="EXK" Global="EXK" />
+        <Command Local="D2C" Global="D2C" />
+        <Command Local="C2D" Global="C2D" />
+        <Command Local="DGNCFG" Global="DGNCFG" />
         <Command Local="CATBD" Global="CATBD" />
         <Command Local="CBD" Global="CBD" />
         <Command Local="AUTOSCAN" Global="AUTOSCAN" />

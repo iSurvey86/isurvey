@@ -1,5 +1,36 @@
 # Changelog — iSurvey
 
+## 1.6.0 — 2026-10-15
+
+### Sản phẩm (CAD ➔ DGN, `C2D`)
+- `C2D` / `ISURVEY_CAD_TO_DGN` xuất bản vẽ ra MicroStation **V8 hoặc V7** bằng `-DGNEXPORT` của Civil 3D. Hộp thoại `DgnExportWindow` tối màu: phạm vi (toàn bộ / đối tượng đang chọn, chụp PICKFIRST ngay khi gõ lệnh), phiên bản, Purge, ghi đè. Bấm xuất ➔ hộp lưu file ➔ hộp thoại báo kết quả (có nút mở thư mục).
+- Trình tự prompt `-DGNEXPORT` (đã xác minh Civil 3D 2026): định dạng `[V7/V8]` ➔ tên file ➔ đơn vị `[Master/Sub]` ➔ mapping setup ➔ seed. Prompt seed chỉ nhận keyword hoặc `~` (hộp thoại modal, không nhận đường dẫn gõ) ➔ `SeedDialogDriver` (luồng nền) tự điền đường dẫn seed và bấm Open (nhận diện theo ComboBox 13006 + IDOK).
+- **Seed tự động**, không bắt người dùng chọn: seed trong bundle `Contents\Seeds\VN2000_Seed{2D|3D}_{V7|V8}.dgn` ➔ seed metric của Civil (`V7/V8-Metric-Seed2D/3D.dgn`). Bản vẽ có Z ≠ 0 (hoặc Solid3d / Polyline3d / mesh...) bắt buộc seed 3D ("A 3D seed file is required"); `Detect3D` quét trước. Kẹt ở bước seed quá 90 giây ➔ tự hủy và báo.
+- `VN2000_Seed2D_V7.dgn` tạo từ 5 element đầu (TCB...) của `DC2.dgn` rồi thêm marker kết thúc (1 UOR = 1 cm, tọa độ VN-2000 vừa giới hạn V7); `VN2000_Seed3D_V7.dgn` = bản 2D vá các byte TCB theo khác biệt giữa seed 2D/3D của Civil. Chưa có seed V8 chuẩn VN-2000 (xem HANDOFF).
+- `DgnExportService`: xuất từ **bản sao tạm** (Wblock đối tượng ➔ DWG tạm ➔ mở ➔ xuất ➔ đóng bỏ) khi chọn "đối tượng đang chọn" hoặc bật Purge ➔ bản vẽ gốc không đổi; xuất toàn bộ + tắt Purge thì xuất thẳng bản vẽ hiện hành. Log `%LocalAppData%\iSurvey\logs\c2d_*.log`.
+- `deploy/build-bundle.ps1` copy `src\Seeds\*.dgn` vào `Contents\Seeds`.
+- Đã kiểm chứng (Civil 3D 2026): V7/V8, chọn/toàn bộ, 2D/3D, Purge bật/tắt; nhập lại DGN ra đúng X=530254, Y=2378229 và Z; trên DWG thật (Hải Dương, 1182 đối tượng, có Z) xuất 128 KB trong 5,2 giây.
+
+### Sản phẩm (DGN ➔ CAD, `D2C`)
+- **Batch** trong hộp thoại D2C: nhiều file `.dgn`, **ghép** vào MỘT bản vẽ mới chưa lưu (các mảnh liền nhau theo tọa độ) hoặc **không ghép** (mỗi file một `.dwg` cùng thư mục, trùng tên: đánh số / bỏ qua / ghi đè). Tuần tự trong bản vẽ trống từ `QNEWTEMPLATE`, đợi kích hoạt (`WaitUntilActive`) trước khi ra lệnh.
+- Nhập bằng `DGNIMPORTMODE=2` (thẳng vào bản vẽ hiện hành, tọa độ tuyệt đối đúng). Chế độ 0 tạo bản vẽ mới và lệch +5×10⁸ (X), +10⁹ (Y) nên không dùng.
+- `-DGNIMPORT` hoàn tất bất đồng bộ sau khi `Editor.Command` trả về ➔ hậu xử lý chờ `Handseed` ngừng đổi (Idle). `UNDO` 2 lần.
+- DGN V8: layer `<file> - Model$0$Level N` ➔ bỏ tiền tố về `Level N` (gộp các mảnh); font V8 giải mã artifact `N/64`, `∅`, `±` rồi qua bảng TCVN3. Giới hạn: chữ hoa `.VnTimeH` ra chữ thường.
+
+### Sản phẩm (chung)
+- Panel **Bản đồ** chia hai nhóm ngăn cách bằng `RibbonSeparator`: nhóm Google Earth/KML và nhóm **DGN**. Nhãn ngắn hơn cho màn 14 inch; mỗi nút DGN có tooltip riêng.
+- Module **DGN ➔ CAD** (Giai đoạn 1): `D2C` / `ISURVEY_DGN_TO_CAD` nhập một file `.dgn` (V7/V8) vào Model Space bằng engine DGN của Civil 3D (`-DGNIMPORT`, `FILEDIA=0`, `CMDDIA=0`), không cần MicroStation.
+  - Lọc đối tượng mới theo `Database.Handseed`; bọc `UNDO _BEGIN/_END` (một lần `UNDO` hoàn tác cả lần nhập); khôi phục biến hệ thống.
+  - Hậu xử lý: Explode cell (có giới hạn), đổi tên/gộp layer (giữ Level / tiền tố / bảng JSON địa chính), TCVN3 ➔ Unicode (Arial) nhận diện theo nội dung chuỗi, dọn linetype/layer/block rác, kiểm tra vùng bao VN-2000, zoom.
+  - Hộp thoại `DgnImportWindow` tối màu; log chi tiết ra Command Line và `%LocalAppData%\iSurvey\logs\dgn_*.log`.
+- `DGNCFG` / `ISURVEY_DGN_CONFIG`: lưu mặc định đơn vị, layer, font; mở bảng ánh xạ `dgn_layer_mapping.json` (bản sửa được trong `%AppData%\iSurvey`).
+- Ba nút DGN bị khóa khi chưa đăng nhập.
+
+### Chưa làm / chưa kiểm chứng
+- Chuẩn hóa theo quy định (Phụ lục 21 – 63 Level, tên layer, màu RGB Phụ lục 22, font, chữ hoa V8) — hoãn theo yêu cầu, xem HANDOFF.
+- Seed V8 chuẩn VN-2000 (đang dùng seed metric của Civil); chưa mở file xuất trong MicroStation; mapping Level của `-DGNEXPORT` mặc định (layer `0` ➔ level 63); font text tiếng Việt khi xuất chưa kiểm.
+- Batch xuất nhiều bản vẽ ➔ DGN chưa có. VNI chưa được chuyển mã (chỉ TCVN3).
+
 ## 1.5.2 — 2026-10-13
 
 ### Sản phẩm

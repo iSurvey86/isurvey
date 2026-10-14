@@ -13,7 +13,7 @@ namespace iSurvey.UI;
 /// Icon Ribbon vector â€” váº½ báº±ng DrawingVisual â†’ RenderTargetBitmap, khÃ´ng cáº§n file áº£nh ngoÃ i.
 /// Ná»n bo gÃ³c (bÃ¡n kÃ­nh size * 0.18), nÃ©t tráº¯ng.
 /// </summary>
-internal static class RibbonIcons
+internal static partial class RibbonIcons
 {
     // ---------- Panel 1: Báº£n Ä‘á»“ (ná»n Ä‘áº·c) ----------
     public static BitmapSource MapInsert(int size) => Render(size, Solid(0x3B7D3B), DrawMapLayers);
