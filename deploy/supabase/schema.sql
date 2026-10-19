@@ -184,3 +184,7 @@ revoke all on function public.isurvey_release_device(text)        from public, a
 grant execute on function public.isurvey_activate(text, text, text) to authenticated;
 grant execute on function public.isurvey_check(text)                to authenticated;
 grant execute on function public.isurvey_release_device(text)       to authenticated;
+
+-- Nhật ký hoạt động (login / lệnh / update): chạy thêm schema_activity.sql
+-- (bảng isurvey_activity + RPC isurvey_log_event).
+-- View tổng hợp Admin: schema_admin.sql. UI: tab iSurvey trong ksnpsc.

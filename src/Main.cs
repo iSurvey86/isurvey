@@ -6,6 +6,8 @@ using iSurvey.Modules.Import;
 using iSurvey.Modules.Map;
 using iSurvey.Modules.Plan;
 using iSurvey.Modules.Scan;
+using iSurvey.Modules.Tuyen;
+using iSurvey.Modules.Uav;
 using iSurvey.UI;
 
 [assembly: ExtensionApplication(typeof(iSurvey.Main))]
@@ -16,6 +18,8 @@ using iSurvey.UI;
 [assembly: CommandClass(typeof(ExportModule))]
 [assembly: CommandClass(typeof(KmlImportModule))]
 [assembly: CommandClass(typeof(DgnModule))]
+[assembly: CommandClass(typeof(UavModule))]
+[assembly: CommandClass(typeof(VertexNumberingService))]
 [assembly: CommandClass(typeof(PlanModule))]
 [assembly: CommandClass(typeof(ScanModule))]
 [assembly: CommandClass(typeof(AuthModule))]

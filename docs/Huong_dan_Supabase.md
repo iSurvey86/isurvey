@@ -16,6 +16,13 @@ Script tạo bảng `isurvey_licenses`, bật RLS (client chỉ đọc được 
 `isurvey_activate`, `isurvey_check`, `isurvey_release_device`. Chạy lại nhiều lần vẫn an toàn.
 Giới hạn thiết bị: hằng `c_max_devices := 2` trong `isurvey_activate`.
 
+Chạy thêm `deploy/supabase/schema_activity.sql` (nhật ký hoạt động): bảng `isurvey_activity` + RPC `isurvey_log_event`.
+Chạy thêm `deploy/supabase/schema_admin.sql` (view tổng hợp Admin: thiết bị / top lệnh / lỗi).
+
+Admin xem:
+- Nhanh: **Table Editor → isurvey_activity** / views `isurvey_v_*`
+- Khuyến nghị: tab **iSurvey** trong ksnpsc → **Quản lý hệ thống** (Admin only; xem `docs/Huong_dan_Admin_ksnpsc.md`)
+
 ## 3. Bật custom SMTP (bắt buộc)
 SMTP mặc định của Supabase **chỉ gửi cho thành viên team** và giới hạn **2 mail/giờ** (không dùng cho production).
 **Authentication → Emails → SMTP Settings → Enable custom SMTP**, điền host/port/user/pass/From của một dịch vụ gửi mail
@@ -58,6 +65,7 @@ File này ghi đè hằng mặc định. Để trống cả hai thì iSurvey ch�
 | Giải phóng suất thiết bị cho người dùng đổi máy | xóa dòng (người dùng cũng tự làm được bằng nút **Đăng Xuất / Đổi Máy** nếu máy cũ còn mở được) |
 | **Khóa cả tài khoản** | Authentication → Users → chọn user → **Ban user**; đồng thời đặt `is_active = false` cho các dòng của user đó |
 | Tăng/giảm số thiết bị | sửa `c_max_devices` trong `isurvey_activate` rồi chạy lại hàm |
+| Xem nhật ký hoạt động | Table Editor → `isurvey_activity` (login / logout / command / update_check) |
 
 Một thiết bị đang bị khóa **không** tự xóa được bằng nút Đổi Máy (hàm chỉ xóa dòng đang `is_active`), nên không né được lệnh khóa.
 

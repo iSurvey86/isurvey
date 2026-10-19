@@ -44,6 +44,38 @@ internal static class RasterClipService
         return ApplyClipRing(raster, localClip);
     }
 
+    /// <summary>
+    /// Gắn clip đa giác đầy đủ (UAV / orthophoto) — không cắt theo hình chữ nhật tile GE.
+    /// Tọa độ WCS ➔ hệ pixel qua PixelToModelTransform.Inverse().
+    /// </summary>
+    public static bool TryApplyClipPolygon(RasterImage raster, IReadOnlyList<Point2d> clipPolygonWcs)
+    {
+        if (clipPolygonWcs.Count < 3)
+            return false;
+
+        return ApplyClipRing(raster, clipPolygonWcs);
+    }
+
+    /// <summary>Gắn clip trực tiếp bằng tọa độ pixel CAD (tránh round-trip WCS sai gốc Y).</summary>
+    public static bool TryApplyClipPolygonPixels(RasterImage raster, IReadOnlyList<Point2d> pixelRing)
+    {
+        if (pixelRing.Count < 3)
+            return false;
+
+        var ring = new Point2dCollection();
+        foreach (var p in pixelRing)
+            ring.Add(p);
+
+        var first = ring[0];
+        var last = ring[ring.Count - 1];
+        if (first.GetDistanceTo(last) > 1e-6)
+            ring.Add(first);
+
+        raster.SetClipBoundary(ClipBoundaryType.Poly, ring);
+        raster.IsClipped = true;
+        return true;
+    }
+
     public static List<Point2d> BuildTileQuad(CoordinateSystem3d orientation)
     {
         var o = orientation.Origin;

@@ -39,11 +39,54 @@ public sealed class AuthModule : ISurveyModule
     [CommandMethod("ISURVEY_UPDATE")]
     public void UpdateCommand()
     {
-        DarkDialog.ShowInfo(
-            "KIỂM TRA CẬP NHẬT",
-            "Bạn đang dùng phiên bản mới nhất",
-            [("Phiên bản hiện tại", AuthManager.AppVersion)],
-            note: "Chức năng tự kiểm tra bản mới trực tuyến sẽ được bổ sung ở phiên bản sau.");
+        AuthManager.Print("\n[iSurvey] Dang kiem tra ban cap nhat...");
+        var result = UpdateCheckService.Check();
+        ActivityLogger.Enqueue("update_check", detail: new
+        {
+            current = AuthManager.AppVersion,
+            latest = result.Manifest?.Latest,
+            available = result.UpdateAvailable,
+            ok = result.Ok,
+        });
+
+        if (!result.Ok)
+        {
+            DarkDialog.ShowInfo(
+                "KIỂM TRA CẬP NHẬT",
+                "Không kiểm tra được",
+                [("Phiên bản hiện tại", AuthManager.AppVersion)],
+                note: result.Message);
+            return;
+        }
+
+        if (!result.UpdateAvailable || result.Manifest is null)
+        {
+            DarkDialog.ShowInfo(
+                "KIỂM TRA CẬP NHẬT",
+                "Bạn đang dùng phiên bản mới nhất",
+                [("Phiên bản hiện tại", AuthManager.AppVersion)]);
+            return;
+        }
+
+        var man = result.Manifest;
+        var rows = new List<(string, string)>
+        {
+            ("Phiên bản hiện tại", AuthManager.AppVersion),
+            ("Phiên bản mới", man.Latest),
+        };
+        if (!string.IsNullOrWhiteSpace(man.Notes))
+            rows.Add(("Ghi chú", man.Notes!));
+
+        var msg = "Có bản cập nhật mới. Tải về và chạy Install-iSurvey.bat (đóng Civil 3D trước).";
+        if (DarkDialog.Confirm("CẬP NHẬT iSurvey", msg + "\n\nMở trang tải về?", "Tải về", "Để sau"))
+        {
+            UpdateCheckService.OpenDownload(man);
+            AuthManager.Print("\n[iSurvey] Da mo link tai ve.");
+        }
+        else
+        {
+            DarkDialog.ShowInfo("CẬP NHẬT iSurvey", "Có bản mới", rows, note: msg);
+        }
     }
 
     [CommandMethod("ISURVEY_LOGOUT")]

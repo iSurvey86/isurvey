@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Windows.Threading;
 using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 
@@ -69,16 +70,23 @@ public static class AuthManager
     }
 
     /// <summary>Đầu mỗi lệnh tính năng. Chưa đăng nhập → nhắc và mở LoginWindow; thành công → true để lệnh chạy tiếp.</summary>
-    public static bool EnsureAuthenticated()
+    public static bool EnsureAuthenticated([CallerMemberName] string? commandName = null)
     {
         Refresh();
         if (IsAuthenticated)
+        {
+            if (!string.IsNullOrWhiteSpace(commandName))
+                ActivityLogger.Enqueue("command", commandName);
             return true;
+        }
 
         Print(_expiredNotice
             ? "\n[iSurvey] Giay phep da qua 7 ngay chua xac minh truc tuyen. Vui long dang nhap lai de kich hoat!"
             : "\n[iSurvey] Vui long dang nhap Gmail de kich hoat ban quyen su dung!");
-        return ShowLogin();
+        var ok = ShowLogin();
+        if (ok && !string.IsNullOrWhiteSpace(commandName))
+            ActivityLogger.Enqueue("command", commandName);
+        return ok;
     }
 
     /// <summary>Mở cửa sổ đăng nhập (modal). Trả true nếu đã kích hoạt.</summary>
@@ -107,11 +115,16 @@ public static class AuthManager
             : Storage.Save(email, LicenseMode.Online, session.UserId, session.RefreshToken);
         _expiredNotice = false;
         RaiseChanged();
+        ActivityLogger.Enqueue("login", detail: new { email, mode = _license.Mode.ToString() });
+        if (_license.Mode == LicenseMode.Online)
+            ActivityLogger.TrackHeartbeat("login");
     }
 
     public static void SignOut()
     {
         var old = _license;
+        if (old is not null)
+            ActivityLogger.Enqueue("logout", detail: new { email = old.Email });
         Storage.Delete();
         _license = null;
         RaiseChanged();
@@ -195,6 +208,8 @@ public static class AuthManager
         try
         {
             _license = Storage.Save(updated);
+            if (outcome.Action == RecheckAction.Verified)
+                ActivityLogger.TrackHeartbeat("recheck");
         }
         catch (System.Exception ex)
         {

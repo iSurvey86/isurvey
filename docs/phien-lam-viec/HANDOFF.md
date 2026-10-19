@@ -18,6 +18,54 @@
 
 ---
 
+## 2026-10-19 — Phát hành Setup / update / activity + UAVCLIP + GOC (1.7.0)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; bump **1.7.0**. Repo ksnpsc đã push tab Admin iSurvey riêng (`e264362`).
+
+### Đã chốt / đã làm
+
+**UAVCLIP (user: Auto-Clip mỹ mãn):**
+- Panel Ribbon **UAV & LiDAR**; `ISURVEY_UAV_CLIP` / `UAVCLIP`: chọn ảnh → (1) polyline + Smart Filter / auto-pair hoặc (2) Auto-Clip nền trắng/đen (downsample ≤2048, contour, Douglas-Peucker, `TryApplyClipPolygonPixels`).
+
+**GOC (user: rất tốt):**
+- `ISURVEY_NUMBER_VERTICES` / `GOC`: đánh số góc tuyến, layer `ISURVEY_GOC_TUYEN` ACI 1, cỡ theo tỷ lệ bản đồ (mặc định 1:1000).
+
+**Phát hành / update / nhật ký:**
+- `deploy/build-release.ps1` → `iSurvey-Setup-1.7.0.zip` (Install/Uninstall + bundle). Đã upload Storage bucket public `isurvey-releases` (`version.json` + zip) — kiểm tra HTTP 200 OK.
+- `ISURVEY_UPDATE` đọc manifest công khai, so semver, mở link tải.
+- `schema_activity.sql` + `ActivityLogger` (login/logout/command/update_check/heartbeat); `schema_admin.sql` (views tổng hợp).
+- **Admin UI:** tab **iSurvey** trong ksnpsc → Quản lý hệ thống (API service role). Docs: `Huong_dan_Phat_hanh.md`, `Huong_dan_Admin_ksnpsc.md`.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Setup | `deploy/Install-iSurvey.*`, `Uninstall-iSurvey.*`, `build-release.ps1`, `CAI_DAT.txt` |
+| Update | `src/Auth/UpdateCheckService.cs`, `AuthModule` (`ISURVEY_UPDATE`) |
+| Activity | `src/Auth/ActivityLogger.cs`, `deploy/supabase/schema_activity.sql`, `schema_admin.sql` |
+| UAV | `src/Modules/Uav/*`, `RasterClipService.cs`, `RibbonIconsUav.cs` |
+| GOC | `src/Modules/Tuyen/VertexNumberingService.cs` |
+| Admin ksnpsc | `ksnpsc/.../IsurveyAdminPanel.js`, `api/isurvey/*` (repo riêng) |
+
+### Việc tiếp
+
+- [ ] **Nhắc user (đầu phiên):** chuẩn hóa DGN theo quy chuẩn (khối NHẮC USER ở đầu file) — vẫn hoãn.
+- [ ] **Vercel ksnpsc:** thêm `ISURVEY_SUPABASE_URL` + `ISURVEY_SERVICE_ROLE_KEY` nếu chưa → tab iSurvey mới tải được dữ liệu.
+- [ ] Chạy `schema_admin.sql` trên Supabase iSurvey nếu chưa.
+- [ ] Cài bản Setup 1.7.0 trên máy dùng thật; thử `ISURVEY_UPDATE` trên máy bản cũ hơn.
+- [ ] Seed V8 VN-2000; kiểm DGN xuất trong MicroStation (tồn từ 1.6.0).
+- [ ] (Tuỳ) CI auto build+upload release khi push — chưa làm.
+
+### Câu mở phiên sau
+
+```text
+Đọc docs/phien-lam-viec/HANDOFF.md (block đầu và khối NHẮC USER). iSurvey 1.7.0 — Setup zip + update online (Storage OK) + activity/heartbeat; UAVCLIP + GOC đã OK trên Civil 2026; tab Admin iSurvey trên ksnpsc (cần env Vercel). Tiếp: nhắc chuẩn hóa DGN theo quy chuẩn, seed V8, hoặc việc mới.
+```
+
+**Lưu trữ ngày:** [2026-10-19-phat-hanh-uav-goc-admin.md](./2026-10-19-phat-hanh-uav-goc-admin.md)
+
+---
+
 ## 2026-10-15 — DGN ➔ CAD (V7/V8, Batch) và CAD ➔ DGN (1.6.0)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; **1.6.0** (HEAD trước đó là 1.5.2, nên 1.6.0 là bản phát hành duy nhất gồm D2C + Batch + C2D).

@@ -31,6 +31,11 @@ public sealed class AuthConfig
     public string? SupabaseUrl { get; set; }
     public string? SupabaseKey { get; set; }
 
+    /// <summary>
+    /// URL file version.json (update online). Để trống = {SupabaseUrl}/storage/v1/object/public/isurvey-releases/version.json
+    /// </summary>
+    public string? UpdateManifestUrl { get; set; }
+
     public string ResolvedSupabaseUrl =>
         (string.IsNullOrWhiteSpace(SupabaseUrl) ? DefaultSupabaseUrl : SupabaseUrl).Trim().TrimEnd('/');
 

@@ -1,5 +1,20 @@
 # Changelog — iSurvey
 
+## 1.7.0 — 2026-10-19
+
+### Phát hành / vận hành
+- **Bản cài gửi người dùng:** `deploy/build-release.ps1` → zip `iSurvey-Setup-1.7.0.zip` (bundle + `Install-iSurvey.bat` / `Uninstall-iSurvey.bat` + `CAI_DAT.txt`). Người dùng giải nén → chạy `Install-iSurvey.bat` (đóng Civil trước).
+- **Update online:** lệnh `ISURVEY_UPDATE` đọc `version.json` công khai trên Supabase Storage bucket `isurvey-releases`, so semver, mở link tải zip Setup nếu có bản mới. Bucket + file đã kiểm tra public OK.
+- **Nhật ký hoạt động:** bảng `isurvey_activity` + RPC `isurvey_log_event` (`schema_activity.sql`). Client ghi login/logout/command/update_check; thêm `heartbeat` (login + recheck 24h) và helper `TrackError`. Chỉ giấy phép Online.
+- **Admin UI (ksnpsc):** tab **Quản lý hệ thống → iSurvey** (repo ksnpsc, Admin only) — tổng quan máy/lệnh/lỗi, khóa thiết bị, nhật ký. Env `ISURVEY_SUPABASE_URL` + `ISURVEY_SERVICE_ROLE_KEY`. Views SQL: `schema_admin.sql`.
+
+### Sản phẩm
+- Panel **UAV & LiDAR**, `UAVCLIP` / `ISURVEY_UAV_CLIP` (clip polyline + Smart Filter / Auto-Clip nền trắng-đen); user xác nhận Auto-Clip đạt.
+- `GOC` / `ISURVEY_NUMBER_VERTICES` đánh số góc tuyến (layer `ISURVEY_GOC_TUYEN`, cỡ theo tỷ lệ bản đồ mặc định 1:1000); user xác nhận rất tốt.
+
+### Docs
+- `docs/Huong_dan_Phat_hanh.md`, `docs/Huong_dan_Admin_ksnpsc.md`; cập nhật `Huong_dan_Supabase.md`.
+
 ## 1.6.0 — 2026-10-15
 
 ### Sản phẩm (CAD ➔ DGN, `C2D`)

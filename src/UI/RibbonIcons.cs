@@ -40,6 +40,7 @@ internal static partial class RibbonIcons
     public static BitmapSource RaiMong(int size) => Render(size, Grad(0x7209B7, 0x3A0CA3), DrawFoundation);
     public static BitmapSource BienDuongTam(int size) => Render(size, Solid(0xE09F3E), DrawRoad);
     public static BitmapSource KeTuyen(int size) => Render(size, Solid(0xB82318), DrawLightning);
+    public static BitmapSource DanhSoGoc(int size) => Render(size, Grad(0xEF4444, 0xB91C1C), DrawVertexNumbers);
     public static BitmapSource DanhSoCot(int size) => Render(size, Solid(0x2A9D8F), DrawTag);
 
     // ---------- Panel 5: Há»“ sÆ¡ & QA/QC ----------
@@ -320,6 +321,18 @@ internal static partial class RibbonIcons
     /// <summary>Tia sÃ©t Ä‘iá»‡n.</summary>
     private static void DrawLightning(DrawingContext dc, double s) =>
         Poly(dc, WpfBrushes.White, null, s, true, 0.60, 0.08, 0.26, 0.52, 0.46, 0.52, 0.38, 0.92, 0.76, 0.42, 0.54, 0.42, 0.68, 0.08);
+
+    /// <summary>Đường gấp khúc + chấm đỉnh góc (đánh số góc tuyến).</summary>
+    private static void DrawVertexNumbers(DrawingContext dc, double s)
+    {
+        var pen = Stroke(s, 0.08);
+        Poly(dc, null, pen, s, false, 0.12, 0.72, 0.38, 0.28, 0.62, 0.62, 0.88, 0.22);
+        var r = Math.Max(1.4, s * 0.07);
+        dc.DrawEllipse(WpfBrushes.White, null, new WpfPoint(s * 0.12, s * 0.72), r, r);
+        dc.DrawEllipse(WpfBrushes.White, null, new WpfPoint(s * 0.38, s * 0.28), r, r);
+        dc.DrawEllipse(WpfBrushes.White, null, new WpfPoint(s * 0.62, s * 0.62), r, r);
+        dc.DrawEllipse(WpfBrushes.White, null, new WpfPoint(s * 0.88, s * 0.22), r, r);
+    }
 
     /// <summary>Tháº» Tag.</summary>
     private static void DrawTag(DrawingContext dc, double s)

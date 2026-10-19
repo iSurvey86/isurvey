@@ -5,7 +5,7 @@ using System.Windows.Media.Imaging;
 
 namespace iSurvey.UI;
 
-/// <summary>Tạo tab Ribbon iSurvey (6 panel) — khởi tạo an toàn khi Ribbon chưa sẵn sàng.</summary>
+/// <summary>Tạo tab Ribbon iSurvey — khởi tạo an toàn khi Ribbon chưa sẵn sàng.</summary>
 public static class RibbonBuilder
 {
     private const string TabId = "ISURVEY_RIBBON_TAB";
@@ -14,8 +14,8 @@ public static class RibbonBuilder
 
     private static bool _subscribed;
 
-    /// <summary>Nút Panel 1–5: bị khóa (IsEnabled=false) khi chưa đăng nhập.</summary>
-    private static readonly List<RibbonButton> GatedButtons = [];
+    /// <summary>Nút nghiệp vụ: bị khóa (IsEnabled=false) khi chưa đăng nhập.</summary>
+    private static readonly List<RibbonItem> GatedButtons = [];
 
     private static RibbonButton? _accountButton;
     private static RibbonButton? _logoutButton;
@@ -110,7 +110,10 @@ public static class RibbonBuilder
                         "Thiết lập mặc định Đơn vị DGN, Ánh xạ Level ➔ Layer và Chuyển mã Font TCVN3 ➔ Unicode (Lệnh tắt: DGNCFG)")
                 ]);
 
-            // Panel 2 — Khung & Cắt Bình Đồ
+            // Panel 2 — UAV & LiDAR (SplitButton gọn cho màn 14")
+            AddUavLidarPanel(tab);
+
+            // Panel 3 — Khung & Cắt Bình Đồ
             AddPanel(tab, "Khung & Cắt Bình Đồ",
                 [
                     new Btn("Tạo Khung\nLưới TĐ", "TAOKHUNG", RibbonIcons.TaoKhung, false),
@@ -122,7 +125,7 @@ public static class RibbonBuilder
                     new Btn("Bảo Vệ Layer Khung", "KHOAKHUNG", RibbonIcons.KhoaKhung, false)
                 ]);
 
-            // Panel 3 — Biên tập Địa hình
+            // Panel 4 — Biên tập Địa hình
             AddPanel(tab, "Biên tập Địa hình",
                 [
                     new Btn("Ghi Số\nĐồng Mức", "GHISODM", RibbonIcons.GhiSoDm, false)
@@ -133,10 +136,12 @@ public static class RibbonBuilder
                     new Btn("Chuẩn Hóa Mã Font", "CHUYENFONT", RibbonIcons.ChuyenFont, false)
                 ]);
 
-            // Panel 4 — Tuyến & Cột Điện
+            // Panel 5 — Tuyến & Cột Điện
             AddPanel(tab, "Tuyến & Cột Điện",
                 [
-                    new Btn("Rải Móng &\nBiên Đất", "RAIMONG", RibbonIcons.RaiMong, false)
+                    new Btn("Rải Móng &\nBiên Đất", "RAIMONG", RibbonIcons.RaiMong, false),
+                    new Btn("Đánh Số\nGóc Tuyến", "ISURVEY_NUMBER_VERTICES", RibbonIcons.DanhSoGoc, true,
+                        "Đánh số góc tim tuyến — chấm đỏ + chữ né đường (GOC)")
                 ],
                 [
                     new Btn("Tạo Biên Đường Tạm", "BIENDUONGTAM", RibbonIcons.BienDuongTam, false),
@@ -144,7 +149,7 @@ public static class RibbonBuilder
                     new Btn("Đánh Số Hiệu Cột", "DANHSOCOT", RibbonIcons.DanhSoCot, false)
                 ]);
 
-            // Panel 5 — Hồ sơ & QA/QC
+            // Panel 6 — Hồ sơ & QA/QC
             AddPanel(tab, "Hồ sơ & QA/QC",
                 [
                     new Btn("Bảng TĐ &\nDiện Tích", "BANGTOADO", RibbonIcons.BangToaDo, false)
@@ -155,7 +160,7 @@ public static class RibbonBuilder
                     new Btn("Xuất Thống Kê Excel", "XUATEXCEL", RibbonIcons.XuatExcel, false)
                 ]);
 
-            // Panel 6 — Tài khoản & Hệ thống (luôn bật; nút Đăng xuất chỉ bật khi đã đăng nhập)
+            // Panel 7 — Tài khoản & Hệ thống (luôn bật; nút Đăng xuất chỉ bật khi đã đăng nhập)
             AddPanel(tab, "Tài khoản & Hệ thống",
                 [
                     new Btn("Đăng Nhập\nKích Hoạt", LoginCommand, AuthIcons.UserLocked, true)
@@ -226,7 +231,7 @@ public static class RibbonBuilder
         return name.Length > 12 ? name[..11] + "…" : name;
     }
 
-    private static void SetIcons(RibbonButton button, Func<int, BitmapSource> icon)
+    private static void SetIcons(RibbonCommandItem button, Func<int, BitmapSource> icon)
     {
         try
         {
@@ -237,6 +242,89 @@ public static class RibbonBuilder
         {
             // Icon tùy chọn — bỏ qua nếu lỗi
         }
+    }
+
+    /// <summary>
+    /// Panel UAV &amp; LiDAR: 2 RibbonSplitButton (Ảnh / DEM) + 3 nút nhỏ Point Cloud xếp dọc.
+    /// Chiều ngang gọn (~130px) cho laptop 14 inch.
+    /// </summary>
+    private static void AddUavLidarPanel(RibbonTab tab)
+    {
+        var source = new RibbonPanelSource { Title = "UAV & LiDAR" };
+
+        source.Items.Add(CreateSplitButton(
+            text: "Chèn Ảnh\nUAV (Geo)",
+            mainCommand: "ISURVEY_UAV_INSERT",
+            mainIcon: RibbonIcons.UavInsert,
+            mainImplemented: true,
+            tip: "Chèn ảnh UAV / orthophoto georeference (đang phát triển)",
+            dropdown:
+            [
+                new Btn("Cắt Ảnh Theo Biên", "ISURVEY_UAV_CLIP", RibbonIcons.UavClip, true,
+                    "Chọn ảnh → 1=Polyline biên (batch) / 2=Auto-Clip nền trắng-đen (UAVCLIP)"),
+                new Btn("Tắt/Bật Khung Ảnh", "ISURVEY_UAV_FRAME_TOGGLE", RibbonIcons.UavFrame, true,
+                    "Bật hoặc tắt khung bao quanh RasterImage"),
+                new Btn("Đưa Ảnh Xuống Dưới", "ISURVEY_UAV_SEND_BACK", RibbonIcons.UavSendBack, true,
+                    "Đưa RasterImage xuống dưới cùng DrawOrder")
+            ]));
+
+        source.Items.Add(CreateSplitButton(
+            text: "Nhập DEM\n& Bề Mặt",
+            mainCommand: "ISURVEY_UAV_DEM",
+            mainIcon: RibbonIcons.UavDem,
+            mainImplemented: true,
+            tip: "Nhập DEM / bề mặt UAV (đang phát triển)",
+            dropdown:
+            [
+                new Btn("Vẽ Đường Đồng Mức", "ISURVEY_UAV_CONTOUR", RibbonIcons.UavContour, true,
+                    "Nội suy đường đồng mức từ DEM (đang phát triển)"),
+                new Btn("Hệ Tọa Độ UAV", "ISURVEY_UAV_CRS", RibbonIcons.UavCrs, true,
+                    "Thiết lập hệ tọa độ ảnh / DEM UAV (đang phát triển)")
+            ]));
+
+        source.Items.Add(CreateRows(
+            [
+                new Btn("Nhập Point Cloud", "ISURVEY_PC_IMPORT", RibbonIcons.PcImport, true,
+                    "Nhập đám mây điểm (đang phát triển)"),
+                new Btn("Lọc Điểm Mặt Đất", "ISURVEY_PC_FILTER", RibbonIcons.PcFilter, true,
+                    "Lọc điểm mặt đất từ Point Cloud (đang phát triển)"),
+                new Btn("Rải Lưới Điểm", "ISURVEY_PC_GRID", RibbonIcons.PcGrid, true,
+                    "Rải lưới điểm từ Point Cloud (đang phát triển)")
+            ],
+            gated: true));
+
+        tab.Panels.Add(new RibbonPanel { Source = source });
+    }
+
+    private static RibbonSplitButton CreateSplitButton(
+        string text,
+        string mainCommand,
+        Func<int, BitmapSource> mainIcon,
+        bool mainImplemented,
+        string tip,
+        IReadOnlyList<Btn> dropdown)
+    {
+        var split = new RibbonSplitButton
+        {
+            Text = text,
+            ShowText = true,
+            Size = RibbonItemSize.Large,
+            Orientation = System.Windows.Controls.Orientation.Vertical,
+            IsSplit = true,
+            IsSynchronizedWithCurrentItem = false,
+            CommandHandler = mainImplemented
+                ? new RibbonCommandHandler(mainCommand + "\n")
+                : new RibbonPlaceholderHandler(mainCommand),
+            ToolTip = tip
+        };
+
+        SetIcons(split, mainIcon);
+        GatedButtons.Add(split);
+
+        foreach (var item in dropdown)
+            split.Items.Add(CreateButton(item, isLarge: false, gated: true));
+
+        return split;
     }
 
     /// <summary>Một panel: các nút Large (32x32, dọc) + một cụm nút nhỏ (16x16, ngang) xếp nhiều dòng.</summary>

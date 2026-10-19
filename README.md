@@ -2,7 +2,7 @@
 
 Add-in cho AutoCAD / Civil 3D **2023–2027**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), nhập và xuất **KML/KMZ**, cắt bình đồ theo biên (`CATBD`), quét cấu trúc bản vẽ (`AUTOSCAN`). Các lệnh nghiệp vụ khóa cho tới khi kích hoạt bằng Gmail + mã OTP.
 
-**Phiên bản bundle:** `1.6.0` (`deploy/iSurvey.bundle/PackageContents.xml`)
+**Phiên bản bundle:** `1.7.0` (`deploy/iSurvey.bundle/PackageContents.xml`)
 
 **Đồng bộ phiên làm việc (Cursor / đa máy):** đọc [docs/phien-lam-viec/HANDOFF.md](docs/phien-lam-viec/HANDOFF.md). Quy tắc cuối phiên: [docs/phien-lam-viec/README.md](docs/phien-lam-viec/README.md). Changelog: [docs/changelog/CHANGELOG.md](docs/changelog/CHANGELOG.md).
 
@@ -33,10 +33,12 @@ Add-in cho AutoCAD / Civil 3D **2023–2027**: chèn tile Google Earth georefere
 | `ISURVEY_LOGIN` | **LGI** | Đăng nhập / kích hoạt (Gmail + OTP 6 số) |
 | `ISURVEY_ABOUT` | **ABT** | Thông tin tài khoản và giấy phép trên máy |
 | `ISURVEY_LOGOUT` | **LGO** | Đăng xuất / đổi máy (trả suất thiết bị nếu đang trực tuyến) |
-| `ISURVEY_UPDATE` | **UPD** | Kiểm tra cập nhật |
+| `ISURVEY_UPDATE` | **UPD** | Kiểm tra cập nhật online (`version.json` trên Storage) |
 | `ISURVEY_GENOTP` |  | In mã kích hoạt trong ngày (chỉ máy Admin có `AdminSecret`) |
+| `ISURVEY_UAV_CLIP` | **UAVCLIP** | Clip biên ảnh UAV (polyline hoặc Auto-Clip nền trắng/đen) |
+| `ISURVEY_NUMBER_VERTICES` | **GOC** | Đánh số góc tuyến theo tỷ lệ bản đồ |
 
-Catalog đầy đủ: [docs/Danh_sach_lenh_iSurvey.xlsx](docs/Danh_sach_lenh_iSurvey.xlsx). Thiết lập Supabase (một lần, Admin): [docs/Huong_dan_Supabase.md](docs/Huong_dan_Supabase.md).
+Catalog đầy đủ: [docs/Danh_sach_lenh_iSurvey.xlsx](docs/Danh_sach_lenh_iSurvey.xlsx). Supabase: [docs/Huong_dan_Supabase.md](docs/Huong_dan_Supabase.md). Phát hành Setup/update: [docs/Huong_dan_Phat_hanh.md](docs/Huong_dan_Phat_hanh.md). Admin nhật ký (ksnpsc): [docs/Huong_dan_Admin_ksnpsc.md](docs/Huong_dan_Admin_ksnpsc.md).
 
 ## Biên dịch
 

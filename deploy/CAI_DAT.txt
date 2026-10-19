@@ -1,0 +1,31 @@
+================================================================================
+  iSurvey — Hướng dẫn cài đặt (người dùng cuối)
+================================================================================
+
+YÊU CẦU
+  - Windows 64-bit
+  - AutoCAD hoặc Civil 3D 2023 / 2024 / 2025 / 2026 / 2027
+  - Đóng hết AutoCAD / Civil trước khi cài hoặc cập nhật
+
+CÀI ĐẶT (khuyên dùng)
+  1. Giải nén toàn bộ file zip ra một thư mục (ví dụ Desktop\iSurvey-Setup).
+  2. Chuột phải Install-iSurvey.bat → "Run as administrator" KHÔNG bắt buộc
+     (cài per-user vào %AppData%). Hoặc double-click Install-iSurvey.bat.
+  3. Nếu Windows chặn script: chuộc phải file .ps1 → Properties → Unblock,
+     hoặc chạy:
+       powershell -ExecutionPolicy Bypass -File .\Install-iSurvey.ps1
+  4. Mở lại Civil 3D → tab Ribbon "iSurvey".
+  5. Bấm Đăng nhập / gõ LGI → nhập Gmail → mã OTP 6 số.
+
+GỠ CÀI
+  - Chạy Uninstall-iSurvey.bat (đóng Civil trước).
+
+CẬP NHẬT
+  - Trong Civil: tab iSurvey → Kiểm Tra Cập Nhật (UPD), hoặc gõ ISURVEY_UPDATE.
+  - Nếu có bản mới: tải zip → đóng Civil → giải nén → chạy Install lại.
+
+HỖ TRỢ
+  - Admin quản lý giấy phép trên Supabase (isurvey_licenses).
+  - Mỗi Gmail tối đa 2 máy. Đăng xuất (LGO) để trả suất thiết bị.
+
+================================================================================
