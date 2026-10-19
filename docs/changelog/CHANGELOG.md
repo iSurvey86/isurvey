@@ -1,5 +1,23 @@
 # Changelog — iSurvey
 
+## 1.7.1 — 2026-10-19
+
+Bản vá sau rà soát 1.7.0. **Nên cài thay 1.7.0.**
+
+### Sửa lỗi nghiêm trọng (đăng nhập / nhật ký)
+- `ActivityLogger` refresh token cho MỖI sự kiện nhưng không lưu refresh token mới. Supabase đổi refresh token mỗi lần dùng nên token trong `license.dat` nhanh chóng hết hiệu lực: nhật ký ngừng ghi, kiểm tra 24 giờ thất bại, giấy phép hết hạn sau 7 ngày không xác minh (người dùng phải đăng nhập lại).
+- Nay `AuthManager.AcquireAccessToken` cấp access token dùng chung (cache ~50 phút), lưu refresh token mới ngay, qua một `TokenGate` chung với kiểm tra định kỳ; lỗi refresh nghỉ 5 phút (không dồn dập). `Refresh()` / `ApplyRecheck` không còn ghi đè token mới bằng bản cũ.
+- Sự kiện `logout` trước đây không bao giờ tới server (giấy phép bị xóa trước khi gửi) — nay gửi cùng bước trả suất thiết bị.
+- Sự kiện `error` nay được ghi từ các lệnh Map / Xuất / Nhập KML / CATBD / SCN / UAVCLIP / DGN khi lỗi. Nhật ký dùng proxy hệ thống (mạng công ty).
+
+### Sửa lỗi khác
+- `GOC`: đỉnh trùng nhau làm lệnh ném lỗi (`GetNormal` vector 0); tuyến khép kín nay tính phân giác đúng ở đỉnh đầu/cuối và không đánh số trùng đỉnh cuối; đỉnh có Z ≠ 0 vẫn tô được chấm (Hatch cùng cao độ).
+- `UAVCLIP`: ảnh trên layer khóa không còn làm hỏng cả lô; biên suy biến chỉ bỏ qua ảnh đó; lỗi bất ngờ báo rõ và hoàn tác; `DrawOrder` dùng đúng block chứa ảnh (Layout cũng được).
+- `ISURVEY_UPDATE`: `min_version` / `released_at` trong `version.json` nay được đọc đúng (trước đó bị bỏ qua); chấp nhận BOM của PowerShell 5.1; chỉ mở link http/https.
+- `build-release.ps1`: tham số `-Notes` thay cho ghi chú cố định; sửa lỗi cú pháp `$stageName.zip`; `version.json` ghi UTF-8 không BOM.
+- Mới `deploy/publish-release.ps1`: build + upload zip + `version.json` lên bucket `isurvey-releases` bằng một lệnh (khóa `service_role` đọc từ biến môi trường `ISURVEY_SERVICE_ROLE_KEY`, không lưu file); kiểm tra zip trước khi đổi manifest, chặn hạ version, `-DryRun` / `-SkipBuild` / `-Force`.
+- `schema_activity.sql`: giới hạn kích thước `detail` (chạy lại file trên Supabase).
+
 ## 1.7.0 — 2026-10-19
 
 ### Phát hành / vận hành

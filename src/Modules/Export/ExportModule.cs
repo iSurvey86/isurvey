@@ -82,6 +82,7 @@ public sealed class ExportModule : ISurveyModule
         catch (System.Exception ex)
         {
             ed.WriteMessage($"\n[iSurvey] Xuất thất bại: {ex.Message}");
+            iSurvey.Auth.ActivityLogger.TrackError(ex);
             return;
         }
 
@@ -117,6 +118,7 @@ public sealed class ExportModule : ISurveyModule
         catch (System.Exception ex)
         {
             ed.WriteMessage($"\n[iSurvey] Xuất thất bại: {ex.Message}");
+            iSurvey.Auth.ActivityLogger.TrackError(ex);
         }
     }
 

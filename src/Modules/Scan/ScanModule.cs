@@ -81,6 +81,7 @@ public sealed class ScanModule : ISurveyModule
         catch (System.Exception ex)
         {
             ed.WriteMessage($"\n[iSurvey] AUTOSCAN that bai: {ex.Message}");
+            iSurvey.Auth.ActivityLogger.TrackError(ex);
         }
     }
 }

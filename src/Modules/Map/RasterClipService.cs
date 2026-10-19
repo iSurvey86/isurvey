@@ -53,7 +53,15 @@ internal static class RasterClipService
         if (clipPolygonWcs.Count < 3)
             return false;
 
-        return ApplyClipRing(raster, clipPolygonWcs);
+        try
+        {
+            return ApplyClipRing(raster, clipPolygonWcs);
+        }
+        catch (Autodesk.AutoCAD.Runtime.Exception)
+        {
+            // Biên suy biến: báo thất bại cho ảnh này, không làm hỏng cả lô UAV.
+            return false;
+        }
     }
 
     /// <summary>Gắn clip trực tiếp bằng tọa độ pixel CAD (tránh round-trip WCS sai gốc Y).</summary>
@@ -71,9 +79,17 @@ internal static class RasterClipService
         if (first.GetDistanceTo(last) > 1e-6)
             ring.Add(first);
 
-        raster.SetClipBoundary(ClipBoundaryType.Poly, ring);
-        raster.IsClipped = true;
-        return true;
+        try
+        {
+            raster.SetClipBoundary(ClipBoundaryType.Poly, ring);
+            raster.IsClipped = true;
+            return true;
+        }
+        catch (Autodesk.AutoCAD.Runtime.Exception)
+        {
+            // Biên suy biến / không hợp lệ: báo thất bại cho ảnh này, không làm hỏng cả lô.
+            return false;
+        }
     }
 
     public static List<Point2d> BuildTileQuad(CoordinateSystem3d orientation)

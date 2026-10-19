@@ -77,7 +77,8 @@ public sealed class AuthModule : ISurveyModule
         if (!string.IsNullOrWhiteSpace(man.Notes))
             rows.Add(("Ghi chú", man.Notes!));
 
-        var msg = "Có bản cập nhật mới. Tải về và chạy Install-iSurvey.bat (đóng Civil 3D trước).";
+        var msg = "Có bản cập nhật mới. Tải về và chạy Install-iSurvey.bat (đóng Civil 3D trước)."
+                  + (result.ForceUpdate ? "\nPhiên bản hiện tại thấp hơn mức tối thiểu được hỗ trợ — nên cập nhật ngay." : "");
         if (DarkDialog.Confirm("CẬP NHẬT iSurvey", msg + "\n\nMở trang tải về?", "Tải về", "Để sau"))
         {
             UpdateCheckService.OpenDownload(man);

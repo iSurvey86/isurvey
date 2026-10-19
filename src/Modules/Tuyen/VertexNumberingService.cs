@@ -103,10 +103,11 @@ public sealed class VertexNumberingService
         var layerId = EnsureRedLayer(tr, db);
 
         var ent = (Entity)tr.GetObject(per.ObjectId, OpenMode.ForRead);
-        var vertices = GetVertices(ent, tr);
-        if (vertices.Count < 2)
+        var vertices = GetVertices(ent, tr, out var closed);
+        NormalizeVertices(vertices, ref closed);
+        if (vertices.Count < (closed ? 3 : 2))
         {
-            ed.WriteMessage("\n[iSurvey] Polyline cần ít nhất 2 đỉnh.");
+            ed.WriteMessage("\n[iSurvey] Polyline cần ít nhất 2 đỉnh khác nhau (3 nếu khép kín).");
             return;
         }
 
@@ -118,7 +119,7 @@ public sealed class VertexNumberingService
         for (var i = 0; i < vertices.Count; i++)
         {
             var v_i = vertices[i];
-            var vDir = ComputeOutsideBisector(vertices, i);
+            var vDir = ComputeOutsideBisector(vertices, i, closed);
             vDir = new Vector3d(vDir.X, vDir.Y, 0);
             if (vDir.Length < 1e-12)
                 vDir = Vector3d.XAxis;
@@ -141,6 +142,7 @@ public sealed class VertexNumberingService
             var hatch = new Hatch();
             btr.AppendEntity(hatch);
             tr.AddNewlyCreatedDBObject(hatch, true);
+            hatch.Elevation = v_i.Z; // cùng cao độ với chấm tròn (đỉnh có Z ≠ 0 vẫn tô được)
             hatch.LayerId = layerId;
             hatch.Color = AcadColor.FromColorIndex(ColorMethod.ByLayer, 256);
             hatch.SetHatchPattern(HatchPatternType.PreDefined, "SOLID");
@@ -204,17 +206,19 @@ public sealed class VertexNumberingService
     }
 
     /// <summary>Vector phân giác (né đường) theo công thức đã chốt — Z bỏ qua.</summary>
-    private static Vector3d ComputeOutsideBisector(IReadOnlyList<Point3d> vertices, int i)
+    private static Vector3d ComputeOutsideBisector(IReadOnlyList<Point3d> vertices, int i, bool closed)
     {
         var v_i = vertices[i];
-        if (i == 0)
+        var n = vertices.Count;
+        if (!closed && i == 0)
             return (v_i - vertices[1]).GetNormal();
 
-        if (i == vertices.Count - 1)
+        if (!closed && i == n - 1)
             return (v_i - vertices[i - 1]).GetNormal();
 
-        var vIn = (vertices[i - 1] - v_i).GetNormal();
-        var vOut = (vertices[i + 1] - v_i).GetNormal();
+        // Khép kín: đỉnh đầu/cuối cũng có đỉnh kề hai phía (vòng).
+        var vIn = (vertices[(i - 1 + n) % n] - v_i).GetNormal();
+        var vOut = (vertices[(i + 1) % n] - v_i).GetNormal();
         // Ép 2D trước khi cộng.
         vIn = new Vector3d(vIn.X, vIn.Y, 0);
         vOut = new Vector3d(vOut.X, vOut.Y, 0);
@@ -230,9 +234,43 @@ public sealed class VertexNumberingService
         return vSum.GetNormal();
     }
 
-    private static List<Point3d> GetVertices(Entity ent, Transaction tr)
+    /// <summary>
+    /// Bỏ đỉnh trùng liên tiếp (GetNormal ném lỗi với vector 0); đỉnh cuối trùng đỉnh đầu = tuyến khép kín.
+    /// </summary>
+    private static void NormalizeVertices(List<Point3d> pts, ref bool closed)
+    {
+        const double tol = 1e-9;
+        for (var i = pts.Count - 1; i > 0; i--)
+        {
+            if (Dist2d(pts[i], pts[i - 1]) < tol)
+                pts.RemoveAt(i);
+        }
+
+        if (pts.Count > 2 && Dist2d(pts[0], pts[^1]) < tol)
+        {
+            pts.RemoveAt(pts.Count - 1);
+            closed = true;
+        }
+    }
+
+    private static double Dist2d(Point3d a, Point3d b)
+    {
+        var dx = a.X - b.X;
+        var dy = a.Y - b.Y;
+        return Math.Sqrt(dx * dx + dy * dy);
+    }
+
+    private static List<Point3d> GetVertices(Entity ent, Transaction tr, out bool closed)
     {
         var pts = new List<Point3d>();
+        closed = ent switch
+        {
+            Polyline p => p.Closed,
+            Polyline2d p2 => p2.Closed,
+            Polyline3d p3 => p3.Closed,
+            _ => false
+        };
+
         switch (ent)
         {
             case Polyline pl:

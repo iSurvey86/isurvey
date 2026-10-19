@@ -25,7 +25,23 @@ Mục tiêu mỗi lần phát hành: **một file zip Setup** gửi người dù
    - `deploy\output\iSurvey-Setup-<ver>.zip` — **gửi người dùng**
    - `deploy\output\release\version.json` + bản zip copy — **upload Storage**
 
-## 2. Upload update online
+## 2a. Phát hành một lệnh (khuyên dùng)
+
+Khóa `service_role` đặt **một lần** trên máy dev (biến môi trường của user, không lưu vào file/repo):
+
+```powershell
+setx ISURVEY_SERVICE_ROLE_KEY "<service_role: Supabase → Project Settings → API>"
+```
+
+Mở lại terminal, rồi mỗi lần phát hành (sau khi bump version ở bước 1):
+
+```powershell
+.\deploy\publish-release.ps1 -Notes "Mô tả ngắn bản này"
+```
+
+Script tự build zip, upload zip, kiểm tra zip tải được và đúng dung lượng, rồi mới ghi đè `version.json` (cache 60 giây) và xác nhận lại trên server. Từ chối upload nếu version thấp hơn bản đang có trên server (cần `-Force` để rollback). Tùy chọn: `-SkipBuild` (chỉ upload bản đã build), `-DryRun` (chỉ kiểm tra). Chưa đặt biến môi trường thì script hỏi nhập khóa (ẩn ký tự, chỉ dùng lần đó).
+
+## 2. Upload thủ công (dự phòng)
 
 Storage bucket `isurvey-releases`, upload (ghi đè `version.json` mỗi lần):
 

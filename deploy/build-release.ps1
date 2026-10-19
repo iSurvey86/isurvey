@@ -1,5 +1,9 @@
 # Dong goi ban phat hanh: build bundle + zip Setup gui nguoi dung + version.json (update online).
-# Usage:  .\deploy\build-release.ps1
+# Usage:  .\deploy\build-release.ps1 [-Notes "Mo ta ngan ban nay"]
+
+param(
+    [string]$Notes = ""
+)
 
 $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
@@ -31,7 +35,7 @@ Copy-Item (Join-Path $Deploy "Set-iSurveyTrustedPath.ps1") $stage -Force
 Copy-Item (Join-Path $Deploy "CAI_DAT.txt") $stage -Force
 
 # Manifest update (Admin upload file nay + zip len Supabase Storage bucket isurvey-releases)
-$notes = "Ban cai Setup; update online; nhat ky hoat dong; UAVCLIP Auto-Clip; GOC 1:1000."
+$notes = if ([string]::IsNullOrWhiteSpace($Notes)) { "iSurvey $Version" } else { $Notes.Trim() }
 $manifest = [ordered]@{
     latest      = $Version
     url         = "https://lmraewcashlnfdawrvmg.supabase.co/storage/v1/object/public/isurvey-releases/iSurvey-Setup-$Version.zip"
@@ -40,7 +44,8 @@ $manifest = [ordered]@{
     min_version = "1.0.0"
 }
 $manifestPath = Join-Path $stage "version.json"
-$manifest | ConvertTo-Json | Set-Content -Path $manifestPath -Encoding UTF8
+# UTF-8 KHONG BOM (Set-Content -Encoding UTF8 cua PS 5.1 them BOM)
+[IO.File]::WriteAllText($manifestPath, ($manifest | ConvertTo-Json), (New-Object Text.UTF8Encoding($false)))
 # Ban copy rieng de Admin upload len Storage (ten co dinh version.json)
 $releaseDir = Join-Path $Deploy "output\release"
 New-Item -ItemType Directory -Force -Path $releaseDir | Out-Null
@@ -49,7 +54,7 @@ Copy-Item $manifestPath (Join-Path $releaseDir "version.json") -Force
 $zipPath = Join-Path $Deploy "output\$stageName.zip"
 if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
 Compress-Archive -Path (Join-Path $stage "*") -DestinationPath $zipPath -CompressionLevel Optimal
-Copy-Item $zipPath (Join-Path $releaseDir $stageName.zip) -Force
+Copy-Item $zipPath (Join-Path $releaseDir "$stageName.zip") -Force
 
 Write-Host ""
 Write-Host "==> GOI SETUP: $zipPath" -ForegroundColor Green

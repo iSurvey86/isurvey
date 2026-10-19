@@ -123,6 +123,7 @@ public sealed class DgnModule : ISurveyModule
         if (r.Error is not null)
         {
             ed.WriteMessage($"\n[iSurvey][C2D] KHÔNG hoàn tất: {r.Error}");
+            iSurvey.Auth.ActivityLogger.Enqueue("error", "ISURVEY_CAD_TO_DGN", new { message = r.Error });
             if (r.LogPath is not null)
                 ed.WriteMessage($"\n[iSurvey][C2D] Log chi tiết: {r.LogPath}");
             ShowExportResultBox(r);
@@ -246,6 +247,7 @@ public sealed class DgnModule : ISurveyModule
         if (r.Error is not null)
         {
             ed.WriteMessage($"\n[iSurvey][DGN] KHÔNG hoàn tất: {r.Error}");
+            iSurvey.Auth.ActivityLogger.Enqueue("error", "ISURVEY_DGN_TO_CAD", new { message = r.Error });
             if (r.LogPath is not null)
                 ed.WriteMessage($"\n[iSurvey][DGN] Log chi tiết: {r.LogPath}");
             return;

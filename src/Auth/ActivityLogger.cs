@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
@@ -10,13 +11,20 @@ namespace iSurvey.Auth;
 
 /// <summary>
 /// Gửi nhật ký hoạt động lên Supabase (RPC isurvey_log_event) — nền, không chặn CAD.
-/// Chỉ gửi khi đã kích hoạt Online (có refresh token).
+/// Chỉ gửi khi đã kích hoạt Online (có refresh token). Access token do <see cref="AuthManager"/> cấp
+/// (dùng lại ~50 phút, lưu refresh token mới sau mỗi lần đổi) nên không làm hỏng giấy phép.
 /// </summary>
 public static class ActivityLogger
 {
     private static readonly ConcurrentQueue<Entry> Queue = new();
     private static int _pumping;
-    private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(8) };
+
+    private static readonly HttpClient Http = new(new HttpClientHandler
+    {
+        UseProxy = true,
+        DefaultProxyCredentials = CredentialCache.DefaultCredentials
+    })
+    { Timeout = TimeSpan.FromSeconds(10) };
 
     private sealed record Entry(string EventType, string? Command, string? DetailJson);
 
@@ -48,7 +56,21 @@ public static class ActivityLogger
 
     /// <summary>Ghi lỗi (không ném). Dùng trong catch các lệnh quan trọng.</summary>
     public static void TrackError(Exception ex, [CallerMemberName] string? command = null) =>
-        Enqueue("error", command, new { message = ex.Message, type = ex.GetType().Name });
+        Enqueue("error", command, new { message = Trim(ex.Message, 300), type = ex.GetType().Name });
+
+    /// <summary>Gửi ngay trên luồng hiện tại bằng access token cho trước (dùng khi đăng xuất). Không ném.</summary>
+    internal static void SendNow(string accessToken, string eventType, string? command, object? detail,
+        string? hwid, CancellationToken ct)
+    {
+        try
+        {
+            Post(accessToken, eventType, command, detail is null ? null : JsonSerializer.Serialize(detail), hwid, ct);
+        }
+        catch
+        {
+            // bỏ qua
+        }
+    }
 
     private static void Pump()
     {
@@ -67,45 +89,54 @@ public static class ActivityLogger
 
     private static void SendOne(Entry entry)
     {
-        var license = AuthManager.License;
-        if (license is null || license.Mode != LicenseMode.Online || string.IsNullOrWhiteSpace(license.RefreshToken))
-            return;
-
-        var config = AuthConfig.Load();
-        if (!config.HasSupabase)
-            return;
-
         try
         {
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(8));
-            var client = new SupabaseAuthClient(config);
-            var refresh = client.RefreshAsync(license.RefreshToken!, cts.Token).GetAwaiter().GetResult();
-            if (!refresh.Result.Ok || refresh.Session is null)
+            var access = AuthManager.AcquireAccessToken();
+            if (access is null)
                 return;
 
-            var access = refresh.Session.AccessToken;
-            var payload = new Dictionary<string, object?>
-            {
-                ["p_event_type"] = entry.EventType,
-                ["p_command"] = entry.Command,
-                ["p_detail"] = string.IsNullOrEmpty(entry.DetailJson)
-                    ? null
-                    : JsonSerializer.Deserialize<JsonElement>(entry.DetailJson!),
-                ["p_app_version"] = AuthManager.AppVersion.TrimStart('v'),
-                ["p_hwid"] = HardwareId.Current,
-                ["p_machine_name"] = Environment.MachineName
-            };
-
-            var url = config.ResolvedSupabaseUrl.TrimEnd('/') + "/rest/v1/rpc/isurvey_log_event";
-            using var req = new HttpRequestMessage(HttpMethod.Post, url);
-            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", access);
-            req.Headers.TryAddWithoutValidation("apikey", config.ResolvedSupabaseKey);
-            req.Content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-            using var _ = Http.SendAsync(req, cts.Token).GetAwaiter().GetResult();
+            Post(access, entry.EventType, entry.Command, entry.DetailJson, null, CancellationToken.None);
         }
         catch
         {
             // bỏ qua
         }
     }
+
+    private static void Post(string accessToken, string eventType, string? command, string? detailJson,
+        string? hwid, CancellationToken ct)
+    {
+        var config = AuthConfig.Load();
+        if (!config.HasSupabase)
+            return;
+
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        cts.CancelAfter(TimeSpan.FromSeconds(8));
+
+        var payload = new Dictionary<string, object?>
+        {
+            ["p_event_type"] = eventType,
+            ["p_command"] = command,
+            ["p_detail"] = string.IsNullOrEmpty(detailJson)
+                ? null
+                : JsonSerializer.Deserialize<JsonElement>(detailJson!),
+            ["p_app_version"] = AuthManager.AppVersion.TrimStart('v'),
+            ["p_hwid"] = hwid ?? HardwareId.Current,
+            ["p_machine_name"] = Environment.MachineName
+        };
+
+        var url = config.ResolvedSupabaseUrl.TrimEnd('/') + "/rest/v1/rpc/isurvey_log_event";
+        using var req = new HttpRequestMessage(HttpMethod.Post, url);
+        req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+        req.Headers.TryAddWithoutValidation("apikey", config.ResolvedSupabaseKey);
+        req.Content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+
+        using var resp = Http.SendAsync(req, cts.Token).GetAwaiter().GetResult();
+
+        // Token bị từ chối → bỏ cache để lần sau refresh lại.
+        if (resp.StatusCode == HttpStatusCode.Unauthorized)
+            AuthManager.InvalidateAccessToken();
+    }
+
+    private static string Trim(string s, int max) => s.Length <= max ? s : s[..max];
 }

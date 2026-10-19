@@ -25,6 +25,18 @@ public static class AuthManager
     private static bool _expiredNotice;
     private static int _rechecking;
 
+    // ---------- Token Supabase dùng chung (nhật ký + kiểm tra định kỳ) ----------
+    // Supabase đổi refresh token mỗi lần dùng → mọi nơi gọi RefreshAsync phải đi qua TokenGate
+    // và lưu token mới NGAY vào license.dat, nếu không lần dùng sau sẽ gặp token đã bị thu hồi.
+    internal static readonly SemaphoreSlim TokenGate = new(1, 1);
+    private static readonly object LicenseLock = new();
+    private static readonly TimeSpan AccessTokenLifetime = TimeSpan.FromMinutes(50);
+    private static readonly TimeSpan RefreshBackoff = TimeSpan.FromMinutes(5);
+    private static string? _accessToken;
+    private static string? _accessOwner;
+    private static DateTimeOffset _accessExpiry;
+    private static DateTimeOffset _noRefreshUntil;
+
     /// <summary>Phát khi trạng thái đổi (đăng nhập/đăng xuất/mất hiệu lực) — Ribbon dùng để mở/khóa nút.</summary>
     public static event Action? StateChanged;
 
@@ -55,17 +67,25 @@ public static class AuthManager
     /// <summary>Đọc lại license.dat; giấy phép quá hạn xác minh (7 ngày) coi như chưa đăng nhập.</summary>
     public static void Refresh()
     {
-        var loaded = Storage.Load();
-        _expiredNotice = false;
-        if (loaded is not null && loaded.IsExpired(DateTimeOffset.Now))
+        LicenseInfo? before;
+        LicenseInfo? loaded;
+        lock (LicenseLock)
         {
-            _expiredNotice = true;
-            loaded = null;
+            loaded = Storage.Load();
+            _expiredNotice = false;
+            if (loaded is not null && loaded.IsExpired(DateTimeOffset.Now))
+            {
+                _expiredNotice = true;
+                loaded = null;
+            }
+
+            before = _license;
+            _license = loaded;
         }
 
-        var before = _license;
-        _license = loaded;
-        if (!Equals(before, loaded))
+        // Chỉ đổi refresh token (nền) thì không cần dựng lại Ribbon.
+        if (!Equals(before is null ? null : before with { RefreshToken = null },
+                loaded is null ? null : loaded with { RefreshToken = null }))
             RaiseChanged();
     }
 
@@ -114,6 +134,7 @@ public static class AuthManager
             ? Storage.Save(email, LicenseMode.Offline)
             : Storage.Save(email, LicenseMode.Online, session.UserId, session.RefreshToken);
         _expiredNotice = false;
+        ClearAccessToken();
         RaiseChanged();
         ActivityLogger.Enqueue("login", detail: new { email, mode = _license.Mode.ToString() });
         if (_license.Mode == LicenseMode.Online)
@@ -123,15 +144,121 @@ public static class AuthManager
     public static void SignOut()
     {
         var old = _license;
-        if (old is not null)
-            ActivityLogger.Enqueue("logout", detail: new { email = old.Email });
         Storage.Delete();
         _license = null;
         RaiseChanged();
 
-        // "Đổi máy": trả lại suất thiết bị trên server (nền, không chặn; lỗi thì Admin giải phóng thủ công).
+        // "Đổi máy": ghi nhật ký đăng xuất + trả lại suất thiết bị trên server
+        // (nền, không chặn; lỗi thì Admin giải phóng thủ công).
         if (old is { Mode: LicenseMode.Online, RefreshToken: not null })
             _ = Task.Run(() => ReleaseDeviceAsync(old));
+    }
+
+    /// <summary>Lưu refresh token mới (an toàn đa luồng) — gọi ngay sau mỗi lần RefreshAsync thành công.</summary>
+    internal static void PersistRefreshToken(string newToken, string ownerEmail)
+    {
+        if (string.IsNullOrWhiteSpace(newToken))
+            return;
+
+        lock (LicenseLock)
+        {
+            var cur = _license;
+            if (cur is null || cur.Mode != LicenseMode.Online
+                || !string.Equals(cur.Email, ownerEmail, StringComparison.OrdinalIgnoreCase))
+                return;
+
+            try
+            {
+                _license = Storage.Save(cur with { RefreshToken = newToken });
+            }
+            catch (System.Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("[iSurvey] Luu refresh token: " + ex.Message);
+            }
+        }
+    }
+
+    /// <summary>Server từ chối access token (401): quên token đang cache để lần sau refresh lại.</summary>
+    internal static void InvalidateAccessToken()
+    {
+        _accessToken = null;
+    }
+
+    private static void ClearAccessToken()
+    {
+        _accessToken = null;
+        _accessOwner = null;
+        _noRefreshUntil = default;
+    }
+
+    /// <summary>
+    /// Access token Online hiện hành (nền, chặn luồng gọi). Dùng lại token đang còn hạn; hết hạn thì refresh
+    /// một lần và lưu refresh token mới. Lỗi refresh → nghỉ 5 phút, không thử lại dồn dập. Không ném exception.
+    /// </summary>
+    internal static string? AcquireAccessToken(CancellationToken ct = default)
+    {
+        try
+        {
+            TokenGate.Wait(ct);
+        }
+        catch (OperationCanceledException)
+        {
+            return null;
+        }
+
+        try
+        {
+            var lic = _license;
+            return lic is { Mode: LicenseMode.Online } && !string.IsNullOrWhiteSpace(lic.RefreshToken)
+                ? AcquireAccessTokenLocked(lic, persist: true, ct)
+                : null;
+        }
+        finally
+        {
+            TokenGate.Release();
+        }
+    }
+
+    /// <summary>Cần đang giữ TokenGate. persist=false khi giấy phép sắp bị xóa (đăng xuất).</summary>
+    private static string? AcquireAccessTokenLocked(LicenseInfo lic, bool persist, CancellationToken ct)
+    {
+        var now = DateTimeOffset.UtcNow;
+        if (_accessToken is not null && _accessOwner == lic.Email && now < _accessExpiry)
+            return _accessToken;
+
+        if (now < _noRefreshUntil)
+            return null;
+
+        try
+        {
+            var config = AuthConfig.Load();
+            if (!config.HasSupabase)
+                return null;
+
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            cts.CancelAfter(TimeSpan.FromSeconds(8));
+            var refreshed = new SupabaseAuthClient(config).RefreshAsync(lic.RefreshToken!, cts.Token)
+                .GetAwaiter().GetResult();
+            if (refreshed.Session is null)
+            {
+                // Token hỏng/hết hạn hoặc mất mạng: không dồn dập; kiểm tra định kỳ vẫn tự xử lý (giữ kích hoạt).
+                _noRefreshUntil = now + RefreshBackoff;
+                return null;
+            }
+
+            if (persist)
+                PersistRefreshToken(refreshed.Session.RefreshToken, lic.Email);
+
+            _accessToken = refreshed.Session.AccessToken;
+            _accessOwner = lic.Email;
+            _accessExpiry = now + AccessTokenLifetime;
+            return _accessToken;
+        }
+        catch
+        {
+            _noRefreshUntil = now + RefreshBackoff;
+            return null;
+        }
     }
 
     // ---------- Kiểm tra định kỳ (nền) ----------
@@ -170,9 +297,25 @@ public static class AuthManager
         if (Interlocked.Exchange(ref _rechecking, 1) == 1)
             return;
 
+        var gateTaken = false;
         try
         {
+            // Cùng cổng với ActivityLogger: không ai dùng refresh token cũ trong lúc người kia đang đổi token.
+            await TokenGate.WaitAsync().ConfigureAwait(false);
+            gateTaken = true;
+
+            // Luôn dùng giấy phép HIỆN HÀNH (token có thể đã được ActivityLogger đổi sau khi snapshot).
+            var current = _license;
+            if (current is null || current.Email != lic.Email || current.HardwareId != lic.HardwareId)
+                return;
+            lic = current;
+
             var outcome = await LicenseRechecker.RunAsync(lic, client, now, RecheckTimeout).ConfigureAwait(false);
+
+            // Lưu token mới ngay (trong cổng), trước khi nhả cho ActivityLogger.
+            if (!string.IsNullOrEmpty(outcome.NewRefreshToken))
+                PersistRefreshToken(outcome.NewRefreshToken!, lic.Email);
+
             if (outcome.Action is RecheckAction.Skip or RecheckAction.NoChange)
                 return;
 
@@ -184,6 +327,8 @@ public static class AuthManager
         }
         finally
         {
+            if (gateTaken)
+                TokenGate.Release();
             Interlocked.Exchange(ref _rechecking, 0);
         }
     }
@@ -198,8 +343,13 @@ public static class AuthManager
         var updated = LicenseRechecker.Apply(_license, outcome, now);
         if (updated is null)
         {
-            Storage.Delete();
-            _license = null;
+            lock (LicenseLock)
+            {
+                Storage.Delete();
+                _license = null;
+            }
+
+            ClearAccessToken();
             RaiseChanged();
             Print("\n[iSurvey] Giay phep tren may nay da bi Admin thu hoi hoac khong con hieu luc. Cac tinh nang da bi khoa.");
             return;
@@ -207,7 +357,15 @@ public static class AuthManager
 
         try
         {
-            _license = Storage.Save(updated);
+            lock (LicenseLock)
+            {
+                // Token mới nhất nằm trong _license (đã lưu trong cổng) — không để bản kiểm tra cũ ghi đè.
+                var latestToken = _license?.RefreshToken;
+                if (!string.IsNullOrEmpty(latestToken))
+                    updated = updated with { RefreshToken = latestToken };
+                _license = Storage.Save(updated);
+            }
+
             if (outcome.Action == RecheckAction.Verified)
                 ActivityLogger.TrackHeartbeat("recheck");
         }
@@ -225,13 +383,26 @@ public static class AuthManager
             if (!cfg.HasSupabase)
                 return;
 
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(8));
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(12));
             var client = new SupabaseAuthClient(cfg);
-            var refreshed = await client.RefreshAsync(lic.RefreshToken!, cts.Token).ConfigureAwait(false);
-            if (refreshed.Session is null)
+
+            string? access;
+            await TokenGate.WaitAsync(cts.Token).ConfigureAwait(false);
+            try
+            {
+                // Giấy phép đã bị xóa khỏi máy → không lưu refresh token mới (persist=false).
+                access = AcquireAccessTokenLocked(lic, persist: false, cts.Token);
+            }
+            finally
+            {
+                TokenGate.Release();
+            }
+
+            if (access is null)
                 return;
 
-            await client.ReleaseAsync(refreshed.Session.AccessToken, lic.HardwareId, cts.Token).ConfigureAwait(false);
+            ActivityLogger.SendNow(access, "logout", null, new { email = lic.Email }, lic.HardwareId, cts.Token);
+            await client.ReleaseAsync(access, lic.HardwareId, cts.Token).ConfigureAwait(false);
         }
         catch
         {

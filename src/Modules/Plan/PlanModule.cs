@@ -104,6 +104,7 @@ public sealed class PlanModule : ISurveyModule
         catch (System.Exception ex)
         {
             ed.WriteMessage($"\n[iSurvey] CATBD that bai: {ex.Message}");
+            iSurvey.Auth.ActivityLogger.TrackError(ex);
         }
     }
 

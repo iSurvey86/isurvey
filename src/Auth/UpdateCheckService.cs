@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace iSurvey.Auth;
@@ -17,11 +18,11 @@ public static class UpdateCheckService
 
     public sealed class Manifest
     {
-        public string Latest { get; set; } = "";
-        public string Url { get; set; } = "";
-        public string? ReleasedAt { get; set; }
-        public string? Notes { get; set; }
-        public string? MinVersion { get; set; }
+        [JsonPropertyName("latest")] public string Latest { get; set; } = "";
+        [JsonPropertyName("url")] public string Url { get; set; } = "";
+        [JsonPropertyName("released_at")] public string? ReleasedAt { get; set; }
+        [JsonPropertyName("notes")] public string? Notes { get; set; }
+        [JsonPropertyName("min_version")] public string? MinVersion { get; set; }
     }
 
     public sealed record CheckResult(
@@ -54,7 +55,8 @@ public static class UpdateCheckService
                     $"Không đọc được thông tin bản mới (HTTP {(int)resp.StatusCode}). Kiểm tra bucket isurvey-releases.");
             }
 
-            var man = JsonSerializer.Deserialize<Manifest>(body, JsonOptions);
+            // PowerShell 5.1 ghi UTF-8 có BOM — bỏ BOM nếu còn sót.
+            var man = JsonSerializer.Deserialize<Manifest>(body.TrimStart('\uFEFF'), JsonOptions);
             if (man is null || string.IsNullOrWhiteSpace(man.Latest))
                 return new CheckResult(false, "File version.json không hợp lệ.");
 
@@ -84,11 +86,13 @@ public static class UpdateCheckService
     /// <summary>Mở trình duyệt tới URL tải (zip Setup).</summary>
     public static void OpenDownload(Manifest man)
     {
-        if (string.IsNullOrWhiteSpace(man.Url))
+        // Chỉ mở link http/https (không để manifest mở file cục bộ / chương trình).
+        if (!Uri.TryCreate(man.Url?.Trim(), UriKind.Absolute, out var uri)
+            || (uri.Scheme != Uri.UriSchemeHttps && uri.Scheme != Uri.UriSchemeHttp))
             return;
         try
         {
-            Process.Start(new ProcessStartInfo(man.Url) { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo(uri.AbsoluteUri) { UseShellExecute = true });
         }
         catch
         {

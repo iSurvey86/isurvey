@@ -18,6 +18,17 @@
 
 ---
 
+## 2026-10-19 (tối) — Bản vá 1.7.1: refresh token / nhật ký + rà soát (CHƯA commit/push)
+
+- **Lỗi nghiêm trọng đã sửa:** `ActivityLogger` refresh token mỗi sự kiện mà không lưu token mới ➔ license hết hiệu lực sớm. Nay `AuthManager.AcquireAccessToken` + `TokenGate` chung với recheck, lưu token mới ngay; `logout` được gửi thật (cùng bước trả suất thiết bị); `TrackError` được gọi từ các lệnh. Chi tiết: CHANGELOG 1.7.1.
+- Sửa thêm: GOC (đỉnh trùng, tuyến khép kín, Z≠0), UAVCLIP (layer khóa, biên suy biến, DrawOrder theo block), `version.json` (`min_version`, BOM), `build-release.ps1 -Notes`, `schema_activity.sql` (giới hạn `detail` — **chạy lại trên Supabase**).
+- Đã build 3 target + `build-release.ps1` ➔ `deploy/output/iSurvey-Setup-1.7.1.zip` + `release/version.json`. **Chưa** upload Storage, chưa cài thử, chưa test trên Civil.
+- Việc tiếp: user đóng Civil ➔ cài 1.7.1 ➔ đăng nhập, chạy vài lệnh, kiểm tab Nhật ký ksnpsc (thấy `command`, `heartbeat`, rồi `logout`); upload zip + `version.json` lên bucket `isurvey-releases`; chạy lại `schema_activity.sql`; commit + push.
+- **Phát hành một lệnh:** `deploy/publish-release.ps1` (khóa `ISURVEY_SERVICE_ROLE_KEY` trong biến môi trường user, không vào repo). Đã `-DryRun` OK; 1.7.1 đã upload thủ công (server báo latest 1.7.1). Lần sau chỉ cần: bump version ➔ `.\deploy\publish-release.ps1 -Notes "..."`.
+- Giới hạn còn lại: tên lệnh trong nhật ký là tên hàm C# (vd `ClipCommand`), chưa phải tên lệnh CAD; `ISURVEY_UPDATE` gọi mạng đồng bộ trên luồng UI (tối đa 12 giây).
+
+---
+
 ## 2026-10-19 — Phát hành Setup / update / activity + UAVCLIP + GOC (1.7.0)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; bump **1.7.0**. Repo ksnpsc đã push tab Admin iSurvey riêng (`e264362`).

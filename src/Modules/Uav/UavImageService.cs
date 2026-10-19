@@ -31,10 +31,19 @@ internal static class UavImageService
             return;
         }
 
-        if (mode == 1)
-            RunBatchPolylineClip(ed, db, images);
-        else
-            RunAutoClip(ed, db, images);
+        try
+        {
+            if (mode == 1)
+                RunBatchPolylineClip(ed, db, images);
+            else
+                RunAutoClip(ed, db, images);
+        }
+        catch (System.Exception ex)
+        {
+            // Transaction chưa Commit → tự hoàn tác; báo rõ thay vì để AutoCAD hiện lỗi thô.
+            ed.WriteMessage($"\n[iSurvey] Lỗi khi cắt ảnh, đã hoàn tác lần chạy này: {ex.Message}");
+            iSurvey.Auth.ActivityLogger.TrackError(ex, "ISURVEY_UAV_CLIP");
+        }
     }
 
     private static List<ObjectId>? PromptSelectImages(Editor ed, Database db)
@@ -214,7 +223,8 @@ internal static class UavImageService
                 continue;
             }
 
-            var raster = (RasterImage)tr.GetObject(imageId, OpenMode.ForWrite);
+            // forceOpenOnLockedLayer: ảnh trên layer khóa vẫn cắt được, không làm hỏng cả lô.
+            var raster = (RasterImage)tr.GetObject(imageId, OpenMode.ForWrite, false, true);
             if (!RasterClipService.TryApplyClipPolygon(raster, ring))
             {
                 ed.WriteMessage("\n[iSurvey] Bỏ qua ảnh — SetClipBoundary thất bại.");
@@ -271,7 +281,7 @@ internal static class UavImageService
             var cadPixels = UavAutoClipService.DrawingPixelsToCadPixels(drawingRing, fullH, yUp);
 
             // Clip trực tiếp bằng pixel CAD — không round-trip WCS.
-            raster.UpgradeOpen();
+            raster = (RasterImage)tr.GetObject(imageId, OpenMode.ForWrite, false, true);
             if (!RasterClipService.TryApplyClipPolygonPixels(raster, cadPixels))
             {
                 ed.WriteMessage("\n[iSurvey] Bỏ qua ảnh — SetClipBoundary thất bại.");
@@ -561,12 +571,13 @@ internal static class UavImageService
 
     private static void SendImageToBack(Transaction tr, Database db, ObjectId imageId)
     {
-        var bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
-        var ms = (BlockTableRecord)tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead);
-        if (ms.DrawOrderTableId.IsNull)
+        // Dùng block chứa ảnh (Model hoặc Layout), không mặc định Model Space.
+        var image = (Entity)tr.GetObject(imageId, OpenMode.ForRead);
+        var owner = (BlockTableRecord)tr.GetObject(image.BlockId, OpenMode.ForRead);
+        if (owner.DrawOrderTableId.IsNull)
             return;
 
-        var order = (DrawOrderTable)tr.GetObject(ms.DrawOrderTableId, OpenMode.ForWrite);
+        var order = (DrawOrderTable)tr.GetObject(owner.DrawOrderTableId, OpenMode.ForWrite);
         order.MoveToBottom(new ObjectIdCollection { imageId });
     }
 

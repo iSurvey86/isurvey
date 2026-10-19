@@ -155,6 +155,7 @@ public sealed class MapModule : ISurveyModule
         catch (System.Exception ex)
         {
             doc.Editor.WriteMessage($"\n[iSurvey] {ex.Message}");
+            iSurvey.Auth.ActivityLogger.TrackError(ex);
         }
     }
 
@@ -271,6 +272,7 @@ public sealed class MapModule : ISurveyModule
         catch (System.Exception ex)
         {
             ed.WriteMessage($"\n[iSurvey] {ex.Message}");
+            iSurvey.Auth.ActivityLogger.TrackError(ex);
         }
     }
 

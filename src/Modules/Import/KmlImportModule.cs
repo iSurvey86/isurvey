@@ -119,6 +119,7 @@ public sealed class KmlImportModule : ISurveyModule
         catch (System.Exception ex)
         {
             ed.WriteMessage($"\n[iSurvey] Nhập thất bại: {ex.Message}");
+            iSurvey.Auth.ActivityLogger.TrackError(ex);
         }
         finally
         {

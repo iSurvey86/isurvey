@@ -64,7 +64,10 @@ begin
     left(p_app_version, 40),
     left(trim(p_event_type), 40),
     left(p_command, 80),
-    p_detail
+    -- chặn detail quá lớn (client có thể bị lạm dụng ghi rác)
+    case when p_detail is not null and length(p_detail::text) > 4000
+         then jsonb_build_object('truncated', true)
+         else p_detail end
   );
 
   return jsonb_build_object('status', 'ok');
