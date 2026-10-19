@@ -1,5 +1,13 @@
 # Changelog — iSurvey
 
+## 1.7.2 — 2026-10-19
+
+### Cập nhật tự cài (UPD)
+- `ISURVEY_UPDATE` / **UPD**: khi có bản mới → **Cập nhật ngay** → tải zip Setup về `%LocalAppData%\iSurvey\updates\` → xác nhận **Thoát & cài**.
+- Helper `Apply-iSurveyUpdate.ps1` chờ AutoCAD/Civil thoát (tránh khóa DLL) rồi chạy `Install-iSurvey.ps1` (per-user), hiện thông báo hoàn tất.
+- Bắt buộc thoát CAD trước khi cài; không cài đè trong lúc acad đang mở. Lỗi tải vẫn có tùy chọn mở link thủ công.
+- `UpdateApplyService.cs`; zip Setup kèm `Apply-iSurveyUpdate.ps1`; cập nhật `CAI_DAT.txt` / `Huong_dan_Phat_hanh.md`.
+
 ## 1.7.1 — 2026-10-19
 
 Bản vá sau rà soát 1.7.0. **Nên cài thay 1.7.0.**

@@ -77,16 +77,71 @@ public sealed class AuthModule : ISurveyModule
         if (!string.IsNullOrWhiteSpace(man.Notes))
             rows.Add(("Ghi chú", man.Notes!));
 
-        var msg = "Có bản cập nhật mới. Tải về và chạy Install-iSurvey.bat (đóng Civil 3D trước)."
-                  + (result.ForceUpdate ? "\nPhiên bản hiện tại thấp hơn mức tối thiểu được hỗ trợ — nên cập nhật ngay." : "");
-        if (DarkDialog.Confirm("CẬP NHẬT iSurvey", msg + "\n\nMở trang tải về?", "Tải về", "Để sau"))
-        {
-            UpdateCheckService.OpenDownload(man);
-            AuthManager.Print("\n[iSurvey] Da mo link tai ve.");
-        }
-        else
+        var msg = "Có bản cập nhật mới. Bấm Cập nhật ngay để tải về rồi THOÁT AutoCAD/Civil và tự cài đặt."
+                  + "\nSau khi cài xong, mở lại AutoCAD/Civil."
+                  + (result.ForceUpdate ? "\n\nPhiên bản hiện tại thấp hơn mức tối thiểu — nên cập nhật ngay." : "");
+
+        if (!DarkDialog.Confirm("CẬP NHẬT iSurvey", msg, "Cập nhật ngay", "Để sau"))
         {
             DarkDialog.ShowInfo("CẬP NHẬT iSurvey", "Có bản mới", rows, note: msg);
+            return;
+        }
+
+        AuthManager.Print("\n[iSurvey] Dang tai ban " + man.Latest + "...");
+        var progress = new Progress<string>(s => AuthManager.Print("\n[iSurvey] " + s));
+        var staged = UpdateApplyService.DownloadAndStage(man, progress);
+        ActivityLogger.Enqueue("update_download", detail: new
+        {
+            current = AuthManager.AppVersion,
+            latest = man.Latest,
+            ok = staged.Ok,
+            message = staged.Message
+        });
+
+        if (!staged.Ok || string.IsNullOrEmpty(staged.SetupDir))
+        {
+            DarkDialog.ShowInfo(
+                "CẬP NHẬT iSurvey",
+                "Không tải được bản mới",
+                rows,
+                note: staged.Message + "\n\nCó thể mở link tải thủ công.");
+            if (DarkDialog.Confirm("CẬP NHẬT iSurvey", "Mở trang tải về để cài thủ công?", "Mở link", "Đóng"))
+                UpdateCheckService.OpenDownload(man);
+            return;
+        }
+
+        if (!DarkDialog.Confirm(
+                "CẬP NHẬT iSurvey",
+                "Đã tải xong bản " + man.Latest + ".\n\nAutoCAD/Civil sẽ THOÁT ngay để hoàn tất cài đặt (tránh khóa file DLL).\nLưu bản vẽ trước nếu cần.\n\nThoát và cài ngay?",
+                "Thoát & cài",
+                "Hủy"))
+        {
+            AuthManager.Print("\n[iSurvey] Da huy cai dat. Ban Setup: " + staged.SetupDir);
+            return;
+        }
+
+        try
+        {
+            var access = AuthManager.AcquireAccessToken();
+            if (access is not null)
+            {
+                ActivityLogger.SendNow(access, "update_apply", null, new
+                {
+                    current = AuthManager.AppVersion,
+                    latest = man.Latest
+                }, null, CancellationToken.None);
+            }
+        }
+        catch
+        {
+            // không chặn cài đặt
+        }
+
+        var launched = UpdateApplyService.LaunchInstallerAndQuit(staged.SetupDir!);
+        if (!launched.Ok)
+        {
+            DarkDialog.ShowInfo("CẬP NHẬT iSurvey", "Không hoàn tất", note: launched.Message);
+            AuthManager.Print("\n[iSurvey] " + launched.Message);
         }
     }
 

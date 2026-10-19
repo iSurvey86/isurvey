@@ -32,6 +32,7 @@ Copy-Item (Join-Path $Deploy "Install-iSurvey.bat") $stage -Force
 Copy-Item (Join-Path $Deploy "Uninstall-iSurvey.ps1") $stage -Force
 Copy-Item (Join-Path $Deploy "Uninstall-iSurvey.bat") $stage -Force
 Copy-Item (Join-Path $Deploy "Set-iSurveyTrustedPath.ps1") $stage -Force
+Copy-Item (Join-Path $Deploy "Apply-iSurveyUpdate.ps1") $stage -Force
 Copy-Item (Join-Path $Deploy "CAI_DAT.txt") $stage -Force
 
 # Manifest update (Admin upload file nay + zip len Supabase Storage bucket isurvey-releases)

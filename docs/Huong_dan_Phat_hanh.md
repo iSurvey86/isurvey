@@ -69,7 +69,7 @@ Nội dung `version.json` mẫu:
 1. Đóng hết AutoCAD / Civil 3D.
 2. Giải nén zip → chạy `Install-iSurvey.bat` (hoặc `.ps1`).
 3. Mở Civil → Ribbon iSurvey.
-4. Lần sau: nút **Cập nhật** / lệnh `ISURVEY_UPDATE` → nếu có bản mới → **Tải về** → lặp bước 1–2.
+4. Lần sau: nút **Cập nhật** / lệnh `ISURVEY_UPDATE` → nếu có bản mới → **Cập nhật ngay** → app tải zip → **Thoát & cài** (CAD phải thoát; helper tự chạy `Install-iSurvey.ps1`) → mở lại Civil.
 
 Gỡ: `Uninstall-iSurvey.bat`. Chi tiết trong `CAI_DAT.txt` trong zip.
 

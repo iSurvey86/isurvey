@@ -18,7 +18,45 @@
 
 ---
 
-## 2026-10-19 (tối) — Bản vá 1.7.1: refresh token / nhật ký + rà soát (CHƯA commit/push)
+## 2026-10-19 (đêm) — Cập nhật tự tải + thoát CAD + tự cài (1.7.2)
+
+**Máy / ngữ cảnh:** Cursor — máy có AutoCAD 2023. Cuối phiên đầy đủ; bump **1.7.2**. User đã cài thử build cục bộ (luồng UPD mới).
+
+### Đã chốt / đã làm
+
+**Sản phẩm (AppVersion 1.7.2):**
+- **UPD / `ISURVEY_UPDATE`:** có bản mới → tải zip Setup → bắt buộc thoát AutoCAD/Civil → helper `Apply-iSurveyUpdate.ps1` chạy `Install-iSurvey.ps1` khi CAD đã đóng → báo hoàn tất. Không cài đè khi DLL còn khóa.
+- Lỗi tải: vẫn mở link thủ công nếu cần. Nhật ký `update_download` / `update_apply` (gửi trước khi Quit).
+- Đã build Setup `deploy/output/iSurvey-Setup-1.7.2.zip` + `release/version.json`; đã cài bundle local. **Chưa upload Storage** (máy này thiếu `ISURVEY_SERVICE_ROLE_KEY`).
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Update | `src/Auth/UpdateApplyService.cs`, `AuthModule.cs` (`ISURVEY_UPDATE`) |
+| Helper | `deploy/Apply-iSurveyUpdate.ps1`, `build-release.ps1`, `CAI_DAT.txt` |
+| Docs | `docs/Huong_dan_Phat_hanh.md` |
+
+### Việc tiếp
+
+- [ ] Upload 1.7.2: `.\deploy\publish-release.ps1 -SkipBuild -Notes "UPD tu tai + thoat CAD + tu cai"` (cần `ISURVEY_SERVICE_ROLE_KEY`).
+- [ ] **Nhắc user (đầu phiên):** chuẩn hóa DGN theo quy chuẩn (khối NHẮC USER) — vẫn hoãn.
+- [ ] Thử UPD end-to-end trên máy có bản cũ hơn 1.7.2 (sau khi upload Storage).
+- [ ] Seed V8 VN-2000; các mục test cũ (khóa thiết bị, CBD/SCN, EG Lào Cai…).
+
+### Câu mở phiên sau
+
+```text
+Đọc docs/phien-lam-viec/HANDOFF.md (block đầu và khối NHẮC USER). iSurvey 1.7.2 — UPD tự tải zip, thoát CAD, tự cài. Tiếp: nhắc chuẩn hóa DGN, hoặc thử UPD từ máy bản cũ, hoặc việc mới theo Mẫu_Tư_Vấn / Mẫu_Vá_Lỗi.
+```
+
+**Lưu trữ ngày:** [2026-10-19-cap-nhat-tu-cai.md](./2026-10-19-cap-nhat-tu-cai.md)
+
+---
+
+## 2026-10-19 (tối) — Bản vá 1.7.1: refresh token / nhật ký + rà soát
+
+> Đã commit/push `691fc4b`; Storage latest 1.7.1. Ghi chú “CHƯA commit” dưới đây là lịch sử phiên trước khi đóng.
 
 - **Lỗi nghiêm trọng đã sửa:** `ActivityLogger` refresh token mỗi sự kiện mà không lưu token mới ➔ license hết hiệu lực sớm. Nay `AuthManager.AcquireAccessToken` + `TokenGate` chung với recheck, lưu token mới ngay; `logout` được gửi thật (cùng bước trả suất thiết bị); `TrackError` được gọi từ các lệnh. Chi tiết: CHANGELOG 1.7.1.
 - Sửa thêm: GOC (đỉnh trùng, tuyến khép kín, Z≠0), UAVCLIP (layer khóa, biên suy biến, DrawOrder theo block), `version.json` (`min_version`, BOM), `build-release.ps1 -Notes`, `schema_activity.sql` (giới hạn `detail` — **chạy lại trên Supabase**).

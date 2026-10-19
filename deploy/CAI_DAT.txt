@@ -22,7 +22,9 @@ GỠ CÀI
 
 CẬP NHẬT
   - Trong Civil: tab iSurvey → Kiểm Tra Cập Nhật (UPD), hoặc gõ ISURVEY_UPDATE.
-  - Nếu có bản mới: tải zip → đóng Civil → giải nén → chạy Install lại.
+  - Nếu có bản mới: bấm "Cập nhật ngay" → app tải zip → hỏi thoát CAD → tự cài khi CAD đã đóng.
+  - Bắt buộc thoát AutoCAD/Civil trước khi cài (DLL bị khóa nếu còn mở). Sau đó mở lại CAD.
+  - Dự phòng thủ công: tải zip → đóng Civil → giải nén → chạy Install-iSurvey.bat.
 
 HỖ TRỢ
   - Admin quản lý giấy phép trên Supabase (isurvey_licenses).
