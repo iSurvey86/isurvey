@@ -18,6 +18,47 @@
 
 ---
 
+## 2026-10-21 — Khung bản đồ / bản vẽ kỹ thuật, DUOITUYEN, trợ lý AI (1.8.0)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; bump **1.8.0**. Mọi tính năng đã test thật trong Civil 3D 2026 (trên bản sao / bản vẽ mới).
+
+### Đã chốt / đã làm
+
+**Sản phẩm (AppVersion 1.8.0):**
+- **`KHUNG` (`ISURVEY_KHUNG`)** khung bản đồ và **`KHUNGBV` (`ISURVEY_KHUNG_BV`)** khung bản vẽ kỹ thuật: A0–A4, 1/200…1/5000, TCVN 7285:2003; khung tên điền sẵn từ `INFOR.txt` + **logo EVN NPC vector** (chữ từ đường viền font Helvetica Black VU, không phụ thuộc font máy khác); KHUNG vẽ thêm lưới tọa độ CAD / mũi tên Bắc / thước tỷ lệ. 2 nút mới ở panel "Khung & Cắt Bình Đồ".
+- **`DUOITUYEN`:** chọn tim tuyến bất kỳ + điểm đầu bắt buộc (DD, G1…Gn, DC), dải chữ nhật liền mạch, bảng góc `.txt` `P 43 34 53`.
+- **Trợ lý AI (Admin-only):** `AIA` / `execute_cad` (đã code từ trước, nay đưa vào commit này).
+- **FILEDIA/CMDDIA = 0** tự đặt lại 1 khi nạp add-in (lỗi do script test cũ của AI để lại).
+- Đã `build-bundle.ps1 -Install` (3 target, 0 lỗi) và test trên Civil; **chưa** build Setup / upload Storage 1.8.0.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Khung | `src/Modules/Frame/FrameService.cs`, `src/Templates/KhungBanDo_Chuan.dwg`, `docs/KhungBD/` (INFOR.txt, LogoEVN.png, mẫu) |
+| Duỗi tuyến | `src/Modules/Tuyen/StripMapService.cs` |
+| Trợ lý AI | `src/Modules/Ai/*`, `src/UI/Ai/*`, `docs/Huong_dan_Tro_ly_AI.md` |
+| UI / đăng ký | `src/UI/RibbonBuilder.cs`, `RibbonIcons.cs`, `src/CommandAliases.cs`, `src/Main.cs`, `PackageContents.xml`, `iSurvey.csproj`, `build-bundle.ps1` |
+| Chi tiết phiên | [2026-10-21-khung-ban-do-duoi-tuyen.md](./2026-10-21-khung-ban-do-duoi-tuyen.md) |
+
+### Việc tiếp
+
+- [ ] User mở lại Civil → kiểm 2 nút ribbon **Khung Bản Đồ** / **Khung Bản Vẽ Kỹ Thuật** (chưa nhìn thấy bằng mắt); thử `KHUNG` / `KHUNGBV` trên bản vẽ thật. Bản vẽ đã có block `KB_A*` cũ: `PURGE` trước.
+- [ ] Ô "DỰ ÁN" trong khung tên còn `<TÊN DỰ ÁN>` (INFOR.txt không có) — cần user chốt giá trị mặc định hoặc form nhập.
+- [ ] Ý tưởng: lệnh nhập logo khác (ảnh/DWG → vector); form nhỏ chọn khổ/tỷ lệ/xoay cho KHUNG (user hiện chọn chỉ bật F12).
+- [ ] Phát hành 1.8.0: `.\deploy\publish-release.ps1 -Notes "..."` (cần `ISURVEY_SERVICE_ROLE_KEY`); cập nhật `docs/Danh_sach_lenh_iSurvey.xlsx` (chưa thêm KHUNG, KHUNGBV, DUOITUYEN, AIA).
+- [ ] **Nhắc user (đầu phiên):** chuẩn hóa DGN theo quy chuẩn (khối NHẮC USER) — vẫn hoãn. Từ nay mọi script test phải trả `FILEDIA`/`CMDDIA` về giá trị cũ.
+
+### Câu mở phiên sau
+
+```text
+Đọc docs/phien-lam-viec/HANDOFF.md (block đầu và khối NHẮC USER). iSurvey 1.8.0 — KHUNG/KHUNGBV (khung chuẩn + logo vector), DUOITUYEN, trợ lý AI. Tiếp: kiểm nút ribbon khung trên Civil, chốt ô DỰ ÁN, hoặc phát hành 1.8.0 / nhắc chuẩn hóa DGN.
+```
+
+**Lưu trữ ngày:** [2026-10-21-khung-ban-do-duoi-tuyen.md](./2026-10-21-khung-ban-do-duoi-tuyen.md)
+
+---
+
 ## 2026-10-19 (đêm) — Cập nhật tự tải + thoát CAD + tự cài (1.7.2)
 
 **Máy / ngữ cảnh:** Cursor — máy có AutoCAD 2023. Cuối phiên đầy đủ; bump **1.7.2**. User đã cài thử build cục bộ (luồng UPD mới).

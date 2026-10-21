@@ -27,6 +27,8 @@ internal static partial class RibbonIcons
     public static BitmapSource TaoKhung(int size) => Render(size, Grad(0x0096C7, 0x023E8A), DrawFrames);
     public static BitmapSource CatBd(int size) => Render(size, Grad(0xF77F00, 0xD62828), DrawScissors);
     public static BitmapSource RaiKhung(int size) => Render(size, Solid(0x0096C7), DrawFramesChain);
+    public static BitmapSource KhungChuan(int size) => Render(size, Grad(0x1D6FA5, 0x0B3C5D), DrawStdFrame);
+    public static BitmapSource KhungBanVe(int size) => Render(size, Grad(0x2A9D8F, 0x264653), DrawTechFrame);
     public static BitmapSource TileKhung(int size) => Render(size, Solid(0x2A9D8F), DrawScaleArrows);
     public static BitmapSource KhoaKhung(int size) => Render(size, Solid(0xE09F3E), DrawLock);
 
@@ -41,6 +43,7 @@ internal static partial class RibbonIcons
     public static BitmapSource BienDuongTam(int size) => Render(size, Solid(0xE09F3E), DrawRoad);
     public static BitmapSource KeTuyen(int size) => Render(size, Solid(0xB82318), DrawLightning);
     public static BitmapSource DanhSoGoc(int size) => Render(size, Grad(0xEF4444, 0xB91C1C), DrawVertexNumbers);
+    public static BitmapSource DuoiTuyen(int size) => Render(size, Grad(0x0F766E, 0x115E59), DrawStripMap);
     public static BitmapSource DanhSoCot(int size) => Render(size, Solid(0x2A9D8F), DrawTag);
 
     // ---------- Panel 5: Há»“ sÆ¡ & QA/QC ----------
@@ -48,6 +51,10 @@ internal static partial class RibbonIcons
     public static BitmapSource KiemTraCaoDo(int size) => Render(size, Solid(0x3B7D3B), DrawCheck);
     public static BitmapSource AutoScan(int size) => Render(size, Solid(0x0096C7), DrawMagnifier);
     public static BitmapSource XuatExcel(int size) => Render(size, Solid(0x2A9D8F), DrawDocument);
+
+    // ---------- Panel Admin: Trợ lý AI ----------
+    public static BitmapSource AiAssist(int size) => Render(size, Grad(0x7C3AED, 0x4F46E5), DrawAiSpark);
+    public static BitmapSource AiSettings(int size) => Render(size, Solid(0x6366F1), DrawAiGear);
 
     // ---------- Helpers ----------
     private static WpfColor Hex(int rgb) =>
@@ -292,6 +299,39 @@ internal static partial class RibbonIcons
         Box(dc, WpfBrushes.White, null, s, 0.43, 0.20, 0.14, 0.62);
     }
 
+    /// <summary>Technical drawing frame: border, title-block table at bottom right, a small logo circle.</summary>
+    private static void DrawTechFrame(DrawingContext dc, double s)
+    {
+        var pen = Stroke(s, 0.07);
+        Box(dc, null, pen, s, 0.10, 0.14, 0.80, 0.72);
+        Box(dc, null, pen, s, 0.50, 0.52, 0.40, 0.34);
+        Seg(dc, pen, s, 0.50, 0.69, 0.90, 0.69);
+        Seg(dc, pen, s, 0.70, 0.52, 0.70, 0.69);
+        var r = Math.Max(1.4, s * 0.06);
+        dc.DrawEllipse(null, Stroke(s, 0.05), new WpfPoint(s * 0.70, s * 0.78), r, r);
+        Seg(dc, Stroke(s, 0.05), s, 0.20, 0.30, 0.42, 0.30);
+        Seg(dc, Stroke(s, 0.05), s, 0.20, 0.42, 0.38, 0.42);
+    }
+
+    /// <summary>Standard map frame: sheet with border, title-block strip on the right, grid crosses.</summary>
+    private static void DrawStdFrame(DrawingContext dc, double s)
+    {
+        var pen = Stroke(s, 0.07);
+        Box(dc, null, pen, s, 0.10, 0.14, 0.80, 0.72);
+        Seg(dc, pen, s, 0.68, 0.14, 0.68, 0.86);
+        Seg(dc, pen, s, 0.68, 0.40, 0.90, 0.40);
+        Seg(dc, pen, s, 0.68, 0.62, 0.90, 0.62);
+        var thin = Stroke(s, 0.05);
+        foreach (var cx in new[] { 0.26, 0.48 })
+        {
+            foreach (var cy in new[] { 0.34, 0.60 })
+            {
+                Seg(dc, thin, s, cx - 0.05, cy, cx + 0.05, cy);
+                Seg(dc, thin, s, cx, cy - 0.05, cx, cy + 0.05);
+            }
+        }
+    }
+
     // ---------- Glyph: Panel 4 ----------
     /// <summary>Viá»n vuÃ´ng nÃ©t Ä‘á»©t (biÃªn láº¥y Ä‘áº¥t) + vuÃ´ng gáº¡ch chÃ©o (mÃ³ng cá»™t).</summary>
     private static void DrawFoundation(DrawingContext dc, double s)
@@ -321,6 +361,17 @@ internal static partial class RibbonIcons
     /// <summary>Tia sÃ©t Ä‘iá»‡n.</summary>
     private static void DrawLightning(DrawingContext dc, double s) =>
         Poly(dc, WpfBrushes.White, null, s, true, 0.60, 0.08, 0.26, 0.52, 0.46, 0.52, 0.38, 0.92, 0.76, 0.42, 0.54, 0.42, 0.68, 0.08);
+
+    /// <summary>Ziczac bên trái, mũi tên, đoạn thẳng bên phải.</summary>
+    private static void DrawStripMap(DrawingContext dc, double s)
+    {
+        var pen = Stroke(s, 0.075);
+        Poly(dc, null, pen, s, false, 0.08, 0.74, 0.24, 0.30, 0.40, 0.70);
+        Seg(dc, pen, s, 0.46, 0.50, 0.60, 0.50);
+        Seg(dc, pen, s, 0.54, 0.40, 0.64, 0.50);
+        Seg(dc, pen, s, 0.54, 0.60, 0.64, 0.50);
+        Seg(dc, pen, s, 0.68, 0.50, 0.92, 0.50);
+    }
 
     /// <summary>Đường gấp khúc + chấm đỉnh góc (đánh số góc tuyến).</summary>
     private static void DrawVertexNumbers(DrawingContext dc, double s)
@@ -375,5 +426,31 @@ internal static partial class RibbonIcons
         Poly(dc, null, pen, s, false, 0.62, 0.12, 0.62, 0.30, 0.80, 0.30);
         Seg(dc, pen, s, 0.34, 0.52, 0.70, 0.52);
         Seg(dc, pen, s, 0.34, 0.68, 0.70, 0.68);
+    }
+
+    /// <summary>Tia AI (hình sao 4 cánh).</summary>
+    private static void DrawAiSpark(DrawingContext dc, double s)
+    {
+        Poly(dc, WpfBrushes.White, null, s, true,
+            0.50, 0.10, 0.58, 0.38, 0.88, 0.42, 0.62, 0.58, 0.70, 0.88, 0.50, 0.68, 0.30, 0.88, 0.38, 0.58, 0.12, 0.42, 0.42, 0.38);
+        var r = Math.Max(1.2, s * 0.05);
+        dc.DrawEllipse(WpfBrushes.White, null, new WpfPoint(s * 0.78, s * 0.22), r, r);
+    }
+
+    /// <summary>Bánh răng cấu hình AI.</summary>
+    private static void DrawAiGear(DrawingContext dc, double s)
+    {
+        var pen = Stroke(s, 0.08);
+        dc.DrawEllipse(null, pen, new WpfPoint(s * 0.50, s * 0.50), s * 0.22, s * 0.22);
+        dc.DrawEllipse(WpfBrushes.White, null, new WpfPoint(s * 0.50, s * 0.50), s * 0.08, s * 0.08);
+        for (var i = 0; i < 6; i++)
+        {
+            var a = i * Math.PI / 3.0;
+            var x0 = 0.50 + 0.28 * Math.Cos(a);
+            var y0 = 0.50 + 0.28 * Math.Sin(a);
+            var x1 = 0.50 + 0.40 * Math.Cos(a);
+            var y1 = 0.50 + 0.40 * Math.Sin(a);
+            Seg(dc, pen, s, x0, y0, x1, y1);
+        }
     }
 }

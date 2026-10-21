@@ -7,6 +7,8 @@ using iSurvey.Modules.Map;
 using iSurvey.Modules.Plan;
 using iSurvey.Modules.Scan;
 using iSurvey.Modules.Tuyen;
+using iSurvey.Modules.Ai;
+using iSurvey.Modules.Frame;
 using iSurvey.Modules.Uav;
 
 namespace iSurvey;
@@ -20,7 +22,8 @@ namespace iSurvey;
 /// INK = Import KML, EXK = Export KML (EG vẫn dùng được),
 /// D2C = DGN to CAD, C2D = CAD to DGN, DGNCFG = Cấu hình DGN,
 /// UAVCLIP = Cắt ảnh UAV theo biên,
-/// GOC = Đánh số góc tuyến,
+/// GOC = Đánh số góc tuyến, DUOITUYEN = Duỗi thẳng tuyến, KHUNG = Chèn khung bản đồ A0–A4 (1/200…1/5000),
+/// AIA = Trợ lý AI (Admin-Only),
 /// CBD = Cắt Bình Đồ (CATBD), SCN = Scan (AUTOSCAN; "ASC" bị Telex thành "ác" nên dùng SCN),
 /// LGI = Login (ISURVEY_LOGIN), UPD = Update, ABT = About, LGO = Logout.
 /// </remarks>
@@ -31,7 +34,10 @@ public sealed class CommandAliases
     private readonly KmlImportModule _import = new();
     private readonly DgnModule _dgn = new();
     private readonly UavModule _uav = new();
+    private readonly AiAssistantModule _ai = new();
     private readonly VertexNumberingService _goc = new();
+    private readonly StripMapService _strip = new();
+    private readonly FrameService _frame = new();
     private readonly PlanModule _plan = new();
     private readonly ScanModule _scan = new();
     private readonly AuthModule _auth = new();
@@ -68,6 +74,18 @@ public sealed class CommandAliases
 
     [CommandMethod("GOC")]
     public void AliasGocTuyen() => _goc.NumberVerticesCommand();
+
+    [CommandMethod("DUOITUYEN")]
+    public void AliasStripMap() => _strip.StripMapCommand();
+
+    [CommandMethod("KHUNG")]
+    public void AliasFrame() => _frame.FrameCommand();
+
+    [CommandMethod("KHUNGBV")]
+    public void AliasTechFrame() => _frame.TechFrameCommand();
+
+    [CommandMethod("AIA")]
+    public void AliasAiAssist() => _ai.AssistCommand();
 
     [CommandMethod("CBD")]
     public void AliasCutPlan() => _plan.CutPlanCommand();

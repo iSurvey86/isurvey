@@ -28,3 +28,7 @@ Desktop.ini
 # Auth: khoa bi mat/SMTP cua may (khong commit)
 auth.config.json
 license.dat
+
+# AutoCAD lock files
+*.dwl
+*.dwl2

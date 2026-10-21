@@ -1,5 +1,23 @@
 # Changelog — iSurvey
 
+## 1.8.0 — 2026-10-21
+
+### Khung bản đồ / khung bản vẽ kỹ thuật (mới)
+- `ISURVEY_KHUNG` (**KHUNG**) và `ISURVEY_KHUNG_BV` (**KHUNGBV**): chèn khung chuẩn TCVN 7285:2003 khổ A0–A4, tỷ lệ 1/200…1/5000 (khung tên đọc trên khung; kích thước ngoài bản vẽ = giấy mm × N/1000, theo `INSUNITS`; đơn vị unitless coi như mét). Xem trước bằng jig, xoay khung (0 / góc / theo tuyến), UCS đúng, nhóm ẩn danh, một `UNDO` hoàn tác cả lượt chèn.
+- Khung bản đồ vẽ thêm: lưới thập mỗi 100 mm giấy theo **tọa độ CAD (WCS)**, nhãn `X=`/`Y=` ở cạnh trái và trên, mũi tên Bắc, thước tỷ lệ. Khung bản vẽ kỹ thuật không có phần này.
+- Mẫu `KhungBanDo_Chuan.dwg` (`src/Templates`, vào bundle `Contents\Templates`): 5 khổ, khung tên điền sẵn từ `INFOR.txt`, **logo EVN NPC vector** (ngôi sao/vòng tròn dựng từ ảnh; chữ EVN = HelveticaBlackVU, NPC = HelveticaBlackOblicVU lấy từ đường viền font — không phụ thuộc font hay file ảnh trên máy khác). Tên chủ đầu tư một dòng.
+- Ribbon: 2 nút mới trong panel "Khung & Cắt Bình Đồ".
+
+### DUOITUYEN (Duỗi tuyến)
+- Chọn tim tuyến ở vị trí bất kỳ; bắt buộc chọn điểm đầu (DD ➔ G1…Gn ➔ DC); dải cắt chữ nhật liền mạch, số liệu chính xác; bảng góc `.txt` dạng `Tên Điểm,X,Y,Khoảng Cách Cạnh Trước,Góc Rẽ` (`P 43 34 53`, X/Y 2 số lẻ).
+
+### Trợ lý AI (thử nghiệm, chỉ Admin)
+- `ISURVEY_AI_ASSIST` (**AIA**), công cụ `isurvey_execute_cad` chạy chuỗi Command Line (blocklist `SHELL`/`NETLOAD`/`QUIT`…, lệnh phá hủy cần xác nhận). `AuthManager.IsAdmin()` / `EnsureAdmin()`. Xem `docs/Huong_dan_Tro_ly_AI.md`.
+
+### Khác
+- Khi nạp add-in, nếu `FILEDIA` hoặc `CMDDIA` đang = 0 (do script bỏ quên) → đặt lại 1 và báo trên command line.
+- `build-bundle.ps1` / `iSurvey.csproj`: đóng gói `src\Templates\*.dwg`; loại `deploy\tools` khỏi build add-in.
+
 ## 1.7.2 — 2026-10-19
 
 ### Cập nhật tự cài (UPD)

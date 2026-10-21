@@ -86,6 +86,17 @@ else {
     Write-Host "    (Chua co src\Seeds\*.dgn - C2D se dung seed metric co san cua Civil 3D)"
 }
 
+# Khung ban do chuan cho ISURVEY_KHUNG: Contents\Templates
+$tplSrc = Join-Path $Root "src\Templates"
+$tplFiles = @()
+if (Test-Path $tplSrc) { $tplFiles = @(Get-ChildItem $tplSrc -Filter "*.dwg") }
+if ($tplFiles.Count -gt 0) {
+    $tplDest = Join-Path $OutDir "Contents\Templates"
+    New-Item -ItemType Directory -Force -Path $tplDest | Out-Null
+    foreach ($f in $tplFiles) { Copy-Item $f.FullName $tplDest -Force }
+    Write-Host "    Templates: $($tplFiles.Name -join ', ')"
+}
+
 Write-Host "==> Bundle san sang: $OutDir"
 
 if ($Install) {

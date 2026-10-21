@@ -20,6 +20,10 @@ public static class RibbonBuilder
     private static RibbonButton? _accountButton;
     private static RibbonButton? _logoutButton;
 
+    /// <summary>Panel Trợ lý AI đã có trên Ribbon hay chưa (đồng bộ khi đăng nhập/đăng xuất Admin).</summary>
+    private static bool _aiPanelPresent;
+    private static bool _rebuilding;
+
     /// <summary>Mô tả một nút. Implemented=true: gửi lệnh thật; false: in thông báo "đang cập nhật".</summary>
     private sealed record Btn(string Text, string Command, Func<int, BitmapSource> Icon, bool Implemented,
         string? Tip = null);
@@ -61,6 +65,7 @@ public static class RibbonBuilder
         GatedButtons.Clear();
         _accountButton = null;
         _logoutButton = null;
+        _aiPanelPresent = false;
     }
 
     private static void OnItemInitialized(object? sender, RibbonItemEventArgs e)
@@ -82,6 +87,7 @@ public static class RibbonBuilder
             GatedButtons.Clear();
             _accountButton = null;
             _logoutButton = null;
+            _aiPanelPresent = false;
 
             var tab = new RibbonTab
             {
@@ -116,6 +122,10 @@ public static class RibbonBuilder
             // Panel 3 — Khung & Cắt Bình Đồ
             AddPanel(tab, "Khung & Cắt Bình Đồ",
                 [
+                    new Btn("Khung\nBản Đồ", "ISURVEY_KHUNG", RibbonIcons.KhungChuan, true,
+                        "Chèn khung bản đồ chuẩn TCVN 7285 khổ A0–A4, tỷ lệ 1/200…1/5000: khung tên, lưới tọa độ, mũi tên Bắc, thước tỷ lệ (KHUNG)"),
+                    new Btn("Khung Bản Vẽ\nKỹ Thuật", "ISURVEY_KHUNG_BV", RibbonIcons.KhungBanVe, true,
+                        "Chèn khung bản vẽ kỹ thuật chuẩn TCVN 7285 khổ A0–A4, tỷ lệ 1/200…1/5000: khung tên + logo, không có lưới tọa độ (KHUNGBV)"),
                     new Btn("Tạo Khung\nLưới TĐ", "TAOKHUNG", RibbonIcons.TaoKhung, false),
                     new Btn("Cắt Bình Đồ", "CATBD", RibbonIcons.CatBd, true)
                 ],
@@ -141,7 +151,9 @@ public static class RibbonBuilder
                 [
                     new Btn("Rải Móng &\nBiên Đất", "RAIMONG", RibbonIcons.RaiMong, false),
                     new Btn("Đánh Số\nGóc Tuyến", "ISURVEY_NUMBER_VERTICES", RibbonIcons.DanhSoGoc, true,
-                        "Đánh số góc tim tuyến — chấm đỏ + chữ né đường (GOC)")
+                        "Đánh số góc tim tuyến — chấm đỏ + chữ né đường (GOC)"),
+                    new Btn("Duỗi Thẳng\nTuyến", "ISURVEY_STRIP_MAP", RibbonIcons.DuoiTuyen, true,
+                        "Duỗi ảnh UAV và đối tượng CAD theo tim tuyến, xuất bảng góc (DUOITUYEN)")
                 ],
                 [
                     new Btn("Tạo Biên Đường Tạm", "BIENDUONGTAM", RibbonIcons.BienDuongTam, false),
@@ -172,6 +184,13 @@ public static class RibbonBuilder
                 ],
                 gated: false);
 
+            // Panel Admin — Trợ lý AI: chỉ dựng khi email trong danh sách Admin
+            if (AuthManager.IsAdmin())
+            {
+                AddAiAssistantPanel(tab);
+                _aiPanelPresent = true;
+            }
+
             ribbon.Tabs.Add(tab);
             UpdateAuthState();
         }
@@ -182,6 +201,46 @@ public static class RibbonBuilder
         }
     }
 
+    /// <summary>Gỡ tab và dựng lại — dùng khi quyền Admin đổi sau đăng nhập/đăng xuất.</summary>
+    private static void RebuildRibbonTab()
+    {
+        if (_rebuilding)
+            return;
+        _rebuilding = true;
+        try
+        {
+            var ribbon = ComponentManager.Ribbon;
+            if (ribbon is null)
+                return;
+            var existing = ribbon.FindTab(TabId);
+            if (existing is not null)
+                ribbon.Tabs.Remove(existing);
+            GatedButtons.Clear();
+            _accountButton = null;
+            _logoutButton = null;
+            _aiPanelPresent = false;
+            TryBuild();
+        }
+        finally
+        {
+            _rebuilding = false;
+        }
+    }
+
+    /// <summary>Panel thử nghiệm Trợ lý AI (Admin-Only).</summary>
+    private static void AddAiAssistantPanel(RibbonTab tab)
+    {
+        AddPanel(tab, "Trợ lý AI",
+            [
+                new Btn("Trợ Lý\nAI", "ISURVEY_AI_ASSIST", RibbonIcons.AiAssist, true,
+                    "Trợ lý AI khảo sát (đang phát triển — chỉ Admin)")
+            ],
+            [
+                new Btn("Cấu Hình AI", "ISURVEY_AI_SETTINGS", RibbonIcons.AiSettings, true,
+                    "Thiết lập Trợ lý AI (đang phát triển — chỉ Admin)")
+            ]);
+    }
+
     /// <summary>
     /// Đồng bộ Ribbon với trạng thái đăng nhập (không cần khởi động lại Civil):
     /// khóa/mở Panel 1–5, đổi nút tài khoản (nhãn, icon, tooltip), bật/tắt nút Đăng xuất.
@@ -190,6 +249,14 @@ public static class RibbonBuilder
     {
         try
         {
+            // Đăng nhập/đăng xuất Admin → hiện/ẩn cả panel (dựng lại tab).
+            var wantAi = AuthManager.IsAdmin();
+            if (wantAi != _aiPanelPresent && ComponentManager.Ribbon?.FindTab(TabId) is not null)
+            {
+                RebuildRibbonTab();
+                return;
+            }
+
             var license = AuthManager.License;
             var authed = license is not null;
 

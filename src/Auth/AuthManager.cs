@@ -44,6 +44,46 @@ public static class AuthManager
 
     public static LicenseInfo? License => _license;
 
+    /// <summary>Email đang kích hoạt (null nếu chưa đăng nhập).</summary>
+    public static string? CurrentUserEmail
+    {
+        get
+        {
+            lock (LicenseLock)
+                return _license?.Email;
+        }
+    }
+
+    /// <summary>
+    /// Email được xem panel/lệnh thử nghiệm (Admin-Only). So khớp không phân biệt hoa thường.
+    /// Chỉ để ẩn UI / chặn command — không thay thế kiểm soát phía server.
+    /// </summary>
+    private static readonly HashSet<string> AdminEmails = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "minhphuong.npsc@gmail.com",
+    };
+
+    /// <summary>True nếu email giấy phép hiện tại nằm trong danh sách Admin.</summary>
+    public static bool IsAdmin()
+    {
+        var email = CurrentUserEmail;
+        return !string.IsNullOrWhiteSpace(email) && AdminEmails.Contains(email.Trim());
+    }
+
+    /// <summary>
+    /// Đảm bảo đã đăng nhập và là Admin. Dùng đầu các lệnh thử nghiệm (sau EnsureAuthenticated hoặc thay thế).
+    /// </summary>
+    public static bool EnsureAdmin([CallerMemberName] string? commandName = null)
+    {
+        if (!EnsureAuthenticated(commandName))
+            return false;
+        if (IsAdmin())
+            return true;
+
+        Print("\n[iSurvey] Lenh nay chi danh cho Admin hoac dang trong qua trinh thu nghiem.");
+        return false;
+    }
+
     /// <summary>Phiên bản đọc từ assembly (đặt trong csproj &lt;Version&gt;), dạng "v1.2.0".</summary>
     public static string AppVersion { get; } = ReadVersion();
 
