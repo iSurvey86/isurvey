@@ -21,6 +21,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ProjNet" Version="2.0.0" />
+    <!-- GDAL 3.13 (win-x64) cho nhập MapInfo TAB. Gói "MaxRev.Gdal.Windows" không còn trên NuGet. -->
+    <PackageReference Include="MaxRev.Gdal.Core" Version="3.13.3.583" />
+    <PackageReference Include="MaxRev.Gdal.WindowsRuntime.Minimal" Version="3.13.3.583" />
     <PackageReference Include="System.Text.Json" Version="8.0.5" Condition="'$(TargetFramework)' == 'net48'" />
     <PackageReference Include="PolySharp" Version="1.15.0" Condition="'$(TargetFramework)' == 'net48'" PrivateAssets="all" />
     <!-- ExcludeAssets=runtime: API chỉ để biên dịch, AutoCAD cung cấp DLL lúc chạy. -->

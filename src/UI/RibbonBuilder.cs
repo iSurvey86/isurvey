@@ -108,6 +108,8 @@ public static class RibbonBuilder
                 ],
                 secondSmall:
                 [
+                    new Btn("Nhập TAB ➔ CAD", "ISURVEY_TAB_TO_CAD", RibbonIcons.ImportTab, true,
+                        "Nhập MapInfo TAB: tô đặc đúng màu MapInfo, layer theo MDSD, nhãn tại điểm trong thửa (T2C)"),
                     new Btn("Nhập DGN ➔ CAD", "ISURVEY_DGN_TO_CAD", RibbonIcons.DgnToCad, true,
                         "Nhập file MicroStation (.dgn V7/V8) vào bản vẽ hiện hành hoặc chuyển hàng loạt sang .dwg (Lệnh tắt: D2C)"),
                     new Btn("Xuất CAD ➔ DGN", "ISURVEY_CAD_TO_DGN", RibbonIcons.CadToDgn, true,

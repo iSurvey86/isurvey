@@ -53,6 +53,8 @@
         <Command Local="INK" Global="INK" />
         <Command Local="EXK" Global="EXK" />
         <Command Local="D2C" Global="D2C" />
+        <Command Local="ISURVEY_TAB_TO_CAD" Global="ISURVEY_TAB_TO_CAD" />
+        <Command Local="T2C" Global="T2C" />
         <Command Local="C2D" Global="C2D" />
         <Command Local="DGNCFG" Global="DGNCFG" />
         <Command Local="UAVCLIP" Global="UAVCLIP" />
@@ -119,6 +121,8 @@
         <Command Local="INK" Global="INK" />
         <Command Local="EXK" Global="EXK" />
         <Command Local="D2C" Global="D2C" />
+        <Command Local="ISURVEY_TAB_TO_CAD" Global="ISURVEY_TAB_TO_CAD" />
+        <Command Local="T2C" Global="T2C" />
         <Command Local="C2D" Global="C2D" />
         <Command Local="DGNCFG" Global="DGNCFG" />
         <Command Local="UAVCLIP" Global="UAVCLIP" />
@@ -185,6 +189,8 @@
         <Command Local="INK" Global="INK" />
         <Command Local="EXK" Global="EXK" />
         <Command Local="D2C" Global="D2C" />
+        <Command Local="ISURVEY_TAB_TO_CAD" Global="ISURVEY_TAB_TO_CAD" />
+        <Command Local="T2C" Global="T2C" />
         <Command Local="C2D" Global="C2D" />
         <Command Local="DGNCFG" Global="DGNCFG" />
         <Command Local="UAVCLIP" Global="UAVCLIP" />

@@ -19,6 +19,7 @@ using iSurvey.UI;
 [assembly: CommandClass(typeof(MapModule))]
 [assembly: CommandClass(typeof(ExportModule))]
 [assembly: CommandClass(typeof(KmlImportModule))]
+[assembly: CommandClass(typeof(TabImportModule))]
 [assembly: CommandClass(typeof(DgnModule))]
 [assembly: CommandClass(typeof(UavModule))]
 [assembly: CommandClass(typeof(AiAssistantModule))]

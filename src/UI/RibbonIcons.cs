@@ -20,6 +20,7 @@ internal static partial class RibbonIcons
     public static BitmapSource MapDelete(int size) => Render(size, Solid(0xB82318), DrawTrash);
     public static BitmapSource ExportGe(int size) => Render(size, Solid(0x0C59CF), DrawExport);
     public static BitmapSource ImportKml(int size) => Render(size, Grad(0x2B9348, 0x1B6CA8), DrawFileDown);
+    public static BitmapSource ImportTab(int size) => Render(size, Grad(0x0F766E, 0x1B6CA8), DrawFileDown);
     public static BitmapSource ExportKml(int size) => Render(size, Grad(0x0C59CF, 0x023E8A), DrawFileUp);
     public static BitmapSource UpdateGe(int size) => Render(size, Solid(0x0096C7), DrawRefresh);
 
