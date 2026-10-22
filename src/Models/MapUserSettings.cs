@@ -64,8 +64,8 @@ public sealed class MapUserSettings
 
     public string DgnLastFolder { get; set; } = string.Empty;
 
-    /// <summary>Batch: "Separate" (mỗi file một .dwg) hoặc "Combine" (ghép vào một bản vẽ mới).</summary>
-    public string DgnBatchMode { get; set; } = "Separate";
+    /// <summary>Batch: "Combine" (ghép vào bản vẽ hiện hành) hoặc "Separate" (mỗi file một .dwg).</summary>
+    public string DgnBatchMode { get; set; } = "Combine";
 
     /// <summary>Batch: khi file .dwg đích đã tồn tại — "Number" (đánh số _1, _2...), "Skip" (bỏ qua), "Overwrite" (ghi đè).</summary>
     public string DgnBatchExisting { get; set; } = "Number";

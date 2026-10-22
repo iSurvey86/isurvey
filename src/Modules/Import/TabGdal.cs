@@ -37,19 +37,27 @@ internal static class TabGdal
 
             // Civil giới hạn đường tìm DLL và đã nạp GEOS.dll của Map.
             // GDAL 3.13 cần bản GEOS đi kèm, nên tách tên import trước khi nạp.
-            LoadBundleNatives();
-            MaxRev.Gdal.Core.GdalBase.ConfigureAll();
+            // Native nằm một bản ở Contents/SharedDependencies/GdalNative cho cả 2023/2025/2027.
+            // AssemblyResolve chỉ thấy DLL managed, không nạp được gdal.dll.
+            var native = LoadBundleNatives();
+            var gdalData = Path.Combine(native, "gdal-data");
+            MaxRev.Gdal.Core.GdalBase.ConfigureGdalDrivers(Directory.Exists(gdalData) ? gdalData : null);
+            var proj = Path.Combine(native, "maxrev.gdal.core.libshared");
+            if (Directory.Exists(proj))
+                MaxRev.Gdal.Core.Proj.Configure(proj);
+            else
+                MaxRev.Gdal.Core.Proj.Configure();
             Ogr.RegisterAll();
             Gdal.SetConfigOption("GDAL_FILENAME_IS_UTF8", "YES");
             _state = 1;
         }
     }
 
-    private static void LoadBundleNatives()
+    private static string LoadBundleNatives()
     {
         var home = Path.GetDirectoryName(typeof(TabGdal).Assembly.Location)
             ?? throw new InvalidOperationException("Không xác định được thư mục iSurvey.dll.");
-        var native = Path.Combine(home, "runtimes", "win-x64", "native");
+        var native = ResolveNativeDir(home);
         if (!File.Exists(Path.Combine(native, "gdal.dll")))
             throw new DirectoryNotFoundException("Không thấy GDAL native: " + native);
 
@@ -70,6 +78,21 @@ internal static class TabGdal
         {
             SetDllDirectory(null);
         }
+
+        return native;
+    }
+
+    /// <summary>
+    /// Bundle: Contents/Win64/{year}/iSurvey.dll → Contents/SharedDependencies/GdalNative.
+    /// Bản build thô vẫn có runtimes/win-x64/native cạnh DLL.
+    /// </summary>
+    private static string ResolveNativeDir(string home)
+    {
+        var shared = Path.GetFullPath(Path.Combine(home, "..", "..", "SharedDependencies", "GdalNative"));
+        if (File.Exists(Path.Combine(shared, "gdal.dll")))
+            return shared;
+
+        return Path.Combine(home, "runtimes", "win-x64", "native");
     }
 
     /// <summary>

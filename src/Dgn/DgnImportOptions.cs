@@ -55,7 +55,7 @@ public sealed class DgnImportOptions
 
     public DgnBatchExisting BatchExisting { get; set; } = DgnBatchExisting.Number;
 
-    /// <summary>true = ghép tất cả vào một bản vẽ mới; false = mỗi file một .dwg riêng.</summary>
+    /// <summary>true = ghép tất cả vào Model Space bản vẽ hiện hành; false = mỗi file một .dwg riêng.</summary>
     public bool BatchCombine { get; set; }
 
     public bool IsBatch => BatchFiles.Count > 0;

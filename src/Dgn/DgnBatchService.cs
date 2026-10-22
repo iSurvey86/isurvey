@@ -18,7 +18,7 @@ internal sealed class DgnBatchFileResult
 {
     public required string Source { get; init; }
 
-    /// <summary>File .dwg đã lưu (chế độ không ghép); null khi ghép vào một bản vẽ mới.</summary>
+    /// <summary>File .dwg đã lưu (chế độ rời); null khi ghép vào bản vẽ hiện hành.</summary>
     public string? Output { get; set; }
 
     public DgnBatchStatus Status { get; set; }
@@ -38,10 +38,10 @@ internal sealed class DgnBatchFileResult
 
 /// <summary>
 /// Batch DGN ➔ CAD. Mỗi file được nhập bằng đúng đường đi của D2C thường (DGNIMPORTMODE=2, tọa độ chuẩn,
-/// hậu xử lý theo Handseed) vào một bản vẽ trống do ta tự tạo từ template mặc định:
+/// hậu xử lý theo Handseed):
 /// <list type="bullet">
-/// <item>Ghép: tất cả file vào MỘT bản vẽ mới, để chưa lưu.</item>
-/// <item>Không ghép: mỗi file một bản vẽ mới ➔ lưu .dwg cạnh file .dgn ➔ đóng ➔ file kế tiếp (luôn chỉ một tab phụ).</item>
+/// <item>Ghép: tất cả file vào Model Space của bản vẽ đang mở, giữ tọa độ gốc.</item>
+/// <item>Rời: mỗi file một bản vẽ mới ➔ lưu .dwg cạnh file .dgn ➔ đóng ➔ file kế tiếp.</item>
 /// </list>
 /// Tạo/đóng bản vẽ chạy ở ngữ cảnh ứng dụng (Application.Idle); gọi lệnh DGNIMPORT chạy ở ngữ cảnh lệnh.
 /// </summary>
@@ -104,8 +104,8 @@ internal static class DgnBatchService
         };
 
         orig.Editor.WriteMessage(options.BatchCombine
-            ? $"\n[iSurvey][DGN] BATCH GHÉP: {files.Count} file ➔ MỘT bản vẽ mới (tuần tự, đừng thao tác trong lúc chạy)."
-            : $"\n[iSurvey][DGN] BATCH TÁCH: {files.Count} file ➔ mỗi file một .dwg cùng thư mục (tuần tự, đừng thao tác trong lúc chạy).");
+            ? $"\n[iSurvey][DGN] GHÉP: {files.Count} file vào Model Space bản vẽ hiện hành (tuần tự, đừng thao tác trong lúc chạy)."
+            : $"\n[iSurvey][DGN] RỜI: {files.Count} file ➔ mỗi file một .dwg cùng thư mục (tuần tự, đừng thao tác trong lúc chạy).");
 
         RunLater(batch, () => Step(batch));
     }
@@ -149,9 +149,13 @@ internal static class DgnBatchService
                 }
             }
 
-            // Bản vẽ đích: ghép ➔ tạo một lần; không ghép ➔ tạo mới cho từng file.
+            // Ghép: chèn vào bản vẽ đang mở. Rời: mỗi file một bản vẽ trống rồi lưu .dwg.
             var created = false;
-            if (b.Target is null)
+            if (b.Combine)
+            {
+                b.Target ??= b.Orig;
+            }
+            else if (b.Target is null)
             {
                 try
                 {
@@ -170,7 +174,7 @@ internal static class DgnBatchService
             }
 
             WriteLine(b.Combine
-                ? $"\n[iSurvey][DGN] {prefix} ➔ ghép vào bản vẽ mới ..."
+                ? $"\n[iSurvey][DGN] {prefix} ➔ chèn vào bản vẽ hiện hành ..."
                 : $"\n[iSurvey][DGN] {prefix} ➔ {Path.GetFileName(output)} ...", b);
 
             var target = b.Target;
@@ -187,6 +191,9 @@ internal static class DgnBatchService
                             options.FilePath = file;
                             options.ImportMode = 2; // nhập thẳng vào bản vẽ đích (tọa độ chuẩn)
                             options.BatchFiles = [];
+                            options.PurgeJunk = true;
+                            // Ghép: Zoom Extents một lần ở file cuối. Rời: mỗi .dwg được zoom trước khi lưu.
+                            options.ZoomToImport = !b.Combine || b.Files.Count == 0;
                             DgnImportService.Start(target, options,
                                 report => OnFileDone(b, file, output, prefix, watch, report));
                         }

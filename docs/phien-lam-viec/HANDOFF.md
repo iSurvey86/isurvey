@@ -18,6 +18,47 @@
 
 ---
 
+## 2026-10-22 — Nhập TAB, GDAL dùng chung, hộp thoại Nhập DGN (1.8.2)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; phát hành **1.8.2**. Bản **1.8.1** (TAB + GDAL dùng chung) đã có trên Supabase từ sớm hơn trong ngày; mã nguồn của phần đó vào git cùng commit 1.8.2.
+
+### Đã chốt / đã làm
+
+**1.8.1 (đã phát hành trước, mã nguồn commit cùng 1.8.2):**
+- **T2C** nhập MapInfo TAB: hatch đặc theo màu MapInfo, layer `TAB_[MDSD]`, nhãn trên `TAB_LABELS`. Đổi TM ➔ TM bằng ProjNET khi kinh tuyến khác bản vẽ.
+- Native GDAL một bản: `Contents/SharedDependencies/GdalNative`. Setup khoảng 40 MB. `TabGdal` nạp từ thư mục dùng chung.
+
+**1.8.2 — Nhập DGN (D2C):**
+- Hộp thoại nền sáng: bảng nhiều tệp (Thêm / Lên / Xuống / Xóa, cột STT, Tên tệp, Đường dẫn, Kích thước).
+- Mặc định **ghép tọa độ** vào Model Space bản vẽ đang mở (không tạo bản vẽ mới). **Rời:** mỗi tệp một `.dwg` cùng thư mục.
+- Layer: giữ Level gốc hoặc tiền tố `DGN_`. Bỏ mục ánh xạ JSON trên UI. TCVN3 bật, Explode Cell tắt. Dọn rác luôn chạy. Zoom Extents một lần ở tệp cuối khi ghép.
+- Đã mở hộp thoại trên Civil 3D 2026 (`Drawing1.dwg` trống) và đối chiếu bố cục. Chưa chạy nhập một file DGN thật trong phiên này.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Hộp thoại DGN | `src/Dgn/DgnImportWindow.xaml`, `DgnImportWindow.xaml.cs` |
+| Ghép vào bản vẽ hiện hành | `src/Dgn/DgnBatchService.cs`, `DgnModule.cs`, `DgnImportOptions.cs` |
+| TAB / GDAL | `src/Modules/Import/TabGdal.cs`, `deploy/build-bundle.ps1` |
+| Phiên bản | `iSurvey.csproj`, `PackageContents.xml` |
+
+### Việc tiếp
+
+- [ ] Thử D2C trên bản sao file `.dgn`: ghép nhiều tệp vào một bản vẽ, rồi chế độ rời.
+- [ ] Máy khác: **UPD / Kiểm Tra Cập Nhật** để nhận 1.8.2 (đợi cache khoảng 60 giây).
+- [ ] Chuẩn hóa DGN theo quy chuẩn (khối NHẮC USER) vẫn hoãn. Bảng JSON không còn trên hộp thoại nhập.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff và tiếp tục. iSurvey 1.8.2 — hộp thoại Nhập DGN (ghép vào bản vẽ hiện hành hoặc tách .dwg). Tiếp: thử D2C trên bản sao file DGN thật.
+```
+
+**Lưu trữ ngày:** [2026-10-22-nhap-dgn.md](./2026-10-22-nhap-dgn.md)
+
+---
+
 ## 2026-10-21 — Khung bản đồ / bản vẽ kỹ thuật, DUOITUYEN, trợ lý AI (1.8.0)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; bump **1.8.0**. Mọi tính năng đã test thật trong Civil 3D 2026 (trên bản sao / bản vẽ mới).

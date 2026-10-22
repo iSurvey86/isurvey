@@ -37,19 +37,7 @@ function Copy-Payload {
     Get-ChildItem $BuildDir -Filter "*.dll" | Where-Object { $blocked -notcontains $_.Name } | ForEach-Object {
         Copy-Item $_.FullName $DestDir -Force
     }
-    foreach ($extra in @("runtimes", "gdal-data", "maxrev.gdal.core.libshared")) {
-        $srcExtra = Join-Path $BuildDir $extra
-        if (Test-Path $srcExtra) {
-            Copy-Item $srcExtra (Join-Path $DestDir $extra) -Recurse -Force
-        }
-    }
-    # NuGet GDAL không copy runtimes/ vào output net48. Native win-x64 dùng chung với net8.
-    $gdalDll = Join-Path $DestDir "runtimes\win-x64\native\gdal.dll"
-    if (-not (Test-Path $gdalDll)) {
-        $donor = Join-Path $Root "bin\Release\net8.0-windows\runtimes"
-        if (-not (Test-Path $donor)) { throw "Thieu GDAL native (runtimes) cho $DestDir" }
-        Copy-Item $donor (Join-Path $DestDir "runtimes") -Recurse -Force
-    }
+    # Native GDAL không copy vào từng năm. Một bản dùng chung: Contents/SharedDependencies/GdalNative.
     $srcData = Join-Path $BuildDir "Data"
     if (-not (Test-Path $srcData)) { throw "Thieu thu muc Data: $srcData" }
     Copy-Item $srcData (Join-Path $DestDir "Data") -Recurse -Force
@@ -82,6 +70,20 @@ foreach ($t in $targets) {
     Copy-Payload -BuildDir $buildDir -DestDir $dest -Framework $t.Framework
     Write-Host "    $($t.Year) <= $($t.Tfm)"
 }
+
+# Một bộ GDAL native cho cả 2023, 2025 và 2027. Nguồn là output net8 (net48 không có runtimes).
+$gdalSrc = Join-Path $Root "bin\Release\net8.0-windows\runtimes"
+$nativeSrc = Join-Path $gdalSrc "win-x64\native"
+if (-not (Test-Path (Join-Path $nativeSrc "gdal.dll"))) { throw "Thieu GDAL native: $nativeSrc" }
+$gdalDest = Join-Path $OutDir "Contents\SharedDependencies\GdalNative"
+New-Item -ItemType Directory -Force -Path $gdalDest | Out-Null
+Copy-Item (Join-Path $nativeSrc "*") $gdalDest -Recurse -Force
+$gdalDataSrc = Join-Path $gdalSrc "any\native\gdal-data"
+if (Test-Path $gdalDataSrc) {
+    Copy-Item $gdalDataSrc (Join-Path $gdalDest "gdal-data") -Recurse -Force
+}
+$sharedMb = [Math]::Round(((Get-ChildItem $gdalDest -Recurse -File | Measure-Object Length -Sum).Sum) / 1MB, 1)
+Write-Host "    GDAL dung chung: Contents\SharedDependencies\GdalNative ($sharedMb MB)"
 
 # Seed DGN cho C2D: Contents\Seeds (DgnSeedLocator tim o ..\..\Seeds so voi iSurvey.dll)
 $seedSrc = Join-Path $Root "src\Seeds"

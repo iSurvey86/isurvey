@@ -1,271 +1,254 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Controls;
 using iSurvey.Core;
 using iSurvey.Models;
-using Win32OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 
 namespace iSurvey.Dgn;
 
 public partial class DgnImportWindow : Window
 {
-    private static readonly char[] InvalidLayerChars = ['<', '>', '/', '\\', '"', ':', ';', '?', '*', '|', '=', '`', ','];
-
-    private readonly MapUserSettings _settings;
     private readonly string? _drawingPath;
     private readonly bool _configOnly;
-    private readonly List<string> _batchFiles = [];
+    private readonly ObservableCollection<DgnFileItem> _files = [];
 
-    /// <summary>Tùy chọn người dùng chốt (null nếu hủy hoặc ở chế độ chỉ cấu hình).</summary>
     public DgnImportOptions? Result { get; private set; }
 
-    public DgnImportWindow(string? drawingPath, bool configOnly)
+    public DgnImportWindow(string? drawingPath, bool configOnly = false)
     {
-        InitializeComponent();
         _drawingPath = drawingPath;
         _configOnly = configOnly;
-        _settings = UserSettingsStore.Load(drawingPath);
+        InitializeComponent();
+        FileGrid.ItemsSource = _files;
+        Loaded += OnLoaded;
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        if (string.Equals(_settings.DgnUnits, "Sub", StringComparison.OrdinalIgnoreCase))
-            UnitsSubRadio.IsChecked = true;
+        var s = UserSettingsStore.Load(_drawingPath);
+
+        if (string.Equals(s.DgnBatchMode, "Separate", StringComparison.OrdinalIgnoreCase))
+            SeparateRadio.IsChecked = true;
         else
-            UnitsMasterRadio.IsChecked = true;
+            BatchRadio.IsChecked = true;
 
-        switch (DgnImportOptions.ParseLayerMode(_settings.DgnLayerMode))
-        {
-            case DgnLayerMode.Prefix:
-                LayerPrefixRadio.IsChecked = true;
-                break;
-            case DgnLayerMode.Map:
-                LayerMapRadio.IsChecked = true;
-                break;
-            default:
-                LayerKeepRadio.IsChecked = true;
-                break;
-        }
-
-        PrefixBox.Text = string.IsNullOrWhiteSpace(_settings.DgnLayerPrefix) ? "DGN_" : _settings.DgnLayerPrefix;
-        FixFontCheck.IsChecked = _settings.DgnFixFonts;
-        ExplodeCheck.IsChecked = _settings.DgnExplodeCells;
-        PurgeCheck.IsChecked = _settings.DgnPurgeLinetypes;
-        ZoomCheck.IsChecked = _settings.DgnZoomToImport;
-
-        switch (DgnImportOptions.ParseBatchExisting(_settings.DgnBatchExisting))
-        {
-            case DgnBatchExisting.Skip:
-                ExistSkipRadio.IsChecked = true;
-                break;
-            case DgnBatchExisting.Overwrite:
-                ExistOverwriteRadio.IsChecked = true;
-                break;
-            default:
-                ExistNumberRadio.IsChecked = true;
-                break;
-        }
-
-        if (string.Equals(_settings.DgnBatchMode, "Combine", StringComparison.OrdinalIgnoreCase))
-            BatchCombineRadio.IsChecked = true;
+        if (string.Equals(s.DgnLayerMode, "Prefix", StringComparison.OrdinalIgnoreCase))
+            PrefixRadio.IsChecked = true;
         else
-            BatchSeparateRadio.IsChecked = true;
-        BatchKind_Changed(this, new RoutedEventArgs());
+            KeepRadio.IsChecked = true;
+
+        if (!string.IsNullOrWhiteSpace(s.DgnLayerPrefix))
+            PrefixBox.Text = s.DgnLayerPrefix;
+
+        FontCheck.IsChecked = s.DgnFixFonts;
+        ExplodeCheck.IsChecked = s.DgnExplodeCells;
 
         if (_configOnly)
         {
             Title = "iSurvey — Cấu hình DGN";
-            FileGroup.Visibility = Visibility.Collapsed;
-            ConfirmButton.Content = "✓ Lưu cấu hình";
-            ConfirmButton.MinWidth = 160;
+            FilePanel.Visibility = Visibility.Collapsed;
+            if (Content is Grid grid && grid.RowDefinitions.Count > 0)
+                grid.RowDefinitions[0].Height = new GridLength(0);
+            OkBtn.Content = "Lưu cấu hình";
+            MinHeight = 280;
+            Height = 320;
         }
 
-        RefreshMapInfo();
+        RefreshTotal();
+        UpdateMoveButtons();
     }
 
-    private void OnActivated(object? sender, EventArgs e) => RefreshMapInfo();
-
-    private void RefreshMapInfo()
+    private void Add_Click(object sender, RoutedEventArgs e)
     {
-        try
+        var dialog = new Microsoft.Win32.OpenFileDialog
         {
-            var map = DgnLayerMap.Load();
-            var source = map.SourcePath is null
-                ? "không đọc được file"
-                : map.SourcePath.StartsWith(Path.GetDirectoryName(DgnLayerMap.UserPath) ?? "\u0001",
-                    StringComparison.OrdinalIgnoreCase)
-                    ? "bản của bạn trong %AppData%\\iSurvey"
-                    : "bản mặc định đi kèm";
-            MapInfoText.Text = $"{map.Levels.Count} Level đã khai báo — {source}.";
-        }
-        catch (System.Exception ex)
-        {
-            MapInfoText.Text = "Không đọc được bảng ánh xạ: " + ex.Message;
-        }
-    }
-
-    private bool IsBatchMode => ModeBatchRadio?.IsChecked == true;
-
-    private void BatchKind_Changed(object sender, RoutedEventArgs e)
-    {
-        if (ExistPanel is null || BatchCombineRadio is null)
-            return;
-
-        // Tùy chọn "đã có .dwg" chỉ áp dụng khi không ghép (mỗi file một .dwg).
-        ExistPanel.Visibility = BatchCombineRadio.IsChecked == true ? Visibility.Collapsed : Visibility.Visible;
-    }
-
-    private void Mode_Changed(object sender, RoutedEventArgs e)
-    {
-        // Sự kiện Checked bắn cả lúc InitializeComponent, khi các control phía sau chưa tạo.
-        if (BatchPanel is null || PathBox is null || ConfirmButton is null)
-            return;
-
-        var batch = IsBatchMode;
-        BatchPanel.Visibility = batch ? Visibility.Visible : Visibility.Collapsed;
-        PathBox.IsReadOnly = batch;
-        PathBox.Text = string.Empty;
-        _batchFiles.Clear();
-        PathBox.ToolTip = batch
-            ? "Bấm \"Chọn file...\" rồi chọn nhiều file .dgn (Ctrl+A để chọn hết trong thư mục)"
-            : "Đường dẫn file .dgn (MicroStation V7 hoặc V8)";
-        if (!_configOnly)
-            ConfirmButton.Content = batch ? "✓ Chạy Batch" : "✓ Thực hiện Nhập DGN";
-    }
-
-    private void Browse_Click(object sender, RoutedEventArgs e)
-    {
-        var batch = IsBatchMode;
-        var dialog = new Win32OpenFileDialog
-        {
-            Title = batch ? "Chọn nhiều file MicroStation DGN" : "Chọn file MicroStation DGN",
-            Filter = "MicroStation (*.dgn)|*.dgn",
-            CheckFileExists = true,
-            Multiselect = batch
+            Filter = "MicroStation DGN (*.dgn)|*.dgn|Tất cả (*.*)|*.*",
+            Title = "Chọn các tệp DGN",
+            Multiselect = true,
+            CheckFileExists = true
         };
 
-        if (Directory.Exists(_settings.DgnLastFolder))
-            dialog.InitialDirectory = _settings.DgnLastFolder;
-
-        if (dialog.ShowDialog(this) != true)
-            return;
-
-        if (!batch)
+        var start = UserSettingsStore.Load(_drawingPath).DgnLastFolder;
+        if (!string.IsNullOrWhiteSpace(start) && System.IO.Directory.Exists(start))
+            dialog.InitialDirectory = start;
+        else if (!string.IsNullOrWhiteSpace(_drawingPath))
         {
-            PathBox.Text = dialog.FileName;
-            return;
+            var folder = System.IO.Path.GetDirectoryName(_drawingPath);
+            if (!string.IsNullOrWhiteSpace(folder) && System.IO.Directory.Exists(folder))
+                dialog.InitialDirectory = folder;
         }
 
-        _batchFiles.Clear();
-        _batchFiles.AddRange(dialog.FileNames.OrderBy(f => f, StringComparer.OrdinalIgnoreCase));
-        PathBox.Text = _batchFiles.Count == 1
-            ? _batchFiles[0]
-            : $"{_batchFiles.Count} file — {Path.GetDirectoryName(_batchFiles[0])}";
-        PathBox.ToolTip = string.Join(Environment.NewLine, _batchFiles.Select(Path.GetFileName));
+        if (dialog.ShowDialog() != true)
+            return;
+
+        var known = new HashSet<string>(_files.Select(f => f.FullPath), StringComparer.OrdinalIgnoreCase);
+        foreach (var path in dialog.FileNames)
+        {
+            if (!known.Add(path))
+                continue;
+            _files.Add(DgnFileItem.FromPath(path));
+        }
+
+        Renumber();
+        if (_files.Count > 0)
+            FileGrid.SelectedIndex = _files.Count - 1;
     }
 
-    private void OpenMap_Click(object sender, RoutedEventArgs e)
+    private void Up_Click(object sender, RoutedEventArgs e) => MoveSelected(-1);
+
+    private void Down_Click(object sender, RoutedEventArgs e) => MoveSelected(1);
+
+    private void Remove_Click(object sender, RoutedEventArgs e)
     {
-        try
-        {
-            var path = DgnLayerMap.EnsureUserCopy();
-            Process.Start(new ProcessStartInfo("notepad.exe", $"\"{path}\"") { UseShellExecute = true });
-            LayerMapRadio.IsChecked = true;
-        }
-        catch (System.Exception ex)
-        {
-            System.Windows.MessageBox.Show(this, "Không mở được bảng ánh xạ: " + ex.Message, "iSurvey",
-                MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
+        if (FileGrid.SelectedItem is not DgnFileItem item)
+            return;
+
+        var index = _files.IndexOf(item);
+        _files.Remove(item);
+        Renumber();
+        if (_files.Count > 0)
+            FileGrid.SelectedIndex = Math.Min(index, _files.Count - 1);
+    }
+
+    private void MoveSelected(int delta)
+    {
+        if (FileGrid.SelectedItem is not DgnFileItem item)
+            return;
+
+        var index = _files.IndexOf(item);
+        var next = index + delta;
+        if (index < 0 || next < 0 || next >= _files.Count)
+            return;
+
+        _files.Move(index, next);
+        Renumber();
+        FileGrid.SelectedIndex = next;
+    }
+
+    private void FileGrid_SelectionChanged(object sender, SelectionChangedEventArgs e) => UpdateMoveButtons();
+
+    private void Renumber()
+    {
+        for (var i = 0; i < _files.Count; i++)
+            _files[i].Index = i + 1;
+        FileGrid.Items.Refresh();
+        RefreshTotal();
+        UpdateMoveButtons();
+    }
+
+    private void RefreshTotal() => TotalLabel.Text = $"Tổng số: {_files.Count} tệp";
+
+    private void UpdateMoveButtons()
+    {
+        var index = FileGrid.SelectedIndex;
+        UpBtn.IsEnabled = index > 0;
+        DownBtn.IsEnabled = index >= 0 && index < _files.Count - 1;
+        RemoveBtn.IsEnabled = index >= 0;
+    }
+
+    private void Cancel_Click(object sender, RoutedEventArgs e)
+    {
+        DialogResult = false;
+        Close();
     }
 
     private void Confirm_Click(object sender, RoutedEventArgs e)
     {
-        var path = PathBox.Text.Trim().Trim('"');
-        if (!_configOnly && IsBatchMode)
+        if (!_configOnly && _files.Count == 0)
         {
-            if (_batchFiles.Count == 0)
-            {
-                System.Windows.MessageBox.Show(this, "Hãy chọn ít nhất một file .dgn cho Batch.", "iSurvey",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            var missing = _batchFiles.Where(f => !File.Exists(f)).ToList();
-            if (missing.Count > 0)
-            {
-                System.Windows.MessageBox.Show(this, "Không tìm thấy file: " + missing[0], "iSurvey",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            path = _batchFiles[0];
-        }
-        else if (!_configOnly)
-        {
-            if (path.Length == 0 || !File.Exists(path))
-            {
-                System.Windows.MessageBox.Show(this, "Hãy chọn một file .dgn tồn tại.", "iSurvey",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (!string.Equals(Path.GetExtension(path), ".dgn", StringComparison.OrdinalIgnoreCase))
-            {
-                System.Windows.MessageBox.Show(this, "File phải có đuôi .dgn.", "iSurvey",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-        }
-
-        var mode = LayerPrefixRadio.IsChecked == true ? DgnLayerMode.Prefix
-            : LayerMapRadio.IsChecked == true ? DgnLayerMode.Map
-            : DgnLayerMode.Keep;
-
-        var prefix = PrefixBox.Text.Trim();
-        if (mode == DgnLayerMode.Prefix && (prefix.Length == 0 || prefix.IndexOfAny(InvalidLayerChars) >= 0))
-        {
-            System.Windows.MessageBox.Show(this, "Tiền tố layer trống hoặc chứa ký tự không hợp lệ.", "iSurvey",
-                MessageBoxButton.OK, MessageBoxImage.Warning);
+            System.Windows.MessageBox.Show(this, "Hãy thêm ít nhất một tệp DGN.", "iSurvey",
+                MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
-        _settings.DgnUnits = UnitsSubRadio.IsChecked == true ? "Sub" : "Master";
-        _settings.DgnLayerMode = DgnImportOptions.LayerModeToText(mode);
-        if (prefix.Length > 0 && prefix.IndexOfAny(InvalidLayerChars) < 0)
-            _settings.DgnLayerPrefix = prefix;
-        _settings.DgnFixFonts = FixFontCheck.IsChecked == true;
-        _settings.DgnExplodeCells = ExplodeCheck.IsChecked == true;
-        _settings.DgnPurgeLinetypes = PurgeCheck.IsChecked == true;
-        _settings.DgnZoomToImport = ZoomCheck.IsChecked == true;
-        var existing = ExistSkipRadio.IsChecked == true ? DgnBatchExisting.Skip
-            : ExistOverwriteRadio.IsChecked == true ? DgnBatchExisting.Overwrite
-            : DgnBatchExisting.Number;
-        _settings.DgnBatchExisting = DgnImportOptions.BatchExistingToText(existing);
-        var combine = BatchCombineRadio.IsChecked == true;
-        _settings.DgnBatchMode = combine ? "Combine" : "Separate";
-
-        if (!_configOnly)
+        var prefix = PrefixRadio.IsChecked == true;
+        var prefixText = (PrefixBox.Text ?? string.Empty).Trim();
+        if (prefix && (prefixText.Length == 0 || prefixText.IndexOfAny(['<', '>', '/', '\\', '"', ':', ';', '?', '*', '|', '=', '`', ',']) >= 0))
         {
-            var folder = Path.GetDirectoryName(path);
-            if (!string.IsNullOrEmpty(folder))
-                _settings.DgnLastFolder = folder;
+            System.Windows.MessageBox.Show(this, "Tiền tố layer không hợp lệ.", "iSurvey",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
+            PrefixBox.Focus();
+            return;
         }
 
-        UserSettingsStore.Save(_drawingPath, _settings);
-
-        if (!_configOnly)
+        var settings = UserSettingsStore.Load(_drawingPath);
+        settings.DgnBatchMode = SeparateRadio.IsChecked == true ? "Separate" : "Combine";
+        settings.DgnLayerMode = prefix ? "Prefix" : "Keep";
+        settings.DgnLayerPrefix = prefixText.Length == 0 ? "DGN_" : prefixText;
+        settings.DgnFixFonts = FontCheck.IsChecked == true;
+        settings.DgnExplodeCells = ExplodeCheck.IsChecked == true;
+        settings.DgnPurgeLinetypes = true;
+        settings.DgnZoomToImport = true;
+        settings.DgnUnits = "Master";
+        if (_files.Count > 0)
         {
-            Result = DgnImportOptions.FromSettings(_settings, path);
-            if (IsBatchMode)
-            {
-                Result.BatchFiles = _batchFiles.ToList();
-                Result.BatchExisting = existing;
-                Result.BatchCombine = combine;
-            }
+            var folder = System.IO.Path.GetDirectoryName(_files[0].FullPath);
+            if (!string.IsNullOrWhiteSpace(folder))
+                settings.DgnLastFolder = folder;
         }
 
+        UserSettingsStore.Save(_drawingPath, settings);
+
+        if (_configOnly)
+        {
+            DialogResult = true;
+            Close();
+            return;
+        }
+
+        var options = DgnImportOptions.FromSettings(settings, _files[0].FullPath);
+        options.FilePath = _files[0].FullPath;
+        options.BatchFiles = _files.Select(f => f.FullPath).ToList();
+        options.BatchCombine = settings.DgnBatchMode == "Combine";
+        options.BatchExisting = DgnBatchExisting.Number;
+        options.PurgeJunk = true;
+        options.ZoomToImport = true;
+        options.UseSubUnits = false;
+        Result = options;
         DialogResult = true;
+        Close();
+    }
+}
+
+public sealed class DgnFileItem
+{
+    public int Index { get; set; }
+
+    public string Name { get; init; } = string.Empty;
+
+    public string Folder { get; init; } = string.Empty;
+
+    public string FullPath { get; init; } = string.Empty;
+
+    public string SizeText { get; init; } = string.Empty;
+
+    public static DgnFileItem FromPath(string path)
+    {
+        long bytes = 0;
+        try
+        {
+            bytes = new System.IO.FileInfo(path).Length;
+        }
+        catch
+        {
+            // bảng vẫn hiện tên tệp khi không đọc được kích thước
+        }
+
+        return new DgnFileItem
+        {
+            Name = System.IO.Path.GetFileName(path),
+            Folder = System.IO.Path.GetDirectoryName(path) ?? string.Empty,
+            FullPath = path,
+            SizeText = FormatSize(bytes)
+        };
     }
 
-    private void Cancel_Click(object sender, RoutedEventArgs e) => DialogResult = false;
+    private static string FormatSize(long bytes)
+    {
+        if (bytes < 1024)
+            return $"{bytes} B";
+        if (bytes < 1024 * 1024)
+            return $"{bytes / 1024.0:0.#} KB";
+        return $"{bytes / 1024.0 / 1024.0:0.#} MB";
+    }
 }

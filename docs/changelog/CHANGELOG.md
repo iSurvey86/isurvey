@@ -1,5 +1,22 @@
 # Changelog — iSurvey
 
+## 1.8.2 — 2026-10-22
+
+### Nhập DGN (D2C)
+- Hộp thoại nền sáng: bảng nhiều tệp (thêm, lên, xuống, xóa), tổng số tệp, cột STT / Tên tệp / Đường dẫn / Kích thước.
+- **Ghép tọa độ** (mặc định): nhập lần lượt vào Model Space của bản vẽ đang mở, giữ tọa độ gốc.
+- **Chuyển đổi rời:** mỗi tệp một `.dwg` trong cùng thư mục (nếu trùng tên thì đánh số `_1`, `_2`…).
+- Layer: giữ Level gốc hoặc thêm tiền tố (mặc định `DGN_`). Không còn mục ánh xạ JSON trên hộp thoại.
+- TCVN3 ➔ Unicode mặc định bật; Explode DGN Cell mặc định tắt. Dọn linetype/layer rác luôn chạy. Zoom Extents một lần ở tệp cuối khi ghép.
+
+## 1.8.1 — 2026-10-22
+
+### Nhập MapInfo TAB (T2C)
+- `ISURVEY_TAB_TO_CAD` / **T2C**: tô đặc theo màu MapInfo, layer theo MDSD, nhãn tại điểm trong thửa. Đổi tọa độ TM ➔ TM bằng ProjNET khi kinh tuyến trục khác bản vẽ.
+
+### GDAL dùng chung
+- Native GDAL một bản tại `Contents/SharedDependencies/GdalNative` cho cả 2023, 2025 và 2027 (không nhân ba trong từng năm).
+
 ## 1.8.0 — 2026-10-21
 
 ### Khung bản đồ / khung bản vẽ kỹ thuật (mới)

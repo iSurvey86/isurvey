@@ -226,7 +226,7 @@ public sealed class DgnModule : ISurveyModule
         if (combined is not null)
         {
             ed.WriteMessage(
-                $"\n[iSurvey][DGN] Đã ghép {ok} file vào bản vẽ '{Path.GetFileName(combined)}' (CHƯA LƯU — hãy Save As).");
+                $"\n[iSurvey][DGN] Đã ghép {ok} file vào bản vẽ hiện hành '{Path.GetFileName(combined)}'.");
         }
 
         foreach (var r in results.Where(r => r.Status == DgnBatchStatus.Ok && r.Output is not null))
