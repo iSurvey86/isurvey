@@ -8,7 +8,7 @@ public enum DgnLayerMode
     /// <summary>Giữ nguyên tên layer do DGNIMPORT sinh ra (Level gốc).</summary>
     Keep,
 
-    /// <summary>Thêm tiền tố (mặc định DGN_) vào layer mới.</summary>
+    /// <summary>Thêm tiền tố (mặc định iSurvey_) vào layer mới.</summary>
     Prefix,
 
     /// <summary>Ánh xạ Level ➔ Layer theo dgn_layer_mapping.json (địa chính VN).</summary>
@@ -38,7 +38,7 @@ public sealed class DgnImportOptions
 
     public DgnLayerMode LayerMode { get; set; } = DgnLayerMode.Keep;
 
-    public string LayerPrefix { get; set; } = "DGN_";
+    public string LayerPrefix { get; set; } = "iSurvey_";
 
     public bool FixFonts { get; set; } = true;
 
@@ -88,7 +88,9 @@ public sealed class DgnImportOptions
         FilePath = filePath,
         UseSubUnits = string.Equals(s.DgnUnits, "Sub", StringComparison.OrdinalIgnoreCase),
         LayerMode = ParseLayerMode(s.DgnLayerMode),
-        LayerPrefix = string.IsNullOrWhiteSpace(s.DgnLayerPrefix) ? "DGN_" : s.DgnLayerPrefix.Trim(),
+        LayerPrefix = string.IsNullOrWhiteSpace(s.DgnLayerPrefix) || s.DgnLayerPrefix.Trim() == "DGN_"
+            ? "iSurvey_"
+            : s.DgnLayerPrefix.Trim(),
         FixFonts = s.DgnFixFonts,
         ExplodeCells = s.DgnExplodeCells,
         PurgeJunk = s.DgnPurgeLinetypes,

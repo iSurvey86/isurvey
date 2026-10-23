@@ -1,4 +1,4 @@
-# Build Release và đóng gói iSurvey.bundle cho AutoCAD / Civil 3D 2023-2027.
+# Build Release và đóng gói iSurvey.bundle cho AutoCAD / Civil 3D 2022-2027.
 # Usage:
 #   .\deploy\build-bundle.ps1              # bundle trong deploy\output
 #   .\deploy\build-bundle.ps1 -Install     # copy AppData + TRUSTEDPATHS
@@ -135,7 +135,7 @@ if ($Install) {
         Write-Host "    Program Files\Autodesk\ApplicationPlugins duoc AutoCAD tin cay mac dinh."
     }
 
-    Write-Host "    Mo lai AutoCAD / Civil 3D 2023-2027 de tu nap iSurvey."
+    Write-Host "    Mo lai AutoCAD / Civil 3D 2022-2027 de tu nap iSurvey."
 }
 else {
     Write-Host ""

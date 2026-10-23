@@ -49,7 +49,7 @@ public sealed class MapUserSettings
     /// <summary>"Keep" (giữ Level gốc), "Prefix" (thêm tiền tố) hoặc "Map" (bảng ánh xạ JSON).</summary>
     public string DgnLayerMode { get; set; } = "Keep";
 
-    public string DgnLayerPrefix { get; set; } = "DGN_";
+    public string DgnLayerPrefix { get; set; } = "iSurvey_";
 
     /// <summary>Chuyển mã TCVN3 ➔ Unicode (Arial) cho DBText/MText vừa nhập.</summary>
     public bool DgnFixFonts { get; set; } = true;

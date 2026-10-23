@@ -1,16 +1,16 @@
 ﻿# iSurvey — Add-in AutoCAD / Civil 3D
 
-Add-in cho AutoCAD / Civil 3D **2023–2027**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), nhập và xuất **KML/KMZ**, cắt bình đồ theo biên (`CATBD`), quét cấu trúc bản vẽ (`AUTOSCAN`). Các lệnh nghiệp vụ khóa cho tới khi kích hoạt bằng Gmail + mã OTP.
+Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), nhập và xuất **KML/KMZ**, cắt bình đồ theo biên (`CATBD`), quét cấu trúc bản vẽ (`AUTOSCAN`). Các lệnh nghiệp vụ khóa cho tới khi kích hoạt bằng Gmail + mã OTP.
 
-**Phiên bản bundle:** `1.8.2` (`deploy/iSurvey.bundle/PackageContents.xml`)
+**Phiên bản bundle:** `1.8.3` (`deploy/iSurvey.bundle/PackageContents.xml`)
 
 **Đồng bộ phiên làm việc (Cursor / đa máy):** đọc [docs/phien-lam-viec/HANDOFF.md](docs/phien-lam-viec/HANDOFF.md). Quy tắc cuối phiên: [docs/phien-lam-viec/README.md](docs/phien-lam-viec/README.md). Changelog: [docs/changelog/CHANGELOG.md](docs/changelog/CHANGELOG.md).
 
 ## Yêu cầu
 
 - Windows x64
-- AutoCAD hoặc Civil 3D **2023, 2024, 2025, 2026 hoặc 2027** (64-bit). Một bundle chứa đúng DLL cho từng nhóm:
-  - 2023–2024: .NET Framework 4.8, build từ API 2023 (2024 tương thích nhị phân)
+- AutoCAD hoặc Civil 3D **2022, 2023, 2024, 2025, 2026 hoặc 2027** (64-bit). Một bundle chứa đúng DLL cho từng nhóm:
+  - 2022–2024: .NET Framework 4.8, build từ API 2022 (2023 và 2024 nạp được plugin này)
   - 2025–2026: .NET 8, build từ API 2025 (2026 nạp được plugin 2025)
   - 2027: .NET 10, build riêng (không nạp DLL của 2025/2026)
 - Máy build cần .NET SDK 8 và 10. API AutoCAD lấy từ gói `AutoCAD.NET` (không cần cài đủ các năm CAD để biên dịch).
@@ -25,8 +25,8 @@ Add-in cho AutoCAD / Civil 3D **2023–2027**: chèn tile Google Earth georefere
 | `ISURVEY_DELETE_GE` | **XG** | Xóa toàn bộ tile GE (xác nhận) |
 | `ISURVEY_IMPORT_KML` | **INK** | Nhập KML/KMZ vào layer `KML_IMPORT` (VN-2000), rồi phóng vừa vùng vừa nhập |
 | `ISURVEY_EXPORT_KML` | **EXK**, **EG** | Xuất CAD → KML/KMZ. Thiết lập → chọn đối tượng → lưu file → mở Google Earth nếu đã chọn |
-| `ISURVEY_DGN_TO_CAD` | **D2C** | Nhập nhiều file MicroStation `.dgn` (V7/V8). **Ghép tọa độ:** chèn tất cả vào Model Space bản vẽ đang mở. **Rời:** mỗi file một `.dwg` cùng thư mục. Layer giữ Level gốc hoặc thêm tiền tố; TCVN3 ➔ Unicode và Explode Cell theo tùy chọn. Dọn linetype/layer rác luôn chạy; Zoom Extents một lần khi ghép xong. `UNDO` hai lần để hoàn tác (hậu xử lý + DGNIMPORT) |
-| `ISURVEY_CAD_TO_DGN` | **C2D** | Xuất CAD ➔ MicroStation DGN V8/V7: toàn bộ Model Space hoặc đối tượng đang chọn; Purge trên bản sao tạm (bản vẽ gốc không đổi); tự chọn seed 2D/3D, tự điền hộp thoại seed |
+| `ISURVEY_DGN_TO_CAD` | **D2C** | Nhập nhiều file MicroStation `.dgn` (V7/V8). **Ghép thành một file .dwg:** chèn tất cả vào Model Space bản vẽ đang mở. **Rời từng file .dwg:** mỗi file một `.dwg` cùng thư mục. Layer giữ Level gốc hoặc thêm tiền tố (mặc định `iSurvey_`); TCVN3 ➔ Unicode và Explode Cell theo tùy chọn. Dọn linetype/layer rác luôn chạy; Zoom Extents một lần khi ghép xong. `UNDO` hai lần để hoàn tác (hậu xử lý + DGNIMPORT) |
+| `ISURVEY_CAD_TO_DGN` | **C2D** | Xuất CAD ➔ MicroStation DGN V8/V7: toàn bộ Model Space hoặc đối tượng đang chọn; Purge trên bản sao tạm (bản vẽ gốc không đổi); tự chọn seed 2D/3D đi kèm bộ cài (V7 và V8), tự điền hộp thoại seed |
 | `ISURVEY_DGN_CONFIG` | **DGNCFG** | Lưu mặc định hộp thoại nhập DGN: ghép/rời, layer giữ nguyên hoặc tiền tố, TCVN3, Explode Cell |
 | `ISURVEY_TAB_TO_CAD` | **T2C** | Nhập MapInfo TAB: tô đặc đúng màu MapInfo, layer theo MDSD, nhãn tại điểm trong thửa |
 | `CATBD` | **CBD** | Cắt bình đồ theo đường biên (giữ Z, không dùng TRIM) |
@@ -39,7 +39,7 @@ Add-in cho AutoCAD / Civil 3D **2023–2027**: chèn tile Google Earth georefere
 | `ISURVEY_UAV_CLIP` | **UAVCLIP** | Clip biên ảnh UAV (polyline hoặc Auto-Clip nền trắng/đen) |
 | `ISURVEY_NUMBER_VERTICES` | **GOC** | Đánh số góc tuyến theo tỷ lệ bản đồ |
 | `ISURVEY_STRIP_MAP` | **DUOITUYEN** | Duỗi thẳng dải bản đồ dọc tuyến: chọn tim tuyến (click chỗ nào cũng được) + bắt buộc chọn điểm đầu (DD, G1…Gn, DC); cắt dải chữ nhật liền mạch; xuất bảng góc `.txt` (`Tên Điểm,X,Y,Khoảng Cách Cạnh Trước,Góc Rẽ` với `P/T độ phút giây`, X/Y 2 số lẻ) |
-| `ISURVEY_KHUNG` | **KHUNG** | Chèn **khung bản đồ** chuẩn TCVN 7285:2003 (ISO 5457) khổ A0–A4, tỷ lệ 1/200…1/5000: khung tên (điền sẵn thông tin dự án + logo EVN NPC vector), lưới tọa độ theo tọa độ CAD, mũi tên Bắc, thước tỷ lệ. Xoay: không / góc / theo tuyến |
+| `ISURVEY_KHUNG` | **KHUNG** | Chèn **khung bản đồ** chuẩn TCVN 7285:2003 (ISO 5457) khổ A0–A4, tỷ lệ 1/200…1/5000: khung tên (ô DỰ ÁN mặc định «Đường dây và TBA 110KV KCN Minh Châu», logo EVN NPC vector), lưới tọa độ theo tọa độ CAD, mũi tên Bắc, thước tỷ lệ. Xoay: không / góc / theo tuyến |
 | `ISURVEY_KHUNG_BV` | **KHUNGBV** | Chèn **khung bản vẽ kỹ thuật** (cùng khung tên, không lưới tọa độ). Mẫu: `Contents\Templates\KhungBanDo_Chuan.dwg`; ghi đè bằng `%AppData%\iSurvey\KhungBanDo.dwg` |
 | `ISURVEY_AI_ASSIST` | **AIA** | Trợ lý AI điều khiển Civil/CAD bằng Command Line (**chỉ Admin**, thử nghiệm). Xem [docs/Huong_dan_Tro_ly_AI.md](docs/Huong_dan_Tro_ly_AI.md) |
 
@@ -54,7 +54,7 @@ dotnet build iSurvey.sln -c Release
 
 Lệnh trên build cả ba bản. File đầu ra:
 
-`bin\Release\net48\iSurvey.dll` (2023–2024), `bin\Release\net8.0-windows\iSurvey.dll` (2025–2026), `bin\Release\net10.0-windows\iSurvey.dll` (2027)
+`bin\Release\net48\iSurvey.dll` (2022–2024), `bin\Release\net8.0-windows\iSurvey.dll` (2025–2026), `bin\Release\net10.0-windows\iSurvey.dll` (2027)
 
 (kèm `Data\isurvey_vn2000_tm3.json`, `Data\isurvey_map_sources.json` và các dependency ProjNet)
 
@@ -107,7 +107,7 @@ Từ **AutoCAD 2026**, `%AppData%\ApplicationPlugins` **không còn được tin
 
 Sau đó **mở lại** Civil 3D.
 
-### Bước 3: Mở AutoCAD hoặc Civil 3D (2023–2027)
+### Bước 3: Mở AutoCAD hoặc Civil 3D (2022–2027)
 
 Tab **iSurvey** xuất hiện tự động. Gõ **IG** / **ISURVEY_MAP** hoặc bấm ribbon tương ứng.
 
@@ -117,7 +117,7 @@ Tab **iSurvey** xuất hiện tự động. Gõ **IG** / **ISURVEY_MAP** hoặc 
 2. Chạy lại `.\deploy\build-bundle.ps1 -Install` (hoặc thay cả thư mục `ApplicationPlugins\iSurvey.bundle`)
 3. Mở lại Civil 3D
 
-> Bundle hỗ trợ **AutoCAD / Civil 3D 2023–2027**. CAD tự chọn DLL trong `Contents\Win64\2023`, `2025` hoặc `2027` theo phiên bản.
+> Bundle hỗ trợ **AutoCAD / Civil 3D 2022–2027**. CAD tự chọn DLL trong `Contents\Win64\2023` (cho 2022–2024), `2025` hoặc `2027` theo phiên bản.
 
 Tab **iSurvey** có 6 panel: Bản đồ, Khung & Cắt Bình Đồ, Biên tập Địa hình, Tuyến & Cột Điện, Hồ sơ & QA/QC, Tài khoản & Hệ thống. Năm panel đầu chỉ bật sau khi kích hoạt. Nút chưa có lệnh in thông báo đang cập nhật trên dòng lệnh.
 
@@ -129,7 +129,7 @@ Kích hoạt: **LGI** → Gmail → **Gửi mã** → nhập 6 số. Giấy phé
 
 1. Mở AutoCAD / Civil 3D.
 2. Gõ lệnh **NETLOAD**.
-3. Chọn `iSurvey.dll` đúng năm: `bin\Release\net48\` (2023–2024), `net8.0-windows\` (2025–2026), `net10.0-windows\` (2027).
+3. Chọn `iSurvey.dll` đúng năm: `bin\Release\net48\` (2022–2024), `net8.0-windows\` (2025–2026), `net10.0-windows\` (2027).
 4. Tab **iSurvey** → **Nhập File KML/KMZ**, hoặc gõ **INK** / **IG**.
 5. Hộp thoại: chọn **Tỉnh** → **Múi 3°/6°** → **Loại ảnh** → **Áp dụng**.
 

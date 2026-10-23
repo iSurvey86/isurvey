@@ -5,16 +5,48 @@
 
 ---
 
-## ⏰ NHẮC USER — việc tồn đọng (đầu mỗi phiên, hỏi user có làm không)
+## Đã chốt — không hỏi lại
 
-**Chuẩn hóa DGN ➔ CAD theo quy định (user hoãn 2026-10-14, "làm sau"):**
-- Tài liệu đã đọc: `cspl_dc/` (TT 26/2024/TT-BTNMT, Phụ lục 21 bảng Level 1–63, Phụ lục 22 màu/ký hiệu) và `cspl_dh/` (QCVN 72:2023/BTNMT địa hình 1:2.000/1:5.000: font Times New Roman, màu CMYK, không có bảng Level).
-- Bảng `src/Data/dgn_layer_mapping.json` mặc định đang LỆCH Phụ lục 21 (level 20/23/31/45/46 sai nghĩa) ➔ thay bằng bảng đủ 63 Level.
-- Cần user chốt: phạm vi (địa chính trước / cả địa hình), quy ước tên layer (`10_RANH_THUA` hay `DC_...`), có áp màu RGB Phụ lục 22 không (tùy chọn / luôn), font địa chính (Arial / Times New Roman / chờ ảnh Phụ lục 22).
-- Giới hạn đã biết: chữ in hoa (font `.VnTimeH`) của DGN V8 ra chữ thường vì tên font gốc mất; Phụ lục 22 địa chính là hình ảnh (không có font/cỡ chữ dạng text).
-- User sẽ gửi thêm QCVN về biên tập bản đồ địa hình / địa chính.
-- Áp dụng cả hướng CAD ➔ DGN (C2D): mapping layer ➔ Level khi xuất hiện là `Standard` mặc định của Civil (layer `0` ➔ level 63).
-- Seed V8 chuẩn VN-2000 (2D và 3D): user lưu từ MicroStation vào `src\Seeds\`.
+- Chuẩn hóa DGN theo TT 26/2024 và QCVN 72: user bỏ ngày 2026-10-23. Không làm bảng Level, màu, font theo quy chuẩn.
+- Ô DỰ ÁN mặc định (thuộc tính `DU_AN`): `Đường dây và TBA 110KV KCN Minh Châu`.
+
+---
+
+## 2026-10-23 — CAD 2022, seed V8, khung tên, hộp thoại Nhập DGN (1.8.3)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; phát hành **1.8.3**. Không có AutoCAD 2022 trên máy này.
+
+### Đã chốt / đã làm
+
+- **CAD 2022–2024** dùng một DLL `Contents/Win64/2023` build từ API 2022 (R24.1–R24.3). 2025–2027 giữ DLL riêng.
+- **C2D:** bốn seed trong `src/Seeds` (V7 2D/3D và V8 2D/3D) đi theo bộ cài. Seed V8 là seed mét, không phải seed theo từng kinh tuyến.
+- **D2C:** nhãn «Ghép thành một file .dwg» / «Rời từng file .dwg», tiền tố mặc định `iSurvey_`, bảng tệp có lưới mờ. Đã xem hộp thoại trên Civil 2026. Chưa nhập một file DGN thật.
+- **KHUNG / KHUNGBV:** ô DỰ ÁN mặc định «Đường dây và TBA 110KV KCN Minh Châu». Bản vẽ đã có block `KB_A*` cũ cần `PURGE` rồi chèn lại.
+- `CAI_DAT.txt`: thêm năm 2022; bỏ dòng admin giấy phép Supabase.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| CAD 2022 | `iSurvey.csproj`, `deploy/iSurvey.bundle/PackageContents.xml` |
+| Seed V8 | `src/Seeds/VN2000_Seed2D_V8.dgn`, `VN2000_Seed3D_V8.dgn` |
+| Nhập DGN | `src/Dgn/DgnImportWindow.xaml`, `DgnImportWindow.xaml.cs`, `DgnImportOptions.cs` |
+| Khung tên | `src/Templates/KhungBanDo_Chuan.dwg`, `src/Modules/Frame/FrameService.cs` |
+| Cài đặt | `deploy/CAI_DAT.txt` |
+
+### Việc tiếp
+
+- [ ] Máy khác: **UPD / Kiểm Tra Cập Nhật** để nhận 1.8.3 (đợi cache khoảng 60 giây). Máy AutoCAD 2022 cài bản này rồi mở CAD để xác nhận tab iSurvey.
+- [ ] Thử D2C trên bản sao file `.dgn`: ghép vào bản vẽ đang mở, rồi chế độ rời.
+- [ ] Bản vẽ đã chèn khung cũ: `PURGE` block `KB_A*` rồi chèn lại để thấy tên dự án mới.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff và tiếp tục. iSurvey 1.8.3 — CAD 2022, seed V8 đi kèm, ô DỰ ÁN mặc định, hộp thoại Nhập DGN (iSurvey_). Tiếp: thử nhập DGN thật trên bản sao, hoặc xác nhận tab iSurvey trên AutoCAD 2022.
+```
+
+**Lưu trữ ngày:** [2026-10-23-cad2022-seed-khung.md](./2026-10-23-cad2022-seed-khung.md)
 
 ---
 
@@ -85,7 +117,7 @@ git pull, đọc handoff và tiếp tục. iSurvey 1.8.2 — hộp thoại Nhậ
 ### Việc tiếp
 
 - [ ] User mở lại Civil → kiểm 2 nút ribbon **Khung Bản Đồ** / **Khung Bản Vẽ Kỹ Thuật** (chưa nhìn thấy bằng mắt); thử `KHUNG` / `KHUNGBV` trên bản vẽ thật. Bản vẽ đã có block `KB_A*` cũ: `PURGE` trước.
-- [ ] Ô "DỰ ÁN" trong khung tên còn `<TÊN DỰ ÁN>` (INFOR.txt không có) — cần user chốt giá trị mặc định hoặc form nhập.
+- [x] Ô "DỰ ÁN" mặc định: `Đường dây và TBA 110KV KCN Minh Châu` (2026-10-23).
 - [ ] Ý tưởng: lệnh nhập logo khác (ảnh/DWG → vector); form nhỏ chọn khổ/tỷ lệ/xoay cho KHUNG (user hiện chọn chỉ bật F12).
 - [ ] Phát hành 1.8.0: `.\deploy\publish-release.ps1 -Notes "..."` (cần `ISURVEY_SERVICE_ROLE_KEY`); cập nhật `docs/Danh_sach_lenh_iSurvey.xlsx` (chưa thêm KHUNG, KHUNGBV, DUOITUYEN, AIA).
 - [ ] **Nhắc user (đầu phiên):** chuẩn hóa DGN theo quy chuẩn (khối NHẮC USER) — vẫn hoãn. Từ nay mọi script test phải trả `FILEDIA`/`CMDDIA` về giá trị cũ.

@@ -3,12 +3,12 @@
     <DefineConstants>$(DefineConstants);DEVRELOAD</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
-    <!-- Ba bản trong một bundle: net48 = 2023–2024, net8 = 2025–2026, net10 = 2027. -->
+    <!-- Ba bản trong một bundle: net48 = 2022–2024, net8 = 2025–2026, net10 = 2027. -->
     <TargetFrameworks>net48;net8.0-windows;net10.0-windows</TargetFrameworks>
     <RootNamespace>iSurvey</RootNamespace>
     <AssemblyName>iSurvey</AssemblyName>
     <!-- Nguồn phiên bản duy nhất cho code (AuthManager.AppVersion); bump cùng PackageContents.xml. -->
-    <Version>1.8.2</Version>
+    <Version>1.8.3</Version>
     <PlatformTarget>x64</PlatformTarget>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
@@ -27,7 +27,8 @@
     <PackageReference Include="System.Text.Json" Version="8.0.5" Condition="'$(TargetFramework)' == 'net48'" />
     <PackageReference Include="PolySharp" Version="1.15.0" Condition="'$(TargetFramework)' == 'net48'" PrivateAssets="all" />
     <!-- ExcludeAssets=runtime: API chỉ để biên dịch, AutoCAD cung cấp DLL lúc chạy. -->
-    <PackageReference Include="AutoCAD.NET" Version="24.2.0" Condition="'$(TargetFramework)' == 'net48'" ExcludeAssets="runtime" />
+    <!-- 24.1 = API 2022. AutoCAD 2023 và 2024 nạp được plugin build từ SDK 2022; chiều ngược lại thì không. -->
+    <PackageReference Include="AutoCAD.NET" Version="24.1.51000" Condition="'$(TargetFramework)' == 'net48'" ExcludeAssets="runtime" />
     <PackageReference Include="AutoCAD.NET" Version="25.0.1" Condition="'$(TargetFramework)' == 'net8.0-windows'" ExcludeAssets="runtime" />
     <PackageReference Include="AutoCAD.NET" Version="26.0.0" Condition="'$(TargetFramework)' == 'net10.0-windows'" ExcludeAssets="runtime" />
   </ItemGroup>

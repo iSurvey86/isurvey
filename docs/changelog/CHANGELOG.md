@@ -1,5 +1,22 @@
 # Changelog — iSurvey
 
+## 1.8.3 — 2026-10-23
+
+### CAD 2022
+- AutoCAD / Civil 3D **2022** dùng chung DLL .NET Framework 4.8 với 2023 và 2024. DLL build từ API 2022 (`AutoCAD.NET` 24.1); 2023 và 2024 nạp được plugin này. `PackageContents` nhận series R24.1–R24.3.
+
+### Xuất DGN (C2D)
+- Bộ cài kèm đủ bốn seed: V7 2D, V7 3D, V8 2D, V8 3D. Lệnh xuất không cần file template của từng năm CAD.
+
+### Nhập DGN (D2C)
+- Nhãn chế độ: «Ghép thành một file .dwg» và «Rời từng file .dwg». Tiền tố layer mặc định `iSurvey_` (cấu hình cũ `DGN_` được đổi sang `iSurvey_`). Bảng tệp có lưới dòng/cột mờ khi danh sách trống.
+
+### Khung tên
+- Ô DỰ ÁN (`DU_AN`) mặc định: «Đường dây và TBA 110KV KCN Minh Châu» trên khổ A0–A4.
+
+### Cài đặt
+- `CAI_DAT.txt` liệt kê CAD 2022–2027. Bỏ dòng hướng dẫn admin quản lý giấy phép.
+
 ## 1.8.2 — 2026-10-22
 
 ### Nhập DGN (D2C)

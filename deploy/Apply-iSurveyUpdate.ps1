@@ -58,5 +58,5 @@ if ($code -ne 0 -and $null -ne $code) {
     exit $code
 }
 
-Show-Msg "Cap nhat iSurvey xong.`nHay mo lai AutoCAD / Civil 3D 2023-2027." "iSurvey Cap nhat"
+Show-Msg "Cap nhat iSurvey xong.`nHay mo lai AutoCAD / Civil 3D 2022-2027." "iSurvey Cap nhat"
 exit 0

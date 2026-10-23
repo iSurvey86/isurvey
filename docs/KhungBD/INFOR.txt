@@ -1,5 +1,6 @@
 CHỦ ĐẦU TƯ: TỔNG CÔNG TY ĐIỆN LỰC MIỀN BẮC
 ĐẠI DIỆN CHỦ ĐẦU TƯ: BAN QUẢN LÝ DỰ ÁN LƯỚI ĐIỆN
+DỰ ÁN: Đường dây và TBA 110KV KCN Minh Châu
 ĐỊA ĐIỂM: TỈNH PHÚ THỌ
 ĐƠN VỊ THIẾT KẾ: XÍ NGHIỆP TƯ VẤN - CÔNG TY DỊCH VỤ ĐIỆN LỰC MIỀN BẮC
 ĐỊA CHỈ: LÔ 2, VP2, BÁN ĐẢO LINH ĐÀM, PHƯỜNG HOÀNG LIỆT, THÀNH PHỐ HÀ NỘI

@@ -69,32 +69,46 @@
                 </StackPanel>
             </DockPanel>
 
-            <Border Background="White" BorderBrush="#D5DCE3" BorderThickness="1" CornerRadius="4">
-                <DataGrid x:Name="FileGrid" AutoGenerateColumns="False" IsReadOnly="True"
-                          HeadersVisibility="Column" GridLinesVisibility="Horizontal"
-                          HorizontalGridLinesBrush="#E6EBEF" BorderThickness="0"
-                          Background="White" RowBackground="White" AlternatingRowBackground="#F7F9FB"
-                          SelectionMode="Single" CanUserAddRows="False" CanUserResizeRows="False"
-                          SelectionChanged="FileGrid_SelectionChanged">
+            <Border Background="White" BorderBrush="#D5DCE3" BorderThickness="1" CornerRadius="4" ClipToBounds="True">
+                <Grid>
+                    <Grid x:Name="SheetHost" IsHitTestVisible="False" Background="White">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="56"/>
+                            <ColumnDefinition Width="220"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="110"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                    <DataGrid x:Name="FileGrid" AutoGenerateColumns="False" IsReadOnly="True"
+                              HeadersVisibility="Column" GridLinesVisibility="All"
+                              HorizontalGridLinesBrush="#E1E6EC" VerticalGridLinesBrush="#E1E6EC"
+                              BorderThickness="0" Background="Transparent" RowBackground="White"
+                              AlternatingRowBackground="White" RowHeight="32"
+                              SelectionMode="Single" CanUserAddRows="False" CanUserResizeRows="False"
+                              SelectionChanged="FileGrid_SelectionChanged" SizeChanged="FileGrid_SizeChanged">
                     <DataGrid.ColumnHeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
                             <Setter Property="Background" Value="#F7F9FB"/>
                             <Setter Property="Foreground" Value="#3D4A57"/>
                             <Setter Property="FontWeight" Value="SemiBold"/>
-                            <Setter Property="BorderBrush" Value="#E6EBEF"/>
-                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                            <Setter Property="BorderBrush" Value="#E1E6EC"/>
+                            <Setter Property="BorderThickness" Value="0,0,1,1"/>
                             <Setter Property="Padding" Value="10,8"/>
                             <Setter Property="HorizontalContentAlignment" Value="Left"/>
                         </Style>
                     </DataGrid.ColumnHeaderStyle>
                     <DataGrid.CellStyle>
                         <Style TargetType="DataGridCell">
-                            <Setter Property="Padding" Value="10,6"/>
-                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="Padding" Value="10,4"/>
+                            <Setter Property="BorderBrush" Value="#E1E6EC"/>
+                            <Setter Property="BorderThickness" Value="0,0,1,1"/>
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="DataGridCell">
-                                        <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                        <Border Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                Padding="{TemplateBinding Padding}">
                                             <ContentPresenter VerticalAlignment="Center"/>
                                         </Border>
                                     </ControlTemplate>
@@ -114,7 +128,8 @@
                         <DataGridTextColumn Header="Đường dẫn" Binding="{Binding Folder}" Width="*"/>
                         <DataGridTextColumn Header="Kích thước" Binding="{Binding SizeText}" Width="110"/>
                     </DataGrid.Columns>
-                </DataGrid>
+                    </DataGrid>
+                </Grid>
             </Border>
         </DockPanel>
 
@@ -165,8 +180,8 @@
 
                     <StackPanel Grid.Column="0" Margin="0,0,16,0">
                         <TextBlock Text="Chế độ xuất" Foreground="#5C6B7A" Margin="0,0,0,8"/>
-                        <RadioButton x:Name="BatchRadio" Content="Batch nhiều tệp .dgn (Ghép tọa độ)" IsChecked="True"/>
-                        <RadioButton x:Name="SeparateRadio" Content="Chuyển đổi rời (Từng tệp)"/>
+                        <RadioButton x:Name="BatchRadio" Content="Ghép thành một file .dwg" IsChecked="True"/>
+                        <RadioButton x:Name="SeparateRadio" Content="Rời từng file .dwg"/>
                     </StackPanel>
 
                     <StackPanel Grid.Column="1" Margin="0,0,16,0">
@@ -174,7 +189,7 @@
                         <RadioButton x:Name="KeepRadio" Content="Giữ nguyên Level gốc" IsChecked="True"/>
                         <StackPanel Orientation="Horizontal">
                             <RadioButton x:Name="PrefixRadio" Content="Thêm tiền tố:" VerticalAlignment="Center" Margin="0"/>
-                            <TextBox x:Name="PrefixBox" Text="DGN_" Width="120" Height="28" Margin="8,0,0,0"
+                            <TextBox x:Name="PrefixBox" Text="iSurvey_" Width="130" Height="28" Margin="8,0,0,0"
                                      VerticalAlignment="Center" Padding="6,2" BorderBrush="#C9D2DC" BorderThickness="1"/>
                         </StackPanel>
                     </StackPanel>

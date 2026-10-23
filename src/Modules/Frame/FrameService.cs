@@ -23,6 +23,7 @@ public sealed class FrameService
     private const string LayerGrid = "KB_TOADO";
     private const string LayerAux = "KB_PHUTRO";
     private const string FrameStyle = "KB_ARIAL";
+    private const string DefaultProjectName = "Đường dây và TBA 110KV KCN Minh Châu";
 
     private static readonly int[] Scales = [200, 500, 1000, 2000, 5000];
 
@@ -260,7 +261,7 @@ public sealed class FrameService
                 continue;
             var ar = new AttributeReference();
             ar.SetAttributeFromBlock(ad, br.BlockTransform);
-            ar.TextString = ad.Tag.Equals("TY_LE", StringComparison.OrdinalIgnoreCase) ? $"1/{scaleN}" : ad.TextString;
+            ar.TextString = AttributeText(ad.Tag, ad.TextString, scaleN);
             br.AttributeCollection.AppendAttribute(ar);
             tr.AddNewlyCreatedDBObject(ar, true);
         }
@@ -525,6 +526,17 @@ public sealed class FrameService
     // -------------------------------------------------------------------------------------------------
     //  Tiện ích
     // -------------------------------------------------------------------------------------------------
+    /// <summary>Tỷ lệ ghi theo khổ đang chèn. Ô dự án còn placeholder thì điền tên mặc định.</summary>
+    private static string AttributeText(string tag, string current, int scaleN)
+    {
+        if (tag.Equals("TY_LE", StringComparison.OrdinalIgnoreCase))
+            return $"1/{scaleN}";
+        if (tag.Equals("DU_AN", StringComparison.OrdinalIgnoreCase)
+            && (string.IsNullOrWhiteSpace(current) || current.Contains("TÊN DỰ ÁN", StringComparison.OrdinalIgnoreCase)))
+            return DefaultProjectName;
+        return current;
+    }
+
     private static string? ResolveTemplate()
     {
         var candidates = new List<string>();

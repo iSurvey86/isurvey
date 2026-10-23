@@ -4,7 +4,7 @@
 
 YÊU CẦU
   - Windows 64-bit
-  - AutoCAD hoặc Civil 3D 2023 / 2024 / 2025 / 2026 / 2027
+  - AutoCAD hoặc Civil 3D 2022 / 2023 / 2024 / 2025 / 2026 / 2027
   - Đóng hết AutoCAD / Civil trước khi cài hoặc cập nhật
 
 CÀI ĐẶT (khuyên dùng)
@@ -27,7 +27,6 @@ CẬP NHẬT
   - Dự phòng thủ công: tải zip → đóng Civil → giải nén → chạy Install-iSurvey.bat.
 
 HỖ TRỢ
-  - Admin quản lý giấy phép trên Supabase (isurvey_licenses).
   - Mỗi Gmail tối đa 2 máy. Đăng xuất (LGO) để trả suất thiết bị.
 
 ================================================================================

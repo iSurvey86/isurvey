@@ -73,5 +73,5 @@ else {
 }
 
 Write-Host ""
-Write-Host "CAI DAT XONG. Hay DONG va MO LAI AutoCAD / Civil 3D 2023-2027." -ForegroundColor Green
+Write-Host "CAI DAT XONG. Hay DONG va MO LAI AutoCAD / Civil 3D 2022-2027." -ForegroundColor Green
 Write-Host "Tab Ribbon: iSurvey. Dang nhap Gmail (LGI) de kich hoat."

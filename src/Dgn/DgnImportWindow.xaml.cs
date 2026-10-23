@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using iSurvey.Core;
 using iSurvey.Models;
 
@@ -37,8 +38,9 @@ public partial class DgnImportWindow : Window
         else
             KeepRadio.IsChecked = true;
 
-        if (!string.IsNullOrWhiteSpace(s.DgnLayerPrefix))
-            PrefixBox.Text = s.DgnLayerPrefix;
+        PrefixBox.Text = string.IsNullOrWhiteSpace(s.DgnLayerPrefix) || s.DgnLayerPrefix.Trim() == "DGN_"
+            ? "iSurvey_"
+            : s.DgnLayerPrefix.Trim();
 
         FontCheck.IsChecked = s.DgnFixFonts;
         ExplodeCheck.IsChecked = s.DgnExplodeCells;
@@ -56,6 +58,68 @@ public partial class DgnImportWindow : Window
 
         RefreshTotal();
         UpdateMoveButtons();
+        PaintSheet();
+    }
+
+    private void FileGrid_SizeChanged(object sender, SizeChangedEventArgs e) => PaintSheet();
+
+    /// <summary>Kẻ ô trống phía dưới danh sách, nét mờ giống Excel.</summary>
+    private void PaintSheet()
+    {
+        if (SheetHost is null || FileGrid.ActualHeight <= 0)
+            return;
+
+        var header = FindVisualChild<System.Windows.Controls.Primitives.DataGridColumnHeadersPresenter>(FileGrid);
+        var headerHeight = header?.ActualHeight ?? 0;
+        if (headerHeight <= 0)
+            headerHeight = 34;
+
+        var scroll = FindVisualChild<ScrollViewer>(FileGrid);
+        var bar = scroll?.ComputedVerticalScrollBarVisibility == Visibility.Visible
+            ? SystemParameters.VerticalScrollBarWidth
+            : 0;
+        SheetHost.Margin = new Thickness(0, headerHeight, bar, 0);
+
+        const double rowHeight = 32;
+        var rows = Math.Max(1, (int)Math.Ceiling(Math.Max(0, SheetHost.ActualHeight) / rowHeight));
+        if (SheetHost.RowDefinitions.Count == rows)
+            return;
+
+        SheetHost.RowDefinitions.Clear();
+        SheetHost.Children.Clear();
+        var line = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0xE1, 0xE6, 0xEC));
+        line.Freeze();
+        for (var r = 0; r < rows; r++)
+        {
+            SheetHost.RowDefinitions.Add(new RowDefinition { Height = new GridLength(rowHeight) });
+            for (var c = 0; c < 4; c++)
+            {
+                var cell = new Border
+                {
+                    BorderBrush = line,
+                    BorderThickness = new Thickness(0, 0, 1, 1),
+                    Background = System.Windows.Media.Brushes.White
+                };
+                Grid.SetRow(cell, r);
+                Grid.SetColumn(cell, c);
+                SheetHost.Children.Add(cell);
+            }
+        }
+    }
+
+    private static T? FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
+    {
+        for (var i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+        {
+            var child = VisualTreeHelper.GetChild(parent, i);
+            if (child is T found)
+                return found;
+            var nested = FindVisualChild<T>(child);
+            if (nested is not null)
+                return nested;
+        }
+
+        return null;
     }
 
     private void Add_Click(object sender, RoutedEventArgs e)
@@ -174,7 +238,7 @@ public partial class DgnImportWindow : Window
         var settings = UserSettingsStore.Load(_drawingPath);
         settings.DgnBatchMode = SeparateRadio.IsChecked == true ? "Separate" : "Combine";
         settings.DgnLayerMode = prefix ? "Prefix" : "Keep";
-        settings.DgnLayerPrefix = prefixText.Length == 0 ? "DGN_" : prefixText;
+        settings.DgnLayerPrefix = prefixText.Length == 0 ? "iSurvey_" : prefixText;
         settings.DgnFixFonts = FontCheck.IsChecked == true;
         settings.DgnExplodeCells = ExplodeCheck.IsChecked == true;
         settings.DgnPurgeLinetypes = true;
