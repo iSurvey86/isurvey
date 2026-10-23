@@ -21,7 +21,7 @@ public sealed class KmlImportModule : ISurveyModule
     [CommandMethod("ISURVEY_IMPORT_KML")]
     public void ImportKmlCommand()
     {
-        if (!AuthManager.EnsureAuthenticated())
+        if (!AuthManager.EnsureAuthenticated(track: false))
             return;
 
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
@@ -102,6 +102,8 @@ public sealed class KmlImportModule : ISurveyModule
             ed.Regen();
             ed.WriteMessage(
                 $"\n[iSurvey] Đã nhập vào layer {KmlDrawService.LayerName}: {report.Points} điểm, {report.Texts} chữ, {report.Lines} đường, {report.Polygons} vùng.");
+            ActivityLogger.Result("ISURVEY_IMPORT_KML",
+                $"file {ActivityLogger.FileName(dialog.FileName)}, {report.Points} điểm, {report.Texts} chữ, {report.Lines} đường, {report.Polygons} vùng, TM-{setup.ZoneWidthDegrees} kinh tuyến {setup.CentralMeridian:0.##}°");
             NoteSkipped(ed, report.InnerRings, report.TracksSkipped);
             if (report.Simplified)
             {

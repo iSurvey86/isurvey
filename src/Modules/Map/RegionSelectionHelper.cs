@@ -12,11 +12,11 @@ internal static class RegionSelectionHelper
     /// <summary>Yêu cầu chọn đối tượng đóng; trả về null nếu hủy.</summary>
     public static BoundarySelection? TrySelectBoundary(Editor ed, Database db, string? prompt = null)
     {
-        var options = new PromptEntityOptions(prompt ?? "\nChọn đường bao (Polyline/Region/Circle): ")
+        var options = new PromptEntityOptions(prompt ?? "\niSurvey: Chọn đường bao (Polyline, Region hoặc Circle): ")
         {
             AllowNone = false
         };
-        options.SetRejectMessage("\n[iSurvey] Chỉ chọn Polyline đóng, Region hoặc Circle.");
+        options.SetRejectMessage("\niSurvey: Chỉ chọn Polyline đóng, Region hoặc Circle.");
         options.AddAllowedClass(typeof(Polyline), true);
         options.AddAllowedClass(typeof(Polyline2d), true);
         options.AddAllowedClass(typeof(Polyline3d), true);

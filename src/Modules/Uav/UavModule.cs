@@ -10,7 +10,7 @@ public sealed class UavModule
     [CommandMethod("ISURVEY_UAV_CLIP")]
     public void ClipCommand()
     {
-        if (!AuthManager.EnsureAuthenticated()) return;
+        if (!AuthManager.EnsureAuthenticated(track: false)) return;
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
         if (doc is null) return;
         UavImageService.ClipByBoundary(doc.Editor, doc.Database);
@@ -19,7 +19,7 @@ public sealed class UavModule
     [CommandMethod("ISURVEY_UAV_FRAME_TOGGLE")]
     public void FrameToggleCommand()
     {
-        if (!AuthManager.EnsureAuthenticated()) return;
+        if (!AuthManager.EnsureAuthenticated(track: false)) return;
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
         if (doc is null) return;
         UavImageService.ToggleImageFrames(doc.Editor, doc.Database);
@@ -28,7 +28,7 @@ public sealed class UavModule
     [CommandMethod("ISURVEY_UAV_SEND_BACK")]
     public void SendBackCommand()
     {
-        if (!AuthManager.EnsureAuthenticated()) return;
+        if (!AuthManager.EnsureAuthenticated(track: false)) return;
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
         if (doc is null) return;
         UavImageService.SendImageToBack(doc.Editor, doc.Database);
@@ -57,7 +57,7 @@ public sealed class UavModule
 
     private static void Stub(string command)
     {
-        if (!AuthManager.EnsureAuthenticated()) return;
+        if (!AuthManager.EnsureAuthenticated(command)) return;
         AcadApp.ShowAlertDialog($"Tính năng đang phát triển\n({command})");
     }
 }

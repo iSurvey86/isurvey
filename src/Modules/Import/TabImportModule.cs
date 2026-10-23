@@ -28,7 +28,7 @@ public sealed class TabImportModule : ISurveyModule
     [CommandMethod("ISURVEY_TAB_TO_CAD")]
     public void TabToCadCommand()
     {
-        if (!AuthManager.EnsureAuthenticated())
+        if (!AuthManager.EnsureAuthenticated(track: false))
             return;
 
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
@@ -67,6 +67,8 @@ public sealed class TabImportModule : ISurveyModule
             var stats = Import(doc.Database, ed, options, settings);
             ZoomExtents(ed);
             var report = BuildReport(stats, options);
+            ActivityLogger.Result("ISURVEY_TAB_TO_CAD",
+                $"file {ActivityLogger.FileName(options.Path)}, {stats.Hatches} hatch, {stats.Outlines} viền, {stats.Labels} nhãn, lỗi {stats.Errors}, bản vẽ {ActivityLogger.FileName(drawingPath)}");
             foreach (var line in report.Split('\n'))
                 ed.WriteMessage("\n[iSurvey] " + line.TrimEnd('\r'));
             AcadApp.ShowAlertDialog(report);

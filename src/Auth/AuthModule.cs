@@ -189,7 +189,7 @@ public sealed class AuthModule : ISurveyModule
             return;
         }
 
-        var pso = new PromptStringOptions("\nNhap Gmail cua nguoi dung can cap ma: ") { AllowSpaces = false };
+        var pso = new PromptStringOptions("\niSurvey: Nhập Gmail cần cấp mã: ") { AllowSpaces = false };
         var res = ed.GetString(pso);
         if (res.Status != PromptStatus.OK)
             return;

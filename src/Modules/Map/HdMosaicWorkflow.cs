@@ -6,6 +6,7 @@ using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
+using iSurvey.Auth;
 using iSurvey.Core;
 using iSurvey.Models;
 using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
@@ -28,6 +29,8 @@ internal static class HdMosaicWorkflow
     public static void Run(Document doc)
     {
         var ed = doc.Editor;
+        var drawing = ActivityLogger.FileName(doc.Database.Filename);
+        void Log(string note) => ActivityLogger.Result("ISURVEY_MAP_SAT", $"{note}, bản vẽ {drawing}");
         var db = doc.Database;
 
         BoundarySelection? boundary;
@@ -39,12 +42,14 @@ internal static class HdMosaicWorkflow
         catch (System.Exception ex)
         {
             ed.WriteMessage($"\n[iSurvey] {ex.Message}");
+            Log("ghép HD, lỗi đường bao: " + ex.Message);
             return;
         }
 
         if (boundary is null)
         {
             ed.WriteMessage("\n[iSurvey] Da huy — chua ghep anh.");
+            Log("ghép HD, đã hủy, chưa chọn đường bao");
             return;
         }
 
@@ -64,6 +69,7 @@ internal static class HdMosaicWorkflow
         catch (System.Exception ex)
         {
             ed.WriteMessage($"\n[iSurvey] Khong tinh duoc pham vi: {ex.Message}");
+            Log("ghép HD, không tính được phạm vi: " + ex.Message);
             return;
         }
 
@@ -80,6 +86,7 @@ internal static class HdMosaicWorkflow
         if (!choices.Any(c => c.Allowed))
         {
             ed.WriteMessage("\n[iSurvey] Ca 3 muc zoom deu vuot gioi han an toan. Ve duong bao nho hon roi chay lai.");
+            Log("ghép HD, cả 3 mức zoom vượt giới hạn");
             return;
         }
 
@@ -87,6 +94,7 @@ internal static class HdMosaicWorkflow
         if (zoom is null)
         {
             ed.WriteMessage("\n[iSurvey] Da huy — chua ghep anh.");
+            Log("ghép HD, đã hủy, chưa chọn zoom");
             return;
         }
 
@@ -111,12 +119,14 @@ internal static class HdMosaicWorkflow
         catch (System.Exception ex)
         {
             ed.WriteMessage($"\n[iSurvey] Loi tai tile: {ex.Message}");
+            Log("ghép HD, lỗi tải tile: " + ex.Message);
             return;
         }
 
         if (ready.Count == 0)
         {
             ed.WriteMessage("\n[iSurvey] Khong tai duoc tile nao — kiem tra mang.");
+            Log("ghép HD, không tải được tile");
             return;
         }
 
@@ -129,11 +139,13 @@ internal static class HdMosaicWorkflow
         catch (OutOfMemoryException)
         {
             ed.WriteMessage("\n[iSurvey] Khong du bo nho de ghep anh. Chon zoom thap hon hoac duong bao nho hon.");
+            Log($"ghép HD, hết bộ nhớ, zoom {picked.Zoom}, {tiles.Count} ô");
             return;
         }
         catch (System.Exception ex)
         {
             ed.WriteMessage($"\n[iSurvey] Loi ghep anh: {ex.Message}");
+            Log("ghép HD, lỗi ghép: " + ex.Message);
             return;
         }
 
@@ -145,6 +157,7 @@ internal static class HdMosaicWorkflow
         catch (System.Exception ex)
         {
             ed.WriteMessage($"\n[iSurvey] Loi chen anh: {ex.Message}");
+            Log($"ghép HD, lỗi chèn file {ActivityLogger.FileName(mosaicPath)}: {ex.Message}");
             return;
         }
 
@@ -152,6 +165,7 @@ internal static class HdMosaicWorkflow
         var missNote = missing > 0 ? $" Thieu {missing}/{tiles.Count} o (vung den)." : "";
         ed.WriteMessage(
             $"\n[iSurvey] Da gan 1 anh HD zoom {picked.Zoom}, {TilePixels}px/o, {ready.Count} o, clip duong bao.{missNote} AutoRefresh khong doi anh nay.");
+        Log($"ghép ảnh HD, file {ActivityLogger.FileName(mosaicPath)}, zoom {picked.Zoom}, {ready.Count}/{tiles.Count} ô, TM-{zone} kinh tuyến {cm:0.##}°");
     }
 
     private static int? PromptZoom(Editor ed, IReadOnlyList<ZoomChoice> choices)
@@ -162,15 +176,14 @@ internal static class HdMosaicWorkflow
 
         while (true)
         {
-            var opts = new PromptKeywordOptions(
-                $"\n[iSurvey] Chon muc zoom [18/19/20] <{fallbackKey}>:")
+            var opts = new PromptKeywordOptions("\niSurvey: Chọn mức zoom")
             {
                 AllowNone = true,
-                AppendKeywordsToMessage = false
+                AppendKeywordsToMessage = true
             };
-            opts.Keywords.Add("18");
-            opts.Keywords.Add("19");
-            opts.Keywords.Add("20");
+            opts.Keywords.Add("18", "18", "Zoom 18");
+            opts.Keywords.Add("19", "19", "Zoom 19");
+            opts.Keywords.Add("20", "20", "Zoom 20");
             opts.Keywords.Default = fallbackKey;
 
             var res = ed.GetKeywords(opts);

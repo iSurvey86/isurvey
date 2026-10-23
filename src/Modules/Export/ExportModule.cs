@@ -22,7 +22,7 @@ public sealed class ExportModule : ISurveyModule
     [CommandMethod("ISURVEY_EXPORT_KML")]
     public void ExportKmlCommand()
     {
-        if (!AuthManager.EnsureAuthenticated())
+        if (!AuthManager.EnsureAuthenticated(track: false))
             return;
 
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
@@ -114,6 +114,8 @@ public sealed class ExportModule : ISurveyModule
             _service.Write(db, settings, collected.Features);
             ed.WriteMessage($"\n[iSurvey] Đã lưu: {settings.OutputPath}");
             ed.WriteMessage($"\n[iSurvey] {collected.Report}");
+            ActivityLogger.Result("ISURVEY_EXPORT_KML",
+                $"file {ActivityLogger.FileName(settings.OutputPath)}, {collected.Features.Count} đối tượng, TM-{settings.ZoneWidthDegrees} kinh tuyến {settings.CentralMeridian:0.##}°, từ bản vẽ {ActivityLogger.FileName(drawingPath)}");
         }
         catch (System.Exception ex)
         {

@@ -130,12 +130,12 @@ public static class AuthManager
     }
 
     /// <summary>Đầu mỗi lệnh tính năng. Chưa đăng nhập → nhắc và mở LoginWindow; thành công → true để lệnh chạy tiếp.</summary>
-    public static bool EnsureAuthenticated([CallerMemberName] string? commandName = null)
+    public static bool EnsureAuthenticated([CallerMemberName] string? commandName = null, bool track = true)
     {
         Refresh();
         if (IsAuthenticated)
         {
-            if (!string.IsNullOrWhiteSpace(commandName))
+            if (track && !string.IsNullOrWhiteSpace(commandName))
                 ActivityLogger.Enqueue("command", commandName);
             return true;
         }
@@ -144,7 +144,7 @@ public static class AuthManager
             ? "\n[iSurvey] Giay phep da qua 7 ngay chua xac minh truc tuyen. Vui long dang nhap lai de kich hoat!"
             : "\n[iSurvey] Vui long dang nhap Gmail de kich hoat ban quyen su dung!");
         var ok = ShowLogin();
-        if (ok && !string.IsNullOrWhiteSpace(commandName))
+        if (track && ok && !string.IsNullOrWhiteSpace(commandName))
             ActivityLogger.Enqueue("command", commandName);
         return ok;
     }

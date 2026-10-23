@@ -25,14 +25,14 @@ public sealed class MapModule : ISurveyModule
     [CommandMethod("ISURVEY_MAP")]
     public void InsertMapCommand()
     {
-        if (!AuthManager.EnsureAuthenticated()) return;
+        if (!AuthManager.EnsureAuthenticated(track: false)) return;
         RunMapWorkflow(MapInsertAction.Insert);
     }
 
     [CommandMethod("ISURVEY_MAP_SAT")]
     public void InsertSatelliteCommand()
     {
-        if (!AuthManager.EnsureAuthenticated()) return;
+        if (!AuthManager.EnsureAuthenticated(track: false)) return;
 
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
         if (doc is null) return;
@@ -44,19 +44,23 @@ public sealed class MapModule : ISurveyModule
         }
 
         if (!EnsureProvince(doc))
+        {
+            ActivityLogger.Result("ISURVEY_MAP_SAT", "đã hủy, chưa chọn múi chiếu");
             return;
+        }
 
         var mode = PromptSatelliteMode(doc.Editor);
         if (mode is null)
         {
             doc.Editor.WriteMessage("\n[iSurvey] Đã hủy.");
+            ActivityLogger.Result("ISURVEY_MAP_SAT", "đã hủy, chưa chọn chế độ");
             return;
         }
 
         if (mode == 2)
             HdMosaicWorkflow.Run(doc);
         else
-            ApplyBasemap("google-satellite");
+            ApplyBasemap("google-satellite", "ISURVEY_MAP_SAT", "xem lướt");
     }
 
     private static bool EnsureProvince(Document doc)
@@ -94,14 +98,15 @@ public sealed class MapModule : ISurveyModule
 
     private static int? PromptSatelliteMode(Editor ed)
     {
-        var opts = new PromptKeywordOptions(
-            "\n[iSurvey] Chon che do chen anh: [1. Xem luot (AutoRefresh) / 2. Ghep anh HD (Chon duong bao)] <1>:")
+        // Không đặt ngoặc vuông trong câu nhắc: CAD 2025/2026 (F12) coi [chữ] là một lựa chọn,
+        // nên [iSurvey] hiện thành mục "iSurvey" và che hai chế độ. Tên hiển thị do Keywords.Add.
+        var opts = new PromptKeywordOptions("\niSurvey: Chọn chế độ chèn ảnh")
         {
             AllowNone = true,
-            AppendKeywordsToMessage = false
+            AppendKeywordsToMessage = true
         };
-        opts.Keywords.Add("1");
-        opts.Keywords.Add("2");
+        opts.Keywords.Add("1", "1", "Xem lướt");
+        opts.Keywords.Add("2", "2", "Ghép ảnh HD");
         opts.Keywords.Default = "1";
 
         var res = ed.GetKeywords(opts);
@@ -118,7 +123,7 @@ public sealed class MapModule : ISurveyModule
     [CommandMethod("ISURVEY_UPDATE_GE")]
     public void UpdateGeCommand()
     {
-        if (!AuthManager.EnsureAuthenticated()) return;
+        if (!AuthManager.EnsureAuthenticated(track: false)) return;
 
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
         if (doc is null) return;
@@ -150,7 +155,9 @@ public sealed class MapModule : ISurveyModule
                     saved.ZoneWidthDegrees);
             }
 
-            _refresh.Refresh(doc, BasemapSession.CentralMeridian, BasemapSession.BasemapId);
+            var result = _refresh.Refresh(doc, BasemapSession.CentralMeridian, BasemapSession.BasemapId);
+            ActivityLogger.Result("ISURVEY_UPDATE_GE",
+                $"cập nhật khung nhìn, {BasemapSession.BasemapId}, zoom {result.Zoom}, {result.TileCount} tile, lỗi {result.FailedTileCount}, TM-{BasemapSession.ZoneWidthDegrees} kinh tuyến {BasemapSession.CentralMeridian:0.##}°, bản vẽ {ActivityLogger.FileName(doc.Database.Filename)}");
         }
         catch (System.Exception ex)
         {
@@ -162,7 +169,7 @@ public sealed class MapModule : ISurveyModule
     [CommandMethod("ISURVEY_DELETE_GE")]
     public void DeleteGeCommand()
     {
-        if (!AuthManager.EnsureAuthenticated()) return;
+        if (!AuthManager.EnsureAuthenticated(track: false)) return;
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
         if (doc is null) return;
         GeDeleteWorkflow.Run(doc);
@@ -224,10 +231,11 @@ public sealed class MapModule : ISurveyModule
             }
         }
 
-        ApplyBasemap(doc, settings.CentralMeridian, settings.BasemapId, settings.AutoRefresh, boundary, settings.ZoneWidthDegrees);
+        var kind = boundary is null ? "chèn bản đồ" : "chèn bản đồ, cắt theo đường bao";
+        ApplyBasemap(doc, settings.CentralMeridian, settings.BasemapId, settings.AutoRefresh, boundary, settings.ZoneWidthDegrees, "ISURVEY_MAP", kind);
     }
 
-    private void ApplyBasemap(string basemapId)
+    private void ApplyBasemap(string basemapId, string command, string kind)
     {
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
         if (doc is null) return;
@@ -240,7 +248,7 @@ public sealed class MapModule : ISurveyModule
 
         var drawingPath = string.IsNullOrWhiteSpace(doc.Database.Filename) ? null : doc.Database.Filename;
         var saved = UserSettingsStore.Load(drawingPath);
-        ApplyBasemap(doc, saved.CentralMeridian, basemapId, saved.AutoRefresh, null, saved.ZoneWidthDegrees);
+        ApplyBasemap(doc, saved.CentralMeridian, basemapId, saved.AutoRefresh, null, saved.ZoneWidthDegrees, command, kind);
     }
 
     private void ApplyBasemap(
@@ -249,7 +257,9 @@ public sealed class MapModule : ISurveyModule
         string basemapId,
         bool autoRefresh,
         BoundarySelection? boundary,
-        int zoneWidthDegrees = 3)
+        int zoneWidthDegrees,
+        string command,
+        string kind)
     {
         var ed = doc.Editor;
         var zone = CoordinateService.NormalizeZoneWidth(zoneWidthDegrees);
@@ -267,7 +277,9 @@ public sealed class MapModule : ISurveyModule
                 boundary?.ClipPolygonWcs,
                 zone);
             AutoRefreshController.ResetViewSignature();
-            _refresh.Refresh(doc, cm, basemapId);
+            var result = _refresh.Refresh(doc, cm, basemapId);
+            ActivityLogger.Result(command,
+                $"{kind}, {basemapId}, zoom {result.Zoom}, {result.TileCount} tile, lỗi {result.FailedTileCount}, TM-{zone} kinh tuyến {cm:0.##}°, bản vẽ {ActivityLogger.FileName(doc.Database.Filename)}");
         }
         catch (System.Exception ex)
         {
@@ -277,7 +289,7 @@ public sealed class MapModule : ISurveyModule
     }
 
     private void ApplyBasemap(Document doc, double centralMeridian, string basemapId, bool autoRefresh)
-        => ApplyBasemap(doc, centralMeridian, basemapId, autoRefresh, null, 3);
+        => ApplyBasemap(doc, centralMeridian, basemapId, autoRefresh, null, 3, "ISURVEY_MAP", "chèn bản đồ");
 
     internal static bool IsModelSpace(Database db)
     {

@@ -12,6 +12,41 @@
 
 ---
 
+## 2026-10-23 — Hộp F12 và nhật ký chi tiết (1.8.4)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; phát hành **1.8.4**. DLL 2025 đã chép vào bundle máy này lúc Civil đóng, trước khi bump số phiên bản trong file; bản phát hành là 1.8.4.
+
+### Đã chốt / đã làm
+
+- **F12:** CAD 2025/2026 biến `[chữ]` thành mục chọn, nên `ISURVEY_MAP_SAT` chỉ hiện «1» và «iSurvey». Câu nhắc bỏ ngoặc vuông. Hộp F12 hiện **Xem lướt** / **Ghép ảnh HD** (gõ 1 hoặc 2 vẫn được), zoom 18/19/20, cắt UAV, xoay khung, lưới. CAD 2022 vốn in cả câu nên không lộ lỗi này. Chưa mở lại Civil sau khi chép DLL để nhìn hộp F12.
+- **Nhật ký:** ghi một dòng khi lệnh xong, kèm tên file, bản vẽ, zoom, số tile hoặc số đối tượng. Xem lướt không có một file ảnh; ghép HD ghi tên `.jpg`. Trang quản trị (ksnpsc `4ce8b6f`) hiện phần `note`. Dòng cũ không có số liệu vì lúc đó chưa lưu.
+- Máy này đã nhận DLL mới trong `%AppData%\Autodesk\ApplicationPlugins\iSurvey.bundle\Contents\Win64\2025` trước lúc đóng gói 1.8.4. Máy khác dùng **UPD**.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Hộp F12 | `src/Modules/Map/MapModule.cs`, `HdMosaicWorkflow.cs`, `FrameService.cs`, `UavImageService.cs` |
+| Nhật ký | `src/Auth/ActivityLogger.cs`, `ActivityPhrases.cs`, `AuthManager.cs` |
+| Trang quản trị | repo `ksnpsc`, `src/lib/isurvey/activityLabels.js` (commit `4ce8b6f`) |
+
+### Việc tiếp
+
+- [ ] Mở Civil 2026, chạy `ISURVEY_MAP_SAT`, nhấn F12: thấy Xem lướt và Ghép ảnh HD. Chạy xong một lần rồi xem nhật ký có tên bản vẽ và số tile.
+- [ ] Máy khác: **UPD** để nhận 1.8.4.
+- [ ] Thử D2C trên bản sao file `.dgn`: ghép vào bản vẽ đang mở, rồi chế độ rời.
+- [ ] Bản vẽ đã chèn khung cũ: `PURGE` block `KB_A*` rồi chèn lại để thấy tên dự án mới.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff và tiếp tục. iSurvey 1.8.4 — hộp F12 hiện đúng lựa chọn, nhật ký ghi tên file và số liệu khi lệnh xong. Tiếp: mở Civil kiểm tra F12 và một dòng nhật ký, hoặc thử nhập DGN thật trên bản sao.
+```
+
+**Lưu trữ ngày:** [2026-10-23-f12-nhat-ky.md](./2026-10-23-f12-nhat-ky.md)
+
+---
+
 ## 2026-10-23 — CAD 2022, seed V8, khung tên, hộp thoại Nhập DGN (1.8.3)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; phát hành **1.8.3**. Không có AutoCAD 2022 trên máy này.

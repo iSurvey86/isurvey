@@ -1,6 +1,7 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
+using iSurvey.Auth;
 using iSurvey.Modules.Map;
 using AcadRegion = Autodesk.AutoCAD.DatabaseServices.Region;
 
@@ -22,12 +23,16 @@ internal static class UavImageService
     {
         var images = PromptSelectImages(ed, db);
         if (images is null)
+        {
+            ActivityLogger.Result("ISURVEY_UAV_CLIP", "đã hủy, chưa chọn ảnh");
             return;
+        }
 
         var mode = PromptClipMode(ed);
         if (mode is null)
         {
             ed.WriteMessage("\n[iSurvey] Đã hủy — chưa cắt ảnh.");
+            ActivityLogger.Result("ISURVEY_UAV_CLIP", "đã hủy, chưa chọn cách cắt");
             return;
         }
 
@@ -52,7 +57,7 @@ internal static class UavImageService
         var filter = new SelectionFilter([new TypedValue((int)DxfCode.Start, "IMAGE")]);
         var selOpts = new PromptSelectionOptions
         {
-            MessageForAdding = "\n[iSurvey] Chọn ảnh UAV (Enter khi xong): ",
+            MessageForAdding = "\niSurvey: Chọn ảnh UAV (Enter khi xong): ",
             AllowDuplicates = false
         };
 
@@ -88,24 +93,21 @@ internal static class UavImageService
 
     private static int? PromptClipMode(Editor ed)
     {
-        var opts = new PromptIntegerOptions(
-            "\n[iSurvey] Chọn phương pháp cắt: [1. Chọn Polyline làm biên / 2. Tự động cắt nền Trắng-Đen (Auto-Clip)] <1>: ")
+        var opts = new PromptKeywordOptions("\niSurvey: Chọn phương pháp cắt")
         {
             AllowNone = true,
-            AllowNegative = false,
-            AllowZero = false,
-            LowerLimit = 1,
-            UpperLimit = 2,
-            DefaultValue = 1,
-            UseDefaultValue = true
+            AppendKeywordsToMessage = true
         };
+        opts.Keywords.Add("1", "1", "Chọn biên");
+        opts.Keywords.Add("2", "2", "Tự cắt nền");
+        opts.Keywords.Default = "1";
 
-        var res = ed.GetInteger(opts);
-        if (res.Status == PromptStatus.None)
-            return 1;
-        if (res.Status != PromptStatus.OK)
+        var res = ed.GetKeywords(opts);
+        if (res.Status == PromptStatus.Cancel)
             return null;
-        return res.Value;
+        if (res.Status == PromptStatus.None || res.StringResult == "1")
+            return 1;
+        return 2;
     }
 
     private static void RunBatchPolylineClip(Editor ed, Database db, List<ObjectId> listImages)
@@ -120,7 +122,7 @@ internal static class UavImageService
         ]);
         var selOpts = new PromptSelectionOptions
         {
-            MessageForAdding = "\n[iSurvey] Chọn biên (Enter khi xong): ",
+            MessageForAdding = "\niSurvey: Chọn biên (Enter khi xong): ",
             AllowDuplicates = false
         };
 
@@ -239,6 +241,7 @@ internal static class UavImageService
 
         tr.Commit();
         ed.WriteMessage($"\n[iSurvey] Batch Clip hoàn tất: Đã cắt thành công {ok}/{total} tấm ảnh UAV.");
+        ActivityLogger.Result("ISURVEY_UAV_CLIP", $"cắt theo biên, {ok}/{total} ảnh, bản vẽ {ActivityLogger.FileName(db.Filename)}");
     }
 
     private static void RunAutoClip(Editor ed, Database db, List<ObjectId> listImages)
@@ -304,6 +307,7 @@ internal static class UavImageService
 
         tr.Commit();
         ed.WriteMessage($"\n[iSurvey] Auto-Clip hoàn tất cho {ok}/{total} tấm ảnh.");
+        ActivityLogger.Result("ISURVEY_UAV_CLIP", $"tự cắt nền, {ok}/{total} ảnh, bản vẽ {ActivityLogger.FileName(db.Filename)}");
     }
 
     private static string? ResolveImagePath(RasterImageDef def)
@@ -385,16 +389,17 @@ internal static class UavImageService
         ed.WriteMessage(nowOff
             ? "\n[iSurvey] Đã bật khung ảnh (IMAGEFRAME)."
             : "\n[iSurvey] Đã tắt khung ảnh (IMAGEFRAME).");
+        ActivityLogger.Result("ISURVEY_UAV_FRAME_TOGGLE", nowOff ? "đã bật khung ảnh" : "đã tắt khung ảnh");
     }
 
     /// <summary>Đưa một RasterImage xuống dưới cùng DrawOrder.</summary>
     public static void SendImageToBack(Editor ed, Database db)
     {
-        var opts = new PromptEntityOptions("\n[iSurvey] Chọn ảnh Raster cần đưa xuống dưới: ")
+        var opts = new PromptEntityOptions("\niSurvey: Chọn ảnh Raster cần đưa xuống dưới: ")
         {
             AllowNone = false
         };
-        opts.SetRejectMessage("\n[iSurvey] Chỉ chọn RasterImage.");
+        opts.SetRejectMessage("\niSurvey: Chỉ chọn RasterImage.");
         opts.AddAllowedClass(typeof(RasterImage), exactMatch: true);
 
         var pick = ed.GetEntity(opts);
@@ -408,6 +413,7 @@ internal static class UavImageService
         SendImageToBack(tr, db, pick.ObjectId);
         tr.Commit();
         ed.WriteMessage("\n[iSurvey] Đã đưa ảnh xuống dưới cùng.");
+        ActivityLogger.Result("ISURVEY_UAV_SEND_BACK", "đã đưa 1 ảnh xuống dưới, bản vẽ " + ActivityLogger.FileName(db.Filename));
     }
 
     // ---------- Smart Filter ----------

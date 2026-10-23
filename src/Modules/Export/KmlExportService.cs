@@ -23,7 +23,7 @@ internal sealed class KmlExportService
         {
             var peo = new PromptSelectionOptions
             {
-                MessageForAdding = "\n[iSurvey] Chọn đối tượng cần xuất (Enter kết thúc):"
+                MessageForAdding = "\niSurvey: Chọn đối tượng cần xuất (Enter kết thúc):"
             };
             var sel = ed.GetSelection(peo);
             if (sel.Status != PromptStatus.OK || sel.Value is null || sel.Value.Count == 0)

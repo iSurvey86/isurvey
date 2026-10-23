@@ -45,7 +45,7 @@ public sealed class PlanModule : ISurveyModule
     [CommandMethod("CATBD")]
     public void CutPlanCommand()
     {
-        if (!AuthManager.EnsureAuthenticated())
+        if (!AuthManager.EnsureAuthenticated(track: false))
             return;
 
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
@@ -62,11 +62,11 @@ public sealed class PlanModule : ISurveyModule
         }
 
         // Buoc 1: duong ranh gioi cat khep kin
-        var peo = new PromptEntityOptions("\nChon duong ranh gioi cat khep kin (LWPolyline/Polyline): ")
+        var peo = new PromptEntityOptions("\niSurvey: Chọn đường ranh giới cắt khép kín: ")
         {
             AllowNone = false
         };
-        peo.SetRejectMessage("\n[iSurvey] Chi chon LWPolyline hoac Polyline 2D/3D.");
+        peo.SetRejectMessage("\niSurvey: Chỉ chọn LWPolyline hoặc Polyline.");
         peo.AddAllowedClass(typeof(Polyline), true);
         peo.AddAllowedClass(typeof(Polyline2d), true);
         peo.AddAllowedClass(typeof(Polyline3d), true);
@@ -81,7 +81,7 @@ public sealed class PlanModule : ISurveyModule
         // Buoc 2: quet chon toan bo ban ve
         var pso = new PromptSelectionOptions
         {
-            MessageForAdding = "\nQuet chon toan bo ban ve can cat (go ALL de chon het): "
+            MessageForAdding = "\niSurvey: Quét chọn bản vẽ cần cắt (gõ ALL để chọn hết): "
         };
         var ps = ed.GetSelection(pso);
         if (ps.Status != PromptStatus.OK)
@@ -97,6 +97,8 @@ public sealed class PlanModule : ISurveyModule
                 $"\n[iSurvey] CATBD xong: bao ve {stats.Protected}, giu trong bien {stats.KeptInside}, " +
                 $"xoa {stats.Erased}, cat {stats.Cut} (tao {stats.NewPieces} doan moi), " +
                 $"bo qua {stats.Skipped}, loi {stats.Errors}.");
+            ActivityLogger.Result("CATBD",
+                $"giữ {stats.KeptInside}, xóa {stats.Erased}, cắt {stats.Cut} (tạo {stats.NewPieces}), bỏ qua {stats.Skipped}, lỗi {stats.Errors}, bản vẽ {ActivityLogger.FileName(db.Filename)}");
             if (stats.FirstError is not null)
                 ed.WriteMessage($"\n[iSurvey] Loi dau tien: {stats.FirstError}");
             ed.WriteMessage("\n[iSurvey] Go UNDO de hoan tac toan bo lan cat nay.");

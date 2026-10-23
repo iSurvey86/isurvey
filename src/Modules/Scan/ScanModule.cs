@@ -25,7 +25,7 @@ public sealed class ScanModule : ISurveyModule
     [CommandMethod("AUTOSCAN")]
     public void AutoScanCommand()
     {
-        if (!AuthManager.EnsureAuthenticated())
+        if (!AuthManager.EnsureAuthenticated(track: false))
             return;
 
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
@@ -37,7 +37,7 @@ public sealed class ScanModule : ISurveyModule
 
         var pso = new PromptSelectionOptions
         {
-            MessageForAdding = "\nQuet chon khu vuc ban ve can phan tich (go ALL de chon het): "
+            MessageForAdding = "\niSurvey: Quét chọn vùng cần phân tích (gõ ALL để chọn hết): "
         };
         var ps = ed.GetSelection(pso);
         if (ps.Status != PromptStatus.OK)
@@ -75,6 +75,8 @@ public sealed class ScanModule : ISurveyModule
 
             File.WriteAllText(dialog.FileName, text, new UTF8Encoding(encoderShouldEmitUTF8Identifier: true));
             ed.WriteMessage($"\n[iSurvey] Da luu bao cao: {dialog.FileName}");
+            ActivityLogger.Result("AUTOSCAN",
+                $"báo cáo {ActivityLogger.FileName(dialog.FileName)}, {ps.Value.Count} đối tượng, bản vẽ {ActivityLogger.FileName(db.Filename)}");
 
             Process.Start(new ProcessStartInfo("notepad.exe", $"\"{dialog.FileName}\"") { UseShellExecute = true });
         }

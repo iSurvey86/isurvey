@@ -8,7 +8,7 @@
     <RootNamespace>iSurvey</RootNamespace>
     <AssemblyName>iSurvey</AssemblyName>
     <!-- Nguồn phiên bản duy nhất cho code (AuthManager.AppVersion); bump cùng PackageContents.xml. -->
-    <Version>1.8.3</Version>
+    <Version>1.8.4</Version>
     <PlatformTarget>x64</PlatformTarget>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>

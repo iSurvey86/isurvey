@@ -60,7 +60,7 @@ public sealed class FrameService
 
     private static void Execute(bool mapMode, string commandName)
     {
-        if (!AuthManager.EnsureAuthenticated())
+        if (!AuthManager.EnsureAuthenticated(track: false))
             return;
 
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
@@ -94,7 +94,7 @@ public sealed class FrameService
             ed.WriteMessage("\n[iSurvey] " + unitNote);
 
         // 1) Khổ giấy
-        var pkSize = new PromptKeywordOptions("\n[iSurvey] Khổ giấy") { AllowNone = true, AppendKeywordsToMessage = true };
+        var pkSize = new PromptKeywordOptions("\niSurvey: Khổ giấy") { AllowNone = true, AppendKeywordsToMessage = true };
         foreach (var s in Specs)
             pkSize.Keywords.Add(s.Name);
         pkSize.Keywords.Default = _lastSize;
@@ -106,7 +106,7 @@ public sealed class FrameService
         var spec = Specs.First(s => s.Name.Equals(_lastSize, StringComparison.OrdinalIgnoreCase));
 
         // 2) Tỷ lệ
-        var pkScale = new PromptKeywordOptions("\n[iSurvey] Mẫu số tỷ lệ 1/N") { AllowNone = true, AppendKeywordsToMessage = true };
+        var pkScale = new PromptKeywordOptions("\niSurvey: Mẫu số tỷ lệ 1/N") { AllowNone = true, AppendKeywordsToMessage = true };
         foreach (var n in Scales)
             pkScale.Keywords.Add(n.ToString(CultureInfo.InvariantCulture));
         pkScale.Keywords.Default = _lastScale.ToString(CultureInfo.InvariantCulture);
@@ -118,10 +118,10 @@ public sealed class FrameService
         var scaleN = _lastScale;
 
         // 3) Xoay khung (khung nằm theo hướng tuyến)
-        var pkRot = new PromptKeywordOptions("\n[iSurvey] Xoay khung") { AllowNone = true, AppendKeywordsToMessage = true };
-        pkRot.Keywords.Add("Khong");
-        pkRot.Keywords.Add("Goc");
-        pkRot.Keywords.Add("Tuyen");
+        var pkRot = new PromptKeywordOptions("\niSurvey: Xoay khung") { AllowNone = true, AppendKeywordsToMessage = true };
+        pkRot.Keywords.Add("Khong", "Khong", "Không xoay");
+        pkRot.Keywords.Add("Goc", "Goc", "Nhập góc");
+        pkRot.Keywords.Add("Tuyen", "Tuyen", "Theo tuyến");
         pkRot.Keywords.Default = _lastRotation;
         var rRot = ed.GetKeywords(pkRot);
         if (rRot.Status is not (PromptStatus.OK or PromptStatus.None))
@@ -134,7 +134,7 @@ public sealed class FrameService
         switch (_lastRotation)
         {
             case "Goc":
-                var pa = new PromptAngleOptions("\n[iSurvey] Góc xoay khung (độ, ngược chiều kim đồng hồ)")
+                var pa = new PromptAngleOptions("\niSurvey: Góc xoay khung (độ, ngược chiều kim đồng hồ)")
                 {
                     AllowNone = true,
                     DefaultValue = _lastAngle,
@@ -148,10 +148,10 @@ public sealed class FrameService
                 theta = _lastAngle + ucsAngle;
                 break;
             case "Tuyen":
-                var p1 = ed.GetPoint(new PromptPointOptions("\n[iSurvey] Điểm đầu đoạn tuyến: ") { AllowNone = false });
+                var p1 = ed.GetPoint(new PromptPointOptions("\niSurvey: Điểm đầu đoạn tuyến: ") { AllowNone = false });
                 if (p1.Status != PromptStatus.OK)
                     return;
-                var p2 = ed.GetPoint(new PromptPointOptions("\n[iSurvey] Điểm cuối đoạn tuyến: ")
+                var p2 = ed.GetPoint(new PromptPointOptions("\niSurvey: Điểm cuối đoạn tuyến: ")
                 {
                     AllowNone = false,
                     UseBasePoint = true,
@@ -181,13 +181,13 @@ public sealed class FrameService
         var extras = false;
         if (mapMode)
         {
-            var pkExtra = new PromptKeywordOptions("\n[iSurvey] Vẽ lưới tọa độ + mũi tên Bắc + thước tỷ lệ")
+            var pkExtra = new PromptKeywordOptions("\niSurvey: Vẽ lưới tọa độ + mũi tên Bắc + thước tỷ lệ")
             {
                 AllowNone = true,
                 AppendKeywordsToMessage = true
             };
-            pkExtra.Keywords.Add("Co");
-            pkExtra.Keywords.Add("Khong");
+            pkExtra.Keywords.Add("Co", "Co", "Có");
+            pkExtra.Keywords.Add("Khong", "Khong", "Không");
             pkExtra.Keywords.Default = _lastExtras;
             var rExtra = ed.GetKeywords(pkExtra);
             if (rExtra.Status is not (PromptStatus.OK or PromptStatus.None))
@@ -217,7 +217,14 @@ public sealed class FrameService
 
         if (placed > 0)
         {
-            ActivityLogger.Enqueue("khung", mapMode ? "ISURVEY_KHUNG" : "ISURVEY_KHUNG_BV", new { size = spec.Name, scale = scaleN, count = placed, extras });
+            ActivityLogger.Enqueue("khung", mapMode ? "ISURVEY_KHUNG" : "ISURVEY_KHUNG_BV", new
+            {
+                size = spec.Name,
+                scale = scaleN,
+                count = placed,
+                extras,
+                drawing = ActivityLogger.FileName(doc.Database.Filename)
+            });
             ed.WriteMessage($"\n[iSurvey] Đã chèn {placed} khung. Nhấp đúp vào khung để điền khung tên; một lần UNDO hoàn tác cả lượt chèn vừa rồi.");
         }
     }
@@ -623,7 +630,7 @@ public sealed class FrameService
 
         protected override SamplerStatus Sampler(JigPrompts prompts)
         {
-            var o = new JigPromptPointOptions("\n[iSurvey] Tâm vùng bản đồ: ")
+            var o = new JigPromptPointOptions("\niSurvey: Tâm vùng bản đồ: ")
             {
                 UserInputControls = UserInputControls.Accept3dCoordinates | UserInputControls.NullResponseAccepted
             };

@@ -1,5 +1,15 @@
 # Changelog — iSurvey
 
+## 1.8.4 — 2026-10-23
+
+### Hộp nhắc F12
+- CAD 2025/2026 coi chữ trong ngoặc vuông là một mục chọn. Câu nhắc không còn `[iSurvey]` hay danh sách viết tay trong `[...]`.
+- Chèn ảnh vệ tinh hiện **Xem lướt** và **Ghép ảnh HD**. Gõ `1` hoặc `2` vẫn được. Mức zoom, cắt ảnh UAV, xoay khung và lưới tọa độ cũng hiện tên tiếng Việt.
+
+### Nhật ký hoạt động
+- Khi lệnh xong, nhật ký ghi thêm việc vừa làm: tên file, tên bản vẽ, mức zoom, số tile, số đối tượng. Chế độ xem lướt ghi số tile; chế độ ghép HD ghi tên file `.jpg`.
+- Tên lệnh gửi lên được viết dạng «SG (chèn ảnh vệ tinh)». Dòng đã ghi trước bản này không có thêm số liệu.
+
 ## 1.8.3 — 2026-10-23
 
 ### CAD 2022

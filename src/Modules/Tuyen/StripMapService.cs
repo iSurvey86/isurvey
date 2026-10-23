@@ -27,7 +27,7 @@ public sealed class StripMapService
     [CommandMethod("ISURVEY_STRIP_MAP")]
     public void StripMapCommand()
     {
-        if (!AuthManager.EnsureAuthenticated())
+        if (!AuthManager.EnsureAuthenticated(track: false))
             return;
 
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
@@ -52,7 +52,7 @@ public sealed class StripMapService
     {
         var sel = ed.GetSelection(new PromptSelectionOptions
         {
-            MessageForAdding = "\n[iSurvey] Chọn đối tượng cần duỗi (ảnh, nét, hatch, block…): "
+            MessageForAdding = "\niSurvey: Chọn đối tượng cần duỗi (ảnh, nét, hatch, block…): "
         });
         if (sel.Status != PromptStatus.OK || sel.Value is null || sel.Value.Count == 0)
         {
@@ -60,11 +60,11 @@ public sealed class StripMapService
             return;
         }
 
-        var peo = new PromptEntityOptions("\n[iSurvey] Chọn tim tuyến (click vị trí nào trên tuyến cũng được): ")
+        var peo = new PromptEntityOptions("\niSurvey: Chọn tim tuyến (click vị trí nào trên tuyến cũng được): ")
         {
             AllowNone = false
         };
-        peo.SetRejectMessage("\n[iSurvey] Chỉ chấp nhận Polyline / Polyline2d / Polyline3d.");
+        peo.SetRejectMessage("\niSurvey: Chỉ chấp nhận Polyline.");
         peo.AddAllowedClass(typeof(Polyline), true);
         peo.AddAllowedClass(typeof(Polyline2d), true);
         peo.AddAllowedClass(typeof(Polyline3d), true);
@@ -105,7 +105,7 @@ public sealed class StripMapService
 
         // Bắt buộc: người dùng chỉ rõ ĐIỂM ĐẦU. Đầu mút gần điểm chọn hơn = DD; đầu kia = DC.
         var ppStart = new PromptPointOptions(
-            "\n[iSurvey] Chọn ĐIỂM ĐẦU tuyến (click gần đầu mút bắt đầu — điểm này là DD): ")
+            "\niSurvey: Chọn điểm đầu tuyến (điểm này là DD): ")
         {
             AllowNone = false
         };
@@ -139,7 +139,7 @@ public sealed class StripMapService
         if (units is not (UnitsValue.Meters or UnitsValue.Undefined))
             ed.WriteMessage("\n[iSurvey] Cảnh báo: bản vẽ không phải mét — số 100 là đơn vị vẽ, không tự đổi ra mét.");
 
-        var pDist = new PromptDistanceOptions($"\n[iSurvey] Hành lang mỗi bên ({units}) <100>: ")
+        var pDist = new PromptDistanceOptions($"\niSurvey: Hành lang mỗi bên ({units}) <100>: ")
         {
             AllowNegative = false,
             AllowZero = false,
@@ -156,7 +156,7 @@ public sealed class StripMapService
 
         var halfWidth = prDist.Value;
 
-        var pso = new PromptStringOptions("\n[iSurvey] Tiền tố điểm góc <G>: ")
+        var pso = new PromptStringOptions("\niSurvey: Tiền tố điểm góc <G>: ")
         {
             AllowSpaces = false,
             UseDefaultValue = true,
@@ -167,7 +167,7 @@ public sealed class StripMapService
             return;
         var prefix = string.IsNullOrEmpty(prStr.StringResult) ? "G" : prStr.StringResult;
 
-        var pio = new PromptIntegerOptions("\n[iSurvey] Số bắt đầu cho góc đầu tiên sau DD <1>: ")
+        var pio = new PromptIntegerOptions("\niSurvey: Số bắt đầu cho góc đầu tiên sau DD <1>: ")
         {
             AllowNone = true,
             AllowZero = true,
@@ -180,7 +180,7 @@ public sealed class StripMapService
             return;
         var startIndex = pir.Status == PromptStatus.OK ? pir.Value : 1;
 
-        var ppo = new PromptPointOptions("\n[iSurvey] Điểm chèn dải tuyến: ")
+        var ppo = new PromptPointOptions("\niSurvey: Điểm chèn dải tuyến: ")
         {
             AllowNone = false
         };
@@ -358,7 +358,9 @@ public sealed class StripMapService
             segments = vertices.Count - 1,
             images = imageCount,
             blocks = blockCount,
-            labels = labelCount
+            labels = labelCount,
+            file = ActivityLogger.FileName(txtPath),
+            drawing = ActivityLogger.FileName(doc.Database.Filename)
         });
 
         ed.WriteMessage(

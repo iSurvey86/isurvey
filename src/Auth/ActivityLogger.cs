@@ -37,7 +37,7 @@ public static class ActivityLogger
             if (detail is not null)
                 json = JsonSerializer.Serialize(detail);
 
-            Queue.Enqueue(new Entry(eventType, command, json));
+            Queue.Enqueue(new Entry(eventType, ActivityPhrases.Command(command), json));
             if (Interlocked.CompareExchange(ref _pumping, 1, 0) == 0)
                 ThreadPool.QueueUserWorkItem(_ => Pump());
         }
@@ -49,6 +49,29 @@ public static class ActivityLogger
 
     public static void TrackCommand([CallerMemberName] string? command = null) =>
         Enqueue("command", command);
+
+    /// <summary>
+    /// Một dòng kết quả, hiện sau tên lệnh trên trang quản trị.
+    /// Gọi khi lệnh đã xong (biết file, số tile, số đối tượng), không gọi lúc vừa mở lệnh.
+    /// </summary>
+    public static void Result(string command, string note) =>
+        Enqueue("command", command, new { note = Trim(note, 500) });
+
+    public static string FileName(string? path) =>
+        string.IsNullOrWhiteSpace(path) ? "bản vẽ chưa lưu" : Path.GetFileName(path);
+
+    public static string FileList(IEnumerable<string?> paths, int max = 6)
+    {
+        var names = paths
+            .Where(p => !string.IsNullOrWhiteSpace(p))
+            .Select(p => Path.GetFileName(p!))
+            .ToList();
+        if (names.Count == 0)
+            return "";
+        if (names.Count <= max)
+            return string.Join(", ", names);
+        return string.Join(", ", names.Take(max)) + $" và {names.Count - max} file nữa";
+    }
 
     /// <summary>Heartbeat khi giấy phép Online còn hiệu lực (sau recheck 24h / đăng nhập).</summary>
     public static void TrackHeartbeat(string? reason = null) =>
@@ -64,7 +87,7 @@ public static class ActivityLogger
     {
         try
         {
-            Post(accessToken, eventType, command, detail is null ? null : JsonSerializer.Serialize(detail), hwid, ct);
+            Post(accessToken, eventType, ActivityPhrases.Command(command), detail is null ? null : JsonSerializer.Serialize(detail), hwid, ct);
         }
         catch
         {

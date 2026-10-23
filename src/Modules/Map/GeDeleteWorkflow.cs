@@ -1,3 +1,4 @@
+using iSurvey.Auth;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -28,6 +29,7 @@ public static class GeDeleteWorkflow
         if (confirm != System.Windows.MessageBoxResult.Yes)
         {
             ed.WriteMessage("\n[iSurvey] Đã hủy xóa ảnh.");
+            ActivityLogger.Result("ISURVEY_DELETE_GE", "đã hủy, chưa xóa, bản vẽ " + ActivityLogger.FileName(db.Filename));
             return;
         }
 
@@ -43,6 +45,10 @@ public static class GeDeleteWorkflow
             ed.WriteMessage(count > 0
                 ? $"\n[iSurvey] Đã xóa {count} tile GE. AutoRefresh đã tắt."
                 : "\n[iSurvey] Không có tile iSurvey trong bản vẽ.");
+            ActivityLogger.Result("ISURVEY_DELETE_GE",
+                count > 0
+                    ? $"đã xóa {count} ảnh tile, bản vẽ {ActivityLogger.FileName(db.Filename)}"
+                    : $"không có ảnh để xóa, bản vẽ {ActivityLogger.FileName(db.Filename)}");
         }
         catch (System.Exception ex)
         {

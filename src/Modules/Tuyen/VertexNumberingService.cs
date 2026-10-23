@@ -29,7 +29,7 @@ public sealed class VertexNumberingService
     [CommandMethod("ISURVEY_NUMBER_VERTICES")]
     public void NumberVerticesCommand()
     {
-        if (!AuthManager.EnsureAuthenticated())
+        if (!AuthManager.EnsureAuthenticated(track: false))
             return;
 
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
@@ -39,11 +39,11 @@ public sealed class VertexNumberingService
         var db = doc.Database;
         var ed = doc.Editor;
 
-        var peo = new PromptEntityOptions("\n[iSurvey] Chọn Polyline tim tuyến: ")
+        var peo = new PromptEntityOptions("\niSurvey: Chọn Polyline tim tuyến: ")
         {
             AllowNone = false
         };
-        peo.SetRejectMessage("\n[iSurvey] Chỉ chấp nhận Polyline / Polyline2d / Polyline3d.");
+        peo.SetRejectMessage("\niSurvey: Chỉ chấp nhận Polyline.");
         peo.AddAllowedClass(typeof(Polyline), true);
         peo.AddAllowedClass(typeof(Polyline2d), true);
         peo.AddAllowedClass(typeof(Polyline3d), true);
@@ -52,7 +52,7 @@ public sealed class VertexNumberingService
         if (per.Status != PromptStatus.OK)
             return;
 
-        var pso = new PromptStringOptions("\n[iSurvey] Nhập tiền tố (Prefix) <G>: ")
+        var pso = new PromptStringOptions("\niSurvey: Nhập tiền tố (Prefix) <G>: ")
         {
             AllowSpaces = false,
             UseDefaultValue = true,
@@ -63,7 +63,7 @@ public sealed class VertexNumberingService
             return;
         var prefix = string.IsNullOrEmpty(prStr.StringResult) ? "G" : prStr.StringResult;
 
-        var pio = new PromptIntegerOptions("\n[iSurvey] Nhập chỉ số bắt đầu <0>: ")
+        var pio = new PromptIntegerOptions("\niSurvey: Nhập chỉ số bắt đầu <0>: ")
         {
             AllowNone = true,
             DefaultValue = 0,
@@ -75,7 +75,7 @@ public sealed class VertexNumberingService
         var startIndex = pir.Status == PromptStatus.OK ? pir.Value : 0;
 
         // Tỷ lệ in bản đồ địa hình — mặc định 1:1000.
-        var pScale = new PromptIntegerOptions("\n[iSurvey] Tỷ lệ bản đồ 1:<1000>: ")
+        var pScale = new PromptIntegerOptions("\niSurvey: Tỷ lệ bản đồ 1:<1000>: ")
         {
             AllowNone = true,
             AllowNegative = false,
@@ -182,6 +182,8 @@ public sealed class VertexNumberingService
 
         tr.Commit();
         ed.WriteMessage($"\n[iSurvey] Đã đánh số thành công {vertices.Count} góc tuyến (layer {LayerName}).");
+        ActivityLogger.Result("ISURVEY_NUMBER_VERTICES",
+            $"{vertices.Count} góc, tiền tố {prefix}, bắt đầu {startIndex}, tỷ lệ 1/{mapScale}");
     }
 
     /// <summary>Đổi kích thước trên giấy (mm) sang đơn vị model (mét) theo tỷ lệ 1:M.</summary>

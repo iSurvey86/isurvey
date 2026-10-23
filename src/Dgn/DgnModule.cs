@@ -20,7 +20,7 @@ public sealed class DgnModule : ISurveyModule
     [CommandMethod("ISURVEY_DGN_TO_CAD")]
     public void DgnToCadCommand()
     {
-        if (!AuthManager.EnsureAuthenticated())
+        if (!AuthManager.EnsureAuthenticated(track: false))
             return;
 
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
@@ -49,6 +49,7 @@ public sealed class DgnModule : ISurveyModule
         if (options is null)
         {
             ed.WriteMessage("\n[iSurvey] Đã hủy nhập DGN.");
+            ActivityLogger.Result("ISURVEY_DGN_TO_CAD", "đã hủy, chưa chọn file");
             return;
         }
 
@@ -61,14 +62,14 @@ public sealed class DgnModule : ISurveyModule
 
         // DGNIMPORT hoàn tất bất đồng bộ: Start trả về ngay, báo cáo in ra khi hậu xử lý xong.
         DgnImportService.Start(doc, options, report =>
-            WriteSummary(AcadApp.DocumentManager.MdiActiveDocument?.Editor ?? ed, report));
+            WriteSummary(AcadApp.DocumentManager.MdiActiveDocument?.Editor ?? ed, report, options.FilePath));
     }
 
     /// <summary>CAD ➔ DGN (C2D). UsePickSet: giữ các đối tượng người dùng đã chọn trước khi gõ lệnh.</summary>
     [CommandMethod("ISURVEY_CAD_TO_DGN", CommandFlags.UsePickSet)]
     public void CadToDgnCommand()
     {
-        if (!AuthManager.EnsureAuthenticated())
+        if (!AuthManager.EnsureAuthenticated(track: false))
             return;
 
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
@@ -110,6 +111,7 @@ public sealed class DgnModule : ISurveyModule
         if (options is null)
         {
             ed.WriteMessage("\n[iSurvey] Đã hủy xuất DGN.");
+            ActivityLogger.Result("ISURVEY_CAD_TO_DGN", "đã hủy, chưa xuất");
             return;
         }
 
@@ -133,6 +135,8 @@ public sealed class DgnModule : ISurveyModule
         ed.WriteMessage(
             $"\n[iSurvey][C2D] Hoàn tất: {r.Entities} đối tượng ➔ {r.OutputPath} " +
             $"({r.OutputBytes / 1024.0:0.#} KB, {r.Elapsed.TotalSeconds:0.#}s).");
+        ActivityLogger.Result("ISURVEY_CAD_TO_DGN",
+            $"file {ActivityLogger.FileName(r.OutputPath)}, {r.Entities} đối tượng, {r.OutputBytes / 1024.0:0.#} KB, seed {r.SeedSource}");
         ed.WriteMessage($"\n[iSurvey][C2D] Seed: {r.SeedSource}.");
         if (r.UsedScratchCopy)
             ed.WriteMessage("\n[iSurvey][C2D] Đã xuất từ bản sao tạm — bản vẽ đang mở không bị thay đổi.");
@@ -229,6 +233,13 @@ public sealed class DgnModule : ISurveyModule
                 $"\n[iSurvey][DGN] Đã ghép {ok} file vào bản vẽ hiện hành '{Path.GetFileName(combined)}'.");
         }
 
+        var names = ActivityLogger.FileList(results.Where(r => r.Status == DgnBatchStatus.Ok).Select(r => r.Source));
+        var where = combined is not null
+            ? $"ghép vào {ActivityLogger.FileName(combined)}"
+            : "rời từng file";
+        ActivityLogger.Result("ISURVEY_DGN_TO_CAD",
+            $"{where}: {ok} thành công, {skipped} bỏ qua, {failed} lỗi. File: {names}");
+
         foreach (var r in results.Where(r => r.Status == DgnBatchStatus.Ok && r.Output is not null))
             ed.WriteMessage($"\n[iSurvey][DGN]   ✓ {r.Output}");
 
@@ -242,7 +253,7 @@ public sealed class DgnModule : ISurveyModule
         ed.WriteMessage("\n[iSurvey][DGN] Log từng file: %LocalAppData%\\iSurvey\\logs\\dgn_*.log");
     }
 
-    private static void WriteSummary(Autodesk.AutoCAD.EditorInput.Editor ed, DgnImportReport r)
+    private static void WriteSummary(Autodesk.AutoCAD.EditorInput.Editor ed, DgnImportReport r, string sourcePath)
     {
         if (r.Error is not null)
         {
@@ -257,6 +268,8 @@ public sealed class DgnModule : ISurveyModule
             $"\n[iSurvey][DGN] Hoàn tất: {r.ImportedEntities} đối tượng nhập; Explode {r.ExplodedCells} cell; " +
             $"layer đổi tên {r.LayersRenamed}, gộp {r.LayersMerged}; font TCVN3 ➔ Unicode {r.TextsConverted} chuỗi; " +
             $"dọn {r.LinetypesPurged} linetype + {r.LayersPurged} layer + {r.BlocksPurged} block.");
+        ActivityLogger.Result("ISURVEY_DGN_TO_CAD",
+            $"file {ActivityLogger.FileName(sourcePath)}, {r.ImportedEntities} đối tượng, explode {r.ExplodedCells} cell, {r.TextsConverted} chuỗi font");
 
         if (r.Extents is { } e)
         {
