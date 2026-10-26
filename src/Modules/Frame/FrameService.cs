@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Reflection;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -16,7 +16,7 @@ namespace iSurvey.Modules.Frame;
 /// phần phụ thuộc vị trí (lưới tọa độ, mũi tên Bắc, thước tỷ lệ) được vẽ theo tọa độ thật của bản vẽ.
 /// Kích thước khung ngoài bản vẽ = kích thước giấy (mm) × mẫu số / 1000 (đơn vị bản vẽ = mét).
 /// </summary>
-public sealed class FrameService
+public sealed partial class FrameService
 {
     private const string TemplateName = "KhungBanDo_Chuan.dwg";
     private const string UserTemplateName = "KhungBanDo.dwg";
@@ -121,6 +121,175 @@ public sealed class FrameService
         ed.Regen();
         ed.WriteMessage($"\n[iSurvey] {note}. Gõ lại ANLOGO và chọn cùng mục để đổi lại.");
         ActivityLogger.Result("ISURVEY_LOGO", note);
+    }
+
+    /// <summary>
+    /// THAYLOGO: bấm vào logo cần thay trong khung tên (hoặc gõ 1 / 2), chọn file ảnh logo mới.
+    /// Gõ K để khôi phục logo EVN gốc. Logo gốc được cất sang layer tắt, không bị xóa.
+    /// </summary>
+    [CommandMethod("ISURVEY_LOGO_REPLACE")]
+    public void ReplaceLogoCommand()
+    {
+        if (!AuthManager.EnsureAuthenticated(track: false))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+
+        try
+        {
+            ReplaceLogoCore(doc);
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage($"\n[iSurvey] Thay logo không thực hiện được: {ex.Message}");
+            ActivityLogger.TrackError(ex);
+        }
+    }
+
+    private static void ReplaceLogoCore(Document doc)
+    {
+        var ed = doc.Editor;
+        var db = doc.Database;
+
+        // 1) Chọn logo: bấm vào logo trong khung, hoặc gõ 1 / 2 / K.
+        bool? owner = null; // null = cả hai (chỉ dùng cho khôi phục)
+        var restore = false;
+        while (true)
+        {
+            var opts = new PromptNestedEntityOptions(
+                "\niSurvey: Bấm vào logo cần thay trong khung tên, hoặc gõ 1 (chủ đầu tư) / 2 (đơn vị thiết kế) / K (khôi phục logo EVN): ")
+            {
+                AllowNone = false
+            };
+            opts.Keywords.Add("1", "1", "1");
+            opts.Keywords.Add("2", "2", "2");
+            opts.Keywords.Add("K", "K", "K");
+
+            var res = ed.GetNestedEntity(opts);
+            if (res.Status == PromptStatus.Keyword)
+            {
+                if (res.StringResult == "K")
+                {
+                    restore = true;
+                    var which = PromptRestoreSide(ed);
+                    if (which is null)
+                        return;
+                    owner = which.Value switch { 1 => true, 2 => false, _ => null };
+                }
+                else
+                {
+                    owner = res.StringResult == "1";
+                }
+
+                break;
+            }
+
+            if (res.Status != PromptStatus.OK)
+                return;
+
+            var side = DetectPickedLogoSide(db, res);
+            if (side is null)
+            {
+                ed.WriteMessage("\n[iSurvey] Đối tượng này không phải logo trong khung tên (khung KHUNG / KHUNGBV có logo EVN). Bấm lại vào logo.");
+                continue;
+            }
+
+            owner = side;
+            break;
+        }
+
+        if (restore)
+        {
+            RestoreLogos(doc, owner);
+            return;
+        }
+
+        // 2) Chọn file ảnh. FILEDIA = 0 thì tự chuyển sang nhập đường dẫn trên dòng lệnh.
+        var label = owner == true ? "chủ đầu tư" : "đơn vị thiết kế";
+        var fo = new PromptOpenFileOptions($"\niSurvey: Chọn file ảnh logo {label} mới: ")
+        {
+            Filter = LogoReplaceService.ImageFilter,
+            DialogCaption = "Chọn ảnh logo " + label,
+            PreferCommandLine = false
+        };
+        var fr = ed.GetFileNameForOpen(fo);
+        if (fr.Status != PromptStatus.OK)
+            return;
+
+        var image = LogoReplaceService.PrepareImage(db, fr.StringResult, owner == true);
+
+        // 3) Thay trong mọi khung của bản vẽ.
+        using var _ = doc.LockDocument();
+        using var tr = db.TransactionManager.StartTransaction();
+        var result = LogoReplaceService.Replace(tr, db, owner == true, image);
+        if (result.Logos == 0)
+        {
+            ed.WriteMessage("\n[iSurvey] " + result.Message);
+            return;
+        }
+
+        tr.Commit();
+        ed.Regen();
+        ed.WriteMessage($"\n[iSurvey] {result.Message}.");
+        ed.WriteMessage("\n[iSurvey] ANLOGO1 / ANLOGO2 ẩn hiện logo; THAYLOGO rồi gõ K để khôi phục logo EVN. Bản vẽ gửi đi cần kèm file ảnh logo.");
+        ActivityLogger.Result("ISURVEY_LOGO_REPLACE", result.Message);
+    }
+
+    private static int? PromptRestoreSide(Editor ed)
+    {
+        var opts = new PromptKeywordOptions("\niSurvey: Khôi phục logo EVN: 1 chủ đầu tư, 2 đơn vị thiết kế, 3 cả hai")
+        {
+            AllowNone = false,
+            AppendKeywordsToMessage = true
+        };
+        opts.Keywords.Add("1", "1", "1");
+        opts.Keywords.Add("2", "2", "2");
+        opts.Keywords.Add("3", "3", "3");
+        var res = ed.GetKeywords(opts);
+        return res.Status == PromptStatus.OK ? int.Parse(res.StringResult, CultureInfo.InvariantCulture) : null;
+    }
+
+    private static void RestoreLogos(Document doc, bool? owner)
+    {
+        var ed = doc.Editor;
+        using var _ = doc.LockDocument();
+        using var tr = doc.Database.TransactionManager.StartTransaction();
+        var restored = 0;
+        if (owner != false)
+            restored += LogoReplaceService.Restore(tr, doc.Database, owner: true);
+        if (owner != true)
+            restored += LogoReplaceService.Restore(tr, doc.Database, owner: false);
+
+        if (restored == 0)
+        {
+            ed.WriteMessage("\n[iSurvey] Không có logo nào đã bị thay bằng ảnh trong bản vẽ này.");
+            return;
+        }
+
+        tr.Commit();
+        ed.Regen();
+        var note = $"Đã khôi phục logo EVN gốc ({restored} chỗ)";
+        ed.WriteMessage($"\n[iSurvey] {note}.");
+        ActivityLogger.Result("ISURVEY_LOGO_REPLACE", note);
+    }
+
+    /// <summary>Đối tượng được bấm thuộc logo bên nào: true = chủ đầu tư, false = đơn vị thiết kế, null = không phải logo.</summary>
+    private static bool? DetectPickedLogoSide(Database db, PromptNestedEntityResult res)
+    {
+        using var tr = db.TransactionManager.StartTransaction();
+        foreach (var cid in res.GetContainers())
+        {
+            if (tr.GetObject(cid, OpenMode.ForRead) is BlockReference br && TitleBlockFit.IsLogo(tr, br))
+                return TitleBlockFit.SideOfLogo(tr, br);
+        }
+
+        return tr.GetObject(res.ObjectId, OpenMode.ForRead) switch
+        {
+            RasterImage ri => LogoReplaceService.SideOfLayer(ri.Layer),
+            BlockReference br when TitleBlockFit.IsLogo(tr, br) => TitleBlockFit.SideOfLogo(tr, br),
+            _ => null
+        };
     }
 
     /// <summary>Co ô chủ đầu tư về một dòng cho khung đã chèn trong bản vẽ này.</summary>
@@ -737,3 +906,4 @@ public sealed class FrameService
         }
     }
 }
+

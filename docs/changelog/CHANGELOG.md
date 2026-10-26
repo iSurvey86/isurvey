@@ -1,5 +1,16 @@
 # Changelog — iSurvey
 
+## 1.8.6 — 2026-10-27
+
+### Dàn trang in (DANTRANG)
+- `ISURVEY_ROUTE_SHEETS` / **DANTRANG** (tên cũ `CATTUYEN` vẫn nhận): chọn tuyến → hộp thoại khổ giấy, tỷ lệ (có 1/10000), chồng gối, lưới Hàng × Cột. Một layout `BanDo_Tuyen` chứa mọi tờ; ô Tờ ghi `i/N`. Đường bao mảnh chỉ vẽ trên Model (không in).
+- Kích đúp (hoặc F2) sửa ô khung tên. Bỏ khoảng trắng thừa. Chọn STT 1 hoặc 5: **Thay Logo...** / **Ẩn logo**. Tick in PDF gộp (`DWG To PDF.pc3`, mỗi trang đúng một tờ giấy).
+
+### Cập nhật (UPD)
+- Hộp thoại mới: phiên bản hiện tại → bản mới, tính năng mới (Chi tiết nếu dài), **Cập nhật ngay** / **Đóng**.
+- Tải gói có thanh tiến trình; đóng hộp thoại rồi mới thoát Civil (tránh treo). Helper đợi DLL được nhả khóa, cài, ghi kết quả, mở lại Civil.
+- Nhật ký: `update_check` → `update_download` → `update_quit` → `update_result` (thành công/thất bại, mã lỗi). File theo dõi `%LocalAppData%\iSurvey\updates\update.log`.
+
 ## 1.8.5 — 2026-10-26
 
 ### Khung tên

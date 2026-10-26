@@ -81,7 +81,7 @@ public static class ActivityLogger
     public static void TrackError(Exception ex, [CallerMemberName] string? command = null) =>
         Enqueue("error", command, new { message = Trim(ex.Message, 300), type = ex.GetType().Name });
 
-    /// <summary>Gửi ngay trên luồng hiện tại bằng access token cho trước (dùng khi đăng xuất). Không ném.</summary>
+    /// <summary>Gửi ngay trên luồng hiện tại bằng access token cho trước (dùng khi đăng xuất / trước khi thoát CAD). Không ném.</summary>
     internal static void SendNow(string accessToken, string eventType, string? command, object? detail,
         string? hwid, CancellationToken ct)
     {
@@ -92,6 +92,20 @@ public static class ActivityLogger
         catch
         {
             // bỏ qua
+        }
+    }
+
+    /// <summary>Gửi hết hàng đợi trên luồng hiện tại (trước khi thoát CAD để không mất log).</summary>
+    internal static void FlushNow()
+    {
+        try
+        {
+            while (Queue.TryDequeue(out var entry))
+                SendOne(entry);
+        }
+        catch
+        {
+            // không chặn thoát
         }
     }
 

@@ -82,6 +82,8 @@ public sealed class Main : IExtensionApplication
                 acad.MdiActiveDocument.Editor.WriteMessage(
                     $"\n[iSurvey] {string.Join(", ", fixedVars)} đang = 0 (làm hộp thoại không hiện) — đã đặt lại 1.");
             }
+
+            iSurvey.Auth.UpdateApplyService.FlushPendingResult();
         }
         catch
         {

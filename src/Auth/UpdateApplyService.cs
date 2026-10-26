@@ -1,6 +1,8 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO.Compression;
+using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 
 namespace iSurvey.Auth;
@@ -11,15 +13,23 @@ namespace iSurvey.Auth;
 /// </summary>
 public static class UpdateApplyService
 {
-    private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromMinutes(10) };
+    private static readonly HttpClient Http = new(new HttpClientHandler
+    {
+        UseProxy = true,
+        DefaultProxyCredentials = CredentialCache.DefaultCredentials
+    })
+    { Timeout = TimeSpan.FromMinutes(10) };
 
-    public sealed record ApplyResult(bool Ok, string Message, string? SetupDir = null);
+    public sealed record ApplyResult(bool Ok, string Message, string? SetupDir = null, long Bytes = 0);
+
+    /// <summary>Tiến trình tải/giải nén — <paramref name="Percent"/> null = không xác định.</summary>
+    public sealed record UpdateProgress(string Title, string? Detail, double? Percent);
 
     /// <summary>Thư mục cập nhật cục bộ (zip + bản giải nén + script helper).</summary>
     public static string UpdatesRoot =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "iSurvey", "updates");
 
-    public static ApplyResult DownloadAndStage(UpdateCheckService.Manifest man, IProgress<string>? progress = null)
+    public static ApplyResult DownloadAndStage(UpdateCheckService.Manifest man, IProgress<UpdateProgress>? progress = null)
     {
         if (!Uri.TryCreate(man.Url?.Trim(), UriKind.Absolute, out var uri)
             || (uri.Scheme != Uri.UriSchemeHttps && uri.Scheme != Uri.UriSchemeHttp))
@@ -33,13 +43,14 @@ public static class UpdateApplyService
             var zipPath = Path.Combine(UpdatesRoot, $"iSurvey-Setup-{safeVer}-{stamp}.zip");
             var extractDir = Path.Combine(UpdatesRoot, $"stage-{safeVer}-{stamp}");
 
-            progress?.Report("Đang tải bản cập nhật...");
-            DownloadToFile(uri, zipPath);
+            progress?.Report(new UpdateProgress("Đang tải gói cài đặt...", "Kết nối máy chủ...", 0));
+            DownloadToFile(uri, zipPath, progress);
 
-            if (!File.Exists(zipPath) || new FileInfo(zipPath).Length < 1024)
-                return new ApplyResult(false, "File tải về quá nhỏ hoặc trống. Thử lại sau.");
+            var zipLen = File.Exists(zipPath) ? new FileInfo(zipPath).Length : 0;
+            if (zipLen < 1024)
+                return new ApplyResult(false, "File tải về quá nhỏ hoặc trống. Thử lại sau.", Bytes: zipLen);
 
-            progress?.Report("Đang giải nén...");
+            progress?.Report(new UpdateProgress("Đang giải nén...", null, null));
             if (Directory.Exists(extractDir))
                 Directory.Delete(extractDir, recursive: true);
             Directory.CreateDirectory(extractDir);
@@ -47,63 +58,59 @@ public static class UpdateApplyService
 
             var setupDir = ResolveSetupRoot(extractDir);
             if (setupDir is null)
-                return new ApplyResult(false, "Gói Setup thiếu Install-iSurvey.ps1 hoặc iSurvey.bundle.");
+                return new ApplyResult(false, "Gói Setup thiếu Install-iSurvey.ps1 hoặc iSurvey.bundle.", Bytes: zipLen);
 
-            return new ApplyResult(true, "Đã tải và giải nén xong.", setupDir);
+            return new ApplyResult(true, "Đã tải và giải nén xong.", setupDir, zipLen);
         }
         catch (Exception ex)
         {
+            Trace("download_fail " + ex.GetType().Name + ": " + ex.Message);
             return new ApplyResult(false, "Lỗi tải / giải nén: " + ex.Message);
         }
     }
 
-    /// <summary>
-    /// Ghi script helper (nếu cần), chạy ngoài tiến trình CAD, rồi thoát AutoCAD.
-    /// Helper đợi PID hiện tại kết thúc rồi mới gọi Install-iSurvey.ps1.
-    /// </summary>
-    public static ApplyResult LaunchInstallerAndQuit(string setupDir)
+    /// <summary>Ghi script helper và chạy ngoài tiến trình CAD. Không gọi Quit — lệnh UPD thoát CAD sau khi hộp thoại đã đóng.</summary>
+    public static ApplyResult LaunchHelper(string setupDir, string latest)
     {
         try
         {
             if (!Directory.Exists(setupDir))
                 return new ApplyResult(false, "Không tìm thấy thư mục Setup đã giải nén.");
 
+            Directory.CreateDirectory(UpdatesRoot);
             var helper = EnsureHelperScript();
             var pid = Process.GetCurrentProcess().Id;
+            WriteRelaunchInfo();
+            WriteLogContext(latest);
             var args =
-                $"-NoProfile -ExecutionPolicy Bypass -File \"{helper}\" -ParentPid {pid} -SetupDir \"{setupDir}\"";
+                $"-NoProfile -ExecutionPolicy Bypass -STA -File \"{helper}\" -ParentPid {pid} -SetupDir \"{setupDir}\"";
 
             var psi = new ProcessStartInfo
             {
                 FileName = "powershell.exe",
                 Arguments = args,
-                UseShellExecute = true,
-                WindowStyle = ProcessWindowStyle.Normal,
+                UseShellExecute = false,
+                CreateNoWindow = true,
                 WorkingDirectory = setupDir
             };
-            Process.Start(psi);
-
-            // Thoát CAD — DLL được nhả khóa; helper đang chờ PID này.
-            try
+            var proc = Process.Start(psi);
+            if (proc is null)
             {
-                AcadApp.Quit();
-            }
-            catch (Exception ex)
-            {
-                return new ApplyResult(false,
-                    "Đã khởi chạy trình cài nhưng không thoát được AutoCAD: " + ex.Message
-                    + "\nHãy thoát AutoCAD thủ công để hoàn tất cài đặt.");
+                Trace("helper_start_fail process=null");
+                return new ApplyResult(false, "Không khởi chạy được PowerShell trình cài.");
             }
 
-            return new ApplyResult(true, "Đang thoát AutoCAD để cài đặt...");
+            Trace($"helper_start pid={proc.Id} acadPid={pid} setup={setupDir}");
+            return new ApplyResult(true, "Đã chạy trình cài (PID " + proc.Id + ").");
         }
         catch (Exception ex)
         {
+            Trace("helper_start_fail " + ex.GetType().Name + ": " + ex.Message);
             return new ApplyResult(false, "Không chạy được trình cài: " + ex.Message);
         }
     }
 
-    private static void DownloadToFile(Uri uri, string zipPath)
+    private static void DownloadToFile(Uri uri, string zipPath, IProgress<UpdateProgress>? progress)
     {
         using var req = new HttpRequestMessage(HttpMethod.Get, uri);
         var config = AuthConfig.Load();
@@ -112,10 +119,152 @@ public static class UpdateApplyService
         req.Headers.TryAddWithoutValidation("Authorization", "Bearer " + config.ResolvedSupabaseKey);
 
         using var resp = Http.SendAsync(req, HttpCompletionOption.ResponseHeadersRead).GetAwaiter().GetResult();
-        resp.EnsureSuccessStatusCode();
+        if (!resp.IsSuccessStatusCode)
+            throw new InvalidOperationException($"HTTP {(int)resp.StatusCode} khi tải gói cài đặt.");
+        var total = resp.Content.Headers.ContentLength;
         using var stream = resp.Content.ReadAsStreamAsync().GetAwaiter().GetResult();
         using var fs = File.Create(zipPath);
-        stream.CopyTo(fs);
+        var buf = new byte[81920];
+        long read = 0;
+        int n;
+        var lastPct = -1;
+        while ((n = stream.Read(buf, 0, buf.Length)) > 0)
+        {
+            fs.Write(buf, 0, n);
+            read += n;
+            if (total is > 0)
+            {
+                var pct = (int)(100.0 * read / total.Value);
+                if (pct == lastPct)
+                    continue;
+                lastPct = pct;
+                progress?.Report(new UpdateProgress(
+                    "Đang tải gói cài đặt...",
+                    $"{FormatMb(read)} / {FormatMb(total.Value)}",
+                    pct));
+            }
+            else
+            {
+                progress?.Report(new UpdateProgress("Đang tải gói cài đặt...", FormatMb(read), null));
+            }
+        }
+    }
+
+    private static string FormatMb(long bytes) =>
+        (bytes / (1024.0 * 1024.0)).ToString("0.0", System.Globalization.CultureInfo.InvariantCulture) + " MB";
+
+    /// <summary>File log cục bộ — đọc được cả khi CAD treo / thoát giữa chừng.</summary>
+    public static string TracePath => Path.Combine(UpdatesRoot, "update.log");
+
+    public static void Trace(string line)
+    {
+        try
+        {
+            Directory.CreateDirectory(UpdatesRoot);
+            File.AppendAllText(TracePath,
+                DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)
+                + "  " + line + Environment.NewLine);
+        }
+        catch
+        {
+            // không chặn cập nhật
+        }
+    }
+
+    /// <summary>Lần mở Civil sau: gửi nhật ký kết quả cài nếu helper chưa gửi được.</summary>
+    public static void FlushPendingResult()
+    {
+        try
+        {
+            var path = Path.Combine(UpdatesRoot, "last-result.json");
+            if (!File.Exists(path))
+                return;
+            var json = File.ReadAllText(path);
+            using var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
+            if (root.TryGetProperty("uploaded", out var up) && up.ValueKind == JsonValueKind.True)
+                return;
+
+            object? detail = JsonSerializer.Deserialize<object>(json);
+            ActivityLogger.Enqueue("update_result", "UPD", detail);
+            Trace("pending_result_enqueued");
+            var sent = path + ".sent";
+            if (File.Exists(sent))
+                File.Delete(sent);
+            File.Move(path, sent);
+        }
+        catch (Exception ex)
+        {
+            Trace("pending_result_fail " + ex.Message);
+        }
+    }
+
+    /// <summary>Ghi đường dẫn + tham số AutoCAD/Civil để helper mở lại sau khi cài.</summary>
+    private static void WriteRelaunchInfo()
+    {
+        try
+        {
+            var exe = Process.GetCurrentProcess().MainModule?.FileName ?? "";
+            var cmd = Environment.CommandLine ?? "";
+            var args = "";
+            if (cmd.StartsWith("\"", StringComparison.Ordinal))
+            {
+                var end = cmd.IndexOf('"', 1);
+                if (end > 0)
+                    args = cmd[(end + 1)..].Trim();
+            }
+            else
+            {
+                var sp = cmd.IndexOf(' ');
+                if (sp > 0)
+                    args = cmd[(sp + 1)..].Trim();
+            }
+
+            var path = Path.Combine(UpdatesRoot, "relaunch.json");
+            File.WriteAllText(path, JsonSerializer.Serialize(new { exe, args }));
+            Trace("relaunch_written exe=" + exe);
+        }
+        catch (Exception ex)
+        {
+            Trace("relaunch_fail " + ex.Message);
+        }
+    }
+
+    /// <summary>Thông tin để helper gửi nhật ký kết quả (CAD đã tắt, không còn ActivityLogger).</summary>
+    private static void WriteLogContext(string latest)
+    {
+        try
+        {
+            var config = AuthConfig.Load();
+            string? access = null;
+            try
+            {
+                access = AuthManager.AcquireAccessToken();
+            }
+            catch
+            {
+                // offline / chưa đăng nhập
+            }
+
+            var ctx = new
+            {
+                url = config.HasSupabase
+                    ? config.ResolvedSupabaseUrl.TrimEnd('/') + "/rest/v1/rpc/isurvey_log_event"
+                    : "",
+                apikey = config.HasSupabase ? config.ResolvedSupabaseKey : "",
+                access = access ?? "",
+                hwid = HardwareId.Current,
+                machine = Environment.MachineName,
+                current = AuthManager.AppVersion.TrimStart('v'),
+                latest
+            };
+            File.WriteAllText(Path.Combine(UpdatesRoot, "log-context.json"), JsonSerializer.Serialize(ctx));
+            Trace("log_context_written hasAccess=" + !string.IsNullOrEmpty(access));
+        }
+        catch (Exception ex)
+        {
+            Trace("log_context_fail " + ex.Message);
+        }
     }
 
     private static void ExtractZip(string zipPath, string extractDir)
@@ -167,27 +316,13 @@ public static class UpdateApplyService
 
     private static string EnsureHelperScript()
     {
-        // Ưu tiên bản trong repo/deploy cạnh plugin; fallback ghi từ mã nguồn.
-        var fromBundle = Path.Combine(
-            Path.GetDirectoryName(typeof(UpdateApplyService).Assembly.Location) ?? "",
-            "..", "..", "..", "Apply-iSurveyUpdate.ps1");
-        try
-        {
-            fromBundle = Path.GetFullPath(fromBundle);
-            if (File.Exists(fromBundle))
-            {
-                var copy = Path.Combine(UpdatesRoot, "Apply-iSurveyUpdate.ps1");
-                File.Copy(fromBundle, copy, overwrite: true);
-                return copy;
-            }
-        }
-        catch
-        {
-            // ghi embedded bên dưới
-        }
-
         var path = Path.Combine(UpdatesRoot, "Apply-iSurveyUpdate.ps1");
-        File.WriteAllText(path, EmbeddedHelperScript, System.Text.Encoding.UTF8);
+        var asm = typeof(UpdateApplyService).Assembly;
+        using var src = asm.GetManifestResourceStream("iSurvey.Apply-iSurveyUpdate.ps1");
+        if (src is null)
+            throw new InvalidOperationException("Thieu script cai dat (Apply-iSurveyUpdate.ps1) trong DLL.");
+        using var dst = File.Create(path);
+        src.CopyTo(dst);
         return path;
     }
 
@@ -197,43 +332,4 @@ public static class UpdateApplyService
             name = name.Replace(c, '_');
         return name;
     }
-
-    private const string EmbeddedHelperScript =
-        """
-        param(
-            [Parameter(Mandatory = $true)][int]$ParentPid,
-            [Parameter(Mandatory = $true)][string]$SetupDir
-        )
-        $ErrorActionPreference = "Stop"
-        function Show-Msg([string]$Text, [string]$Title) {
-            try {
-                Add-Type -AssemblyName System.Windows.Forms -ErrorAction SilentlyContinue
-                [System.Windows.Forms.MessageBox]::Show($Text, $Title) | Out-Null
-            } catch { Write-Host $Text }
-        }
-        $SetupDir = [System.IO.Path]::GetFullPath($SetupDir)
-        $installPs1 = Join-Path $SetupDir "Install-iSurvey.ps1"
-        $bundle = Join-Path $SetupDir "iSurvey.bundle"
-        if (-not (Test-Path $installPs1) -or -not (Test-Path $bundle)) {
-            Show-Msg "Thu muc Setup khong hop le.`n$SetupDir" "iSurvey Cap nhat"
-            exit 1
-        }
-        $deadline = (Get-Date).AddMinutes(30)
-        while ($true) {
-            if (-not (Get-Process -Id $ParentPid -ErrorAction SilentlyContinue)) { break }
-            if ((Get-Date) -gt $deadline) {
-                Show-Msg "Het thoi gian cho. Dong AutoCAD roi chay Install-iSurvey.bat.`n$SetupDir" "iSurvey Cap nhat"
-                exit 2
-            }
-            Start-Sleep -Seconds 1
-        }
-        Start-Sleep -Seconds 2
-        & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installPs1
-        if ($LASTEXITCODE -ne 0 -and $null -ne $LASTEXITCODE) {
-            Show-Msg "Cai dat that bai (ma $LASTEXITCODE).`n$SetupDir" "iSurvey Cap nhat"
-            exit $LASTEXITCODE
-        }
-        Show-Msg "Cap nhat iSurvey xong.`nHay mo lai AutoCAD / Civil 3D." "iSurvey Cap nhat"
-        exit 0
-        """;
 }

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -9,7 +10,12 @@ namespace iSurvey.Auth;
 /// <summary>Đọc version.json công khai (Supabase Storage) và so với AppVersion.</summary>
 public static class UpdateCheckService
 {
-    private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(12) };
+    private static readonly HttpClient Http = new(new HttpClientHandler
+    {
+        UseProxy = true,
+        DefaultProxyCredentials = CredentialCache.DefaultCredentials
+    })
+    { Timeout = TimeSpan.FromSeconds(20) };
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {

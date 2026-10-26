@@ -1,4 +1,4 @@
-namespace iSurvey.Auth;
+﻿namespace iSurvey.Auth;
 
 /// <summary>
 /// Câu ghi vào nhật ký để admin đọc được mà không cần tra tên hàm.
@@ -79,6 +79,17 @@ internal static class ActivityPhrases
         ["ISURVEY_LOGO2"] = "ANLOGO2 (ẩn hoặc hiện logo đơn vị thiết kế)",
         ["ANLOGO2"] = "ANLOGO2 (ẩn hoặc hiện logo đơn vị thiết kế)",
 
+        ["RouteLayoutCommand"] = "DANTRANG (dàn trang in dọc tuyến)",
+        ["ISURVEY_ROUTE_SHEETS"] = "DANTRANG (dàn trang in dọc tuyến)",
+        ["DANTRANG"] = "DANTRANG (dàn trang in dọc tuyến)",
+        ["CATTUYEN"] = "DANTRANG (dàn trang in dọc tuyến)",
+        ["RouteLayoutQuickCommand"] = "DANTRANG (không hộp thoại)",
+        ["ISURVEY_ROUTE_SHEETS_QUICK"] = "DANTRANG (không hộp thoại)",
+
+        ["ReplaceLogoCommand"] = "THAYLOGO (thay logo khung tên bằng ảnh)",
+        ["ISURVEY_LOGO_REPLACE"] = "THAYLOGO (thay logo khung tên bằng ảnh)",
+        ["THAYLOGO"] = "THAYLOGO (thay logo khung tên bằng ảnh)",
+
         ["FitTitleCommand"] = "CODAN (co chữ chủ đầu tư về một dòng)",
         ["ISURVEY_FIT_TITLE"] = "CODAN (co chữ chủ đầu tư về một dòng)",
         ["CODAN"] = "CODAN (co chữ chủ đầu tư về một dòng)",
@@ -136,3 +147,5 @@ internal static class ActivityPhrases
         return Commands.TryGetValue(name.Trim(), out var phrase) ? phrase : name.Trim();
     }
 }
+
+

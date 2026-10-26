@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -17,7 +17,11 @@ internal static class TitleBlockFit
     internal const string LogoLayer = "KB_LOGO_VE";
     internal const string LogoOwnerLayer = "KB_LOGO_CDT";
     internal const string LogoDesignLayer = "KB_LOGO_TK";
-    private const string LogoBlock = "KB_LOGO_EVN";
+    internal const string LogoBlock = "KB_LOGO_EVN";
+
+    /// <summary>Logo EVN gốc được cất sang layer tắt này khi người dùng thay logo bằng ảnh (THAYLOGO), để khôi phục được.</summary>
+    internal const string LogoOwnerOrigLayer = "KB_LOGO_CDT_GOC";
+    internal const string LogoDesignOrigLayer = "KB_LOGO_TK_GOC";
 
     private const string RegApp = "ISURVEY_FIT";
     private const double MinFactor = 0.35;
@@ -128,6 +132,13 @@ internal static class TitleBlockFit
 
             foreach (var br in logos)
             {
+                // Logo gốc đã được cất đi vì đã thay bằng ảnh: giữ nguyên, không kéo về layer logo.
+                if (IsStoredOriginalLayer(br.Layer))
+                {
+                    count++;
+                    continue;
+                }
+
                 var layer = OwnerLogo(br.Position, ownerPt, designPt, logos) ? LogoOwnerLayer : LogoDesignLayer;
                 if (!br.Layer.Equals(layer, StringComparison.OrdinalIgnoreCase))
                 {
@@ -142,6 +153,23 @@ internal static class TitleBlockFit
         return new LogoSplit { Count = count, ReleasedSharedLayer = released };
     }
 
+    /// <summary>Logo bên chủ đầu tư (true) / đơn vị thiết kế (false) đang bị tắt layer?</summary>
+    internal static bool IsLogoHidden(Database db, bool owner)
+    {
+        using var tr = db.TransactionManager.StartTransaction();
+        var lt = (LayerTable)tr.GetObject(db.LayerTableId, OpenMode.ForRead);
+        var name = owner ? LogoOwnerLayer : LogoDesignLayer;
+        return lt.Has(name) && ((LayerTableRecord)tr.GetObject(lt[name], OpenMode.ForRead)).IsOff;
+    }
+
+    /// <summary>Đặt hẳn trạng thái ẩn/hiện logo một bên (cần đã gọi SeparateLogos để layer tồn tại).</summary>
+    internal static void SetLogoHidden(Transaction tr, Database db, bool owner, bool hidden)
+    {
+        var lt = (LayerTable)tr.GetObject(db.LayerTableId, OpenMode.ForRead);
+        var name = owner ? LogoOwnerLayer : LogoDesignLayer;
+        if (lt.Has(name))
+            SetLayerOff(tr, db, name, hidden);
+    }
     public static string ToggleLogoLayer(Transaction tr, Database db, bool owner, bool forceHide)
     {
         var name = owner ? LogoOwnerLayer : LogoDesignLayer;
@@ -214,7 +242,41 @@ internal static class TitleBlockFit
         return dOwner <= dDesign;
     }
 
-    private static bool IsLogo(Transaction tr, BlockReference br)
+    /// <summary>Logo thuộc bên nào: true = chủ đầu tư, false = đơn vị thiết kế. Ưu tiên layer, không có thì theo vị trí gần ô tên.</summary>
+    internal static bool? SideOfLogo(Transaction tr, BlockReference br)
+    {
+        var byLayer = LogoReplaceService.SideOfLayer(br.Layer);
+        if (byLayer is not null)
+            return byLayer;
+
+        var btr = (BlockTableRecord)tr.GetObject(br.OwnerId, OpenMode.ForRead);
+        var logos = new List<BlockReference>();
+        Point3d? ownerPt = null;
+        Point3d? designPt = null;
+        foreach (ObjectId id in btr)
+        {
+            switch (tr.GetObject(id, OpenMode.ForRead))
+            {
+                case BlockReference b when IsLogo(tr, b):
+                    logos.Add(b);
+                    break;
+                case AttributeDefinition ad when ad.Tag.Equals("CHU_DAU_TU", StringComparison.OrdinalIgnoreCase):
+                    ownerPt = TextPoint(ad);
+                    break;
+                case AttributeDefinition ad when ad.Tag.Equals("DON_VI_TK", StringComparison.OrdinalIgnoreCase):
+                    designPt = TextPoint(ad);
+                    break;
+            }
+        }
+
+        return OwnerLogo(br.Position, ownerPt, designPt, logos);
+    }
+
+    internal static bool IsStoredOriginalLayer(string layer) =>
+        layer.Equals(LogoOwnerOrigLayer, StringComparison.OrdinalIgnoreCase)
+        || layer.Equals(LogoDesignOrigLayer, StringComparison.OrdinalIgnoreCase);
+
+    internal static bool IsLogo(Transaction tr, BlockReference br)
     {
         var def = (BlockTableRecord)tr.GetObject(br.BlockTableRecord, OpenMode.ForRead);
         return def.Name.Equals(LogoBlock, StringComparison.OrdinalIgnoreCase);
@@ -232,7 +294,7 @@ internal static class TitleBlockFit
         return dx * dx + dy * dy;
     }
 
-    private static void EnsureLogoLayer(Transaction tr, Database db, string name)
+    internal static void EnsureLogoLayer(Transaction tr, Database db, string name)
     {
         var lt = (LayerTable)tr.GetObject(db.LayerTableId, OpenMode.ForRead);
         if (lt.Has(name))
@@ -461,3 +523,4 @@ internal static class TitleBlockFit
         return width;
     }
 }
+

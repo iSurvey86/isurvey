@@ -1,4 +1,4 @@
-using Autodesk.AutoCAD.Runtime;
+﻿using Autodesk.AutoCAD.Runtime;
 using iSurvey.Auth;
 using iSurvey.Dgn;
 using iSurvey.Modules.Export;
@@ -23,6 +23,7 @@ namespace iSurvey;
 /// D2C = DGN to CAD, C2D = CAD to DGN, DGNCFG = Cấu hình DGN, T2C = TAB to CAD,
 /// UAVCLIP = Cắt ảnh UAV theo biên,
 /// GOC = Đánh số góc tuyến, DUOITUYEN = Duỗi thẳng tuyến, KHUNG = Chèn khung bản đồ A0–A4 (1/200…1/5000),
+/// DANTRANG = Dàn trang in dọc tuyến (CATTUYEN vẫn nhận),
 /// AIA = Trợ lý AI (Admin-Only),
 /// CBD = Cắt Bình Đồ (CATBD), SCN = Scan (AUTOSCAN; "ASC" bị Telex thành "ác" nên dùng SCN),
 /// LGI = Login (ISURVEY_LOGIN), UPD = Update, ABT = About, LGO = Logout.
@@ -97,6 +98,16 @@ public sealed class CommandAliases
     [CommandMethod("ANLOGO2")]
     public void AliasToggleLogoDesign() => _frame.ToggleLogoDesignCommand();
 
+    [CommandMethod("DANTRANG")]
+    public void AliasRouteLayout() => _frame.RouteLayoutCommand();
+
+    /// <summary>Tên cũ: vẫn nhận để không gãy thói quen gõ.</summary>
+    [CommandMethod("CATTUYEN")]
+    public void AliasRouteLayoutOld() => _frame.RouteLayoutCommand();
+
+    [CommandMethod("THAYLOGO")]
+    public void AliasReplaceLogo() => _frame.ReplaceLogoCommand();
+
     [CommandMethod("CODAN")]
     public void AliasFitTitle() => _frame.FitTitleCommand();
 
@@ -122,3 +133,4 @@ public sealed class CommandAliases
     [CommandMethod("LGO")]
     public void AliasLogout() => _auth.LogoutCommand();
 }
+

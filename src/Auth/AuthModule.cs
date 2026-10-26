@@ -68,80 +68,66 @@ public sealed class AuthModule : ISurveyModule
             return;
         }
 
-        var man = result.Manifest;
-        var rows = new List<(string, string)>
-        {
-            ("Phiên bản hiện tại", AuthManager.AppVersion),
-            ("Phiên bản mới", man.Latest),
-        };
-        if (!string.IsNullOrWhiteSpace(man.Notes))
-            rows.Add(("Ghi chú", man.Notes!));
-
-        var msg = "Có bản cập nhật mới. Bấm Cập nhật ngay để tải về rồi THOÁT AutoCAD/Civil và tự cài đặt."
-                  + "\nSau khi cài xong, mở lại AutoCAD/Civil."
-                  + (result.ForceUpdate ? "\n\nPhiên bản hiện tại thấp hơn mức tối thiểu — nên cập nhật ngay." : "");
-
-        if (!DarkDialog.Confirm("CẬP NHẬT iSurvey", msg, "Cập nhật ngay", "Để sau"))
-        {
-            DarkDialog.ShowInfo("CẬP NHẬT iSurvey", "Có bản mới", rows, note: msg);
+        var setupDir = UpdateWindow.ShowAvailable(result.Manifest, result.ForceUpdate);
+        if (string.IsNullOrEmpty(setupDir))
             return;
-        }
 
-        AuthManager.Print("\n[iSurvey] Dang tai ban " + man.Latest + "...");
-        var progress = new Progress<string>(s => AuthManager.Print("\n[iSurvey] " + s));
-        var staged = UpdateApplyService.DownloadAndStage(man, progress);
-        ActivityLogger.Enqueue("update_download", detail: new
+        var man = result.Manifest;
+        UpdateApplyService.Trace("quit_prepare setup=" + setupDir);
+        ActivityLogger.FlushNow();
+
+        var launched = UpdateApplyService.LaunchHelper(setupDir, man.Latest);
+        var quitDetail = new
         {
             current = AuthManager.AppVersion,
             latest = man.Latest,
-            ok = staged.Ok,
-            message = staged.Message
-        });
-
-        if (!staged.Ok || string.IsNullOrEmpty(staged.SetupDir))
-        {
-            DarkDialog.ShowInfo(
-                "CẬP NHẬT iSurvey",
-                "Không tải được bản mới",
-                rows,
-                note: staged.Message + "\n\nCó thể mở link tải thủ công.");
-            if (DarkDialog.Confirm("CẬP NHẬT iSurvey", "Mở trang tải về để cài thủ công?", "Mở link", "Đóng"))
-                UpdateCheckService.OpenDownload(man);
-            return;
-        }
-
-        if (!DarkDialog.Confirm(
-                "CẬP NHẬT iSurvey",
-                "Đã tải xong bản " + man.Latest + ".\n\nAutoCAD/Civil sẽ THOÁT ngay để hoàn tất cài đặt (tránh khóa file DLL).\nLưu bản vẽ trước nếu cần.\n\nThoát và cài ngay?",
-                "Thoát & cài",
-                "Hủy"))
-        {
-            AuthManager.Print("\n[iSurvey] Da huy cai dat. Ban Setup: " + staged.SetupDir);
-            return;
-        }
-
+            ok = launched.Ok,
+            message = launched.Message,
+            stage = "quit"
+        };
         try
         {
             var access = AuthManager.AcquireAccessToken();
             if (access is not null)
-            {
-                ActivityLogger.SendNow(access, "update_apply", null, new
-                {
-                    current = AuthManager.AppVersion,
-                    latest = man.Latest
-                }, null, CancellationToken.None);
-            }
+                ActivityLogger.SendNow(access, "update_quit", "UPD", quitDetail, null, CancellationToken.None);
+            else
+                ActivityLogger.Enqueue("update_quit", "UPD", quitDetail);
         }
         catch
         {
-            // không chặn cài đặt
+            ActivityLogger.Enqueue("update_quit", "UPD", quitDetail);
         }
 
-        var launched = UpdateApplyService.LaunchInstallerAndQuit(staged.SetupDir!);
+        ActivityLogger.FlushNow();
+
         if (!launched.Ok)
         {
-            DarkDialog.ShowInfo("CẬP NHẬT iSurvey", "Không hoàn tất", note: launched.Message);
+            UpdateApplyService.Trace("helper_fail " + launched.Message);
+            DarkDialog.ShowInfo("CẬP NHẬT iSurvey", "Không chạy được trình cài", note: launched.Message);
             AuthManager.Print("\n[iSurvey] " + launched.Message);
+            return;
+        }
+
+        AuthManager.Print("\n[iSurvey] Dang dong AutoCAD/Civil de cai dat...");
+        try
+        {
+            AcadApp.Quit();
+        }
+        catch (System.Exception ex)
+        {
+            UpdateApplyService.Trace("quit_fail " + ex.Message);
+            ActivityLogger.Enqueue("update_result", "UPD", new
+            {
+                current = AuthManager.AppVersion,
+                latest = man.Latest,
+                ok = false,
+                stage = "quit",
+                message = "Không thoát được AutoCAD: " + ex.Message
+            });
+            DarkDialog.ShowInfo(
+                "CẬP NHẬT iSurvey",
+                "Không thoát được AutoCAD/Civil",
+                note: ex.Message + "\n\nHãy lưu bản vẽ, đóng Civil, rồi chạy lại UPD.");
         }
     }
 

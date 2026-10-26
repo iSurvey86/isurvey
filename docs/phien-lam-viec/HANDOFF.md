@@ -12,6 +12,41 @@
 
 ---
 
+## 2026-10-27 — DANTRANG + sửa UPD (1.8.6)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; phát hành **1.8.6**.
+
+### Đã chốt / đã làm
+
+- **DANTRANG** (`ISURVEY_ROUTE_SHEETS`): một layout `BanDo_Tuyen` lưới khung + viewport xoay; thuật toán cắt mảnh giữ nguyên. `CATTUYEN` vẫn nhận. Hộp thoại: khổ, tỷ lệ (có 1/10000), chồng gối, Hàng/Cột/Cách, kích đúp sửa ô, Ẩn/Thay logo STT 1 và 5, in PDF gộp. User đã xem bản vẽ và hài lòng.
+- **UPD:** đóng hộp thoại rồi mới `Quit` (tránh treo). Helper đợi nhả DLL, cài, ghi `update_result` + `update.log`, mở lại Civil. Hộp thoại: phiên bản hiện tại → mới, tính năng mới, Chi tiết, Cập nhật ngay / Đóng.
+- Không gộp với `DUOITUYEN` (cắt dải 100 m mỗi bên trên Model để dựng mặt cắt dọc).
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Dàn trang | `src/Modules/Frame/FrameService.RouteLayout.cs`, `RouteGeometry.cs`, `RouteLayoutOptions.cs`, `RoutePdfPlot.cs`, `src/UI/Frame/RouteLayoutWindow.*` |
+| Logo | `LogoReplaceService.cs`, `TitleBlockFit.cs` |
+| Cập nhật | `UpdateWindow.*`, `UpdateApplyService.cs`, `AuthModule.cs`, `deploy/Apply-iSurveyUpdate.ps1` |
+
+### Việc tiếp
+
+- [ ] Máy khác: **UPD** lên 1.8.6. Máy còn helper cũ (treo): cài tay zip Setup một lần.
+- [ ] Mở Civil, gõ `UPD`: máy này (đã 1.8.6) báo đã mới nhất.
+- [ ] Alignment Civil làm đầu vào DANTRANG: chưa thử.
+- [ ] Lệnh in PDF riêng khi layout đã có: chưa làm.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff và tiếp tục. iSurvey 1.8.6 đã phát hành: DANTRANG dàn trang in, UPD không treo và ghi kết quả cài. Tiếp: máy khác UPD, hoặc thử Alignment / in PDF riêng.
+```
+
+**Lưu trữ ngày:** [2026-10-27-dantrang-upd.md](./2026-10-27-dantrang-upd.md)
+
+---
+
 ## 2026-10-26 — Ẩn riêng logo khung tên (1.8.5)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; bản **1.8.5** đã lên git, chưa phát hành gói cài.
