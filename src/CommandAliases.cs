@@ -88,6 +88,18 @@ public sealed class CommandAliases
     [CommandMethod("KHUNGBV")]
     public void AliasTechFrame() => _frame.TechFrameCommand();
 
+    [CommandMethod("ANLOGO")]
+    public void AliasToggleLogo() => _frame.ToggleLogoCommand();
+
+    [CommandMethod("ANLOGO1")]
+    public void AliasToggleLogoOwner() => _frame.ToggleLogoOwnerCommand();
+
+    [CommandMethod("ANLOGO2")]
+    public void AliasToggleLogoDesign() => _frame.ToggleLogoDesignCommand();
+
+    [CommandMethod("CODAN")]
+    public void AliasFitTitle() => _frame.FitTitleCommand();
+
     [CommandMethod("AIA")]
     public void AliasAiAssist() => _ai.AssistCommand();
 

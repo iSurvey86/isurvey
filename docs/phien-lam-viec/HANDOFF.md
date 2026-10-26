@@ -12,6 +12,43 @@
 
 ---
 
+## 2026-10-26 — Ẩn riêng logo khung tên (1.8.5)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; bản **1.8.5** đã lên git, chưa phát hành gói cài.
+
+### Đã chốt / đã làm
+
+- **ANLOGO** hỏi bằng số: `1` logo chủ đầu tư, `2` logo đơn vị thiết kế. `ANLOGO1` / `ANLOGO2` không hỏi. Hộp F12 không nhận chữ có dấu cách, nên không đưa «Chủ đầu tư» vào mục chọn.
+- Nét logo nằm trong khối `KB_LOGO_EVN` trên lớp `KB_LOGO_VE`. Lệnh chuyển nét về lớp 0 rồi tách hai hình chèn sang `KB_LOGO_CDT` và `KB_LOGO_TK`. Tắt một lớp không mất logo kia.
+- Đã thử `ANLOGO2` trên bản sao `KhungBanDo_Chuan.dwg` (file tạm, không phải bản vẽ Tuyên Quang): logo EVN ở ô chủ đầu tư còn, logo ở ô đơn vị thiết kế mất.
+- **CODAN** co `CHU_DAU_TU` và `DAI_DIEN_CDT` về một dòng. Chưa nhìn trên bản vẽ Tuyên Quang.
+- DLL 2025 trên máy này là bản có lệnh mới. Máy khác chưa nhận vì chưa phát hành.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Ẩn logo, co chữ | `src/Modules/Frame/TitleBlockFit.cs`, `FrameService.cs`, `CommandAliases.cs` |
+| Nhật ký | `src/Auth/ActivityPhrases.cs` |
+
+### Việc tiếp
+
+- [ ] Mở bản vẽ Tuyên Quang, gõ `ANLOGO2`. Logo đơn vị thiết kế mất, logo EVN ở chủ đầu tư còn.
+- [ ] Gõ `CODAN` nếu tên đại diện chủ đầu tư vẫn hai dòng.
+- [ ] Phát hành 1.8.5 khi được yêu cầu, rồi máy khác dùng **UPD**.
+- [ ] Mở Civil, chạy `ISURVEY_MAP_SAT`, nhấn F12: thấy Xem lướt và Ghép ảnh HD.
+- [ ] Thử D2C trên bản sao file `.dgn`.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff và tiếp tục. iSurvey 1.8.5 đã trên git, chưa phát hành. ANLOGO2 ẩn logo đơn vị thiết kế, logo EVN chủ đầu tư giữ nguyên. Tiếp: mở bản vẽ Tuyên Quang chạy ANLOGO2, hoặc phát hành 1.8.5.
+```
+
+**Lưu trữ ngày:** [2026-10-26-an-logo-khung-ten.md](./2026-10-26-an-logo-khung-ten.md)
+
+---
+
 ## 2026-10-23 — Hộp F12 và nhật ký chi tiết (1.8.4)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; phát hành **1.8.4**. DLL 2025 đã chép vào bundle máy này lúc Civil đóng, trước khi bump số phiên bản trong file; bản phát hành là 1.8.4.

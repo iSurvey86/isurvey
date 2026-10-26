@@ -1,5 +1,11 @@
 # Changelog — iSurvey
 
+## 1.8.5 — 2026-10-26
+
+### Khung tên
+- `ANLOGO` hỏi ẩn logo nào: gõ `1` cho chủ đầu tư, `2` cho đơn vị thiết kế. `ANLOGO1` và `ANLOGO2` làm thẳng việc đó. Hai logo không còn tắt cùng lúc.
+- `CODAN` co chữ ô chủ đầu tư và đại diện chủ đầu tư về một dòng. Ô tên bản vẽ vẫn xuống dòng trong khung.
+
 ## 1.8.4 — 2026-10-23
 
 ### Hộp nhắc F12

@@ -58,6 +58,86 @@ public sealed class FrameService
     [CommandMethod("ISURVEY_KHUNG_BV")]
     public void TechFrameCommand() => Execute(mapMode: false, "ISURVEY_KHUNG_BV");
 
+    /// <summary>Hỏi ẩn logo chủ đầu tư hay logo đơn vị thiết kế. Gõ ANLOGO1 / ANLOGO2 để chọn thẳng.</summary>
+    [CommandMethod("ISURVEY_LOGO")]
+    public void ToggleLogoCommand()
+    {
+        if (!AuthManager.EnsureAuthenticated(track: false))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+        var which = PromptLogo(doc.Editor);
+        if (which is null)
+            return;
+        ApplyLogo(doc, which.Value);
+    }
+
+    [CommandMethod("ISURVEY_LOGO1")]
+    public void ToggleLogoOwnerCommand() => ToggleLogoDirect(owner: true);
+
+    [CommandMethod("ISURVEY_LOGO2")]
+    public void ToggleLogoDesignCommand() => ToggleLogoDirect(owner: false);
+
+    private static void ToggleLogoDirect(bool owner)
+    {
+        if (!AuthManager.EnsureAuthenticated(track: false))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+        ApplyLogo(doc, owner);
+    }
+
+    private static bool? PromptLogo(Editor ed)
+    {
+        var opts = new PromptKeywordOptions("\niSurvey: 1 logo chủ đầu tư, 2 logo đơn vị thiết kế")
+        {
+            AllowNone = true,
+            AppendKeywordsToMessage = true
+        };
+        opts.Keywords.Add("1", "1", "1");
+        opts.Keywords.Add("2", "2", "2");
+        var res = ed.GetKeywords(opts);
+        if (res.Status != PromptStatus.OK)
+            return null;
+        return res.StringResult == "1";
+    }
+
+    private static void ApplyLogo(Document doc, bool owner)
+    {
+        var ed = doc.Editor;
+        using var _ = doc.LockDocument();
+        using var tr = doc.Database.TransactionManager.StartTransaction();
+        var split = TitleBlockFit.SeparateLogos(tr, doc.Database);
+        if (split.Count == 0)
+        {
+            ed.WriteMessage("\n[iSurvey] Bản vẽ này không có logo EVN trong khung tên.");
+            return;
+        }
+
+        var note = TitleBlockFit.ToggleLogoLayer(tr, doc.Database, owner, split.ReleasedSharedLayer);
+        tr.Commit();
+        ed.Regen();
+        ed.WriteMessage($"\n[iSurvey] {note}. Gõ lại ANLOGO và chọn cùng mục để đổi lại.");
+        ActivityLogger.Result("ISURVEY_LOGO", note);
+    }
+
+    /// <summary>Co ô chủ đầu tư về một dòng cho khung đã chèn trong bản vẽ này.</summary>
+    [CommandMethod("ISURVEY_FIT_TITLE")]
+    public void FitTitleCommand()
+    {
+        if (!AuthManager.EnsureAuthenticated(track: false))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+        var n = TitleBlockFit.FitDocument(doc);
+        doc.Editor.WriteMessage(n > 0
+            ? $"\n[iSurvey] Đã co {n} ô chủ đầu tư về một dòng."
+            : "\n[iSurvey] Không có ô chủ đầu tư nào cần co.");
+    }
+
     private static void Execute(bool mapMode, string commandName)
     {
         if (!AuthManager.EnsureAuthenticated(track: false))
@@ -271,6 +351,7 @@ public sealed class FrameService
             ar.TextString = AttributeText(ad.Tag, ad.TextString, scaleN);
             br.AttributeCollection.AppendAttribute(ar);
             tr.AddNewlyCreatedDBObject(ar, true);
+            TitleBlockFit.Fit(tr, ar, br);
         }
 
         var made = new ObjectIdCollection { br.ObjectId };

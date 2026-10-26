@@ -49,6 +49,7 @@ public sealed class Main : IExtensionApplication
         _exportModule = new ExportModule();
         _exportModule.Initialize();
         RibbonBuilder.EnsureRibbon();
+        TitleBlockFit.Watch();
 
         // FILEDIA/CMDDIA = 0 (do script/lệnh khác bỏ quên) làm hộp thoại không mở được → báo và đặt lại 1 (một lần, lúc rảnh).
         Autodesk.AutoCAD.ApplicationServices.Application.Idle += OnFirstIdle;

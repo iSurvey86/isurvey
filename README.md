@@ -2,7 +2,7 @@
 
 Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), nhập và xuất **KML/KMZ**, cắt bình đồ theo biên (`CATBD`), quét cấu trúc bản vẽ (`AUTOSCAN`). Các lệnh nghiệp vụ khóa cho tới khi kích hoạt bằng Gmail + mã OTP.
 
-**Phiên bản bundle:** `1.8.4` (`deploy/iSurvey.bundle/PackageContents.xml`)
+**Phiên bản bundle:** `1.8.5` (`deploy/iSurvey.bundle/PackageContents.xml`)
 
 **Đồng bộ phiên làm việc (Cursor / đa máy):** đọc [docs/phien-lam-viec/HANDOFF.md](docs/phien-lam-viec/HANDOFF.md). Quy tắc cuối phiên: [docs/phien-lam-viec/README.md](docs/phien-lam-viec/README.md). Changelog: [docs/changelog/CHANGELOG.md](docs/changelog/CHANGELOG.md).
 
@@ -41,6 +41,8 @@ Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georefere
 | `ISURVEY_STRIP_MAP` | **DUOITUYEN** | Duỗi thẳng dải bản đồ dọc tuyến: chọn tim tuyến (click chỗ nào cũng được) + bắt buộc chọn điểm đầu (DD, G1…Gn, DC); cắt dải chữ nhật liền mạch; xuất bảng góc `.txt` (`Tên Điểm,X,Y,Khoảng Cách Cạnh Trước,Góc Rẽ` với `P/T độ phút giây`, X/Y 2 số lẻ) |
 | `ISURVEY_KHUNG` | **KHUNG** | Chèn **khung bản đồ** chuẩn TCVN 7285:2003 (ISO 5457) khổ A0–A4, tỷ lệ 1/200…1/5000: khung tên (ô DỰ ÁN mặc định «Đường dây và TBA 110KV KCN Minh Châu», logo EVN NPC vector), lưới tọa độ theo tọa độ CAD, mũi tên Bắc, thước tỷ lệ. Xoay: không / góc / theo tuyến |
 | `ISURVEY_KHUNG_BV` | **KHUNGBV** | Chèn **khung bản vẽ kỹ thuật** (cùng khung tên, không lưới tọa độ). Mẫu: `Contents\Templates\KhungBanDo_Chuan.dwg`; ghi đè bằng `%AppData%\iSurvey\KhungBanDo.dwg` |
+| `ISURVEY_LOGO` | **ANLOGO** | Ẩn hoặc hiện một logo trên khung tên. Gõ `1` logo chủ đầu tư, `2` logo đơn vị thiết kế. `ANLOGO1` và `ANLOGO2` chọn thẳng, không hỏi |
+| `ISURVEY_FIT_TITLE` | **CODAN** | Co ô chủ đầu tư và đại diện chủ đầu tư về một dòng. Ô tên bản vẽ vẫn xuống dòng trong khung |
 | `ISURVEY_AI_ASSIST` | **AIA** | Trợ lý AI điều khiển Civil/CAD bằng Command Line (**chỉ Admin**, thử nghiệm). Xem [docs/Huong_dan_Tro_ly_AI.md](docs/Huong_dan_Tro_ly_AI.md) |
 
 Catalog đầy đủ: [docs/Danh_sach_lenh_iSurvey.xlsx](docs/Danh_sach_lenh_iSurvey.xlsx). Supabase: [docs/Huong_dan_Supabase.md](docs/Huong_dan_Supabase.md). Phát hành Setup/update: [docs/Huong_dan_Phat_hanh.md](docs/Huong_dan_Phat_hanh.md). Admin nhật ký (ksnpsc): [docs/Huong_dan_Admin_ksnpsc.md](docs/Huong_dan_Admin_ksnpsc.md).

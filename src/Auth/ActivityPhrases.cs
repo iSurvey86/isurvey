@@ -69,6 +69,20 @@ internal static class ActivityPhrases
         ["ISURVEY_KHUNG_BV"] = "KHUNGBV (chèn khung bản vẽ kỹ thuật)",
         ["KHUNGBV"] = "KHUNGBV (chèn khung bản vẽ kỹ thuật)",
 
+        ["ToggleLogoCommand"] = "ANLOGO (ẩn hoặc hiện logo EVN)",
+        ["ISURVEY_LOGO"] = "ANLOGO (ẩn hoặc hiện logo EVN)",
+        ["ANLOGO"] = "ANLOGO (ẩn hoặc hiện logo EVN)",
+        ["ToggleLogoOwnerCommand"] = "ANLOGO1 (ẩn hoặc hiện logo chủ đầu tư)",
+        ["ISURVEY_LOGO1"] = "ANLOGO1 (ẩn hoặc hiện logo chủ đầu tư)",
+        ["ANLOGO1"] = "ANLOGO1 (ẩn hoặc hiện logo chủ đầu tư)",
+        ["ToggleLogoDesignCommand"] = "ANLOGO2 (ẩn hoặc hiện logo đơn vị thiết kế)",
+        ["ISURVEY_LOGO2"] = "ANLOGO2 (ẩn hoặc hiện logo đơn vị thiết kế)",
+        ["ANLOGO2"] = "ANLOGO2 (ẩn hoặc hiện logo đơn vị thiết kế)",
+
+        ["FitTitleCommand"] = "CODAN (co chữ chủ đầu tư về một dòng)",
+        ["ISURVEY_FIT_TITLE"] = "CODAN (co chữ chủ đầu tư về một dòng)",
+        ["CODAN"] = "CODAN (co chữ chủ đầu tư về một dòng)",
+
         ["NumberVerticesCommand"] = "GOC (đánh số góc tuyến)",
         ["ISURVEY_NUMBER_VERTICES"] = "GOC (đánh số góc tuyến)",
         ["GOC"] = "GOC (đánh số góc tuyến)",
