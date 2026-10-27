@@ -11,7 +11,9 @@ public enum RecheckAction
     /// <summary>Kết quả không rõ ràng nhưng refresh token đã bị đổi: chỉ lưu token mới, KHÔNG gia hạn.</summary>
     RotateOnly,
     /// <summary>Server trả rõ ràng thiết bị bị khóa (is_active=false) hoặc không còn đăng ký → khóa lại.</summary>
-    Revoke
+    Revoke,
+    /// <summary>Admin cắt phiên trên máy này. Xóa giấy phép cục bộ, không xóa suất thiết bị — đăng nhập lại được.</summary>
+    Logout
 }
 
 public sealed record RecheckOutcome(RecheckAction Action, string? NewRefreshToken = null);
@@ -52,6 +54,7 @@ public static class LicenseRechecker
             {
                 DeviceStatus.Ok => new RecheckOutcome(RecheckAction.Verified, rotated),
                 DeviceStatus.Blocked or DeviceStatus.NotRegistered => new RecheckOutcome(RecheckAction.Revoke),
+                DeviceStatus.Logout => new RecheckOutcome(RecheckAction.Logout),
                 _ => new RecheckOutcome(RecheckAction.RotateOnly, rotated)
             };
         }
@@ -69,7 +72,7 @@ public static class LicenseRechecker
         {
             RecheckAction.Verified => current with { LastVerifiedAt = now, RefreshToken = outcome.NewRefreshToken },
             RecheckAction.RotateOnly => current with { RefreshToken = outcome.NewRefreshToken },
-            RecheckAction.Revoke => null,
+            RecheckAction.Revoke or RecheckAction.Logout => null,
             _ => current
         };
 }

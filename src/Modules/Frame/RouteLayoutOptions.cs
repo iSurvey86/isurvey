@@ -55,7 +55,10 @@ public sealed class RouteLayoutOptions
     public int Rows { get; set; } = 1;
     public int Cols { get; set; } = 1;
     public double GapMm { get; set; } = 20;
-    public bool PlotPdf { get; set; } = true;
+    public bool PlotPdf { get; set; }
+
+    /// <summary>File DWG chữ ký theo tag TEN_1 … TEN_5.</summary>
+    public Dictionary<string, string> Signatures { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>Giá trị ô khung tên theo tag (đã gồm giá trị mặc định của khung mẫu).</summary>
     public Dictionary<string, string> Attributes { get; set; } = new(StringComparer.OrdinalIgnoreCase);
@@ -78,7 +81,7 @@ public sealed class RouteLayoutSettings
     public int Scale { get; set; } = 1000;
     public double OverlapM { get; set; } = -1;
     public double GapMm { get; set; } = 20;
-    public bool PlotPdf { get; set; } = true;
+    public bool PlotPdf { get; set; }
 
     /// <summary>Chỉ các ô người dùng đã sửa khác mặc định của khung mẫu.</summary>
     public Dictionary<string, string> Attributes { get; set; } = new(StringComparer.OrdinalIgnoreCase);

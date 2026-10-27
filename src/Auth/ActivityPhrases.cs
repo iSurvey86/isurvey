@@ -85,6 +85,9 @@ internal static class ActivityPhrases
         ["CATTUYEN"] = "DANTRANG (dàn trang in dọc tuyến)",
         ["RouteLayoutQuickCommand"] = "DANTRANG (không hộp thoại)",
         ["ISURVEY_ROUTE_SHEETS_QUICK"] = "DANTRANG (không hộp thoại)",
+        ["RoutePlotCommand"] = "INTUYEN (in lại layout dàn trang)",
+        ["ISURVEY_ROUTE_PLOT"] = "INTUYEN (in lại layout dàn trang)",
+        ["INTUYEN"] = "INTUYEN (in lại layout dàn trang)",
 
         ["ReplaceLogoCommand"] = "THAYLOGO (thay logo khung tên bằng ảnh)",
         ["ISURVEY_LOGO_REPLACE"] = "THAYLOGO (thay logo khung tên bằng ảnh)",

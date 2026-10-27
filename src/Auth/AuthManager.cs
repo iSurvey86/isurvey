@@ -18,12 +18,18 @@ public static class AuthManager
     /// <summary>Tổng thời gian tối đa cho cả chuỗi refresh + check (timeout ngắn, không làm phiền người dùng).</summary>
     private static readonly TimeSpan RecheckTimeout = TimeSpan.FromSeconds(5);
 
+    /// <summary>Hỏi server xem admin có cắt phiên không. Không cập nhật mốc "lần thấy".</summary>
+    private static readonly TimeSpan SessionWatchInterval = TimeSpan.FromMinutes(2);
+
     private static readonly LicenseStorage Storage = new();
     private static LicenseInfo? _license;
     private static OtpAuthService? _otp;
     private static Dispatcher? _ui;
     private static bool _expiredNotice;
     private static int _rechecking;
+    private static int _watching;
+    private static int _watchStarted;
+    private static System.Threading.Timer? _sessionWatch;
 
     // ---------- Token Supabase dùng chung (nhật ký + kiểm tra định kỳ) ----------
     // Supabase đổi refresh token mỗi lần dùng → mọi nơi gọi RefreshAsync phải đi qua TokenGate
@@ -308,6 +314,8 @@ public static class AuthManager
     /// </summary>
     public static void StartBackgroundRecheck()
     {
+        StartSessionWatch();
+
         var snapshot = _license;
         if (snapshot is null || snapshot.Mode != LicenseMode.Online || string.IsNullOrEmpty(snapshot.RefreshToken))
             return;
@@ -391,7 +399,26 @@ public static class AuthManager
 
             ClearAccessToken();
             RaiseChanged();
-            Print("\n[iSurvey] Giay phep tren may nay da bi Admin thu hoi hoac khong con hieu luc. Cac tinh nang da bi khoa.");
+            if (outcome.Action == RecheckAction.Logout)
+            {
+                Print("\n[iSurvey] Admin da dang xuat phien tren may nay. Hay dang nhap lai.");
+                try
+                {
+                    UI.Account.DarkDialog.ShowInfo(
+                        "ĐĂNG XUẤT",
+                        "Admin đã đăng xuất phiên trên máy này",
+                        note: "Máy không bị khóa. Hãy đăng nhập lại để dùng tiếp.");
+                }
+                catch (System.Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("[iSurvey] Hop thoai dang xuat: " + ex.Message);
+                }
+            }
+            else
+            {
+                Print("\n[iSurvey] Giay phep tren may nay da bi Admin thu hoi hoac khong con hieu luc. Cac tinh nang da bi khoa.");
+            }
+
             return;
         }
 
@@ -412,6 +439,86 @@ public static class AuthManager
         catch (System.Exception ex)
         {
             System.Diagnostics.Debug.WriteLine("[iSurvey] Luu giay phep: " + ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Trong lúc Civil mở: khoảng 2 phút một lần hỏi cờ đăng xuất / khóa.
+    /// Chạy cả khi lúc mở Civil chưa đăng nhập, để phiên đăng nhập sau đó vẫn bị cắt được.
+    /// </summary>
+    private static void StartSessionWatch()
+    {
+        if (Interlocked.Exchange(ref _watchStarted, 1) == 1)
+            return;
+
+        _sessionWatch = new System.Threading.Timer(
+            _ => { _ = WatchSessionAsync(); },
+            null,
+            TimeSpan.FromSeconds(20),
+            SessionWatchInterval);
+    }
+
+    private static async Task WatchSessionAsync()
+    {
+        if (Interlocked.Exchange(ref _watching, 1) == 1)
+            return;
+
+        try
+        {
+            var lic = _license;
+            if (lic is not { Mode: LicenseMode.Online } || string.IsNullOrEmpty(lic.RefreshToken))
+                return;
+
+            var config = AuthConfig.Load();
+            if (!config.HasSupabase)
+                return;
+
+            var access = AcquireAccessToken();
+            if (access is null)
+                return;
+
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(8));
+            var check = await new SupabaseAuthClient(config)
+                .CheckAsync(access, lic.HardwareId, cts.Token, touch: false)
+                .ConfigureAwait(false);
+            if (!check.Result.Ok)
+                return;
+
+            var action = check.Status switch
+            {
+                DeviceStatus.Logout => RecheckAction.Logout,
+                DeviceStatus.Blocked or DeviceStatus.NotRegistered => RecheckAction.Revoke,
+                _ => (RecheckAction?)null
+            };
+            if (action is null)
+                return;
+
+            var current = _license;
+            if (current is null || current.Email != lic.Email || current.HardwareId != lic.HardwareId)
+                return;
+
+            if (action == RecheckAction.Logout)
+            {
+                try
+                {
+                    ActivityLogger.SendNow(access, "remote_logout", null,
+                        new { email = lic.Email }, lic.HardwareId, CancellationToken.None);
+                }
+                catch
+                {
+                    // Nhật ký không chặn việc cắt phiên.
+                }
+            }
+
+            PostToUi(() => ApplyRecheck(lic, new RecheckOutcome(action.Value), DateTimeOffset.Now));
+        }
+        catch (System.Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine("[iSurvey] Session watch: " + ex.Message);
+        }
+        finally
+        {
+            Interlocked.Exchange(ref _watching, 0);
         }
     }
 

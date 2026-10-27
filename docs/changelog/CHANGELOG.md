@@ -1,5 +1,20 @@
 # Changelog — iSurvey
 
+## 1.8.7 — 2026-10-27
+
+### Dàn trang in
+- Hộp DANTRANG chia hai cột: khổ giấy / tỷ lệ / chồng gối, và Hàng / Cột / Cách.
+- **Nhập TXT/CSV**: mỗi dòng `MÃ;nội dung` (hoặc tab, hoặc dấu phẩy đầu tiên). Bỏ dòng `#` và `//`. Không nhập ô Tờ và Tỷ lệ vì hai ô đó tự điền.
+- Khi chọn Họ tên 1–5 có nút **Chèn chữ ký**. File DWG được đặt vào ô trống bên phải tên, trên mọi tờ.
+- Sau khi tạo layout có hộp “Dàn trang in đã xong”, kèm tên layout, số tờ, và đường PDF nếu có in.
+- Tên PDF gợi ý: `tên bản vẽ-yyyyMMdd-HHmm.pdf`.
+- **INTUYEN** in lại layout `BanDo_Tuyen` đã có, không dựng trang mới. Nhiều layout thì chọn bằng số `1`, `2`, …
+- Hỏi ghi đè layout cũng bằng số `1` / `2`, để bấm chọn không bị gãy vì dấu cách.
+
+### Đăng xuất từ xa
+- Admin bật cờ trên máy (không khóa). Bản này hỏi khoảng mỗi 2 phút. Có cờ thì xóa giấy phép trên máy và bảo đăng nhập lại. Suất thiết bị vẫn giữ.
+- Bản 1.8.6 trở xuống không nghe cờ này.
+
 ## 1.8.6 — 2026-10-27
 
 ### Dàn trang in (DANTRANG)

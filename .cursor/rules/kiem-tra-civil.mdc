@@ -1,0 +1,13 @@
+---
+description: Trước khi xong việc đụng lệnh hoặc giao diện CAD, tự mở Civil để kiểm tra
+alwaysApply: true
+---
+
+# Kiểm tra trên Civil trước khi hoàn thành
+
+Khi sửa lệnh, hộp thoại, hoặc cách bản vẽ hiện ra trong AutoCAD / Civil 3D, tự mở Civil và kiểm tra trước khi báo xong. Không chờ người dùng nhắc.
+
+- Chỉ thử trên bản sao hoặc bản vẽ mới. Không ghi đè file gốc của người dùng.
+- Civil đang mở và đang khóa DLL thì đóng bản vẽ trắng (không lưu) rồi mở lại sau khi chép DLL. Không tắt bản vẽ người dùng đang sửa nếu chưa được bảo.
+- Chạy đúng lệnh vừa sửa, nhìn kết quả trên màn hình (hộp thoại hoặc bản vẽ), rồi mới kết luận.
+- Không mở được Civil thì nói rõ phần nào chưa nhìn thấy.

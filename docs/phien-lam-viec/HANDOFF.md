@@ -12,6 +12,41 @@
 
 ---
 
+## 2026-10-27 — DANTRANG hộp thoại + đăng xuất từ xa (1.8.7)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; phát hành **1.8.7**. SQL đăng xuất từ xa đã chạy trên Supabase (lần đầu lỗi view, chạy lại thì Success).
+
+### Đã chốt / đã làm
+
+- **DANTRANG:** hai cột khổ giấy và lưới. Nhập TXT/CSV (`MÃ;nội dung`). Nút **Chèn chữ ký** trên Họ tên 1–5, đặt nét vào ô trống bên phải tên. Hộp “Dàn trang in đã xong”. Tên PDF `tên bản vẽ-yyyyMMdd-HHmm`. Tick in PDF tắt sẵn. Đã xem trên bản vẽ trắng `Drawing1`, đóng không lưu. Không mở bản vẽ tuyến.
+- **INTUYEN:** in lại layout `BanDo_Tuyen` đã có. Hộp lưu PDF hiện tên đúng; đã Cancel, không ghi file. Nhiều layout thì chọn bằng số `1`, `2`. Ghi đè layout cũng bằng `1` / `2`.
+- **Đăng xuất từ xa:** khác với Khóa. Cờ `force_logout` trên `isurvey_licenses`. Plugin 1.8.7 hỏi khoảng mỗi 2 phút, xóa giấy phép cục bộ, không trả suất máy. Đăng nhập lại thì xóa cờ. Nút **Đăng xuất** nằm ở ksnpsc (commit riêng repo đó). Bản 1.8.6 không nghe cờ.
+- Quy tắc Cursor: tự mở Civil kiểm tra trước khi xong (`.cursor/rules/kiem-tra-civil.mdc`).
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Dàn trang | `src/UI/Frame/RouteLayoutWindow.*`, `src/Modules/Frame/FrameService.RouteLayout.cs`, `RouteLayoutOptions.cs` |
+| Đăng xuất từ xa | `src/Auth/AuthManager.cs`, `LicenseRechecker.cs`, `SupabaseAuthClient.cs`, `deploy/supabase/schema_force_logout.sql` |
+| Trang quản trị | repo `ksnpsc`: `IsurveyAdminPanel.js`, `api/isurvey/licenses/route.js` |
+
+### Việc tiếp
+
+- [ ] Máy này và máy khác: **UPD** lên 1.8.7. Máy còn helper cũ: cài tay zip một lần.
+- [ ] Trang quản trị: sau khi ksnpsc lên Vercel, tab Thiết bị có nút Đăng xuất. Thử trên một máy đã UPD, không thử trên bản vẽ đang làm.
+- [ ] Alignment Civil làm đầu vào DANTRANG: chưa thử.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff và tiếp tục. iSurvey 1.8.7 đã phát hành: DANTRANG nhập khung tên và chữ ký, INTUYEN in lại layout, đăng xuất từ xa. SQL đã chạy. Tiếp: UPD các máy, hoặc thử nút Đăng xuất trên trang quản trị.
+```
+
+**Lưu trữ ngày:** [2026-10-27-dantrang-dang-xuat.md](./2026-10-27-dantrang-dang-xuat.md)
+
+---
+
 ## 2026-10-27 — DANTRANG + sửa UPD (1.8.6)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; phát hành **1.8.6**.

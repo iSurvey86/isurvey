@@ -80,6 +80,7 @@ public partial class RouteLayoutWindow : Window
     private string? _logoDesign;
     private bool _hideOwner;
     private bool _hideDesign;
+    private readonly Dictionary<string, string> _signatures = new(StringComparer.OrdinalIgnoreCase);
     private bool _allowEdit;
 
     public RouteLayoutWindow(RouteLayoutDialogInput input)
@@ -245,6 +246,7 @@ public partial class RouteLayoutWindow : Window
             ContentLabel.Text = "Nội dung:";
             ContentBox.Text = "";
             ContentBox.IsEnabled = false;
+            SignPanel.Visibility = Visibility.Collapsed;
             LogoPanel.Visibility = Visibility.Collapsed;
         }
         else
@@ -252,6 +254,10 @@ public partial class RouteLayoutWindow : Window
             ContentLabel.Text = $"Nội dung ({row.Stt}. {row.Label}):";
             ContentBox.Text = row.Field.Auto ? "Tự động: số thứ tự tờ / tổng số tờ (ví dụ 3/9)" : row.Value;
             ContentBox.IsEnabled = !row.Field.Auto;
+            var sign = IsSignRow(row);
+            SignPanel.Visibility = sign ? Visibility.Visible : Visibility.Collapsed;
+            if (sign)
+                SignClearButton.Visibility = _signatures.ContainsKey(row.Field.Tag) ? Visibility.Visible : Visibility.Collapsed;
             LogoPanel.Visibility = row.Stt is 1 or 5 ? Visibility.Visible : Visibility.Collapsed;
             if (row.Stt is 1 or 5)
             {
@@ -451,7 +457,117 @@ public partial class RouteLayoutWindow : Window
             parts.Add("logo đơn vị thiết kế: ẨN");
         else if (_logoDesign is not null)
             parts.Add("logo đơn vị thiết kế: thay bằng " + System.IO.Path.GetFileName(_logoDesign));
+        foreach (var kv in _signatures)
+            parts.Add("chữ ký " + kv.Key + ": " + System.IO.Path.GetFileName(kv.Value));
         LogoNote.Text = parts.Count == 0 ? "" : string.Join("; ", parts) + " (áp dụng khi bấm Tạo Layout).";
+    }
+
+    private static bool IsSignRow(FieldRow row) =>
+        row.Field.Tag.StartsWith("TEN_", StringComparison.OrdinalIgnoreCase)
+        && row.Field.Tag.Length == 5
+        && row.Field.Tag[4] is >= '1' and <= '5';
+
+    private void Import_Click(object sender, RoutedEventArgs e)
+    {
+        using var dlg = new System.Windows.Forms.OpenFileDialog
+        {
+            Title = "Nhập thông tin khung tên",
+            Filter = "TXT hoặc CSV (*.txt;*.csv)|*.txt;*.csv|Tất cả (*.*)|*.*",
+            CheckFileExists = true
+        };
+        if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+            return;
+
+        string[] lines;
+        try
+        {
+            lines = System.IO.File.ReadAllLines(dlg.FileName);
+        }
+        catch (System.Exception ex)
+        {
+            System.Windows.MessageBox.Show(this, "Không đọc được file: " + ex.Message, "iSurvey", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var filled = 0;
+        var skipped = 0;
+        foreach (var raw in lines)
+        {
+            var line = raw.Trim();
+            if (line.Length == 0 || line.StartsWith('#') || line.StartsWith("//"))
+                continue;
+            if (!SplitField(line, out var key, out var value))
+            {
+                skipped++;
+                continue;
+            }
+
+            var row = FindRow(key);
+            if (row is null || row.Field.Auto)
+            {
+                skipped++;
+                continue;
+            }
+
+            row.Value = FrameFields.Clean(value);
+            filled++;
+        }
+
+        UpdateContentEditor();
+        System.Windows.MessageBox.Show(this, $"Đã điền {filled} ô." + (skipped > 0 ? $" Bỏ qua {skipped} dòng." : ""), "iSurvey", MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
+    private FieldRow? FindRow(string key)
+    {
+        if (int.TryParse(key, NumberStyles.Integer, CultureInfo.InvariantCulture, out var stt))
+            return _rows.FirstOrDefault(r => r.Stt == stt);
+        return _rows.FirstOrDefault(r =>
+            r.Field.Tag.Equals(key, StringComparison.OrdinalIgnoreCase)
+            || r.Label.Equals(key, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static bool SplitField(string line, out string key, out string value)
+    {
+        key = "";
+        value = "";
+        var cut = line.IndexOf(';');
+        if (cut < 0)
+            cut = line.IndexOf('\t');
+        if (cut < 0)
+            cut = line.IndexOf(',');
+        if (cut <= 0 || cut >= line.Length - 1)
+            return false;
+        key = line[..cut].Trim().Trim('"');
+        value = line[(cut + 1)..].Trim().Trim('"');
+        return key.Length > 0;
+    }
+
+    private void Sign_Click(object sender, RoutedEventArgs e)
+    {
+        var row = Selected;
+        if (row is null || !IsSignRow(row))
+            return;
+        using var dlg = new System.Windows.Forms.OpenFileDialog
+        {
+            Title = "Chọn bản vẽ chữ ký cho " + row.Label,
+            Filter = "Bản vẽ chữ ký (*.dwg)|*.dwg",
+            CheckFileExists = true
+        };
+        if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+            return;
+        _signatures[row.Field.Tag] = dlg.FileName;
+        UpdateLogoNote();
+        UpdateContentEditor();
+    }
+
+    private void SignClear_Click(object sender, RoutedEventArgs e)
+    {
+        var row = Selected;
+        if (row is null)
+            return;
+        _signatures.Remove(row.Field.Tag);
+        UpdateLogoNote();
+        UpdateContentEditor();
     }
     // ---- Nút ----
     private void Cancel_Click(object sender, RoutedEventArgs e)
@@ -500,7 +616,8 @@ public partial class RouteLayoutWindow : Window
             LogoOwnerPath = _logoOwner,
             LogoDesignPath = _logoDesign,
             HideOwnerLogo = _hideOwner,
-            HideDesignLogo = _hideDesign
+            HideDesignLogo = _hideDesign,
+            Signatures = new Dictionary<string, string>(_signatures, StringComparer.OrdinalIgnoreCase)
         };
         Close();
     }

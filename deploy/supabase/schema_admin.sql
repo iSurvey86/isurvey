@@ -3,8 +3,11 @@
 -- Chạy sau schema.sql + schema_activity.sql. Có thể chạy lại.
 -- =====================================================================
 
--- Máy / giấy phép đang active (toàn bộ đăng ký còn hiệu lực)
-create or replace view public.isurvey_v_devices as
+-- Máy / giấy phép đang active (toàn bộ đăng ký còn hiệu lực).
+-- Xóa rồi tạo lại: CREATE OR REPLACE không cho chèn cột force_logout vào giữa view cũ.
+drop view if exists public.isurvey_v_devices;
+
+create view public.isurvey_v_devices as
 select
   id,
   email,
@@ -12,6 +15,7 @@ select
   machine_name,
   app_version,
   is_active,
+  force_logout,
   activated_at,
   last_login_at,
   note,

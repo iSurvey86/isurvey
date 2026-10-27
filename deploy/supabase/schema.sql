@@ -17,6 +17,7 @@ create table if not exists public.isurvey_licenses (
   machine_name  text,
   app_version   text,
   is_active     boolean not null default true,      -- Admin đặt false để khóa/thu hồi thiết bị
+  force_logout  boolean not null default false,     -- Admin bật để cắt phiên hiện tại; đăng nhập lại thì xóa
   activated_at  timestamptz not null default now(),
   last_login_at timestamptz not null default now(),
   note          text,
@@ -25,6 +26,10 @@ create table if not exists public.isurvey_licenses (
 
 create index if not exists isurvey_licenses_user_id_idx on public.isurvey_licenses (user_id);
 create index if not exists isurvey_licenses_email_idx   on public.isurvey_licenses (email);
+
+-- Bảng đã tạo trước khi có đăng xuất từ xa: thêm cột, không đụng dữ liệu cũ.
+alter table public.isurvey_licenses
+  add column if not exists force_logout boolean not null default false;
 
 alter table public.isurvey_licenses enable row level security;
 
@@ -88,7 +93,8 @@ begin
        set user_id       = v_uid,
            machine_name  = coalesce(left(p_machine_name, 120), machine_name),
            app_version   = coalesce(left(p_app_version, 40), app_version),
-           last_login_at = now()
+           last_login_at = now(),
+           force_logout  = false
      where id = v_row.id;
 
     select count(*) into v_count from public.isurvey_licenses where email = v_email;
@@ -112,10 +118,15 @@ end;
 $$;
 
 -- ---------------------------------------------------------------------
--- isurvey_check: kiểm tra định kỳ (client gọi nền sau mỗi 24 giờ).
--- Trả: ok | blocked | not_registered | unauthenticated. KHÔNG tự đăng ký thiết bị.
+-- isurvey_check: kiểm tra định kỳ và khi admin đăng xuất từ xa.
+-- Trả: ok | blocked | logout | not_registered | unauthenticated. KHÔNG tự đăng ký thiết bị.
+-- p_touch: bản 24 giờ cập nhật last_login_at. Lần hỏi nhanh (khoảng 2 phút) truyền false
+-- để không biến "lần thấy" thành nhịp hỏi.
+-- Chữ ký cũ (1 tham số) phải xóa trước: thêm tham số mặc định là overload mới, không phải replace.
 -- ---------------------------------------------------------------------
-create or replace function public.isurvey_check(p_hwid text)
+drop function if exists public.isurvey_check(text);
+
+create or replace function public.isurvey_check(p_hwid text, p_touch boolean default true)
 returns jsonb
 language plpgsql
 security definer
@@ -142,7 +153,14 @@ begin
     return jsonb_build_object('status', 'blocked', 'is_active', false);
   end if;
 
-  update public.isurvey_licenses set last_login_at = now() where id = v_row.id;
+  if v_row.force_logout then
+    return jsonb_build_object('status', 'logout', 'is_active', true);
+  end if;
+
+  if p_touch then
+    update public.isurvey_licenses set last_login_at = now() where id = v_row.id;
+  end if;
+
   return jsonb_build_object('status', 'ok', 'is_active', true);
 end;
 $$;
@@ -179,10 +197,10 @@ $$;
 
 -- Chỉ người đã đăng nhập (authenticated) gọi được các hàm.
 revoke all on function public.isurvey_activate(text, text, text)  from public, anon;
-revoke all on function public.isurvey_check(text)                 from public, anon;
+revoke all on function public.isurvey_check(text, boolean)        from public, anon;
 revoke all on function public.isurvey_release_device(text)        from public, anon;
 grant execute on function public.isurvey_activate(text, text, text) to authenticated;
-grant execute on function public.isurvey_check(text)                to authenticated;
+grant execute on function public.isurvey_check(text, boolean)       to authenticated;
 grant execute on function public.isurvey_release_device(text)       to authenticated;
 
 -- Nhật ký hoạt động (login / lệnh / update): chạy thêm schema_activity.sql

@@ -105,6 +105,9 @@ public sealed class CommandAliases
     [CommandMethod("CATTUYEN")]
     public void AliasRouteLayoutOld() => _frame.RouteLayoutCommand();
 
+    [CommandMethod("INTUYEN")]
+    public void AliasRoutePlot() => _frame.RoutePlotCommand();
+
     [CommandMethod("THAYLOGO")]
     public void AliasReplaceLogo() => _frame.ReplaceLogoCommand();
 

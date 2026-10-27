@@ -32,6 +32,26 @@ public sealed partial class FrameService
     [CommandMethod("ISURVEY_ROUTE_SHEETS_QUICK")]
     public void RouteLayoutQuickCommand() => RunRouteLayout(withDialog: false, "ISURVEY_ROUTE_SHEETS_QUICK");
 
+    /// <summary>In lại layout BanDo_Tuyen đã có, không dựng trang mới.</summary>
+    [CommandMethod("ISURVEY_ROUTE_PLOT")]
+    public void RoutePlotCommand()
+    {
+        if (!AuthManager.EnsureAuthenticated(track: false))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+        try
+        {
+            PlotExistingRoute(doc);
+        }
+        catch (System.Exception ex)
+        {
+            ActivityLogger.TrackError(ex, "ISURVEY_ROUTE_PLOT");
+            doc.Editor.WriteMessage($"\n[iSurvey] In layout lỗi: {ex.Message}");
+        }
+    }
+
     private static void RunRouteLayout(bool withDialog, string commandName)
     {
         if (!AuthManager.EnsureAuthenticated(track: false))
@@ -107,7 +127,7 @@ public sealed partial class FrameService
             Scale = scaleN,
             OverlapM = overlapM,
             GapMm = settings.GapMm,
-            PlotPdf = settings.PlotPdf,
+            PlotPdf = false,
             Attributes = attrs,
             HideOwnerLogo = TitleBlockFit.IsLogoHidden(db, owner: true),
             HideDesignLogo = TitleBlockFit.IsLogoHidden(db, owner: false)
@@ -173,14 +193,14 @@ public sealed partial class FrameService
         {
             if (withDialog)
             {
-                var pk = new PromptKeywordOptions($"\niSurvey: Layout {layoutName} đã có. Ghi đè hay tạo layout mới?")
+                var pk = new PromptKeywordOptions($"\niSurvey: Layout {layoutName} đã có. Gõ 1 để ghi đè, 2 để tạo layout mới")
                 {
                     AllowNone = true,
                     AppendKeywordsToMessage = true
                 };
-                pk.Keywords.Add("Ghide", "Ghide", "Ghi đè");
-                pk.Keywords.Add("Moi", "Moi", "Mới");
-                pk.Keywords.Default = "Moi";
+                pk.Keywords.Add("1", "1", "1");
+                pk.Keywords.Add("2", "2", "2");
+                pk.Keywords.Default = "2";
                 var rk = ed.GetKeywords(pk);
                 if (rk.Status is not (PromptStatus.OK or PromptStatus.None))
                 {
@@ -188,7 +208,7 @@ public sealed partial class FrameService
                     return;
                 }
 
-                overwrite = rk.Status == PromptStatus.OK && rk.StringResult == "Ghide";
+                overwrite = rk.Status == PromptStatus.OK && rk.StringResult == "1";
             }
 
 
@@ -240,10 +260,11 @@ public sealed partial class FrameService
 
         // 6) In PDF gộp
         string? pdfNote = null;
+        string? pdfIssue = null;
         if (pdfPath is not null && _pageSetupIssue is null)
         {
             var (pw, ph) = PaperSizeMm(spec);
-            var pdf = RoutePdfPlot.Plot(doc, layoutName, windows, pdfPath, pw, ph, out var issue);
+            var pdf = RoutePdfPlot.Plot(doc, layoutName, windows, pdfPath, pw, ph, out pdfIssue);
             if (pdf)
             {
                 ed.WriteMessage($"\n[iSurvey] Đã in {windows.Count} trang vào {pdfPath}");
@@ -251,12 +272,25 @@ public sealed partial class FrameService
             }
             else
             {
-                ed.WriteMessage($"\n[iSurvey] In PDF thất bại: {issue}");
+                ed.WriteMessage($"\n[iSurvey] In PDF thất bại: {pdfIssue}");
             }
         }
         else if (pdfPath is not null)
         {
+            pdfIssue = _pageSetupIssue;
             ed.WriteMessage("\n[iSurvey] Bỏ qua in PDF vì chưa đặt được máy in/khổ giấy cho layout.");
+        }
+
+        if (withDialog)
+        {
+            var done = $"Dàn trang in đã xong.\n\nLayout {layoutName}: {built} tờ {spec.Name}, tỷ lệ 1/{scaleN}.";
+            if (pdfNote is not null)
+                done += $"\nĐã in {windows.Count} trang:\n{pdfPath}";
+            else if (pdfIssue is not null)
+                done += "\nChưa in được PDF: " + pdfIssue;
+            else
+                done += "\nChưa in PDF. Gõ INTUYEN khi muốn in layout này.";
+            System.Windows.MessageBox.Show(done, "iSurvey", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
         }
 
         var note = $"layout {layoutName}: {built} khung {spec.Name} 1/{scaleN}, tuyến {routeLenM:0.#} m, chồng gối {opts.OverlapM:0.#} m{pdfNote}";
@@ -424,7 +458,8 @@ public sealed partial class FrameService
             stem = "BanVe";
         }
 
-        return Path.Combine(dir, $"{stem}_{layoutName}.pdf");
+        var stamp = DateTime.Now.ToString("yyyyMMdd-HHmm", CultureInfo.InvariantCulture);
+        return Path.Combine(dir, $"{stem}-{stamp}.pdf");
     }
 
     // -------------------------------------------------------------------------------------------------
@@ -493,6 +528,7 @@ public sealed partial class FrameService
         // Logo thay thế (áp cho cả bản vẽ, trước khi chèn khung để khung nhận đúng logo)
         ApplyPendingLogos(doc, opts);
         ApplyLogoVisibility(doc, opts);
+        var signBlocks = ImportSignatureBlocks(doc, opts);
 
         // Pha 0: tạo layout, chuyển sang nó một lần để AutoCAD khởi tạo vùng giấy riêng, rồi quay về Model.
         var layoutId = lm.CreateLayout(layoutName);
@@ -550,6 +586,8 @@ public sealed partial class FrameService
                     tr.AddNewlyCreatedDBObject(ar, true);
                     TitleBlockFit.Fit(tr, ar, br);
                 }
+
+                PlaceSignatures(tr, ps, br, signBlocks);
 
                 // Viewport: tâm vùng nhìn = tâm mảnh, xoay ngược góc tuyến → tuyến nằm ngang
                 var twist = Math.PI * 2 - NormalizeAngle(pc.Phi);
@@ -761,6 +799,331 @@ public sealed partial class FrameService
         if (tag.Equals(FrameFields.ScaleTag, StringComparison.OrdinalIgnoreCase))
             return $"1/{scaleN}";
         return opts.Attributes.TryGetValue(tag, out var v) ? v : "";
+    }
+
+    private static Dictionary<string, ObjectId> ImportSignatureBlocks(Document doc, RouteLayoutOptions opts)
+    {
+        var map = new Dictionary<string, ObjectId>(StringComparer.OrdinalIgnoreCase);
+        if (opts.Signatures is null || opts.Signatures.Count == 0)
+            return map;
+        var db = doc.Database;
+        foreach (var kv in opts.Signatures)
+        {
+            var path = kv.Value;
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+            {
+                doc.Editor.WriteMessage($"\n[iSurvey] Không thấy file chữ ký {kv.Key}.");
+                continue;
+            }
+
+            try
+            {
+                var info = new FileInfo(path);
+                var name = $"ISURVEY_CK_{kv.Key.ToUpperInvariant()}_{info.Length:X}";
+                using var src = new Database(false, true);
+                src.ReadDwgFile(path, FileOpenMode.OpenForReadAndAllShare, true, "");
+                using (var tr = db.TransactionManager.StartTransaction())
+                {
+                    var bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
+                    if (bt.Has(name))
+                    {
+                        map[kv.Key] = bt[name];
+                        tr.Commit();
+                        continue;
+                    }
+
+                    tr.Commit();
+                }
+
+                map[kv.Key] = db.Insert(name, src, false);
+            }
+            catch (System.Exception ex)
+            {
+                doc.Editor.WriteMessage($"\n[iSurvey] Không đưa được chữ ký {kv.Key} vào bản vẽ ({ex.Message}).");
+            }
+        }
+
+        return map;
+    }
+
+    /// <summary>
+    /// Ô ký là phần trống bên phải họ tên: hình chữ nhật của hàng TEN_n, cắt bởi đường đứng ngay sau chữ.
+    /// Không thấy ô thì đặt giữa chữ, cao khoảng 10 mm.
+    /// </summary>
+    private static bool TrySignatureCell(Transaction tr, BlockReference frame, Point3d attrPaper, out Point3d center, out double cellW, out double cellH)
+    {
+        center = attrPaper;
+        cellW = 0;
+        cellH = 0;
+        var local = attrPaper.TransformBy(frame.BlockTransform.Inverse());
+        var def = (BlockTableRecord)tr.GetObject(frame.BlockTableRecord, OpenMode.ForRead);
+        Extents3d? row = null;
+        var bestArea = double.MaxValue;
+        var dividers = new List<(double X, double Y0, double Y1)>();
+        foreach (ObjectId id in def)
+        {
+            var ent = tr.GetObject(id, OpenMode.ForRead);
+            if (ent is Polyline pl && pl.Closed)
+            {
+                Extents3d ext;
+                try
+                {
+                    ext = pl.GeometricExtents;
+                }
+                catch
+                {
+                    continue;
+                }
+
+                if (local.X < ext.MinPoint.X - 0.5 || local.X > ext.MaxPoint.X + 0.5
+                    || local.Y < ext.MinPoint.Y - 0.5 || local.Y > ext.MaxPoint.Y + 0.5)
+                    continue;
+                var area = (ext.MaxPoint.X - ext.MinPoint.X) * (ext.MaxPoint.Y - ext.MinPoint.Y);
+                if (area < 4 || area >= bestArea)
+                    continue;
+                bestArea = area;
+                row = ext;
+            }
+            else if (ent is Line ln && Math.Abs(ln.StartPoint.X - ln.EndPoint.X) <= 0.2)
+            {
+                var y0 = Math.Min(ln.StartPoint.Y, ln.EndPoint.Y);
+                var y1 = Math.Max(ln.StartPoint.Y, ln.EndPoint.Y);
+                if (y1 - y0 < 4)
+                    continue;
+                dividers.Add(((ln.StartPoint.X + ln.EndPoint.X) / 2.0, y0, y1));
+            }
+        }
+
+        if (row is null)
+            return false;
+        var box = row.Value;
+        double? split = null;
+        foreach (var d in dividers)
+        {
+            if (d.X < local.X + 1.0 || d.X > box.MaxPoint.X - 0.5)
+                continue;
+            var overlap = Math.Min(d.Y1, box.MaxPoint.Y) - Math.Max(d.Y0, box.MinPoint.Y);
+            if (overlap < (box.MaxPoint.Y - box.MinPoint.Y) * 0.5)
+                continue;
+            if (split is null || d.X < split)
+                split = d.X;
+        }
+
+        if (split is null)
+            return false;
+        cellW = box.MaxPoint.X - split.Value;
+        cellH = box.MaxPoint.Y - box.MinPoint.Y;
+        if (cellW < 4 || cellH < 4)
+            return false;
+        center = new Point3d((split.Value + box.MaxPoint.X) / 2.0, (box.MinPoint.Y + box.MaxPoint.Y) / 2.0, 0)
+            .TransformBy(frame.BlockTransform);
+        return true;
+    }
+
+    /// <summary>Đặt block chữ ký vào ô ký bên phải họ tên trên một tờ.</summary>
+    private static void PlaceSignatures(Transaction tr, BlockTableRecord space, BlockReference frame, Dictionary<string, ObjectId> blocks)
+    {
+        if (blocks.Count == 0)
+            return;
+        foreach (ObjectId aid in frame.AttributeCollection)
+        {
+            if (tr.GetObject(aid, OpenMode.ForRead) is not AttributeReference ar)
+                continue;
+            if (!blocks.TryGetValue(ar.Tag, out var blockId))
+                continue;
+            var ins = new BlockReference(Point3d.Origin, blockId) { Layer = frame.Layer };
+            space.AppendEntity(ins);
+            tr.AddNewlyCreatedDBObject(ins, true);
+            Extents3d ext;
+            try
+            {
+                ext = ins.GeometricExtents;
+            }
+            catch
+            {
+                ins.Erase();
+                continue;
+            }
+
+            var bw = Math.Max(ext.MaxPoint.X - ext.MinPoint.X, 0.01);
+            var bh = Math.Max(ext.MaxPoint.Y - ext.MinPoint.Y, 0.01);
+            var paper = ar.AlignmentPoint;
+            if (paper.DistanceTo(Point3d.Origin) < 1e-6)
+                paper = ar.Position;
+            var target = paper;
+            var maxW = 40.0;
+            var maxH = 10.0;
+            if (TrySignatureCell(tr, frame, paper, out var cellCenter, out var cellW, out var cellH))
+            {
+                target = cellCenter;
+                maxW = Math.Max(cellW - 2.0, cellW * 0.85);
+                maxH = Math.Max(cellH - 2.0, cellH * 0.85);
+            }
+
+            var sc = maxH / bh;
+            if (bw * sc > maxW)
+                sc = maxW / bw;
+            ins.ScaleFactors = new Scale3d(sc);
+            var sized = ins.GeometricExtents;
+            var mid = new Point3d(
+                (sized.MinPoint.X + sized.MaxPoint.X) / 2,
+                (sized.MinPoint.Y + sized.MaxPoint.Y) / 2,
+                0);
+            ins.Position = target - (mid - ins.Position);
+        }
+    }
+
+    private static void PlotExistingRoute(Document doc)
+    {
+        var db = doc.Database;
+        var ed = doc.Editor;
+        List<string> names;
+        using (var tr = db.TransactionManager.StartTransaction())
+        {
+            var dict = (DBDictionary)tr.GetObject(db.LayoutDictionaryId, OpenMode.ForRead);
+            names = [];
+            foreach (DBDictionaryEntry entry in dict)
+            {
+                if (entry.Key.StartsWith(RouteLayoutName, StringComparison.OrdinalIgnoreCase))
+                    names.Add(entry.Key);
+            }
+
+            names.Sort(StringComparer.OrdinalIgnoreCase);
+            tr.Commit();
+        }
+
+        if (names.Count == 0)
+        {
+            ed.WriteMessage("\n[iSurvey] Bản vẽ chưa có layout dàn trang. Gõ DANTRANG trước.");
+            return;
+        }
+
+        var layoutName = names[0];
+        if (names.Count > 1)
+        {
+            var pk = new PromptKeywordOptions("\niSurvey: Chọn layout cần in. " + string.Join(", ", names.Select((n, i) => $"{i + 1} = {n}")))
+            {
+                AllowNone = false,
+                AppendKeywordsToMessage = true
+            };
+            for (var i = 0; i < names.Count && i < 9; i++)
+            {
+                var token = (i + 1).ToString(CultureInfo.InvariantCulture);
+                pk.Keywords.Add(token, token, token);
+            }
+
+            pk.Keywords.Default = "1";
+            var rk = ed.GetKeywords(pk);
+            if (rk.Status != PromptStatus.OK || !int.TryParse(rk.StringResult, NumberStyles.Integer, CultureInfo.InvariantCulture, out var pick) || pick < 1 || pick > names.Count)
+            {
+                ed.WriteMessage("\n[iSurvey] Đã hủy in.");
+                return;
+            }
+
+            layoutName = names[pick - 1];
+        }
+
+        List<Extents2d> windows;
+        double paperW;
+        double paperH;
+        using (var tr = db.TransactionManager.StartTransaction())
+        {
+            var dict = (DBDictionary)tr.GetObject(db.LayoutDictionaryId, OpenMode.ForRead);
+            var lay = (Layout)tr.GetObject(dict.GetAt(layoutName), OpenMode.ForRead);
+            var ps = (BlockTableRecord)tr.GetObject(lay.BlockTableRecordId, OpenMode.ForRead);
+            var found = new List<(double x, double y, Extents2d window)>();
+            foreach (ObjectId id in ps)
+            {
+                if (tr.GetObject(id, OpenMode.ForRead) is not BlockReference br)
+                    continue;
+                var def = (BlockTableRecord)tr.GetObject(br.BlockTableRecord, OpenMode.ForRead);
+                var spec = Specs.FirstOrDefault(s => s.Block.Equals(def.Name, StringComparison.OrdinalIgnoreCase));
+                if (spec is null)
+                    continue;
+                var (pw, ph) = PaperSizeMm(spec);
+                paperW = pw;
+                paperH = ph;
+                var originX = pw - spec.Fw - 5.0;
+                var originY = (ph - spec.Fh) / 2.0;
+                var cx = br.Position.X - originX;
+                var cy = br.Position.Y - originY;
+                found.Add((cx, cy, new Extents2d(cx, cy, cx + pw, cy + ph)));
+            }
+
+            tr.Commit();
+            if (found.Count == 0)
+            {
+                ed.WriteMessage($"\n[iSurvey] Layout {layoutName} không có khung tờ in.");
+                return;
+            }
+
+            windows = found
+                .OrderByDescending(f => f.y)
+                .ThenBy(f => f.x)
+                .Select(f => f.window)
+                .ToList();
+            var first = Specs.First(s => s.Block.Equals("KB_A3", StringComparison.OrdinalIgnoreCase));
+            (paperW, paperH) = PaperSizeMm(first);
+            foreach (var spec in Specs)
+            {
+                if (found.Count > 0)
+                    break;
+            }
+
+            // Khổ lấy từ khung đầu tiên đã gom ở trên. Tính lại cho đúng khổ của các tờ.
+            using var tr2 = db.TransactionManager.StartTransaction();
+            var dict2 = (DBDictionary)tr2.GetObject(db.LayoutDictionaryId, OpenMode.ForRead);
+            var lay2 = (Layout)tr2.GetObject(dict2.GetAt(layoutName), OpenMode.ForRead);
+            var ps2 = (BlockTableRecord)tr2.GetObject(lay2.BlockTableRecordId, OpenMode.ForRead);
+            foreach (ObjectId id in ps2)
+            {
+                if (tr2.GetObject(id, OpenMode.ForRead) is not BlockReference br)
+                    continue;
+                var def = (BlockTableRecord)tr2.GetObject(br.BlockTableRecord, OpenMode.ForRead);
+                var spec = Specs.FirstOrDefault(s => s.Block.Equals(def.Name, StringComparison.OrdinalIgnoreCase));
+                if (spec is null)
+                    continue;
+                (paperW, paperH) = PaperSizeMm(spec);
+                break;
+            }
+
+            tr2.Commit();
+        }
+
+        var pdfPath = DefaultPdfPath(db, layoutName);
+        using (var dlg = new System.Windows.Forms.SaveFileDialog
+        {
+            Title = "Lưu file PDF",
+            Filter = "PDF (*.pdf)|*.pdf",
+            FileName = Path.GetFileName(pdfPath),
+            InitialDirectory = Path.GetDirectoryName(pdfPath),
+            OverwritePrompt = true
+        })
+        {
+            if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+            {
+                ed.WriteMessage("\n[iSurvey] Đã hủy in.");
+                return;
+            }
+
+            pdfPath = dlg.FileName;
+        }
+
+        var ok = RoutePdfPlot.Plot(doc, layoutName, windows, pdfPath, paperW, paperH, out var issue);
+        if (!ok)
+        {
+            ed.WriteMessage($"\n[iSurvey] In PDF thất bại: {issue}");
+            System.Windows.MessageBox.Show("Chưa in được PDF: " + issue, "iSurvey", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+            return;
+        }
+
+        ed.WriteMessage($"\n[iSurvey] Đã in {windows.Count} trang vào {pdfPath}");
+        ActivityLogger.Result("ISURVEY_ROUTE_PLOT", $"in lại {layoutName}, {windows.Count} trang, {Path.GetFileName(pdfPath)}");
+        System.Windows.MessageBox.Show(
+            $"Đã in {windows.Count} trang.\n{pdfPath}",
+            "iSurvey",
+            System.Windows.MessageBoxButton.OK,
+            System.Windows.MessageBoxImage.Information);
     }
 }
 

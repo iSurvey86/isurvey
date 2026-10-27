@@ -82,29 +82,43 @@
         <Border Grid.Row="0" Background="White" BorderBrush="#D5DBE4" BorderThickness="1" CornerRadius="4" Padding="14,10,14,12">
             <StackPanel>
                 <TextBlock Style="{StaticResource SectionTitle}" Text="1. CÀI ĐẶT BỐ CỤC &amp; BẢN IN" />
-                <WrapPanel Orientation="Horizontal">
-                    <StackPanel Orientation="Horizontal" Margin="0,0,22,6">
-                        <TextBlock Style="{StaticResource Lbl}" Text="Khổ giấy:" />
-                        <ComboBox x:Name="SizeBox" Width="150" SelectionChanged="Plan_Changed" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="18" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Khổ giấy" FontWeight="SemiBold" Foreground="#1F4E8C" Margin="0,0,0,6" />
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                            <TextBlock Style="{StaticResource Lbl}" Text="Khổ:" Width="72" />
+                            <ComboBox x:Name="SizeBox" Width="160" SelectionChanged="Plan_Changed" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                            <TextBlock Style="{StaticResource Lbl}" Text="Tỷ lệ:" Width="72" />
+                            <ComboBox x:Name="ScaleBox" Width="110" SelectionChanged="Plan_Changed" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource Lbl}" Text="Chồng gối (m):" Width="92" />
+                            <TextBox x:Name="OverlapBox" Width="70" TextChanged="Overlap_TextChanged" />
+                        </StackPanel>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,22,6">
-                        <TextBlock Style="{StaticResource Lbl}" Text="Tỷ lệ:" />
-                        <ComboBox x:Name="ScaleBox" Width="100" SelectionChanged="Plan_Changed" />
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Lưới layout" FontWeight="SemiBold" Foreground="#1F4E8C" Margin="0,0,0,6" />
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                            <TextBlock Style="{StaticResource Lbl}" Text="Hàng:" Width="72" />
+                            <TextBox x:Name="RowsBox" Width="56" TextChanged="Grid_TextChanged" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                            <TextBlock Style="{StaticResource Lbl}" Text="Cột:" Width="72" />
+                            <TextBox x:Name="ColsBox" Width="56" TextChanged="Grid_TextChanged" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource Lbl}" Text="Cách (mm):" Width="72" />
+                            <TextBox x:Name="GapBox" Width="56" />
+                        </StackPanel>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,22,6">
-                        <TextBlock Style="{StaticResource Lbl}" Text="Chồng gối (m):" />
-                        <TextBox x:Name="OverlapBox" Width="70" TextChanged="Overlap_TextChanged" />
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                        <TextBlock Style="{StaticResource Lbl}" Text="Lưới Layout:" FontWeight="SemiBold" />
-                        <TextBlock Style="{StaticResource Lbl}" Text="Hàng:" />
-                        <TextBox x:Name="RowsBox" Width="46" Margin="0,0,12,0" TextChanged="Grid_TextChanged" />
-                        <TextBlock Style="{StaticResource Lbl}" Text="Cột:" />
-                        <TextBox x:Name="ColsBox" Width="46" Margin="0,0,12,0" TextChanged="Grid_TextChanged" />
-                        <TextBlock Style="{StaticResource Lbl}" Text="Cách (mm):" />
-                        <TextBox x:Name="GapBox" Width="56" />
-                    </StackPanel>
-                </WrapPanel>
+                </Grid>
                 <TextBlock x:Name="InfoText" Margin="0,10,0,0" Foreground="#1F4E8C" TextWrapping="Wrap" />
                 <TextBlock x:Name="WarnText" Margin="0,2,0,0" Foreground="#C0392B" TextWrapping="Wrap" Visibility="Collapsed" />
             </StackPanel>
@@ -118,7 +132,12 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Style="{StaticResource SectionTitle}" Text="2. THÔNG TIN KHUNG TÊN (áp dụng cho mọi tờ)" />
+                <DockPanel Grid.Row="0" LastChildFill="True" Margin="0,0,0,8">
+                    <Button DockPanel.Dock="Right" Content="Nhập TXT/CSV" Padding="12,4" Click="Import_Click"
+                            ToolTip="Mỗi dòng: MÃ;nội dung hoặc STT;nội dung. Ô Tờ và tỷ lệ vẫn tự điền." />
+                    <TextBlock Style="{StaticResource SectionTitle}" Margin="0" VerticalAlignment="Center"
+                               Text="2. THÔNG TIN KHUNG TÊN (áp dụng cho mọi tờ)" />
+                </DockPanel>
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -150,6 +169,12 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock x:Name="ContentLabel" Grid.Column="0" Style="{StaticResource Lbl}" Text="Nội dung:" FontWeight="SemiBold" />
                     <TextBox x:Name="ContentBox" Grid.Column="1" MinHeight="28" TextChanged="Content_TextChanged" LostFocus="Content_LostFocus" />
+                    <StackPanel x:Name="SignPanel" Grid.Column="2" Orientation="Horizontal" Margin="10,0,0,0" Visibility="Collapsed">
+                        <Button Content="Chèn chữ ký" Padding="14,4" Click="Sign_Click"
+                                ToolTip="Chọn file DWG chữ ký. Đặt vào đúng ô họ tên này trên mọi tờ khi bấm Tạo Layout." />
+                        <Button x:Name="SignClearButton" Content="✕" Padding="8,4" Margin="4,0,0,0" Click="SignClear_Click"
+                                ToolTip="Bỏ chữ ký đã chọn cho ô này" Visibility="Collapsed" />
+                    </StackPanel>
                     <StackPanel x:Name="LogoPanel" Grid.Column="2" Orientation="Horizontal" Margin="10,0,0,0" Visibility="Collapsed">
                         <Button x:Name="LogoButton" Content="Thay Logo..." Padding="14,4" Click="Logo_Click"
                                 ToolTip="Chọn ảnh logo thay cho logo EVN trong khung tên (áp dụng cho cả bản vẽ khi bấm Tạo Layout)" />

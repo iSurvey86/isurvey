@@ -3,7 +3,7 @@
 ## Đã có gì
 - Tab **iSurvey** (chỉ Admin hệ thống: `Q_ADMIN` hoặc `q_system_log`)
 - Tổng quan: máy active, seen 24h / N ngày, email, lỗi, top lệnh
-- Thiết bị: khóa / mở (`is_active` trên `isurvey_licenses`)
+- Thiết bị: khóa / mở (`is_active`). **Đăng xuất** (`force_logout`) cắt phiên đang mở, máy vẫn Active. Bản iSurvey từ 1.8.7 hỏi khoảng mỗi 2 phút rồi bắt đăng nhập lại. Bản cũ không tự thoát. SQL: `deploy/supabase/schema_force_logout.sql` (đã chạy trên Supabase ngày 2026-10-27).
 - Nhật ký: lọc `login` / `command` / `heartbeat` / `error` / …
 
 API server (service role iSurvey, không lộ ra browser):

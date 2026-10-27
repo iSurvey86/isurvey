@@ -40,6 +40,8 @@ public enum DeviceStatus
     InvalidEmail,
     Unauthenticated,
     Released,
+    /// <summary>Admin yêu cầu cắt phiên trên máy này. Máy vẫn active — đăng nhập lại được.</summary>
+    Logout,
     Unknown
 }
 
@@ -52,7 +54,8 @@ public interface ISupabaseAuth
     Task<SbVerifyResult> VerifyOtpAsync(string email, string token, CancellationToken ct);
     Task<SbVerifyResult> RefreshAsync(string refreshToken, CancellationToken ct);
     Task<SbDeviceResult> ActivateAsync(string accessToken, string hwid, string machineName, string appVersion, CancellationToken ct);
-    Task<SbDeviceResult> CheckAsync(string accessToken, string hwid, CancellationToken ct);
+    /// <param name="touch">false: không cập nhật last_login_at (lần hỏi nhanh xem có lệnh đăng xuất không).</param>
+    Task<SbDeviceResult> CheckAsync(string accessToken, string hwid, CancellationToken ct, bool touch = true);
     Task<SbDeviceResult> ReleaseAsync(string accessToken, string hwid, CancellationToken ct);
 }
 
@@ -147,8 +150,10 @@ public sealed class SupabaseAuthClient : ISupabaseAuth
         RpcAsync("isurvey_activate",
             new { p_hwid = hwid, p_machine_name = machineName, p_app_version = appVersion }, accessToken, ct);
 
-    public Task<SbDeviceResult> CheckAsync(string accessToken, string hwid, CancellationToken ct) =>
-        RpcAsync("isurvey_check", new { p_hwid = hwid }, accessToken, ct);
+    public Task<SbDeviceResult> CheckAsync(string accessToken, string hwid, CancellationToken ct, bool touch = true) =>
+        RpcAsync("isurvey_check",
+            touch ? (object)new { p_hwid = hwid } : new { p_hwid = hwid, p_touch = false },
+            accessToken, ct);
 
     public Task<SbDeviceResult> ReleaseAsync(string accessToken, string hwid, CancellationToken ct) =>
         RpcAsync("isurvey_release_device", new { p_hwid = hwid }, accessToken, ct);
@@ -175,6 +180,7 @@ public sealed class SupabaseAuthClient : ISupabaseAuth
                 "invalid_email" => DeviceStatus.InvalidEmail,
                 "unauthenticated" => DeviceStatus.Unauthenticated,
                 "released" => DeviceStatus.Released,
+                "logout" => DeviceStatus.Logout,
                 _ => DeviceStatus.Unknown
             };
             return new SbDeviceResult(result, mapped, count, max);
