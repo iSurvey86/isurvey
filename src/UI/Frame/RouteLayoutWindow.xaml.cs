@@ -494,7 +494,7 @@ public partial class RouteLayoutWindow : Window
         foreach (var raw in lines)
         {
             var line = raw.Trim();
-            if (line.Length == 0 || line.StartsWith('#') || line.StartsWith("//"))
+            if (line.Length == 0 || line.StartsWith("#") || line.StartsWith("//"))
                 continue;
             if (!SplitField(line, out var key, out var value))
             {
