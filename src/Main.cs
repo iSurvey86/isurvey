@@ -50,6 +50,7 @@ public sealed class Main : IExtensionApplication
         _exportModule.Initialize();
         RibbonBuilder.EnsureRibbon();
         TitleBlockFit.Watch();
+        FrameDoubleClick.Watch();
 
         // FILEDIA/CMDDIA = 0 (do script/lệnh khác bỏ quên) làm hộp thoại không mở được → báo và đặt lại 1 (một lần, lúc rảnh).
         Autodesk.AutoCAD.ApplicationServices.Application.Idle += OnFirstIdle;
@@ -94,6 +95,7 @@ public sealed class Main : IExtensionApplication
     public void Terminate()
     {
         Autodesk.AutoCAD.ApplicationServices.Application.Idle -= OnFirstIdle;
+        FrameDoubleClick.Stop();
         _exportModule?.Terminate();
         _exportModule = null;
         _mapModule?.Terminate();

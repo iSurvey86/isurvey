@@ -33,7 +33,7 @@ public sealed partial class FrameService
     public void RouteLayoutQuickCommand() => RunRouteLayout(withDialog: false, "ISURVEY_ROUTE_SHEETS_QUICK");
 
     /// <summary>In lại layout BanDo_Tuyen đã có, không dựng trang mới.</summary>
-    [CommandMethod("ISURVEY_ROUTE_PLOT")]
+    [CommandMethod("ISURVEY_ROUTE_PLOT", CommandFlags.UsePickSet | CommandFlags.Redraw)]
     public void RoutePlotCommand()
     {
         if (!AuthManager.EnsureAuthenticated(track: false))
@@ -797,7 +797,7 @@ public sealed partial class FrameService
         if (tag.Equals(FrameFields.SheetTag, StringComparison.OrdinalIgnoreCase))
             return $"{index}/{total}";
         if (tag.Equals(FrameFields.ScaleTag, StringComparison.OrdinalIgnoreCase))
-            return $"1/{scaleN}";
+            return string.IsNullOrEmpty(opts.ScaleText) ? $"1/{scaleN}" : opts.ScaleText;
         return opts.Attributes.TryGetValue(tag, out var v) ? v : "";
     }
 
@@ -973,6 +973,131 @@ public sealed partial class FrameService
         }
     }
 
+    private readonly record struct PlotSheet(ObjectId Id, double X, double Y, Extents2d Window, double PaperW, double PaperH);
+
+    private static List<PlotSheet> CollectPlotSheets(Database db, string layoutName)
+    {
+        var found = new List<PlotSheet>();
+        using var tr = db.TransactionManager.StartTransaction();
+        var dict = (DBDictionary)tr.GetObject(db.LayoutDictionaryId, OpenMode.ForRead);
+        var lay = (Layout)tr.GetObject(dict.GetAt(layoutName), OpenMode.ForRead);
+        var space = (BlockTableRecord)tr.GetObject(lay.BlockTableRecordId, OpenMode.ForRead);
+        foreach (ObjectId id in space)
+        {
+            if (!TryResolveFrame(tr, id, out var br))
+                continue;
+            var spec = Specs.FirstOrDefault(s => s.Block.Equals(BlockName(tr, br), StringComparison.OrdinalIgnoreCase));
+            if (spec is null)
+                continue;
+            var (pw, ph) = PaperSizeMm(spec);
+            var originX = pw - spec.Fw - 5.0;
+            var originY = (ph - spec.Fh) / 2.0;
+            var cx = br.Position.X - originX;
+            var cy = br.Position.Y - originY;
+            found.Add(new PlotSheet(br.ObjectId, cx, cy, new Extents2d(cx, cy, cx + pw, cy + ph), pw, ph));
+        }
+
+        tr.Commit();
+        return found
+            .OrderByDescending(s => s.Y)
+            .ThenBy(s => s.X)
+            .ToList();
+    }
+
+    /// <summary>1 = khung đang chọn (chọn sẵn hoặc chọn thêm), 2 = mọi khung trên layout.</summary>
+    private static bool TryChooseSheets(
+        Document doc, string layoutName, List<PlotSheet> all, ObjectId[] preselected, out List<PlotSheet> chosen, out string scope)
+    {
+        chosen = all;
+        scope = "tất cả";
+        var ed = doc.Editor;
+        var pk = new PromptKeywordOptions("\niSurvey: In khung nào? 1 = khung đang chọn, 2 = tất cả")
+        {
+            AllowNone = false,
+            AppendKeywordsToMessage = true
+        };
+        pk.Keywords.Add("1", "1", "1");
+        pk.Keywords.Add("2", "2", "2");
+        var rk = ed.GetKeywords(pk);
+        if (rk.Status != PromptStatus.OK)
+        {
+            ed.WriteMessage("\n[iSurvey] Đã hủy in.");
+            return false;
+        }
+
+        if (rk.StringResult != "1")
+            return true;
+
+        scope = "khung đang chọn";
+        var hit = MatchSheets(doc.Database, all, preselected);
+        if (hit.Count == 0)
+        {
+            try
+            {
+                if (!LayoutManager.Current.CurrentLayout.Equals(layoutName, StringComparison.OrdinalIgnoreCase))
+                    LayoutManager.Current.CurrentLayout = layoutName;
+            }
+            catch (System.Exception ex)
+            {
+                ed.WriteMessage($"\n[iSurvey] Không mở được layout {layoutName}: {ex.Message}");
+                return false;
+            }
+
+            var pso = new PromptSelectionOptions { MessageForAdding = "\nChọn khung cần in: " };
+            var filter = new SelectionFilter(
+            [
+                new TypedValue(-4, "<OR"),
+                new TypedValue(0, "INSERT"),
+                new TypedValue(0, "ATTRIB"),
+                new TypedValue(-4, "OR>")
+            ]);
+            var sel = ed.GetSelection(pso, filter);
+            if (sel.Status != PromptStatus.OK)
+            {
+                ed.WriteMessage("\n[iSurvey] Đã hủy in.");
+                return false;
+            }
+
+            hit = MatchSheets(doc.Database, all, sel.Value.GetObjectIds());
+        }
+
+        if (hit.Count == 0)
+        {
+            ed.WriteMessage("\n[iSurvey] Không thấy khung tờ in trong vùng chọn.");
+            return false;
+        }
+
+        chosen = hit;
+        return true;
+    }
+
+    private static ObjectId[] ImpliedIds(Editor ed)
+    {
+        var implied = ed.SelectImplied();
+        if (implied.Status != PromptStatus.OK || implied.Value is null)
+            return [];
+        return implied.Value.GetObjectIds();
+    }
+
+    private static List<PlotSheet> MatchSheets(Database db, List<PlotSheet> all, ObjectId[] raw)
+    {
+        if (raw.Length == 0)
+            return [];
+        var wanted = new HashSet<ObjectId>();
+        using (var tr = db.TransactionManager.StartTransaction())
+        {
+            foreach (var id in raw)
+            {
+                if (TryResolveFrame(tr, id, out var br))
+                    wanted.Add(br.ObjectId);
+            }
+
+            tr.Commit();
+        }
+
+        return all.Where(s => wanted.Contains(s.Id)).ToList();
+    }
+
     private static void PlotExistingRoute(Document doc)
     {
         var db = doc.Database;
@@ -984,7 +1109,8 @@ public sealed partial class FrameService
             names = [];
             foreach (DBDictionaryEntry entry in dict)
             {
-                if (entry.Key.StartsWith(RouteLayoutName, StringComparison.OrdinalIgnoreCase))
+                if (entry.Key.StartsWith(RouteLayoutName, StringComparison.OrdinalIgnoreCase)
+                    || entry.Key.StartsWith(ProfileLayoutName, StringComparison.OrdinalIgnoreCase))
                     names.Add(entry.Key);
             }
 
@@ -994,7 +1120,7 @@ public sealed partial class FrameService
 
         if (names.Count == 0)
         {
-            ed.WriteMessage("\n[iSurvey] Bản vẽ chưa có layout dàn trang. Gõ DANTRANG trước.");
+            ed.WriteMessage("\n[iSurvey] Bản vẽ chưa có layout dàn trang. Gõ RAIKHUNG hoặc RAIMCD trước.");
             return;
         }
 
@@ -1023,72 +1149,21 @@ public sealed partial class FrameService
             layoutName = names[pick - 1];
         }
 
-        List<Extents2d> windows;
-        double paperW;
-        double paperH;
-        using (var tr = db.TransactionManager.StartTransaction())
+        var preselected = ImpliedIds(ed);
+        var allSheets = CollectPlotSheets(db, layoutName);
+        if (allSheets.Count == 0)
         {
-            var dict = (DBDictionary)tr.GetObject(db.LayoutDictionaryId, OpenMode.ForRead);
-            var lay = (Layout)tr.GetObject(dict.GetAt(layoutName), OpenMode.ForRead);
-            var ps = (BlockTableRecord)tr.GetObject(lay.BlockTableRecordId, OpenMode.ForRead);
-            var found = new List<(double x, double y, Extents2d window)>();
-            foreach (ObjectId id in ps)
-            {
-                if (tr.GetObject(id, OpenMode.ForRead) is not BlockReference br)
-                    continue;
-                var def = (BlockTableRecord)tr.GetObject(br.BlockTableRecord, OpenMode.ForRead);
-                var spec = Specs.FirstOrDefault(s => s.Block.Equals(def.Name, StringComparison.OrdinalIgnoreCase));
-                if (spec is null)
-                    continue;
-                var (pw, ph) = PaperSizeMm(spec);
-                paperW = pw;
-                paperH = ph;
-                var originX = pw - spec.Fw - 5.0;
-                var originY = (ph - spec.Fh) / 2.0;
-                var cx = br.Position.X - originX;
-                var cy = br.Position.Y - originY;
-                found.Add((cx, cy, new Extents2d(cx, cy, cx + pw, cy + ph)));
-            }
-
-            tr.Commit();
-            if (found.Count == 0)
-            {
-                ed.WriteMessage($"\n[iSurvey] Layout {layoutName} không có khung tờ in.");
-                return;
-            }
-
-            windows = found
-                .OrderByDescending(f => f.y)
-                .ThenBy(f => f.x)
-                .Select(f => f.window)
-                .ToList();
-            var first = Specs.First(s => s.Block.Equals("KB_A3", StringComparison.OrdinalIgnoreCase));
-            (paperW, paperH) = PaperSizeMm(first);
-            foreach (var spec in Specs)
-            {
-                if (found.Count > 0)
-                    break;
-            }
-
-            // Khổ lấy từ khung đầu tiên đã gom ở trên. Tính lại cho đúng khổ của các tờ.
-            using var tr2 = db.TransactionManager.StartTransaction();
-            var dict2 = (DBDictionary)tr2.GetObject(db.LayoutDictionaryId, OpenMode.ForRead);
-            var lay2 = (Layout)tr2.GetObject(dict2.GetAt(layoutName), OpenMode.ForRead);
-            var ps2 = (BlockTableRecord)tr2.GetObject(lay2.BlockTableRecordId, OpenMode.ForRead);
-            foreach (ObjectId id in ps2)
-            {
-                if (tr2.GetObject(id, OpenMode.ForRead) is not BlockReference br)
-                    continue;
-                var def = (BlockTableRecord)tr2.GetObject(br.BlockTableRecord, OpenMode.ForRead);
-                var spec = Specs.FirstOrDefault(s => s.Block.Equals(def.Name, StringComparison.OrdinalIgnoreCase));
-                if (spec is null)
-                    continue;
-                (paperW, paperH) = PaperSizeMm(spec);
-                break;
-            }
-
-            tr2.Commit();
+            ed.WriteMessage($"\n[iSurvey] Layout {layoutName} không có khung tờ in.");
+            return;
         }
+
+        if (!TryChooseSheets(doc, layoutName, allSheets, preselected, out var sheets, out var scope))
+            return;
+
+        var windows = sheets.Select(s => s.Window).ToList();
+        var paperW = sheets[0].PaperW;
+        var paperH = sheets[0].PaperH;
+        ed.WriteMessage($"\n[iSurvey] In {sheets.Count} khung ({scope}).");
 
         var pdfPath = DefaultPdfPath(db, layoutName);
         using (var dlg = new System.Windows.Forms.SaveFileDialog
@@ -1112,13 +1187,19 @@ public sealed partial class FrameService
         var ok = RoutePdfPlot.Plot(doc, layoutName, windows, pdfPath, paperW, paperH, out var issue);
         if (!ok)
         {
+            if (issue == "đã hủy")
+            {
+                ed.WriteMessage("\n[iSurvey] Đã hủy xuất PDF.");
+                return;
+            }
+
             ed.WriteMessage($"\n[iSurvey] In PDF thất bại: {issue}");
             System.Windows.MessageBox.Show("Chưa in được PDF: " + issue, "iSurvey", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
             return;
         }
 
-        ed.WriteMessage($"\n[iSurvey] Đã in {windows.Count} trang vào {pdfPath}");
-        ActivityLogger.Result("ISURVEY_ROUTE_PLOT", $"in lại {layoutName}, {windows.Count} trang, {Path.GetFileName(pdfPath)}");
+        ed.WriteMessage($"\n[iSurvey] Đã in {windows.Count} trang ({scope}) vào {pdfPath}");
+        ActivityLogger.Result("ISURVEY_ROUTE_PLOT", $"in lại {layoutName}, {scope}, {windows.Count} trang, {Path.GetFileName(pdfPath)}");
         System.Windows.MessageBox.Show(
             $"Đã in {windows.Count} trang.\n{pdfPath}",
             "iSurvey",

@@ -27,6 +27,24 @@ public sealed class RouteLayoutDialogInput
 
     /// <summary>Số mảnh → (hàng, cột) gợi ý.</summary>
     public required Func<int, (int rows, int cols)> SuggestGrid { get; init; }
+
+    /// <summary>Sửa khung đã chèn: ẩn phần bố cục, hiện ô áp dụng toàn bộ.</summary>
+    public bool EditExisting { get; init; }
+
+    /// <summary>Tag TEN_n đã có chữ ký trên khung vừa chọn.</summary>
+    public IReadOnlyCollection<string>? ExistingSignatures { get; init; }
+
+    /// <summary>Nhãn combo tỷ lệ. Cùng số phần tử với <see cref="Scales"/>. Mặt cắt dọc ghi cặp 1/500; 1/5000.</summary>
+    public string[]? ScaleLabels { get; init; }
+
+    /// <summary>Giữ số chồng gối đang có khi đổi khổ hoặc tỷ lệ.</summary>
+    public bool KeepOverlap { get; init; }
+
+    /// <summary>Tiêu đề cửa sổ khi không phải chế độ sửa khung.</summary>
+    public string? WindowTitle { get; init; }
+
+    /// <summary>Khổ và tỷ lệ không chứa nổi nội dung thì trả về câu cảnh báo, hộp thoại không cho tạo.</summary>
+    public Func<string, int, string?>? RejectPlan { get; init; }
 }
 
 public sealed class FieldRow : INotifyPropertyChanged
@@ -81,6 +99,8 @@ public partial class RouteLayoutWindow : Window
     private bool _hideOwner;
     private bool _hideDesign;
     private readonly Dictionary<string, string> _signatures = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _existingSigns = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _clearedSigns = new(StringComparer.OrdinalIgnoreCase);
     private bool _allowEdit;
 
     public RouteLayoutWindow(RouteLayoutDialogInput input)
@@ -90,8 +110,17 @@ public partial class RouteLayoutWindow : Window
 
         foreach (var s in input.Sizes)
             SizeBox.Items.Add(PaperText.TryGetValue(s, out var t) ? $"{s} ({t})" : s);
-        foreach (var n in input.Scales)
-            ScaleBox.Items.Add($"1/{n}");
+        if (input.ScaleLabels is { Length: > 0 })
+        {
+            ScaleBox.Width = 168;
+            foreach (var label in input.ScaleLabels)
+                ScaleBox.Items.Add(label);
+        }
+        else
+        {
+            foreach (var n in input.Scales)
+                ScaleBox.Items.Add($"1/{n}");
+        }
 
         var init = input.Initial;
         SizeBox.SelectedIndex = Math.Max(0, Array.FindIndex(input.Sizes, s => s.Equals(init.Size, StringComparison.OrdinalIgnoreCase)));
@@ -100,9 +129,14 @@ public partial class RouteLayoutWindow : Window
         RowsBox.Text = init.Rows.ToString(CultureInfo.InvariantCulture);
         ColsBox.Text = init.Cols.ToString(CultureInfo.InvariantCulture);
         GapBox.Text = Fmt(init.GapMm);
-        PdfCheck.IsChecked = init.PlotPdf;
+        PdfCheck.IsChecked = !input.EditExisting || init.PlotPdf;
         _hideOwner = init.HideOwnerLogo;
         _hideDesign = init.HideDesignLogo;
+        if (input.ExistingSignatures is not null)
+        {
+            foreach (var tag in input.ExistingSignatures)
+                _existingSigns.Add(tag);
+        }
 
         foreach (var f in FrameFields.All)
         {
@@ -118,9 +152,16 @@ public partial class RouteLayoutWindow : Window
         LeftGrid.ItemsSource = _rows.Where(r => r.Stt <= 13).ToList();
         RightGrid.ItemsSource = _rows.Where(r => r.Stt > 13).ToList();
         _loading = false;
-        RecalcPlan();
-        UpdateContentEditor();
-        UpdateLogoNote();
+        if (input.EditExisting)
+            EnterEditMode();
+        else
+        {
+            if (!string.IsNullOrEmpty(input.WindowTitle))
+                Title = input.WindowTitle;
+            RecalcPlan();
+            UpdateContentEditor();
+            UpdateLogoNote();
+        }
     }
 
     public RouteLayoutOptions? Result { get; private set; }
@@ -130,6 +171,53 @@ public partial class RouteLayoutWindow : Window
         var w = new RouteLayoutWindow(input);
         AcadApp.ShowModalWindow(w);
         return w.Result;
+    }
+
+    /// <summary>Sửa thông tin một khung đã có. Không dựng lại viewport.</summary>
+    public static RouteLayoutOptions? ShowEdit(
+        IReadOnlyDictionary<string, string> attributes,
+        IReadOnlyCollection<string> existingSignatures)
+    {
+        var input = new RouteLayoutDialogInput
+        {
+            RouteLengthM = 0,
+            Sizes = ["A3"],
+            Scales = [1000],
+            Initial = new RouteLayoutOptions
+            {
+                Attributes = CopyAttrs(attributes),
+                PlotPdf = false
+            },
+            TemplateDefaults = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase),
+            CountPieces = (_, _, _) => 1,
+            MapWidthM = (_, _) => 1,
+            SuggestGrid = _ => (1, 1),
+            EditExisting = true,
+            ExistingSignatures = existingSignatures
+        };
+        return Show(input);
+    }
+
+    private static Dictionary<string, string> CopyAttrs(IReadOnlyDictionary<string, string> attributes)
+    {
+        var copy = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var kv in attributes)
+            copy[kv.Key] = kv.Value;
+        return copy;
+    }
+
+    private void EnterEditMode()
+    {
+        Title = "iSurvey — Sửa thông tin khung";
+        LayoutPanel.Visibility = Visibility.Collapsed;
+        PdfCheck.Visibility = Visibility.Collapsed;
+        ApplyAllCheck.Visibility = Visibility.Visible;
+        ApplyAllCheck.IsChecked = true;
+        OkButton.Content = "Cập nhật";
+        OkButton.IsEnabled = true;
+        FieldsTitle.Text = "THÔNG TIN TRÊN KHUNG";
+        UpdateContentEditor();
+        UpdateLogoNote();
     }
 
  private static string Fmt(double v) => v.ToString("0.##", CultureInfo.InvariantCulture);
@@ -148,7 +236,7 @@ public partial class RouteLayoutWindow : Window
     {
         if (_loading)
             return;
-        if (!_overlapTouched)
+        if (!_overlapTouched && !_in.KeepOverlap)
         {
             _loading = true;
             OverlapBox.Text = Fmt(Math.Max(1, Math.Round(_in.MapWidthM(CurrentSize, CurrentScale) * 0.1)));
@@ -186,10 +274,13 @@ public partial class RouteLayoutWindow : Window
 
         var size = CurrentSize;
         var scale = CurrentScale;
-        var wMeters = _in.MapWidthM(size, scale);
+        if (_in.RejectPlan?.Invoke(size, scale) is { Length: > 0 } why)
+        {
+            ShowWarn(why);
+            return;
+        }
+
         _pieces = Math.Max(1, _in.CountPieces(size, scale, ov));
-        InfoText.Text =
-            $"Tuyến dài {_in.RouteLengthM:0.#} m  →  {_pieces} tờ khổ {size} tỷ lệ 1/{scale}   (vùng bản đồ mỗi tờ dài {wMeters:0.#} m, chồng gối {ov:0.#} m)";
 
         if (!_gridTouched)
         {
@@ -257,8 +348,8 @@ public partial class RouteLayoutWindow : Window
             var sign = IsSignRow(row);
             SignPanel.Visibility = sign ? Visibility.Visible : Visibility.Collapsed;
             if (sign)
-                SignClearButton.Visibility = _signatures.ContainsKey(row.Field.Tag) ? Visibility.Visible : Visibility.Collapsed;
-            LogoPanel.Visibility = row.Stt is 1 or 5 ? Visibility.Visible : Visibility.Collapsed;
+                ApplySignButton(row.Field.Tag);
+            LogoPanel.Visibility = !_in.EditExisting && row.Stt is 1 or 5 ? Visibility.Visible : Visibility.Collapsed;
             if (row.Stt is 1 or 5)
             {
                 LogoClearButton.Visibility = PendingLogo(row.Stt == 1) is null ? Visibility.Collapsed : Visibility.Visible;
@@ -459,8 +550,24 @@ public partial class RouteLayoutWindow : Window
             parts.Add("logo đơn vị thiết kế: thay bằng " + System.IO.Path.GetFileName(_logoDesign));
         foreach (var kv in _signatures)
             parts.Add("chữ ký " + kv.Key + ": " + System.IO.Path.GetFileName(kv.Value));
+        foreach (var tag in _clearedSigns)
+        {
+            if (!_signatures.ContainsKey(tag))
+                parts.Add("bỏ chữ ký " + tag);
+        }
+
+        if (_in.EditExisting)
+        {
+            parts.Add("ô Tờ và tỷ lệ giữ nguyên");
+            LogoNote.Text = string.Join("; ", parts) + ".";
+            return;
+        }
+
         LogoNote.Text = parts.Count == 0 ? "" : string.Join("; ", parts) + " (áp dụng khi bấm Tạo Layout).";
     }
+
+    private bool HasSign(string tag) =>
+        _signatures.ContainsKey(tag) || (_existingSigns.Contains(tag) && !_clearedSigns.Contains(tag));
 
     private static bool IsSignRow(FieldRow row) =>
         row.Field.Tag.StartsWith("TEN_", StringComparison.OrdinalIgnoreCase)
@@ -542,11 +649,36 @@ public partial class RouteLayoutWindow : Window
         return key.Length > 0;
     }
 
+    private void ApplySignButton(string tag)
+    {
+        var has = HasSign(tag);
+        SignButton.Content = has ? "Xóa chữ ký" : "Chèn chữ ký";
+        if (!has)
+        {
+            SignButton.ToolTip = "Chọn file DWG chữ ký cho ô họ tên này.";
+            return;
+        }
+
+        SignButton.ToolTip = _signatures.TryGetValue(tag, out var path)
+            ? "Bỏ chữ ký " + System.IO.Path.GetFileName(path)
+            : "Bỏ chữ ký đang gắn trên ô này.";
+    }
+
     private void Sign_Click(object sender, RoutedEventArgs e)
     {
         var row = Selected;
         if (row is null || !IsSignRow(row))
             return;
+        if (HasSign(row.Field.Tag))
+        {
+            _signatures.Remove(row.Field.Tag);
+            if (_existingSigns.Contains(row.Field.Tag))
+                _clearedSigns.Add(row.Field.Tag);
+            UpdateLogoNote();
+            UpdateContentEditor();
+            return;
+        }
+
         using var dlg = new System.Windows.Forms.OpenFileDialog
         {
             Title = "Chọn bản vẽ chữ ký cho " + row.Label,
@@ -556,16 +688,7 @@ public partial class RouteLayoutWindow : Window
         if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
             return;
         _signatures[row.Field.Tag] = dlg.FileName;
-        UpdateLogoNote();
-        UpdateContentEditor();
-    }
-
-    private void SignClear_Click(object sender, RoutedEventArgs e)
-    {
-        var row = Selected;
-        if (row is null)
-            return;
-        _signatures.Remove(row.Field.Tag);
+        _clearedSigns.Remove(row.Field.Tag);
         UpdateLogoNote();
         UpdateContentEditor();
     }
@@ -578,6 +701,13 @@ public partial class RouteLayoutWindow : Window
 
     private void Ok_Click(object sender, RoutedEventArgs e)
     {
+        if (_in.EditExisting)
+        {
+            Result = BuildResult(size: "A3", scale: 1000, overlap: 0, rows: 1, cols: 1, gap: 0, plotPdf: false);
+            Close();
+            return;
+        }
+
         if (!TryNum(OverlapBox.Text, out var ov) || ov < 0)
         {
             ShowWarn("Chồng gối phải là số mét ≥ 0.");
@@ -596,6 +726,12 @@ public partial class RouteLayoutWindow : Window
             return;
         }
 
+        Result = BuildResult(CurrentSize, CurrentScale, ov, rows, cols, gap, PdfCheck.IsChecked == true);
+        Close();
+    }
+
+    private RouteLayoutOptions BuildResult(string size, int scale, double overlap, int rows, int cols, double gap, bool plotPdf)
+    {
         var attrs = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach (var r in _rows)
         {
@@ -603,23 +739,24 @@ public partial class RouteLayoutWindow : Window
                 attrs[r.Field.Tag] = FrameFields.Clean(r.Value);
         }
 
-        Result = new RouteLayoutOptions
+        return new RouteLayoutOptions
         {
-            Size = CurrentSize,
-            Scale = CurrentScale,
-            OverlapM = ov,
+            Size = size,
+            Scale = scale,
+            OverlapM = overlap,
             Rows = rows,
             Cols = cols,
             GapMm = gap,
-            PlotPdf = PdfCheck.IsChecked == true,
+            PlotPdf = plotPdf,
             Attributes = attrs,
             LogoOwnerPath = _logoOwner,
             LogoDesignPath = _logoDesign,
             HideOwnerLogo = _hideOwner,
             HideDesignLogo = _hideDesign,
-            Signatures = new Dictionary<string, string>(_signatures, StringComparer.OrdinalIgnoreCase)
+            Signatures = new Dictionary<string, string>(_signatures, StringComparer.OrdinalIgnoreCase),
+            ClearSignatures = new HashSet<string>(_clearedSigns, StringComparer.OrdinalIgnoreCase),
+            ApplyToAll = ApplyAllCheck.IsChecked == true
         };
-        Close();
     }
 }
 

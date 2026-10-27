@@ -1,5 +1,21 @@
 # Changelog — iSurvey
 
+## Chưa đóng gói — 2026-10-27 (vẫn 1.8.7)
+
+Chưa bump phiên bản, chưa phát hành. Máy cài bằng UPD vẫn đang 1.8.7.
+
+### Rải khung theo tuyến
+- Lệnh đổi tên **RAIKHUNG**. `DANTRANG` và `CATTUYEN` không còn.
+- Hộp thoại gọn một hàng khổ giấy và lưới. Tiêu đề mục khung tên là «2. THÔNG TIN KHUNG TÊN». Cột STT và đầu bảng căn giữa. Đầu cột «Nội dung» không có dấu hai chấm.
+- Tick «Tự động gộp, xuất pdf sau khi tạo» bật sẵn khi tạo trang. Lệnh không hộp thoại không tự in.
+- Đã chọn file chữ ký thì nút thành **Xóa chữ ký**. Nhấp đúp khung để sửa thông tin.
+- **INTUYEN** hỏi in khung đang chọn (`1`) hay tất cả (`2`), có cửa sổ tiến trình, và in được layout mặt cắt dọc.
+
+### Rải khung mặt cắt dọc
+- **RAIMCD**: chọn góc dưới-trái của hàng cuối cần in. Tỷ lệ trên khung là `1/500; 1/5000` hoặc `1/200; 1/2000`. Viewport khóa theo mẫu số lớn (1:5000 hoặc 1:2000).
+- Dải cao hơn khổ giấy thì tăng khổ A3 → A2 → A1 → A0, không đổi tỷ lệ. Layout tên `MatCat_Doc`.
+- Mặt đất đặt ở khoảng trên-giữa khung. Góc trái sát mép trong của khung.
+
 ## 1.8.7 — 2026-10-27
 
 ### Dàn trang in

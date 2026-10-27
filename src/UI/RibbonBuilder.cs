@@ -132,7 +132,10 @@ public static class RibbonBuilder
                     new Btn("Cắt Bình Đồ", "CATBD", RibbonIcons.CatBd, true)
                 ],
                 [
-                    new Btn("Rải Khung Theo Tuyến", "RAIKHUNG", RibbonIcons.RaiKhung, false),
+                    new Btn("Rải Khung Theo Tuyến", "RAIKHUNG", RibbonIcons.RaiKhung, true,
+                        "Rải khung in dọc tuyến: một layout, nhiều tờ, viewport xoay (RAIKHUNG)"),
+                    new Btn("Rải Khung Mặt Cắt", "RAIMCD", RibbonIcons.RaiKhung, true,
+                        "Rải khung in mặt cắt dọc: chọn góc dưới-trái hàng cuối, tỷ lệ 1/500; 1/5000 (RAIMCD)"),
                     new Btn("Thiết Lập Tỉ Lệ Khung", "TILEKHUNG", RibbonIcons.TileKhung, false),
                     new Btn("Bảo Vệ Layer Khung", "KHOAKHUNG", RibbonIcons.KhoaKhung, false)
                 ]);

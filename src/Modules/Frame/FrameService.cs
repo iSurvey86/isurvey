@@ -474,7 +474,7 @@ public sealed partial class FrameService
                 extras,
                 drawing = ActivityLogger.FileName(doc.Database.Filename)
             });
-            ed.WriteMessage($"\n[iSurvey] Đã chèn {placed} khung. Nhấp đúp vào khung để điền khung tên; một lần UNDO hoàn tác cả lượt chèn vừa rồi.");
+            ed.WriteMessage($"\n[iSurvey] Đã chèn {placed} khung. Nhấp đúp vào khung để sửa thông tin; một lần UNDO hoàn tác cả lượt chèn vừa rồi.");
         }
     }
 

@@ -57,8 +57,20 @@ public sealed class RouteLayoutOptions
     public double GapMm { get; set; } = 20;
     public bool PlotPdf { get; set; }
 
-    /// <summary>File DWG chữ ký theo tag TEN_1 … TEN_5.</summary>
+    /// <summary>Chuỗi ghi vào ô tỷ lệ. Mặt cắt dọc dùng "1/500; 1/5000". Trống thì ghi 1/N.</summary>
+    [JsonIgnore]
+    public string? ScaleText { get; set; }
+
+    /// <summary>File DWG chữ ký theo tag TEN_1 … TEN_5. Khóa không có = giữ chữ ký đang có trên khung.</summary>
     public Dictionary<string, string> Signatures { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Tag TEN_n cần gỡ chữ ký đã chèn. Chỉ dùng khi sửa khung có sẵn.</summary>
+    [JsonIgnore]
+    public HashSet<string> ClearSignatures { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Sửa khung có sẵn: true = mọi khung cùng layout, false = chỉ khung vừa chọn.</summary>
+    [JsonIgnore]
+    public bool ApplyToAll { get; set; }
 
     /// <summary>Giá trị ô khung tên theo tag (đã gồm giá trị mặc định của khung mẫu).</summary>
     public Dictionary<string, string> Attributes { get; set; } = new(StringComparer.OrdinalIgnoreCase);

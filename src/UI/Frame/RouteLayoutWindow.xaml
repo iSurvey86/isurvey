@@ -1,8 +1,8 @@
 ﻿<Window x:Class="iSurvey.UI.Frame.RouteLayoutWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="iSurvey — Dàn trang in"
-        Width="1000" Height="740" MinWidth="860" MinHeight="620"
+        Title="iSurvey — Rải khung theo tuyến"
+        Width="1120" SizeToContent="Height" MinWidth="1040" MaxHeight="980"
         WindowStartupLocation="CenterScreen" ShowInTaskbar="False"
         Background="#F3F5F8" FontFamily="Segoe UI" FontSize="13" PreviewKeyDown="Window_PreviewKeyDown">
     <Window.Resources>
@@ -68,59 +68,66 @@
             <Setter Property="RowBackground" Value="White" />
             <Setter Property="AlternatingRowBackground" Value="#F8FAFC" />
             <Setter Property="RowHeight" Value="26" />
+            <Setter Property="EnableRowVirtualization" Value="False" />
+            <Setter Property="EnableColumnVirtualization" Value="False" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="ColumnHeaderStyle">
+                <Setter.Value>
+                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                    </Style>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="SttCell" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
     </Window.Resources>
 
     <Grid Margin="14">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <!-- 1. Cài đặt bố cục & bản in -->
-        <Border Grid.Row="0" Background="White" BorderBrush="#D5DBE4" BorderThickness="1" CornerRadius="4" Padding="14,10,14,12">
+        <Border x:Name="LayoutPanel" Grid.Row="0" Background="White" BorderBrush="#D5DBE4" BorderThickness="1" CornerRadius="4" Padding="14,10,14,12">
             <StackPanel>
                 <TextBlock Style="{StaticResource SectionTitle}" Text="1. CÀI ĐẶT BỐ CỤC &amp; BẢN IN" />
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="18" />
-                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="28" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0">
                         <TextBlock Text="Khổ giấy" FontWeight="SemiBold" Foreground="#1F4E8C" Margin="0,0,0,6" />
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                            <TextBlock Style="{StaticResource Lbl}" Text="Khổ:" Width="72" />
-                            <ComboBox x:Name="SizeBox" Width="160" SelectionChanged="Plan_Changed" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                            <TextBlock Style="{StaticResource Lbl}" Text="Tỷ lệ:" Width="72" />
-                            <ComboBox x:Name="ScaleBox" Width="110" SelectionChanged="Plan_Changed" />
-                        </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Style="{StaticResource Lbl}" Text="Chồng gối (m):" Width="92" />
-                            <TextBox x:Name="OverlapBox" Width="70" TextChanged="Overlap_TextChanged" />
+                            <TextBlock Style="{StaticResource Lbl}" Text="Khổ:" />
+                            <ComboBox x:Name="SizeBox" Width="148" Margin="0,0,14,0" SelectionChanged="Plan_Changed" />
+                            <TextBlock Style="{StaticResource Lbl}" Text="Tỷ lệ:" />
+                            <ComboBox x:Name="ScaleBox" Width="96" Margin="0,0,14,0" SelectionChanged="Plan_Changed" />
+                            <TextBlock Style="{StaticResource Lbl}" Text="Chồng gối (m):" />
+                            <TextBox x:Name="OverlapBox" Width="64" TextChanged="Overlap_TextChanged" />
                         </StackPanel>
                     </StackPanel>
                     <StackPanel Grid.Column="2">
                         <TextBlock Text="Lưới layout" FontWeight="SemiBold" Foreground="#1F4E8C" Margin="0,0,0,6" />
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                            <TextBlock Style="{StaticResource Lbl}" Text="Hàng:" Width="72" />
-                            <TextBox x:Name="RowsBox" Width="56" TextChanged="Grid_TextChanged" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                            <TextBlock Style="{StaticResource Lbl}" Text="Cột:" Width="72" />
-                            <TextBox x:Name="ColsBox" Width="56" TextChanged="Grid_TextChanged" />
-                        </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Style="{StaticResource Lbl}" Text="Cách (mm):" Width="72" />
-                            <TextBox x:Name="GapBox" Width="56" />
+                            <TextBlock Style="{StaticResource Lbl}" Text="Hàng:" />
+                            <TextBox x:Name="RowsBox" Width="52" Margin="0,0,12,0" TextChanged="Grid_TextChanged" />
+                            <TextBlock Style="{StaticResource Lbl}" Text="Cột:" />
+                            <TextBox x:Name="ColsBox" Width="52" Margin="0,0,12,0" TextChanged="Grid_TextChanged" />
+                            <TextBlock Style="{StaticResource Lbl}" Text="Cách (mm):" />
+                            <TextBox x:Name="GapBox" Width="52" />
                         </StackPanel>
                     </StackPanel>
                 </Grid>
-                <TextBlock x:Name="InfoText" Margin="0,10,0,0" Foreground="#1F4E8C" TextWrapping="Wrap" />
-                <TextBlock x:Name="WarnText" Margin="0,2,0,0" Foreground="#C0392B" TextWrapping="Wrap" Visibility="Collapsed" />
+                <TextBlock x:Name="WarnText" Margin="0,8,0,0" Foreground="#C0392B" TextWrapping="Wrap" Visibility="Collapsed" />
             </StackPanel>
         </Border>
 
@@ -129,14 +136,14 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <DockPanel Grid.Row="0" LastChildFill="True" Margin="0,0,0,8">
                     <Button DockPanel.Dock="Right" Content="Nhập TXT/CSV" Padding="12,4" Click="Import_Click"
                             ToolTip="Mỗi dòng: MÃ;nội dung hoặc STT;nội dung. Ô Tờ và tỷ lệ vẫn tự điền." />
-                    <TextBlock Style="{StaticResource SectionTitle}" Margin="0" VerticalAlignment="Center"
-                               Text="2. THÔNG TIN KHUNG TÊN (áp dụng cho mọi tờ)" />
+                    <TextBlock x:Name="FieldsTitle" Style="{StaticResource SectionTitle}" Margin="0" VerticalAlignment="Center"
+                               Text="2. THÔNG TIN KHUNG TÊN" />
                 </DockPanel>
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
@@ -147,17 +154,17 @@
                     <DataGrid x:Name="LeftGrid" Grid.Column="0" Style="{StaticResource FieldGrid}"
                               SelectionChanged="Grid_SelectionChanged" BeginningEdit="Grid_BeginningEdit" CellEditEnding="Grid_CellEditEnding" PreviewMouseDoubleClick="Grid_DoubleClick" PreviewKeyDown="Grid_KeyDown">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="STT" Binding="{Binding Stt, Mode=OneWay}" IsReadOnly="True" Width="44" />
+                            <DataGridTextColumn Header="STT" Binding="{Binding Stt, Mode=OneWay}" IsReadOnly="True" Width="44" ElementStyle="{StaticResource SttCell}" />
                             <DataGridTextColumn Header="Tiêu đề" Binding="{Binding Label, Mode=OneWay}" IsReadOnly="True" Width="130" />
-                            <DataGridTextColumn Header="Nội dung (kích đúp để sửa)" Binding="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="*" />
+                            <DataGridTextColumn Header="Nội dung" Binding="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="*" />
                         </DataGrid.Columns>
                     </DataGrid>
                     <DataGrid x:Name="RightGrid" Grid.Column="2" Style="{StaticResource FieldGrid}"
                               SelectionChanged="Grid_SelectionChanged" BeginningEdit="Grid_BeginningEdit" CellEditEnding="Grid_CellEditEnding" PreviewMouseDoubleClick="Grid_DoubleClick" PreviewKeyDown="Grid_KeyDown">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="STT" Binding="{Binding Stt, Mode=OneWay}" IsReadOnly="True" Width="44" />
+                            <DataGridTextColumn Header="STT" Binding="{Binding Stt, Mode=OneWay}" IsReadOnly="True" Width="44" ElementStyle="{StaticResource SttCell}" />
                             <DataGridTextColumn Header="Tiêu đề" Binding="{Binding Label, Mode=OneWay}" IsReadOnly="True" Width="130" />
-                            <DataGridTextColumn Header="Nội dung (kích đúp để sửa)" Binding="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="*" />
+                            <DataGridTextColumn Header="Nội dung" Binding="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="*" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
@@ -167,13 +174,11 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock x:Name="ContentLabel" Grid.Column="0" Style="{StaticResource Lbl}" Text="Nội dung:" FontWeight="SemiBold" />
+                    <TextBlock x:Name="ContentLabel" Grid.Column="0" Style="{StaticResource Lbl}" Text="Nội dung" FontWeight="SemiBold" />
                     <TextBox x:Name="ContentBox" Grid.Column="1" MinHeight="28" TextChanged="Content_TextChanged" LostFocus="Content_LostFocus" />
                     <StackPanel x:Name="SignPanel" Grid.Column="2" Orientation="Horizontal" Margin="10,0,0,0" Visibility="Collapsed">
-                        <Button Content="Chèn chữ ký" Padding="14,4" Click="Sign_Click"
-                                ToolTip="Chọn file DWG chữ ký. Đặt vào đúng ô họ tên này trên mọi tờ khi bấm Tạo Layout." />
-                        <Button x:Name="SignClearButton" Content="✕" Padding="8,4" Margin="4,0,0,0" Click="SignClear_Click"
-                                ToolTip="Bỏ chữ ký đã chọn cho ô này" Visibility="Collapsed" />
+                        <Button x:Name="SignButton" Content="Chèn chữ ký" MinWidth="118" Padding="14,4" Click="Sign_Click"
+                                ToolTip="Chọn file DWG chữ ký cho ô họ tên này." />
                     </StackPanel>
                     <StackPanel x:Name="LogoPanel" Grid.Column="2" Orientation="Horizontal" Margin="10,0,0,0" Visibility="Collapsed">
                         <Button x:Name="LogoButton" Content="Thay Logo..." Padding="14,4" Click="Logo_Click"
@@ -194,7 +199,9 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                <CheckBox x:Name="PdfCheck" Content="Tự động in PDF gộp sau khi tạo" />
+                <CheckBox x:Name="ApplyAllCheck" Content="Áp dụng cho toàn bộ khung" IsChecked="True" Visibility="Collapsed"
+                          ToolTip="Bỏ chọn để chỉ sửa khung vừa nhắp. Ô Tờ và tỷ lệ giữ nguyên." />
+                <CheckBox x:Name="PdfCheck" Content="Tự động gộp, xuất pdf sau khi tạo" Foreground="#6AAA2A" FontWeight="SemiBold" Margin="0,4,0,0" IsChecked="True" />
                 <TextBlock x:Name="LogoNote" Margin="0,4,0,0" Foreground="#555" FontSize="12" TextWrapping="Wrap" />
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal">

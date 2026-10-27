@@ -15,6 +15,8 @@ internal static class RoutePdfPlot
     public static bool Plot(
         Document doc, string layoutName, IReadOnlyList<Extents2d> windows, string pdfPath, double paperW, double paperH, out string? issue)
     {
+        _ = paperW;
+        _ = paperH;
         issue = null;
         if (windows.Count == 0)
         {
@@ -39,6 +41,7 @@ internal static class RoutePdfPlot
         }
 
         var step = "";
+        PlotProgressWindow? progress = null;
         try
         {
             AcadApp.SetSystemVariable("BACKGROUNDPLOT", 0);
@@ -49,8 +52,10 @@ internal static class RoutePdfPlot
                 File.Delete(pdfPath);
 
             using var _ = doc.LockDocument();
+            progress = PlotProgressWindow.ShowNew();
             var db = doc.Database;
             step = "CurrentLayout";
+            progress.Report(0, windows.Count, "Đang mở layout " + layoutName + "...");
             LayoutManager.Current.CurrentLayout = layoutName;
 
             using var tr = db.TransactionManager.StartTransaction();
@@ -61,14 +66,22 @@ internal static class RoutePdfPlot
             var settingsKeep = new List<PlotSettings>();
             var psv = PlotSettingsValidator.Current;
             var piv = new PlotInfoValidator { MediaMatchingPolicy = MatchingPolicy.MatchEnabled };
-            foreach (var w in windows)
+            for (var i = 0; i < windows.Count; i++)
             {
+                if (progress.Cancelled)
+                {
+                    DisposeSettings(settingsKeep);
+                    issue = "đã hủy";
+                    return false;
+                }
+
                 step = "PlotSettings";
+                progress.Report(i, windows.Count, $"Đang chuẩn bị trang {i + 1} / {windows.Count}...");
                 var ps = new PlotSettings(lay.ModelType);
                 ps.CopyFrom(lay);
                 settingsKeep.Add(ps);
                 step = "SetPlotWindowArea";
-                psv.SetPlotWindowArea(ps, w);
+                psv.SetPlotWindowArea(ps, windows[i]);
                 step = "SetPlotType";
                 psv.SetPlotType(ps, Autodesk.AutoCAD.DatabaseServices.PlotType.Window);
                 var pi = new PlotInfo { Layout = lay.ObjectId, OverrideSettings = ps };
@@ -77,27 +90,51 @@ internal static class RoutePdfPlot
                 infos.Add(pi);
             }
 
+            if (progress.Cancelled || infos.Count == 0)
+            {
+                DisposeSettings(settingsKeep);
+                issue = "đã hủy";
+                return false;
+            }
+
             step = "BeginPlot";
             using var pe = PlotFactory.CreatePublishEngine();
             pe.BeginPlot(null, null);
             step = "BeginDocument";
             pe.BeginDocument(infos[0], doc.Name, null, 1, true, pdfPath);
+            var printed = 0;
+            var cancelled = false;
             for (var i = 0; i < infos.Count; i++)
             {
+                if (progress.Cancelled)
+                {
+                    cancelled = true;
+                    break;
+                }
+
                 step = $"BeginPage {i + 1}";
+                progress.Report(printed, infos.Count, $"Đang in trang {i + 1} / {infos.Count}...");
                 using var ppi = new PlotPageInfo();
                 pe.BeginPage(ppi, infos[i], i == infos.Count - 1, null);
                 pe.BeginGenerateGraphics(null);
                 pe.EndGenerateGraphics(null);
                 pe.EndPage(null);
+                printed++;
+                progress.Report(printed, infos.Count, $"Đã in {printed} / {infos.Count} trang");
             }
 
             step = "EndDocument";
             pe.EndDocument(null);
             pe.EndPlot(null);
             tr.Commit();
-            foreach (var ps in settingsKeep)
-                ps.Dispose();
+            DisposeSettings(settingsKeep);
+
+            if (cancelled)
+            {
+                TryDelete(pdfPath);
+                issue = "đã hủy";
+                return false;
+            }
 
             if (!File.Exists(pdfPath) || new FileInfo(pdfPath).Length == 0)
             {
@@ -105,6 +142,7 @@ internal static class RoutePdfPlot
                 return false;
             }
 
+            progress.Report(infos.Count, infos.Count, "Đã xuất xong.");
             return true;
         }
         catch (System.Exception ex)
@@ -116,6 +154,15 @@ internal static class RoutePdfPlot
         {
             try
             {
+                progress?.ForceClose();
+            }
+            catch
+            {
+                // không chặn
+            }
+
+            try
+            {
                 if (oldBg is not null)
                     AcadApp.SetSystemVariable("BACKGROUNDPLOT", oldBg);
             }
@@ -125,5 +172,24 @@ internal static class RoutePdfPlot
             }
         }
     }
-}
 
+    private static void DisposeSettings(List<PlotSettings> settings)
+    {
+        foreach (var ps in settings)
+            ps.Dispose();
+        settings.Clear();
+    }
+
+    private static void TryDelete(string pdfPath)
+    {
+        try
+        {
+            if (File.Exists(pdfPath))
+                File.Delete(pdfPath);
+        }
+        catch
+        {
+            // file đang mở: bỏ qua
+        }
+    }
+}

@@ -12,6 +12,41 @@
 
 ---
 
+## 2026-10-27 — RAIKHUNG, RAIMCD (vẫn 1.8.7, chưa phát hành)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ, **không bump phiên bản, không phát hành**. Gói UPD vẫn là 1.8.7. DLL trên máy này đã là bản mới (bundle 2025).
+
+### Đã chốt / đã làm
+
+- **RAIKHUNG** thay **DANTRANG**. Alias `CATTUYEN` bỏ. Hộp thoại: một hàng khổ giấy và lưới; tiêu đề «2. THÔNG TIN KHUNG TÊN»; cột STT và tiêu đề bảng căn giữa; đầu cột «Nội dung» không có dấu hai chấm; không thanh cuộn. Tick «Tự động gộp, xuất pdf sau khi tạo» màu xanh, bật sẵn khi tạo mới. Lệnh nhanh không tự in PDF. Đã chọn file chữ ký thì nút thành **Xóa chữ ký**. Nhấp đúp khung mở hộp sửa thông tin.
+- **INTUYEN** hỏi `1` khung đang chọn, `2` tất cả. Có cửa sổ tiến trình. In được cả layout `MatCat_Doc`.
+- **RAIMCD**: một điểm, góc dưới-trái hàng cuối cần in (thường là Khoảng cách cộng dồn). Tỷ lệ ghi trên khung là `1/500; 1/5000` (viewport khóa 1:5000), hoặc `1/200; 1/2000`. Không ghi `1/100; 1/1000`. Cao quá khổ thì lên A3 → A2 → A1 → A0, giữ tỷ lệ. Layout `MatCat_Doc`. Mặt đất ở khoảng trên-giữa khung. Góc trái sát mép trong khung (cách khoảng 2 mm). Ô tỷ lệ rộng đủ chữ. Đã xem trên bản sao MCD1 (A2) và MCD2 (A3), đóng không lưu. File gốc trong `docs\MCD` không đổi và không đưa vào git.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Rải khung tuyến | `src/UI/Frame/RouteLayoutWindow.*`, `src/Modules/Frame/FrameService.RouteLayout.cs`, `RoutePdfPlot.cs`, `PlotProgressWindow.cs` |
+| Sửa khung, nhấp đúp | `FrameDoubleClick.cs`, `FrameService.FrameEdit.cs` |
+| Mặt cắt dọc | `src/Modules/Frame/FrameService.ProfileLayout.cs` |
+| Lệnh, ribbon | `CommandAliases.cs`, `RibbonBuilder.cs`, `ActivityPhrases.cs` |
+
+### Việc tiếp
+
+- [ ] Phát hành khi được yêu cầu (khi đó mới bump phiên bản), rồi các máy **UPD**.
+- [ ] Alignment Civil làm đầu vào RAIKHUNG: chưa thử.
+- [ ] Mẫu mặt cắt `docs\MCD` chỉ có trên máy này.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff và tiếp tục. Nguồn đã có RAIKHUNG, INTUYEN chọn khung, và RAIMCD, nhưng gói cài vẫn 1.8.7, chưa phát hành. Tiếp: phát hành khi được yêu cầu, hoặc thử Alignment cho RAIKHUNG.
+```
+
+**Lưu trữ ngày:** [2026-10-27-raikhung-raimcd.md](./2026-10-27-raikhung-raimcd.md)
+
+---
+
 ## 2026-10-27 — DANTRANG hộp thoại + đăng xuất từ xa (1.8.7)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ; phát hành **1.8.7**. SQL đăng xuất từ xa đã chạy trên Supabase (lần đầu lỗi view, chạy lại thì Success).
