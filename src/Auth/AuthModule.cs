@@ -39,7 +39,7 @@ public sealed class AuthModule : ISurveyModule
     [CommandMethod("ISURVEY_UPDATE")]
     public void UpdateCommand()
     {
-        AuthManager.Print("\n[iSurvey] Dang kiem tra ban cap nhat...");
+        AuthManager.Print("\n[iSurvey] Đang kiểm tra bản cập nhật...");
         var result = UpdateCheckService.Check();
         ActivityLogger.Enqueue("update_check", detail: new
         {
@@ -108,7 +108,7 @@ public sealed class AuthModule : ISurveyModule
             return;
         }
 
-        AuthManager.Print("\n[iSurvey] Dang dong AutoCAD/Civil de cai dat...");
+        AuthManager.Print("\n[iSurvey] Đang đóng AutoCAD/Civil để cài đặt...");
         try
         {
             AcadApp.Quit();

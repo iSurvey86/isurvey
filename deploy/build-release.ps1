@@ -1,5 +1,7 @@
 # Dong goi ban phat hanh: build bundle + zip Setup gui nguoi dung + version.json (update online).
-# Usage:  .\deploy\build-release.ps1 [-Notes "Mo ta ngan ban nay"]
+# Usage:  .\deploy\build-release.ps1 [-Notes "DANTRANG: ý nghĩa`nINTUYEN: ý nghĩa"]
+# -Notes: mỗi dòng một tính năng, tiếng Việt có dấu, dạng "LỆNH: ý nghĩa".
+# Không ghi thao tác chỉ dành cho Admin (OTP, đăng xuất từ xa, trợ lý AI).
 
 param(
     [string]$Notes = ""

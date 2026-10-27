@@ -1,7 +1,8 @@
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using iSurvey.Auth;
 using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 
@@ -13,7 +14,7 @@ public partial class UpdateWindow : Window
     private const int PreviewCount = 4;
 
     private readonly UpdateCheckService.Manifest _man;
-    private readonly IReadOnlyList<string> _notes;
+    private readonly IReadOnlyList<ReleaseNote> _notes;
     private readonly bool _force;
     private bool _expanded;
     private bool _busy;
@@ -52,6 +53,9 @@ public partial class UpdateWindow : Window
         };
     }
 
+    /// <summary>Một dòng tính năng: tên lệnh (nếu có) và ý nghĩa cho người dùng.</summary>
+    internal readonly record struct ReleaseNote(string? Command, string Text);
+
     /// <summary>Hiện hộp thoại. Trả về thư mục Setup đã giải nén nếu người dùng bấm Cập nhật ngay và tải xong; null nếu hủy hoặc lỗi.</summary>
     public static string? ShowAvailable(UpdateCheckService.Manifest man, bool force)
     {
@@ -60,7 +64,7 @@ public partial class UpdateWindow : Window
         return w.SetupDir;
     }
 
-    internal static IReadOnlyList<string> ParseNotes(string? notes)
+    internal static IReadOnlyList<ReleaseNote> ParseNotes(string? notes)
     {
         if (string.IsNullOrWhiteSpace(notes))
             return [];
@@ -77,10 +81,42 @@ public partial class UpdateWindow : Window
                 .Where(p => p.Length > 0)
                 .ToList();
             if (parts.Count > 1)
-                return parts;
+                lines = parts;
         }
 
-        return lines;
+        var list = new List<ReleaseNote>();
+        foreach (var line in lines)
+        {
+            if (IsAdminOnly(line))
+                continue;
+            list.Add(ToNote(line));
+        }
+
+        return list;
+    }
+
+    /// <summary>Dòng chỉ dành cho Admin (đăng xuất từ xa, OTP, trợ lý AI) không hiện cho người dùng.</summary>
+    private static bool IsAdminOnly(string line)
+    {
+        if (Regex.IsMatch(line, @"^\s*Admin\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+            return true;
+        if (Regex.IsMatch(line, "đăng xuất từ xa", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+            || Regex.IsMatch(line, "dang xuat tu xa", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+            return true;
+
+        var cmd = Regex.Match(line, @"^[A-Z][A-Z0-9_]{1,24}");
+        if (!cmd.Success)
+            return false;
+        return cmd.Value is "AIA" or "AICFG" or "GENOTP" or "ISURVEY_GENOTP";
+    }
+
+    /// <summary>Đưa về dạng tên lệnh + ý nghĩa. Dòng không bắt đầu bằng lệnh thì giữ nguyên câu.</summary>
+    private static ReleaseNote ToNote(string line)
+    {
+        var m = Regex.Match(line, @"^(?<cmd>[A-Z][A-Z0-9_]{1,24})(?:\s*[:：]\s*|\s+)(?<rest>\S.*)$");
+        if (!m.Success)
+            return new ReleaseNote(null, line);
+        return new ReleaseNote(m.Groups["cmd"].Value, m.Groups["rest"].Value.Trim());
     }
 
     private static string FormatVersion(string v, bool keepPrefix = true)
@@ -96,26 +132,27 @@ public partial class UpdateWindow : Window
     private void RenderNotes()
     {
         NotesList.Children.Clear();
+        var ink = (System.Windows.Media.Brush)FindResource("Ink");
+        var accent = (System.Windows.Media.Brush)FindResource("Accent");
         var take = _expanded || _notes.Count <= PreviewCount ? _notes.Count : PreviewCount;
         for (var i = 0; i < take; i++)
         {
-            var row = new StackPanel { Orientation = System.Windows.Controls.Orientation.Horizontal, Margin = new Thickness(0, 2, 0, 2) };
-            row.Children.Add(new TextBlock
+            var note = _notes[i];
+            var text = new TextBlock
             {
-                Text = "•",
-                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0x38, 0xAB, 0xFF)),
-                FontSize = 13,
-                Margin = new Thickness(0, 0, 8, 0)
-            });
-            row.Children.Add(new TextBlock
-            {
-                Text = _notes[i],
-                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0xD5, 0xDB, 0xE6)),
-                FontSize = 13,
                 TextWrapping = TextWrapping.Wrap,
-                MaxWidth = 420
-            });
-            NotesList.Children.Add(row);
+                FontSize = 13,
+                Foreground = ink,
+                Margin = new Thickness(0, 3, 0, 3)
+            };
+            text.Inlines.Add(new Run("•  ") { Foreground = accent });
+            if (!string.IsNullOrEmpty(note.Command))
+            {
+                text.Inlines.Add(new Run(note.Command) { FontWeight = FontWeights.SemiBold });
+                text.Inlines.Add(new Run(": "));
+            }
+            text.Inlines.Add(new Run(note.Text));
+            NotesList.Children.Add(text);
         }
 
         if (_notes.Count > PreviewCount)
@@ -127,12 +164,6 @@ public partial class UpdateWindow : Window
         {
             DetailLink.Visibility = Visibility.Collapsed;
         }
-    }
-
-    private void Header_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-        if (e.ButtonState == MouseButtonState.Pressed)
-            DragMove();
     }
 
     private void Detail_Click(object sender, MouseButtonEventArgs e)
@@ -155,7 +186,8 @@ public partial class UpdateWindow : Window
         _busy = true;
         OfferPanel.Visibility = Visibility.Collapsed;
         ProgressPanel.Visibility = Visibility.Visible;
-        CloseX.IsEnabled = false;
+        CloseButton.Visibility = Visibility.Collapsed;
+        UpdateButton.Visibility = Visibility.Collapsed;
         SetProgress("Đang tải gói cài đặt...", "Bắt đầu tải...", 0);
         _downloadStart = DateTime.UtcNow;
         UpdateApplyService.Trace("download_start latest=" + _man.Latest);
@@ -228,9 +260,8 @@ public partial class UpdateWindow : Window
         if (!staged.Ok || string.IsNullOrEmpty(staged.SetupDir))
         {
             _busy = false;
-            CloseX.IsEnabled = true;
             SetProgress("Không tải được bản mới", staged.Message, null);
-            ProgressButtons.Visibility = Visibility.Visible;
+            ErrorClose.Visibility = Visibility.Visible;
             AuthManager.Print("\n[iSurvey] " + staged.Message);
             return;
         }

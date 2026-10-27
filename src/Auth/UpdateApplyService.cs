@@ -320,7 +320,7 @@ public static class UpdateApplyService
         var asm = typeof(UpdateApplyService).Assembly;
         using var src = asm.GetManifestResourceStream("iSurvey.Apply-iSurveyUpdate.ps1");
         if (src is null)
-            throw new InvalidOperationException("Thieu script cai dat (Apply-iSurveyUpdate.ps1) trong DLL.");
+            throw new InvalidOperationException("Thiếu script cài đặt (Apply-iSurveyUpdate.ps1) trong DLL.");
         using var dst = File.Create(path);
         src.CopyTo(dst);
         return path;
