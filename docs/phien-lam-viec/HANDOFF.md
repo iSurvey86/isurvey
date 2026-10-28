@@ -5,6 +5,43 @@
 
 ---
 
+## 2026-10-28 — Kiểu in, Excel, lề mặt cắt (1.8.9, đã phát hành)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ và phát hành. Gói UPD là **1.8.9**.
+
+### Đã chốt / đã làm
+
+- **Kiểu in:** hộp thoại có In màu (`acad.ctb`) và In đen trắng (`monochrome.ctb`). Không sửa hai file `.ctb` của máy. RAIKHUNG và RAIMCD nhớ lựa chọn. INTUYEN in lại đúng bảng nét đang gắn trên layout.
+- **Nhập Excel/CSV:** cột STT là mã, cột Nội dung là giá trị. Ngày `10/2026` đọc đúng, không thành số serial. Đã thử cả `.xlsx` và `.xls` trên hộp thoại rồi hủy, không tạo layout.
+- **RAIMCD:** trục đứng lùi 2,5 m so với điểm chọn. Layout che phần trái và phần dưới điểm chọn bằng mặt nạ, không xóa Model. Đã xem trên bản sao MCD2: thước cao độ và nét đứng hiện lại. File gốc trong `docs\MCD` không đổi và không đưa vào git.
+- **Hộp thoại:** hai cột, cao vừa nội dung, 25 ô hiện hết, không cuộn. Ô dài có dấu `...`, rê chuột thì thấy đủ câu.
+- Bản 1.8.8 (nét PDF 0,05 mm, chữ đọc ngang, nhớ logo và chữ ký) chưa từng lên Supabase. Gói 1.8.9 mang theo các phần đó.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Kiểu in | `src/Modules/Frame/ThinPlotStyle.cs`, `RoutePdfPlot.cs`, `FrameService.RouteLayout.cs`, `FrameService.ProfileLayout.cs` |
+| Nhập Excel | `src/Modules/Frame/FrameSheetImport.cs`, `RouteLayoutWindow.xaml.cs` |
+| Hộp thoại | `src/UI/Frame/RouteLayoutWindow.xaml` |
+| Mặt cắt | `src/Modules/Frame/FrameService.ProfileLayout.cs` |
+
+### Việc tiếp
+
+- [ ] Alignment Civil làm đầu vào RAIKHUNG: chưa thử.
+- [ ] Nét polyline có độ rộng hình học không đổi theo bảng màu.
+- [ ] Các máy khác chạy **UPD** để lấy 1.8.9.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff và tiếp tục. Đã phát hành 1.8.9: kiểu in màu hoặc đen trắng, nhập Excel khung tên, lề mặt cắt dọc. UPD lấy bản này. Tiếp: Alignment cho RAIKHUNG khi được yêu cầu.
+```
+
+**Lưu trữ ngày:** [2026-10-28-kieu-in-excel.md](./2026-10-28-kieu-in-excel.md)
+
+---
+
 ## Đã chốt — không hỏi lại
 
 - Chuẩn hóa DGN theo TT 26/2024 và QCVN 72: user bỏ ngày 2026-10-23. Không làm bảng Level, màu, font theo quy chuẩn.

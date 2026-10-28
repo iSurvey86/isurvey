@@ -1,5 +1,21 @@
 # Changelog — iSurvey
 
+## 1.8.9 — 2026-10-28
+
+Đã phát hành. Máy đang 1.8.7 cập nhật bằng **UPD** nhận luôn phần 1.8.8 (nét mỏng, chữ đọc ngang, nhớ logo và chữ ký).
+
+### Hộp thoại rải khung
+- RAIKHUNG và RAIMCD dùng một cửa sổ hai cột: bên trái là bố cục in, bên phải là đủ 25 ô khung tên, không thanh cuộn. Ô nội dung dài có dấu `...`; rê chuột vào thì thấy đủ câu.
+- **Nhập Excel/CSV**: cột STT là mã, cột Nội dung là giá trị. Ngày kiểu tháng/năm đọc thành `10/2026`. Ô Tờ vẫn tự điền.
+
+### Kiểu in
+- **In màu** gắn `acad.ctb`. **In đen trắng** gắn `monochrome.ctb`. Độ dày nét lấy theo file trên máy. Không sửa hai file này.
+- INTUYEN in lại đúng bảng nét đã gắn trên layout.
+
+### Mặt cắt dọc
+- Trục đứng lùi 2,5 m so với điểm chọn để thước cao độ và nét đứng không dính mép viewport.
+- Từ góc dưới-trái điểm chọn, layout che phần thừa bên trái và bên dưới. Hình trên Model giữ nguyên.
+
 ## 1.8.8 — 2026-10-28
 
 Chưa phát hành. Máy cài bằng UPD vẫn đang 1.8.7 cho đến khi phát hành bản này.

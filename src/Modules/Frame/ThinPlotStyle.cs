@@ -3,6 +3,32 @@ using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 
 namespace iSurvey.Modules.Frame;
 
+/// <summary>Gắn acad.ctb hoặc monochrome.ctb có sẵn trên máy. Không sửa hai file này.</summary>
+internal static class NamedPlotStyle
+{
+    public const string ColorFile = "acad.ctb";
+    public const string MonoFile = "monochrome.ctb";
+
+    public static string FileName(bool monochrome) => monochrome ? MonoFile : ColorFile;
+
+    public static string Label(bool monochrome) => monochrome ? "đen trắng (monochrome.ctb)" : "màu (acad.ctb)";
+
+    public static void Apply(PlotSettings ps, Database db, bool monochrome) =>
+        Apply(ps, db, FileName(monochrome));
+
+    public static void Apply(PlotSettings ps, Database db, string fileName)
+    {
+        if (!db.PlotStyleMode)
+            throw new InvalidOperationException("bản vẽ dùng kiểu in đặt tên (STB), không gắn được bảng màu");
+
+        var v = PlotSettingsValidator.Current;
+        v.RefreshLists(ps);
+        v.SetCurrentStyleSheet(ps, fileName);
+        ps.PlotPlotStyles = true;
+        ps.ShowPlotStyles = true;
+    }
+}
+
 /// <summary>
 /// Bảng in màu của iSurvey: 255 màu ACI, màu và kiểu nét giữ theo đối tượng, nét in 0.05 mm.
 /// Không sửa acad.ctb hay file pc3 của máy.

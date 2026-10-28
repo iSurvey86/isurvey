@@ -29,6 +29,9 @@ public sealed partial class FrameService
     /// Mép trái vùng vẽ của khung mẫu nằm ở 20 mm (cột đóng tập). Đặt góc chọn ngay trong mép đó.
     /// </summary>
     private const double ProfileLeftInsetMm = 22;
+
+    /// <summary>Trục đứng nằm trong cửa sổ, cách điểm chọn về bên trái chừng này (mét) để không bị cắt mép.</summary>
+    private const double ProfileAxisMarginM = 2.5;
     private static readonly int[] ProfileScales = [5000, 2000];
     private static readonly string[] ProfileScaleLabels = ["1/500; 1/5000", "1/200; 1/2000"];
     private static readonly string[] ProfileSizes = ["A3", "A2", "A1", "A0"];
@@ -111,6 +114,7 @@ public sealed partial class FrameService
             OverlapM = overlapM,
             GapMm = saved.GapMm > 0 ? saved.GapMm : 20,
             PlotPdf = false,
+            Monochrome = saved.Monochrome,
             ScaleText = ProfileScaleText(scaleN),
             Attributes = attrs,
             HideOwnerLogo = TitleBlockFit.IsLogoHidden(db, owner: true),
@@ -243,7 +247,7 @@ public sealed partial class FrameService
             ed.WriteMessage($"\n[iSurvey] Chưa đặt được khổ giấy cho layout ({_pageSetupIssue}) — chọn khổ giấy {spec.Name}, tỷ lệ in 1:1 trong Page Setup.");
 
         ed.WriteMessage(
-            $"\n[iSurvey] Đã tạo layout {layoutName}: {built} tờ {spec.Name}, tỷ lệ {opts.ScaleText}. Viewport đã khóa.");
+            $"\n[iSurvey] Đã tạo layout {layoutName}: {built} tờ {spec.Name}, tỷ lệ {opts.ScaleText}. Viewport đã khóa. Kiểu in: {NamedPlotStyle.Label(opts.Monochrome)}.");
 
         string? pdfNote = null;
         string? pdfIssue = null;
@@ -596,6 +600,8 @@ public sealed partial class FrameService
         var custom = 1000.0 * unitM / opts.Scale;
         var labelMm = (band.XSplit - band.XLeft) * custom;
         var stationMm = mapW - labelMm;
+        var margin = ProfileAxisMarginM / unitM;
+        var marginMm = margin * custom;
         var viewH = mapH / custom;
         var centerY = ProfileCenterY(band, viewH);
 
@@ -621,11 +627,12 @@ public sealed partial class FrameService
         lm.CurrentLayout = "Model";
 
         var viewportIds = new List<ObjectId>();
+        var coverIds = new List<ObjectId>();
         using (var tr = db.TransactionManager.StartTransaction())
         {
             var bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
             var lay = (Layout)tr.GetObject(layoutId, OpenMode.ForWrite);
-            ApplyPageSetup(lay, spec, paperW, paperH);
+            ApplyPageSetup(lay, spec, paperW, paperH, opts.Monochrome);
             var ps = (BlockTableRecord)tr.GetObject(lay.BlockTableRecordId, OpenMode.ForWrite);
             foreach (ObjectId id in ps)
             {
@@ -668,22 +675,43 @@ public sealed partial class FrameService
 
                 PlaceSignatures(tr, ps, br, signBlocks);
 
+                var leftPaper = cx + originX + spec.Mx0 + ProfileLeftInsetMm;
+                var leftWidth = labelMm + marginMm;
+                var leftModel = (band.XLeft - margin + band.XSplit) / 2.0;
+                var paperY = cy + originY + spec.Cy;
                 viewportIds.Add(AddProfileViewport(tr, ps,
-                    cx + originX + spec.Mx0 + ProfileLeftInsetMm + labelMm / 2.0,
-                    cy + originY + spec.Cy,
-                    labelMm, mapH,
-                    (band.XLeft + band.XSplit) / 2.0, centerY, viewH, custom));
+                    leftPaper + leftWidth / 2.0, paperY,
+                    leftWidth, mapH,
+                    leftModel, centerY, viewH, custom));
+
+                var rightPaper = leftPaper + leftWidth - marginMm;
+                var rightModel = slice.X0 - margin + (stationMm / custom) / 2.0;
                 viewportIds.Add(AddProfileViewport(tr, ps,
-                    cx + originX + spec.Mx0 + ProfileLeftInsetMm + labelMm + stationMm / 2.0,
-                    cy + originY + spec.Cy,
+                    rightPaper + stationMm / 2.0, paperY,
                     stationMm, mapH,
-                    (slice.X0 + slice.X1) / 2.0, centerY, viewH, custom));
+                    rightModel, centerY, viewH, custom));
+
+                var xLeftPaper = leftPaper + leftWidth / 2.0 + (band.XLeft - leftModel) * custom;
+                var yCutPaper = paperY + (band.YCut - centerY) * custom;
+                foreach (var id in AddProfileCover(tr, ps, frameLayer,
+                    leftPaper, paperY - mapH / 2.0, rightPaper + stationMm, paperY + mapH / 2.0,
+                    xLeftPaper, yCutPaper))
+                    coverIds.Add(id);
             }
 
             tr.Commit();
         }
 
         lm.CurrentLayout = layoutName;
+        try
+        {
+            AcadApp.SetSystemVariable("WIPEOUTFRAME", 2);
+        }
+        catch
+        {
+            // khung wipeout không chặn lệnh
+        }
+
         using (var tr = db.TransactionManager.StartTransaction())
         {
             foreach (var vid in viewportIds)
@@ -691,6 +719,17 @@ public sealed partial class FrameService
                 var vp = (Viewport)tr.GetObject(vid, OpenMode.ForWrite);
                 vp.On = true;
                 vp.Locked = true;
+            }
+
+            if (coverIds.Count > 0)
+            {
+                var lay = (Layout)tr.GetObject(layoutId, OpenMode.ForRead);
+                var space = (BlockTableRecord)tr.GetObject(lay.BlockTableRecordId, OpenMode.ForRead);
+                var order = (DrawOrderTable)tr.GetObject(space.DrawOrderTableId, OpenMode.ForWrite);
+                var ids = new ObjectIdCollection();
+                foreach (var id in coverIds)
+                    ids.Add(id);
+                order.MoveToTop(ids);
             }
 
             tr.Commit();
@@ -730,6 +769,42 @@ public sealed partial class FrameService
         return vp.ObjectId;
     }
 
+    /// <summary>
+    /// Che phần model lọt vào lề trái và bên dưới điểm chọn. Không xóa hình trên Model.
+    /// </summary>
+    private static List<ObjectId> AddProfileCover(
+        Transaction tr, BlockTableRecord ps, string layer,
+        double left, double bottom, double right, double top, double xLeftPaper, double yCutPaper)
+    {
+        var made = new List<ObjectId>();
+        const double gap = 0.08;
+        var xMask = xLeftPaper - gap;
+        var yMask = yCutPaper - gap;
+        if (xMask - left > 0.12)
+            made.Add(AddCover(tr, ps, layer, left, bottom, xMask, top));
+        if (yMask - bottom > 0.2 && right - Math.Max(left, xMask) > 0.2)
+            made.Add(AddCover(tr, ps, layer, Math.Max(left, xMask), bottom, right, yMask));
+        return made;
+    }
+
+    private static ObjectId AddCover(
+        Transaction tr, BlockTableRecord ps, string layer, double x0, double y0, double x1, double y1)
+    {
+        var cover = new Wipeout { Layer = layer };
+        ps.AppendEntity(cover);
+        tr.AddNewlyCreatedDBObject(cover, true);
+        var pts = new Point2dCollection
+        {
+            new(x0, y0),
+            new(x1, y0),
+            new(x1, y1),
+            new(x0, y1),
+            new(x0, y0)
+        };
+        cover.SetFrom(pts, Vector3d.ZAxis);
+        return cover.ObjectId;
+    }
+
     private static void SaveProfileChoices(RouteLayoutOptions opts, Dictionary<string, string> defaults)
     {
         try
@@ -756,7 +831,8 @@ public sealed partial class FrameService
             Size = opts.Size,
             Scale = opts.Scale,
             OverlapM = opts.OverlapM,
-            GapMm = opts.GapMm
+            GapMm = opts.GapMm,
+            Monochrome = opts.Monochrome
         }.Save();
     }
 
@@ -766,6 +842,7 @@ public sealed partial class FrameService
         public int Scale { get; set; } = 5000;
         public double OverlapM { get; set; } = 100;
         public double GapMm { get; set; } = 20;
+        public bool Monochrome { get; set; }
 
         private static string FilePath =>
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "iSurvey", "profile_layout.json");

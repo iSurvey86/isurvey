@@ -57,6 +57,9 @@ public sealed class RouteLayoutOptions
     public double GapMm { get; set; } = 20;
     public bool PlotPdf { get; set; }
 
+    /// <summary>true = in đen trắng (monochrome.ctb). false = in màu (acad.ctb).</summary>
+    public bool Monochrome { get; set; }
+
     /// <summary>Chuỗi ghi vào ô tỷ lệ. Mặt cắt dọc dùng "1/500; 1/5000". Trống thì ghi 1/N.</summary>
     [JsonIgnore]
     public string? ScaleText { get; set; }
@@ -94,6 +97,9 @@ public sealed class RouteLayoutSettings
     public double OverlapM { get; set; } = -1;
     public double GapMm { get; set; } = 20;
     public bool PlotPdf { get; set; }
+
+    /// <summary>true = lần sau mở hộp thoại ở In đen trắng.</summary>
+    public bool Monochrome { get; set; }
 
     /// <summary>Chỉ các ô người dùng đã sửa khác mặc định của khung mẫu.</summary>
     public Dictionary<string, string> Attributes { get; set; } = new(StringComparer.OrdinalIgnoreCase);

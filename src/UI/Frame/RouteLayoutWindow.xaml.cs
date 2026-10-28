@@ -117,7 +117,6 @@ public partial class RouteLayoutWindow : Window
             SizeBox.Items.Add(PaperText.TryGetValue(s, out var t) ? $"{s} ({t})" : s);
         if (input.ScaleLabels is { Length: > 0 })
         {
-            ScaleBox.Width = 168;
             foreach (var label in input.ScaleLabels)
                 ScaleBox.Items.Add(label);
         }
@@ -135,6 +134,7 @@ public partial class RouteLayoutWindow : Window
         ColsBox.Text = init.Cols.ToString(CultureInfo.InvariantCulture);
         GapBox.Text = Fmt(init.GapMm);
         PdfCheck.IsChecked = !input.EditExisting || init.PlotPdf;
+        StyleBox.SelectedIndex = init.Monochrome ? 1 : 0;
         _hideOwner = init.HideOwnerLogo;
         _hideDesign = init.HideDesignLogo;
         if (input.ExistingSignatures is not null)
@@ -215,6 +215,8 @@ public partial class RouteLayoutWindow : Window
     {
         Title = "iSurvey — Sửa thông tin khung";
         LayoutPanel.Visibility = Visibility.Collapsed;
+        LeftColumn.Width = new GridLength(0);
+        GapColumn.Width = new GridLength(0);
         PdfCheck.Visibility = Visibility.Collapsed;
         ApplyAllCheck.Visibility = Visibility.Visible;
         ApplyAllCheck.IsChecked = true;
@@ -319,6 +321,19 @@ public partial class RouteLayoutWindow : Window
     }
 
     // ---- Bảng khung tên ----
+    private void Value_ToolTipOpening(object sender, ToolTipEventArgs e)
+    {
+        if (sender is not TextBlock block || string.IsNullOrWhiteSpace(block.Text))
+        {
+            e.Handled = true;
+            return;
+        }
+
+        block.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
+        if (block.DesiredSize.Width <= block.ActualWidth + 1)
+            e.Handled = true;
+    }
+
     private void Grid_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (_loading)
@@ -339,7 +354,7 @@ public partial class RouteLayoutWindow : Window
         _loading = true;
         if (row is null)
         {
-            ContentLabel.Text = "Nội dung:";
+            ContentLabel.Text = "Sửa đổi:";
             ContentBox.Text = "";
             ContentBox.IsEnabled = false;
             SignPanel.Visibility = Visibility.Collapsed;
@@ -347,7 +362,7 @@ public partial class RouteLayoutWindow : Window
         }
         else
         {
-            ContentLabel.Text = $"Nội dung ({row.Stt}. {row.Label}):";
+            ContentLabel.Text = "Sửa đổi:";
             ContentBox.Text = row.Field.Auto ? "Tự động: số thứ tự tờ / tổng số tờ (ví dụ 3/9)" : row.Value;
             ContentBox.IsEnabled = !row.Field.Auto;
             var sign = IsSignRow(row);
@@ -594,16 +609,16 @@ public partial class RouteLayoutWindow : Window
         using var dlg = new System.Windows.Forms.OpenFileDialog
         {
             Title = "Nhập thông tin khung tên",
-            Filter = "TXT hoặc CSV (*.txt;*.csv)|*.txt;*.csv|Tất cả (*.*)|*.*",
+            Filter = "Excel (*.xlsx;*.xlsm;*.xls)|*.xlsx;*.xlsm;*.xls|TXT hoặc CSV (*.txt;*.csv)|*.txt;*.csv|Tất cả (*.*)|*.*",
             CheckFileExists = true
         };
         if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
             return;
 
-        string[] lines;
+        IReadOnlyList<(string Key, string Value)> pairs;
         try
         {
-            lines = System.IO.File.ReadAllLines(dlg.FileName);
+            pairs = FrameSheetImport.Read(dlg.FileName);
         }
         catch (System.Exception ex)
         {
@@ -613,25 +628,16 @@ public partial class RouteLayoutWindow : Window
 
         var filled = 0;
         var skipped = 0;
-        foreach (var raw in lines)
+        foreach (var pair in pairs)
         {
-            var line = raw.Trim();
-            if (line.Length == 0 || line.StartsWith("#") || line.StartsWith("//"))
-                continue;
-            if (!SplitField(line, out var key, out var value))
-            {
-                skipped++;
-                continue;
-            }
-
-            var row = FindRow(key);
+            var row = FindRow(pair.Key);
             if (row is null || row.Field.Auto)
             {
                 skipped++;
                 continue;
             }
 
-            row.Value = FrameFields.Clean(value);
+            row.Value = FrameFields.Clean(pair.Value);
             filled++;
         }
 
@@ -646,22 +652,6 @@ public partial class RouteLayoutWindow : Window
         return _rows.FirstOrDefault(r =>
             r.Field.Tag.Equals(key, StringComparison.OrdinalIgnoreCase)
             || r.Label.Equals(key, StringComparison.OrdinalIgnoreCase));
-    }
-
-    private static bool SplitField(string line, out string key, out string value)
-    {
-        key = "";
-        value = "";
-        var cut = line.IndexOf(';');
-        if (cut < 0)
-            cut = line.IndexOf('\t');
-        if (cut < 0)
-            cut = line.IndexOf(',');
-        if (cut <= 0 || cut >= line.Length - 1)
-            return false;
-        key = line[..cut].Trim().Trim('"');
-        value = line[(cut + 1)..].Trim().Trim('"');
-        return key.Length > 0;
     }
 
     private void ApplySignButton(string tag)
@@ -763,6 +753,7 @@ public partial class RouteLayoutWindow : Window
             Cols = cols,
             GapMm = gap,
             PlotPdf = plotPdf,
+            Monochrome = StyleBox.SelectedIndex == 1,
             Attributes = attrs,
             LogoOwnerPath = _logoOwner,
             LogoDesignPath = _logoDesign,

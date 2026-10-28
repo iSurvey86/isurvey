@@ -128,6 +128,7 @@ public sealed partial class FrameService
             OverlapM = overlapM,
             GapMm = settings.GapMm,
             PlotPdf = false,
+            Monochrome = settings.Monochrome,
             Attributes = attrs,
             HideOwnerLogo = TitleBlockFit.IsLogoHidden(db, owner: true),
             HideDesignLogo = TitleBlockFit.IsLogoHidden(db, owner: false)
@@ -259,7 +260,7 @@ public sealed partial class FrameService
 
         ed.WriteMessage(
             $"\n[iSurvey] Đã tạo layout {layoutName}: {built} khung {spec.Name} 1/{scaleN} (lưới {opts.Rows}×{opts.Cols}, cách {opts.GapMm:0.#} mm). " +
-            $"Đường bao mảnh vẽ trên Model (layer {LayerPiece}, không in). Viewport đã khóa tỷ lệ/hướng.");
+            $"Đường bao mảnh vẽ trên Model (layer {LayerPiece}, không in). Viewport đã khóa tỷ lệ/hướng. Kiểu in: {NamedPlotStyle.Label(opts.Monochrome)}.");
 
         // 6) In PDF gộp
         string? pdfNote = null;
@@ -432,7 +433,8 @@ public sealed partial class FrameService
             Scale = o.Scale,
             OverlapM = o.OverlapM,
             GapMm = o.GapMm,
-            PlotPdf = o.PlotPdf
+            PlotPdf = o.PlotPdf,
+            Monochrome = o.Monochrome
         };
         foreach (var f in FrameFields.All)
         {
@@ -547,7 +549,7 @@ public sealed partial class FrameService
             var bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
             var model = (BlockTableRecord)tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite);
             var lay = (Layout)tr.GetObject(layoutId, OpenMode.ForWrite);
-            ApplyPageSetup(lay, spec, paperW, paperH);
+            ApplyPageSetup(lay, spec, paperW, paperH, opts.Monochrome);
 
             var ps = (BlockTableRecord)tr.GetObject(lay.BlockTableRecordId, OpenMode.ForWrite);
             // bỏ viewport phụ có sẵn (nếu có); giữ viewport số 1 = chính tờ giấy
@@ -970,7 +972,7 @@ public sealed partial class FrameService
     private static string _step = "";
 
     /// <summary>Thiết lập khổ giấy (ưu tiên khổ không lề), tỷ lệ in 1:1 (mm), máy in PDF. Lỗi thì ghi chú lại — layout vẫn dùng được.</summary>
-    private static void ApplyPageSetup(Layout lay, Spec spec, double paperW, double paperH)
+    private static void ApplyPageSetup(Layout lay, Spec spec, double paperW, double paperH, bool monochrome = false)
     {
         try
         {
@@ -1031,11 +1033,11 @@ public sealed partial class FrameService
             v.SetPlotOrigin(ps, new Point2d(0, 0));
             try
             {
-                ThinPlotStyle.Apply(ps, lay.Database);
+                NamedPlotStyle.Apply(ps, lay.Database, monochrome);
             }
             catch (System.Exception ex)
             {
-                _pageSetupIssue = "chưa gắn nét 0.05 mm: " + ex.Message;
+                _pageSetupIssue = "chưa gắn bảng nét " + NamedPlotStyle.FileName(monochrome) + ": " + ex.Message;
             }
 
             lay.CopyFrom(ps);
