@@ -142,7 +142,10 @@ public sealed partial class FrameService
                 TemplateDefaults = defaults,
                 CountPieces = CountPieces,
                 MapWidthM = (size, scale) => StationWidthM(band, size, scale, unitM),
-                SuggestGrid = (n) => { SuggestGrid(n, out var r, out var c); return (r, c); }
+                SuggestGrid = (n) => { SuggestGrid(n, out var r, out var c); return (r, c); },
+                ExistingSignatures = LiveSignatureTags(db),
+                KeptLogoOwner = KeptLogoFileName(db, owner: true),
+                KeptLogoDesign = KeptLogoFileName(db, owner: false)
             };
             var result = RouteLayoutWindow.Show(input);
             if (result is null)
@@ -611,7 +614,7 @@ public sealed partial class FrameService
 
         ApplyPendingLogos(doc, opts);
         ApplyLogoVisibility(doc, opts);
-        var signBlocks = ImportSignatureBlocks(doc, opts);
+        var signBlocks = CollectSignatureBlocks(doc, opts);
 
         var layoutId = lm.CreateLayout(layoutName);
         lm.CurrentLayout = layoutName;

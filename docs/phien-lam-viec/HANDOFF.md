@@ -12,6 +12,41 @@
 
 ---
 
+## 2026-10-28 — Nét PDF, chữ layout, nhớ chữ ký (1.8.8, chưa phát hành)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ. Nguồn đánh số **1.8.8**. Chưa phát hành. UPD các máy vẫn là 1.8.7.
+
+### Đã chốt / đã làm
+
+- **Nét PDF:** RAIKHUNG, RAIMCD và INTUYEN gắn bảng `iSurvey_005.ctb`. Cả 255 màu in nét 0.05 mm. Màu và kiểu nét theo đối tượng. Không sửa `acad.ctb` và không sửa file pc3. Đã in thử năm đường nét gốc 0.18–0.70 mm, PDF còn khoảng 0.05 mm.
+- **Chữ trên layout:** TEXT, MTEXT và thuộc tính trong vùng tờ RAIKHUNG đọc ngang khi xem layout. Góc và chiều cao trong Model không đổi. Sửa bên Model thì tờ in theo. Nhãn mảnh và chữ ngoài tờ không annotative.
+- **Logo và chữ ký:** nhớ trong từng file. Lần rải sau dùng lại cho đến khi đổi ảnh, đổi file chữ ký, hoặc bấm Xóa chữ ký. File mới không kéo theo. Đã rải hai lần trong một bản vẽ thử (mỗi layout một chữ ký, logo đã thay) và một file mới thì trống. Đóng không lưu.
+- Phần RAIKHUNG, INTUYEN và RAIMCD đã có trong nguồn từ 2026-10-27 nay nằm trong 1.8.8.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Nét in | `src/Modules/Frame/ThinPlotStyle.cs`, `src/PlotStyles/iSurvey_005.ctb`, `RoutePdfPlot.cs` |
+| Chữ layout, nhớ logo và chữ ký | `FrameService.RouteLayout.cs`, `FrameMemory.cs`, `LogoReplaceService.cs`, `FrameService.FrameEdit.cs`, `FrameService.ProfileLayout.cs` |
+| Hộp thoại | `src/UI/Frame/RouteLayoutWindow.xaml.cs` |
+
+### Việc tiếp
+
+- [ ] Phát hành 1.8.8 khi được yêu cầu, rồi các máy **UPD**.
+- [ ] Alignment Civil làm đầu vào RAIKHUNG: chưa thử.
+- [ ] Nét polyline có độ rộng hình học không đổi theo bảng màu. Nếu tờ in vẫn dày ở một số nét, kiểm tra độ rộng polyline.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff và tiếp tục. Nguồn 1.8.8 có nét PDF 0.05 mm, chữ đọc ngang trên layout, và nhớ logo cùng chữ ký trong từng file. Chưa phát hành, UPD vẫn 1.8.7. Tiếp: phát hành khi được yêu cầu.
+```
+
+**Lưu trữ ngày:** [2026-10-28-net-chu-ky.md](./2026-10-28-net-chu-ky.md)
+
+---
+
 ## 2026-10-27 — RAIKHUNG, RAIMCD (vẫn 1.8.7, chưa phát hành)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ, **không bump phiên bản, không phát hành**. Gói UPD vẫn là 1.8.7. DLL trên máy này đã là bản mới (bundle 2025).

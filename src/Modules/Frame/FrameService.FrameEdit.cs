@@ -123,6 +123,8 @@ public sealed partial class FrameService
             tr.Commit();
         }
 
+        SyncSignatureMemory(doc.Database, imported, drop);
+
         ed.Regen();
         var scope = result.ApplyToAll ? "toàn bộ khung" : "khung đang chọn";
         ed.WriteMessage($"\n[iSurvey] Đã cập nhật thông tin {count} khung ({scope}).");

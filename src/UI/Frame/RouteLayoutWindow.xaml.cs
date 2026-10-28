@@ -31,8 +31,13 @@ public sealed class RouteLayoutDialogInput
     /// <summary>Sửa khung đã chèn: ẩn phần bố cục, hiện ô áp dụng toàn bộ.</summary>
     public bool EditExisting { get; init; }
 
-    /// <summary>Tag TEN_n đã có chữ ký trên khung vừa chọn.</summary>
+    /// <summary>Tag TEN_n đã có chữ ký trong bản vẽ này.</summary>
     public IReadOnlyCollection<string>? ExistingSignatures { get; init; }
+
+    /// <summary>Tên file logo đang dùng trong bản vẽ. Trống nếu chưa thay.</summary>
+    public string? KeptLogoOwner { get; init; }
+
+    public string? KeptLogoDesign { get; init; }
 
     /// <summary>Nhãn combo tỷ lệ. Cùng số phần tử với <see cref="Scales"/>. Mặt cắt dọc ghi cặp 1/500; 1/5000.</summary>
     public string[]? ScaleLabels { get; init; }
@@ -544,12 +549,22 @@ public partial class RouteLayoutWindow : Window
             parts.Add("logo chủ đầu tư: ẨN");
         else if (_logoOwner is not null)
             parts.Add("logo chủ đầu tư: thay bằng " + System.IO.Path.GetFileName(_logoOwner));
+        else if (!string.IsNullOrEmpty(_in.KeptLogoOwner))
+            parts.Add("logo chủ đầu tư: giữ " + _in.KeptLogoOwner);
         if (_hideDesign)
             parts.Add("logo đơn vị thiết kế: ẨN");
         else if (_logoDesign is not null)
             parts.Add("logo đơn vị thiết kế: thay bằng " + System.IO.Path.GetFileName(_logoDesign));
+        else if (!string.IsNullOrEmpty(_in.KeptLogoDesign))
+            parts.Add("logo đơn vị thiết kế: giữ " + _in.KeptLogoDesign);
         foreach (var kv in _signatures)
             parts.Add("chữ ký " + kv.Key + ": " + System.IO.Path.GetFileName(kv.Value));
+        foreach (var tag in _existingSigns)
+        {
+            if (_signatures.ContainsKey(tag) || _clearedSigns.Contains(tag))
+                continue;
+            parts.Add("chữ ký " + tag + ": giữ trong bản vẽ");
+        }
         foreach (var tag in _clearedSigns)
         {
             if (!_signatures.ContainsKey(tag))

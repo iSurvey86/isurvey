@@ -147,7 +147,10 @@ public sealed partial class FrameService
                 TemplateDefaults = defaults,
                 CountPieces = CountPieces,
                 MapWidthM = MapWidthM,
-                SuggestGrid = (n) => { SuggestGrid(n, out var r, out var c); return (r, c); }
+                SuggestGrid = (n) => { SuggestGrid(n, out var r, out var c); return (r, c); },
+                ExistingSignatures = LiveSignatureTags(db),
+                KeptLogoOwner = KeptLogoFileName(db, owner: true),
+                KeptLogoDesign = KeptLogoFileName(db, owner: false)
             };
             var result = RouteLayoutWindow.Show(input);
             if (result is null)
@@ -474,6 +477,7 @@ public sealed partial class FrameService
         var ed = doc.Editor;
         var scaleN = opts.Scale;
         windows = [];
+        var annoName = db.Cannoscale?.Name;
         using var _ = doc.LockDocument();
         var lm = LayoutManager.Current;
 
@@ -528,7 +532,7 @@ public sealed partial class FrameService
         // Logo thay thế (áp cho cả bản vẽ, trước khi chèn khung để khung nhận đúng logo)
         ApplyPendingLogos(doc, opts);
         ApplyLogoVisibility(doc, opts);
-        var signBlocks = ImportSignatureBlocks(doc, opts);
+        var signBlocks = CollectSignatureBlocks(doc, opts);
 
         // Pha 0: tạo layout, chuyển sang nó một lần để AutoCAD khởi tạo vùng giấy riêng, rồi quay về Model.
         var layoutId = lm.CreateLayout(layoutName);
@@ -616,7 +620,18 @@ public sealed partial class FrameService
             tr.Commit();
         }
 
-        // Pha 2: viewport chỉ bật (On) và khóa được khi layout của nó đang là layout hiện hành.
+        var readable = 0;
+        try
+        {
+            readable = OrientSheetText(doc, pieces, mapW / customScale, mapH / customScale, opts.Scale);
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage($"\n[iSurvey] Chưa đặt được chữ đọc ngang trên layout ({ex.Message}).");
+        }
+
+        // Pha 2: viewport chỉ bật (On) được khi layout của nó đang là layout hiện hành.
+        // Tỷ lệ chú thích phải gán sau khi On đã ghi xong, nếu không AutoCAD từ chối và chữ annotative không hiện.
         lm.CurrentLayout = layoutName;
         using (var tr = db.TransactionManager.StartTransaction())
         {
@@ -624,11 +639,48 @@ public sealed partial class FrameService
             {
                 var vp = (Viewport)tr.GetObject(vid, OpenMode.ForWrite);
                 vp.On = true;
+            }
+
+            tr.Commit();
+        }
+
+        using (var tr = db.TransactionManager.StartTransaction())
+        {
+            AnnotationScale? sheetScale = null;
+            try
+            {
+                sheetScale = EnsureAnnotationScale(db, opts.Scale);
+            }
+            catch (System.Exception ex)
+            {
+                ed.WriteMessage($"\n[iSurvey] Không lấy được tỷ lệ chú thích 1:{opts.Scale} ({ex.Message}).");
+            }
+
+            foreach (var vid in viewportIds)
+            {
+                var vp = (Viewport)tr.GetObject(vid, OpenMode.ForWrite);
+                if (sheetScale is not null)
+                {
+                    try
+                    {
+                        vp.AnnotationScale = sheetScale;
+                    }
+                    catch (System.Exception ex)
+                    {
+                        ed.WriteMessage($"\n[iSurvey] Chưa gán được tỷ lệ chú thích cho viewport ({ex.Message}).");
+                    }
+                }
+
                 vp.Locked = true;
             }
 
             tr.Commit();
         }
+
+        RestoreAnnotationScale(db, annoName);
+
+        if (readable > 0)
+            ed.WriteMessage($"\n[iSurvey] {readable} chữ đọc ngang trên layout. Vị trí và góc trong model không đổi; sửa chữ bên model thì tờ in cập nhật theo.");
 
         try
         {
@@ -644,27 +696,48 @@ public sealed partial class FrameService
 
     private static void ApplyPendingLogos(Document doc, RouteLayoutOptions opts)
     {
-        if (string.IsNullOrEmpty(opts.LogoOwnerPath) && string.IsNullOrEmpty(opts.LogoDesignPath))
-            return;
+        ApplyLogoSide(doc, opts.LogoOwnerPath, owner: true);
+        ApplyLogoSide(doc, opts.LogoDesignPath, owner: false);
+    }
 
+    /// <summary>Ảnh mới thì thay. Không chọn ảnh thì dùng lại ảnh đã gắn trong file này, kể cả khổ giấy vừa nhập.</summary>
+    private static void ApplyLogoSide(Document doc, string? picked, bool owner)
+    {
         var db = doc.Database;
-        foreach (var (path, owner) in new[] { (opts.LogoOwnerPath, true), (opts.LogoDesignPath, false) })
+        var userPicked = !string.IsNullOrEmpty(picked);
+        var path = picked;
+        if (!userPicked)
         {
-            if (string.IsNullOrEmpty(path))
-                continue;
-            try
+            var data = FrameMemory.Load(db);
+            path = owner ? data.LogoOwner : data.LogoDesign;
+            if (string.IsNullOrEmpty(path) || !File.Exists(path))
+                path = LogoReplaceService.AppliedImagePath(db, owner);
+            if (string.IsNullOrEmpty(path) || !File.Exists(path))
+                return;
+            if (!LogoReplaceService.HasUnreplacedLogo(db, owner))
+                return;
+        }
+
+        try
+        {
+            var image = userPicked
+                ? LogoReplaceService.PrepareImage(db, path!, owner)
+                : LogoReplaceService.PreparedFromFile(path!);
+            using var tr = db.TransactionManager.StartTransaction();
+            var res = LogoReplaceService.Replace(tr, db, owner, image);
+            if (res.Logos <= 0)
             {
-                var image = LogoReplaceService.PrepareImage(db, path, owner);
-                using var tr = db.TransactionManager.StartTransaction();
-                var res = LogoReplaceService.Replace(tr, db, owner, image);
-                if (res.Logos > 0)
-                    tr.Commit();
                 doc.Editor.WriteMessage("\n[iSurvey] " + res.Message + ".");
+                return;
             }
-            catch (System.Exception ex)
-            {
-                doc.Editor.WriteMessage($"\n[iSurvey] Không thay được logo ({ex.Message}).");
-            }
+
+            tr.Commit();
+            FrameMemory.RememberLogo(db, owner, image.Path);
+            doc.Editor.WriteMessage("\n[iSurvey] " + res.Message + ".");
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage($"\n[iSurvey] Không thay được logo ({ex.Message}).");
         }
     }
 
@@ -687,6 +760,179 @@ public sealed partial class FrameService
             doc.Editor.WriteMessage($"\n[iSurvey] Không đặt được ẩn/hiện logo ({ex.Message}).");
         }
     }
+    /// <summary>
+    /// Chữ trong các mảnh thành annotative, bám hướng layout. Góc và vị trí trong model giữ nguyên.
+    /// Cỡ chữ trên tờ in giữ như trước khi bật, ở đúng tỷ lệ tờ.
+    /// </summary>
+    private static int OrientSheetText(Document doc, IReadOnlyList<Piece> pieces, double wm, double hm, int scaleN)
+    {
+        if (pieces.Count == 0 || wm < 1 || hm < 1)
+            return 0;
+
+        var db = doc.Database;
+        var sheetScale = EnsureAnnotationScale(db, scaleN);
+
+        var reach = 0.5 * Math.Sqrt(wm * wm + hm * hm);
+        var minX = double.MaxValue;
+        var minY = double.MaxValue;
+        var maxX = double.MinValue;
+        var maxY = double.MinValue;
+        foreach (var pc in pieces)
+        {
+            minX = Math.Min(minX, pc.Center.X - reach);
+            minY = Math.Min(minY, pc.Center.Y - reach);
+            maxX = Math.Max(maxX, pc.Center.X + reach);
+            maxY = Math.Max(maxY, pc.Center.Y + reach);
+        }
+
+        var count = 0;
+        using (var tr = db.TransactionManager.StartTransaction())
+        {
+            var bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
+            var ms = (BlockTableRecord)tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead);
+            foreach (ObjectId id in ms)
+            {
+                if (tr.GetObject(id, OpenMode.ForRead) is not Entity ent)
+                    continue;
+                if (ent is BlockReference br)
+                {
+                    foreach (ObjectId aid in br.AttributeCollection)
+                    {
+                        if (tr.GetObject(aid, OpenMode.ForRead) is AttributeReference ar
+                            && TryOrientText(ar, pieces, wm, hm, sheetScale, minX, minY, maxX, maxY))
+                            count++;
+                    }
+
+                    continue;
+                }
+
+                if (TryOrientText(ent, pieces, wm, hm, sheetScale, minX, minY, maxX, maxY))
+                    count++;
+            }
+
+            tr.Commit();
+        }
+
+        return count;
+    }
+
+    private static AnnotationScale EnsureAnnotationScale(Database db, int scaleN)
+    {
+        var occ = db.ObjectContextManager.GetContextCollection("ACDB_ANNOTATIONSCALES");
+        var name = "1:" + scaleN.ToString(CultureInfo.InvariantCulture);
+        if (occ.HasContext(name))
+            return (AnnotationScale)occ.GetContext(name);
+
+        foreach (ObjectContext ctx in occ)
+        {
+            if (ctx is AnnotationScale existing
+                && existing.PaperUnits > 0
+                && Math.Abs(existing.DrawingUnits / existing.PaperUnits - scaleN) < 1e-3)
+                return existing;
+        }
+
+        var created = new AnnotationScale
+        {
+            Name = name,
+            PaperUnits = 1.0,
+            DrawingUnits = scaleN
+        };
+        occ.AddContext(created);
+        return created;
+    }
+
+    private static void RestoreAnnotationScale(Database db, string? name)
+    {
+        if (string.IsNullOrEmpty(name))
+            return;
+        try
+        {
+            var occ = db.ObjectContextManager.GetContextCollection("ACDB_ANNOTATIONSCALES");
+            if (occ.HasContext(name))
+                db.Cannoscale = (AnnotationScale)occ.GetContext(name);
+        }
+        catch
+        {
+            // Giữ tỷ lệ hiện tại nếu không trả lại được tỷ lệ chú thích cũ.
+        }
+    }
+
+    private static bool TryOrientText(
+        Entity ent, IReadOnlyList<Piece> pieces, double wm, double hm, AnnotationScale scale,
+        double minX, double minY, double maxX, double maxY)
+    {
+        if (ent.Layer.Equals(LayerPiece, StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        Point3d anchor;
+        string content;
+        if (ent is DBText text)
+        {
+            content = text.TextString;
+            anchor = text.HorizontalMode == TextHorizontalMode.TextLeft && text.VerticalMode == TextVerticalMode.TextBase
+                ? text.Position
+                : text.AlignmentPoint;
+            if (Math.Abs(text.Normal.Z) < 0.5)
+                return false;
+        }
+        else if (ent is MText mtext)
+        {
+            content = mtext.Text;
+            anchor = mtext.Location;
+            if (Math.Abs(mtext.Normal.Z) < 0.5)
+                return false;
+        }
+        else
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(content))
+            return false;
+        if (anchor.X < minX || anchor.X > maxX || anchor.Y < minY || anchor.Y > maxY)
+            return false;
+        if (!InSheet(anchor, pieces, wm, hm))
+            return false;
+        if (ent.Annotative == AnnotativeStates.NotApplicable)
+            return false;
+
+        try
+        {
+            var already = ent.Annotative == AnnotativeStates.True;
+            ent.UpgradeOpen();
+            if (!already)
+                ent.Annotative = AnnotativeStates.True;
+            if (!ent.HasContext(scale))
+                ent.AddContext(scale);
+            if (ent.PaperOrientation != PaperOrientationStates.True)
+                ent.SetPaperOrientation(true);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static bool InSheet(Point3d p, IReadOnlyList<Piece> pieces, double wm, double hm)
+    {
+        var hx = wm * 0.5;
+        var hy = hm * 0.5;
+        foreach (var pc in pieces)
+        {
+            var dx = p.X - pc.Center.X;
+            var dy = p.Y - pc.Center.Y;
+            var cos = Math.Cos(pc.Phi);
+            var sin = Math.Sin(pc.Phi);
+            var u = dx * cos + dy * sin;
+            var v = -dx * sin + dy * cos;
+            if (Math.Abs(u) <= hx && Math.Abs(v) <= hy)
+                return true;
+        }
+
+        return false;
+    }
+
     private static void DrawPieceOutline(
         Transaction tr, Database db, BlockTableRecord model, ObjectId style, Piece pc, double w, double h, double s0, int total,
         string size)
@@ -783,6 +1029,15 @@ public sealed partial class FrameService
             v.SetCustomPrintScale(ps, new CustomScale(1, 1));
             _step = "SetPlotOrigin";
             v.SetPlotOrigin(ps, new Point2d(0, 0));
+            try
+            {
+                ThinPlotStyle.Apply(ps, lay.Database);
+            }
+            catch (System.Exception ex)
+            {
+                _pageSetupIssue = "chưa gắn nét 0.05 mm: " + ex.Message;
+            }
+
             lay.CopyFrom(ps);
         }
         catch (System.Exception ex)
@@ -799,6 +1054,111 @@ public sealed partial class FrameService
         if (tag.Equals(FrameFields.ScaleTag, StringComparison.OrdinalIgnoreCase))
             return string.IsNullOrEmpty(opts.ScaleText) ? $"1/{scaleN}" : opts.ScaleText;
         return opts.Attributes.TryGetValue(tag, out var v) ? v : "";
+    }
+
+    /// <summary>Chữ ký lần này, cộng chữ ký đã nhớ trong file. Bấm xóa thì bỏ khỏi file.</summary>
+    private static Dictionary<string, ObjectId> CollectSignatureBlocks(Document doc, RouteLayoutOptions opts)
+    {
+        var db = doc.Database;
+        var imported = ImportSignatureBlocks(doc, opts);
+        var data = FrameMemory.Load(db);
+        foreach (var tag in opts.ClearSignatures)
+        {
+            if (!imported.ContainsKey(tag))
+                data.Signs.Remove(tag);
+        }
+
+        using (var tr = db.TransactionManager.StartTransaction())
+        {
+            var bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
+            foreach (var kv in imported)
+            {
+                var def = (BlockTableRecord)tr.GetObject(kv.Value, OpenMode.ForRead);
+                data.Signs[kv.Key] = def.Name;
+            }
+
+            var stale = new List<string>();
+            foreach (var kv in data.Signs)
+            {
+                if (!bt.Has(kv.Value))
+                    stale.Add(kv.Key);
+            }
+
+            foreach (var tag in stale)
+                data.Signs.Remove(tag);
+            tr.Commit();
+        }
+
+        FrameMemory.Save(db, data);
+
+        var map = new Dictionary<string, ObjectId>(imported, StringComparer.OrdinalIgnoreCase);
+        using (var tr = db.TransactionManager.StartTransaction())
+        {
+            var bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
+            foreach (var kv in data.Signs)
+            {
+                if (!map.ContainsKey(kv.Key) && bt.Has(kv.Value))
+                    map[kv.Key] = bt[kv.Value];
+            }
+
+            tr.Commit();
+        }
+
+        var reused = map.Count - imported.Count;
+        if (reused > 0)
+            doc.Editor.WriteMessage($"\n[iSurvey] Giữ {reused} chữ ký đã chèn trong bản vẽ.");
+        return map;
+    }
+
+    /// <summary>Sửa khung: lựa chọn chữ ký mới trở thành lựa chọn của cả file cho lần rải sau.</summary>
+    private static void SyncSignatureMemory(Database db, Dictionary<string, ObjectId> imported, HashSet<string> drop)
+    {
+        var data = FrameMemory.Load(db);
+        foreach (var tag in drop)
+        {
+            if (!imported.ContainsKey(tag))
+                data.Signs.Remove(tag);
+        }
+
+        using (var tr = db.TransactionManager.StartTransaction())
+        {
+            foreach (var kv in imported)
+            {
+                var def = (BlockTableRecord)tr.GetObject(kv.Value, OpenMode.ForRead);
+                data.Signs[kv.Key] = def.Name;
+            }
+
+            tr.Commit();
+        }
+
+        FrameMemory.Save(db, data);
+    }
+
+    private static string[] LiveSignatureTags(Database db)
+    {
+        var data = FrameMemory.Load(db);
+        using var tr = db.TransactionManager.StartTransaction();
+        var bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
+        var tags = new List<string>();
+        foreach (var kv in data.Signs)
+        {
+            if (bt.Has(kv.Value))
+                tags.Add(kv.Key);
+        }
+
+        tr.Commit();
+        return tags.ToArray();
+    }
+
+    private static string? KeptLogoFileName(Database db, bool owner)
+    {
+        var data = FrameMemory.Load(db);
+        var path = owner ? data.LogoOwner : data.LogoDesign;
+        if (string.IsNullOrEmpty(path) || !File.Exists(path))
+            path = LogoReplaceService.AppliedImagePath(db, owner);
+        if (string.IsNullOrEmpty(path) || !File.Exists(path))
+            return null;
+        return Path.GetFileName(path);
     }
 
     private static Dictionary<string, ObjectId> ImportSignatureBlocks(Document doc, RouteLayoutOptions opts)

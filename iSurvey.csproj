@@ -8,7 +8,7 @@
     <RootNamespace>iSurvey</RootNamespace>
     <AssemblyName>iSurvey</AssemblyName>
     <!-- Nguồn phiên bản duy nhất cho code (AuthManager.AppVersion); bump cùng PackageContents.xml. -->
-    <Version>1.8.7</Version>
+    <Version>1.8.8</Version>
     <PlatformTarget>x64</PlatformTarget>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
@@ -53,5 +53,6 @@
     <!-- Khung ban do chuan (ISURVEY_KHUNG): build-bundle.ps1 copy vao Contents\Templates. -->
     <None Include="src\Templates\*.dwg"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory><Link>Templates\%(Filename)%(Extension)</Link></None>
     <EmbeddedResource Include="deploy\Apply-iSurveyUpdate.ps1" LogicalName="iSurvey.Apply-iSurveyUpdate.ps1" />
+    <EmbeddedResource Include="src\PlotStyles\iSurvey_005.ctb" LogicalName="iSurvey.iSurvey_005.ctb" />
   </ItemGroup>
 </Project>

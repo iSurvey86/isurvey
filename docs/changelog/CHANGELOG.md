@@ -1,8 +1,17 @@
 # Changelog — iSurvey
 
-## Chưa đóng gói — 2026-10-27 (vẫn 1.8.7)
+## 1.8.8 — 2026-10-28
 
-Chưa bump phiên bản, chưa phát hành. Máy cài bằng UPD vẫn đang 1.8.7.
+Chưa phát hành. Máy cài bằng UPD vẫn đang 1.8.7 cho đến khi phát hành bản này.
+
+### In PDF
+- RAIKHUNG, RAIMCD và INTUYEN in bằng bảng `iSurvey_005.ctb`: cả 255 màu, nét 0.05 mm, màu và kiểu nét vẫn theo đối tượng. Không sửa `acad.ctb` của máy.
+
+### Chữ trên tờ in
+- Chữ, dòng chữ và thuộc tính nằm trong vùng tờ RAIKHUNG đọc ngang trên layout. Góc và chiều cao bên Model giữ nguyên. Sửa chữ bên Model thì tờ in cập nhật theo. Nhãn mảnh và chữ ngoài tờ không đổi.
+
+### Logo và chữ ký
+- Trong một file, logo và chữ ký đã chèn được dùng lại cho lần RAIKHUNG hoặc RAIMCD sau. Đổi ảnh, đổi file chữ ký, hoặc bấm Xóa chữ ký thì lựa chọn mới có hiệu lực. File khác bắt đầu trống.
 
 ### Rải khung theo tuyến
 - Lệnh đổi tên **RAIKHUNG**. `DANTRANG` và `CATTUYEN` không còn.

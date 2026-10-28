@@ -84,6 +84,8 @@ internal static class RoutePdfPlot
                 psv.SetPlotWindowArea(ps, windows[i]);
                 step = "SetPlotType";
                 psv.SetPlotType(ps, Autodesk.AutoCAD.DatabaseServices.PlotType.Window);
+                step = "StyleSheet";
+                ThinPlotStyle.Apply(ps, db);
                 var pi = new PlotInfo { Layout = lay.ObjectId, OverrideSettings = ps };
                 step = "Validate";
                 piv.Validate(pi);

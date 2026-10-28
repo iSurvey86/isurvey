@@ -297,4 +297,73 @@ internal static class LogoReplaceService
             // không quan trọng
         }
     }
+
+    /// <summary>Ảnh đã chuẩn, không chép thêm bản mới.</summary>
+    public static PreparedImage PreparedFromFile(string path)
+    {
+        using var img = System.Drawing.Image.FromFile(path);
+        return new PreparedImage(path, img.Width, img.Height, "logo đã chèn trong bản vẽ");
+    }
+
+    /// <summary>Còn khung nào bên này vẫn là logo EVN, chưa có ảnh thay.</summary>
+    public static bool HasUnreplacedLogo(Database db, bool owner)
+    {
+        using var tr = db.TransactionManager.StartTransaction();
+        var sideLayer = owner ? TitleBlockFit.LogoOwnerLayer : TitleBlockFit.LogoDesignLayer;
+        var bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
+        foreach (ObjectId btrId in bt)
+        {
+            var btr = (BlockTableRecord)tr.GetObject(btrId, OpenMode.ForRead);
+            if (btr.IsLayout || btr.Name.Equals(TitleBlockFit.LogoBlock, StringComparison.OrdinalIgnoreCase))
+                continue;
+            var unreplaced = false;
+            var hasRaster = false;
+            foreach (ObjectId id in btr)
+            {
+                switch (tr.GetObject(id, OpenMode.ForRead))
+                {
+                    case BlockReference br when TitleBlockFit.IsLogo(tr, br) && !TitleBlockFit.IsStoredOriginalLayer(br.Layer):
+                        if (TitleBlockFit.SideOfLogo(tr, br) == owner)
+                            unreplaced = true;
+                        break;
+                    case RasterImage ri when ri.Layer.Equals(sideLayer, StringComparison.OrdinalIgnoreCase):
+                        hasRaster = true;
+                        break;
+                }
+            }
+
+            if (unreplaced && !hasRaster)
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>Đường dẫn ảnh logo đang gắn trong khung, nếu file còn trên đĩa.</summary>
+    public static string? AppliedImagePath(Database db, bool owner)
+    {
+        using var tr = db.TransactionManager.StartTransaction();
+        var sideLayer = owner ? TitleBlockFit.LogoOwnerLayer : TitleBlockFit.LogoDesignLayer;
+        var bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
+        foreach (ObjectId btrId in bt)
+        {
+            var btr = (BlockTableRecord)tr.GetObject(btrId, OpenMode.ForRead);
+            if (btr.IsLayout)
+                continue;
+            foreach (ObjectId id in btr)
+            {
+                if (tr.GetObject(id, OpenMode.ForRead) is not RasterImage ri)
+                    continue;
+                if (!ri.Layer.Equals(sideLayer, StringComparison.OrdinalIgnoreCase) || ri.ImageDefId.IsNull)
+                    continue;
+                if (tr.GetObject(ri.ImageDefId, OpenMode.ForRead) is not RasterImageDef def)
+                    continue;
+                var path = def.SourceFileName;
+                if (!string.IsNullOrEmpty(path) && File.Exists(path))
+                    return path;
+            }
+        }
+
+        return null;
+    }
 }
