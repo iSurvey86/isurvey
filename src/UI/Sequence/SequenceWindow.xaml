@@ -1,0 +1,165 @@
+<Window x:Class="iSurvey.UI.Sequence.SequenceWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="iSurvey — Đánh số thứ tự tự động"
+        Width="440" SizeToContent="Height"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ResizeMode="NoResize" ShowInTaskbar="False" FontFamily="Segoe UI"
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Window.Resources>
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="White" />
+            <Setter Property="Foreground" Value="#1F2937" />
+            <Setter Property="BorderBrush" Value="#D1D5DB" />
+            <Setter Property="MinHeight" Value="30" />
+            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid MinHeight="{TemplateBinding MinHeight}">
+                            <ToggleButton Focusable="False" ClickMode="Press"
+                                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border x:Name="Box" Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1"
+                                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                            <Path Width="8" Height="5" HorizontalAlignment="Right" Margin="0,0,10,0"
+                                                  Stretch="Fill" Data="M 0 0 L 4 4 L 8 0 Z" Fill="#6B7280" />
+                                        </Border>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <TextBlock Margin="8,0,28,0" VerticalAlignment="Center" IsHitTestVisible="False"
+                                       Foreground="#1F2937"
+                                       Text="{Binding SelectedItem.Label, RelativeSource={RelativeSource TemplatedParent}}" />
+                            <Popup IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom"
+                                   AllowsTransparency="True" Focusable="False">
+                                <Border Background="White" BorderBrush="#D1D5DB" BorderThickness="1"
+                                        MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                        MaxHeight="240">
+                                    <ScrollViewer>
+                                        <ItemsPresenter />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Border Background="White" CornerRadius="12" Margin="12">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="18" ShadowDepth="2" Opacity="0.28" />
+        </Border.Effect>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Background="#1D4ED8" CornerRadius="12,12,0,0" MouseLeftButtonDown="Header_Drag">
+                <DockPanel Margin="14,10">
+                    <Button DockPanel.Dock="Right" Content="&#xE8BB;" FontFamily="Segoe MDL2 Assets" Foreground="White"
+                            Background="Transparent" BorderThickness="0" FontSize="12" Width="28" Height="28"
+                            Click="Cancel_Click" ToolTip="Đóng" />
+                    <Border DockPanel.Dock="Left" Background="White" CornerRadius="4" Padding="6,2" Margin="0,0,8,0" VerticalAlignment="Center">
+                        <TextBlock Text="CAD" Foreground="#1D4ED8" FontWeight="Bold" FontSize="11" />
+                    </Border>
+                    <TextBlock Text="iSurvey — Đánh số thứ tự tự động" Foreground="White" FontWeight="SemiBold"
+                               VerticalAlignment="Center" />
+                </DockPanel>
+            </Border>
+
+            <StackPanel Grid.Row="1" Margin="16,14,16,8">
+                <Border BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" Padding="12,10">
+                    <StackPanel>
+                        <TextBlock Text="1. ĐỊNH DẠNG CHUỖI" Foreground="#1D4ED8" FontWeight="SemiBold" Margin="0,0,0,10" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Tiền tố (Prefix):" Foreground="#374151" Margin="0,0,0,4" />
+                                <TextBox Text="{Binding Prefix, UpdateSourceTrigger=PropertyChanged}" Padding="8,6" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Hậu tố (Suffix):" Foreground="#374151" Margin="0,0,0,4" />
+                                <TextBox Text="{Binding Suffix, UpdateSourceTrigger=PropertyChanged}" Padding="8,6" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Margin="0,10,0,0">
+                                <TextBlock Text="Số bắt đầu:" Foreground="#374151" Margin="0,0,0,4" />
+                                <TextBox Text="{Binding StartText, UpdateSourceTrigger=PropertyChanged}" Padding="8,6" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,10,0,0">
+                                <TextBlock Text="Bước nhảy (+):" Foreground="#374151" Margin="0,0,0,4" />
+                                <TextBox Text="{Binding StepText, UpdateSourceTrigger=PropertyChanged}" Padding="8,6" />
+                            </StackPanel>
+                        </Grid>
+                        <Border Background="#EFF6FF" CornerRadius="6" Margin="0,12,0,0" Padding="10,8">
+                            <TextBlock HorizontalAlignment="Center">
+                                <Run Text="Xem trước: " Foreground="#6B7280" />
+                                <Run Text="{Binding PreviewNumbers, Mode=OneWay}" Foreground="#1D4ED8" FontWeight="Bold" />
+                            </TextBlock>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <Border BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" Padding="12,10" Margin="0,12,0,0">
+                    <StackPanel>
+                        <TextBlock Text="2. THUỘC TÍNH HIỂN THỊ" Foreground="#1D4ED8" FontWeight="SemiBold" Margin="0,0,0,10" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="88" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="88" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Font chữ:" VerticalAlignment="Center" Foreground="#374151" />
+                            <ComboBox Grid.Column="1" Grid.ColumnSpan="4" Margin="8,0,0,0"
+                                      ItemsSource="{Binding Fonts}" SelectedItem="{Binding SelectedFont}"
+                                      DisplayMemberPath="Label" VerticalContentAlignment="Center" />
+                            <TextBlock Grid.Row="1" Margin="0,10,0,0" Text="Chiều cao chữ (H):" VerticalAlignment="Center" Foreground="#374151" />
+                            <TextBox Grid.Row="1" Grid.Column="1" Margin="8,10,0,0" Text="{Binding HeightText, UpdateSourceTrigger=PropertyChanged}" Padding="8,6" />
+                            <TextBlock Grid.Row="1" Grid.Column="3" Margin="0,10,0,0" Text="Độ hẹp (Width):" VerticalAlignment="Center" Foreground="#374151" />
+                            <TextBox Grid.Row="1" Grid.Column="4" Margin="8,10,0,0" Text="{Binding WidthText, UpdateSourceTrigger=PropertyChanged}" Padding="8,6" />
+                        </Grid>
+                        <CheckBox Content="Vẽ đường tròn bao quanh (R = 1.15*H)" Margin="0,12,0,0"
+                                  IsChecked="{Binding DrawCircle}" Foreground="#1F2937" />
+                        <CheckBox Content="Tạo Wipeout che nền bên dưới số" Margin="0,8,0,0"
+                                  IsChecked="{Binding UseWipeout}" Foreground="#1F2937" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <Border Grid.Row="2" Background="#F8FAFC" CornerRadius="0,0,12,12" Padding="16,12">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Hủy bỏ" MinWidth="96" Padding="14,8" Margin="0,0,8,0" Click="Cancel_Click"
+                            Background="White" BorderBrush="#D1D5DB" BorderThickness="1" />
+                    <Button Content="&#x25B7;  Bắt đầu Tick" MinWidth="140" Padding="14,8" Click="Start_Click"
+                            Background="#1D4ED8" Foreground="White" BorderThickness="0" FontWeight="SemiBold" IsDefault="True" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

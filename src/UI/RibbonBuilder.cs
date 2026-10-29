@@ -163,7 +163,8 @@ public static class RibbonBuilder
                 [
                     new Btn("Tạo Biên Đường Tạm", "BIENDUONGTAM", RibbonIcons.BienDuongTam, false),
                     new Btn("Kẻ Tuyến 110kV/220kV", "KETUYEN", RibbonIcons.KeTuyen, false),
-                    new Btn("Đánh Số Hiệu Cột", "DANHSOCOT", RibbonIcons.DanhSoCot, false)
+                    new Btn("Đánh Số Thứ Tự", "STT", RibbonIcons.DanhSoCot, true,
+                        "Đánh số thứ tự (STT)")
                 ]);
 
             // Panel 6 — Hồ sơ & QA/QC

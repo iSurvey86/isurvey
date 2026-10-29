@@ -24,6 +24,7 @@ using iSurvey.UI;
 [assembly: CommandClass(typeof(UavModule))]
 [assembly: CommandClass(typeof(AiAssistantModule))]
 [assembly: CommandClass(typeof(VertexNumberingService))]
+[assembly: CommandClass(typeof(SequenceNumberService))]
 [assembly: CommandClass(typeof(StripMapService))]
 [assembly: CommandClass(typeof(FrameService))]
 [assembly: CommandClass(typeof(PlanModule))]

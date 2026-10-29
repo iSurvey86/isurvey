@@ -109,6 +109,8 @@ internal static class ActivityPhrases
         ["NumberVerticesCommand"] = "GOC (đánh số góc tuyến)",
         ["ISURVEY_NUMBER_VERTICES"] = "GOC (đánh số góc tuyến)",
         ["GOC"] = "GOC (đánh số góc tuyến)",
+        ["STT"] = "STT (đánh số thứ tự tại điểm click)",
+        ["SequenceCommand"] = "STT (đánh số thứ tự tại điểm click)",
 
         ["ClipCommand"] = "UAVCLIP (cắt ảnh UAV theo đường biên)",
         ["ISURVEY_UAV_CLIP"] = "UAVCLIP (cắt ảnh UAV theo đường biên)",

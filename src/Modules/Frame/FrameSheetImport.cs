@@ -6,11 +6,41 @@ using System.Xml;
 namespace iSurvey.Modules.Frame;
 
 /// <summary>
-/// Đọc bảng khung tên từ TXT, CSV, Excel .xlsx hoặc .xls.
-/// Excel lấy cột STT (hoặc mã) và cột Nội dung, bỏ cột Tiêu đề.
+/// Đọc bảng khung tên từ Excel .xlsx, .xlsm hoặc .xls.
+/// Lấy cột STT (hoặc mã) và cột Nội dung, bỏ cột Tiêu đề.
 /// </summary>
 public static class FrameSheetImport
 {
+    /// <summary>Nội dung gợi ý trong file mẫu. Ô Tờ vẫn bị bỏ qua khi nhập.</summary>
+    private static readonly string[] SampleContent =
+    [
+        "TỔNG CÔNG TY ĐIỆN LỰC",
+        "CÔNG TY ĐIỆN LỰC",
+        "Đường dây và TBA 110KV KCN Minh Châu",
+        "TỈNH TUYÊN QUANG",
+        "CÔNG TY CỔ PHẦN TƯ VẤN THIẾT KẾ",
+        "Số nhà, đường, phường, tỉnh",
+        "TỔNG GIÁM ĐỐC",
+        "Họ và tên",
+        "C.N.D.A",
+        "Họ và tên",
+        "C.N.K.S",
+        "Họ và tên",
+        "Kiểm soát",
+        "Họ và tên",
+        "Khảo sát",
+        "Họ và tên",
+        "BÁO CÁO KINH TẾ KỸ THUẬT",
+        "PHẦN ĐƯỜNG DÂY",
+        "MẶT BẰNG HƯỚNG TUYẾN",
+        "10/2026",
+        "/",
+        "/",
+        "/",
+        "i/N (tự động)",
+        "<SỐ HIỆU>"
+    ];
+
     public static IReadOnlyList<(string Key, string Value)> Read(string path)
     {
         var ext = Path.GetExtension(path).ToLowerInvariant();
@@ -18,39 +48,102 @@ public static class FrameSheetImport
             return Pairs(ReadXlsx(path));
         if (ext == ".xls")
             return Pairs(ReadXls(path));
-        return ReadDelimited(path);
+        throw new InvalidOperationException("Chỉ nhận file Excel (.xlsx, .xlsm, .xls).");
     }
 
-    private static List<(string Key, string Value)> ReadDelimited(string path)
+    /// <summary>Ghi file .xlsx mẫu: hàng đầu STT, Tiêu đề, Nội dung, rồi đủ 25 ô khung tên.</summary>
+    public static void WriteSample(string path)
     {
-        var list = new List<(string, string)>();
-        foreach (var raw in File.ReadAllLines(path))
+        var sheet = new StringBuilder();
+        sheet.Append("""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>""");
+        sheet.Append("""<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">""");
+        sheet.Append("""<cols><col min="1" max="1" width="8" customWidth="1"/>""");
+        sheet.Append("""<col min="2" max="2" width="22" customWidth="1"/>""");
+        sheet.Append("""<col min="3" max="3" width="56" customWidth="1"/></cols><sheetData>""");
+        sheet.Append(SampleRow(1, "STT", "Tiêu đề", "Nội dung"));
+        for (var i = 0; i < FrameFields.All.Length; i++)
         {
-            var line = raw.Trim();
-            if (line.Length == 0 || line.StartsWith("#") || line.StartsWith("//"))
-                continue;
-            if (!SplitField(line, out var key, out var value))
-                continue;
-            list.Add((key, value));
+            var field = FrameFields.All[i];
+            var content = i < SampleContent.Length ? SampleContent[i] : "";
+            sheet.Append(SampleRow(i + 2, field.Stt.ToString(CultureInfo.InvariantCulture), field.Label, content));
         }
 
-        return list;
+        sheet.Append("</sheetData></worksheet>");
+
+        var dir = Path.GetDirectoryName(path);
+        if (!string.IsNullOrEmpty(dir))
+            Directory.CreateDirectory(dir);
+        if (File.Exists(path))
+            File.Delete(path);
+
+        using var zip = ZipFile.Open(path, ZipArchiveMode.Create);
+        WriteEntry(zip, "[Content_Types].xml", """
+            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+            <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+              <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+              <Default Extension="xml" ContentType="application/xml"/>
+              <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+              <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+              <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+            </Types>
+            """);
+        WriteEntry(zip, "_rels/.rels", """
+            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+            <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+              <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+            </Relationships>
+            """);
+        WriteEntry(zip, "xl/workbook.xml", """
+            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+            <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+              <sheets><sheet name="Khung tên" sheetId="1" r:id="rId1"/></sheets>
+            </workbook>
+            """);
+        WriteEntry(zip, "xl/_rels/workbook.xml.rels", """
+            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+            <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+              <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+              <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+            </Relationships>
+            """);
+        WriteEntry(zip, "xl/styles.xml", """
+            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+            <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+              <fonts count="1"><font><sz val="11"/><name val="Calibri"/></font></fonts>
+              <fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>
+              <borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>
+              <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+              <cellXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/></cellXfs>
+            </styleSheet>
+            """);
+        WriteEntry(zip, "xl/worksheets/sheet1.xml", sheet.ToString());
     }
 
-    private static bool SplitField(string line, out string key, out string value)
+    private static string SampleRow(int row, string stt, string title, string content) =>
+        $"""<row r="{row}"><c r="A{row}" t="inlineStr"><is><t>{Xml(stt)}</t></is></c><c r="B{row}" t="inlineStr"><is><t>{Xml(title)}</t></is></c><c r="C{row}" t="inlineStr"><is><t>{Xml(content)}</t></is></c></row>""";
+
+    private static string Xml(string text)
     {
-        key = "";
-        value = "";
-        var cut = line.IndexOf(';');
-        if (cut < 0)
-            cut = line.IndexOf('\t');
-        if (cut < 0)
-            cut = line.IndexOf(',');
-        if (cut <= 0 || cut >= line.Length - 1)
-            return false;
-        key = line.Substring(0, cut).Trim().Trim('"');
-        value = line.Substring(cut + 1).Trim().Trim('"');
-        return key.Length > 0;
+        var sb = new StringBuilder(text.Length);
+        foreach (var c in text)
+        {
+            switch (c)
+            {
+                case '&': sb.Append("&amp;"); break;
+                case '<': sb.Append("&lt;"); break;
+                case '>': sb.Append("&gt;"); break;
+                default: sb.Append(c); break;
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    private static void WriteEntry(ZipArchive zip, string name, string xml)
+    {
+        var entry = zip.CreateEntry(name, CompressionLevel.Optimal);
+        using var writer = new StreamWriter(entry.Open(), new UTF8Encoding(false));
+        writer.Write(xml.Trim());
     }
 
     private static List<(string Key, string Value)> Pairs(List<string[]> rows)

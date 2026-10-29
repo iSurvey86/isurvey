@@ -22,7 +22,7 @@ namespace iSurvey;
 /// INK = Import KML, EXK = Export KML (EG vẫn dùng được),
 /// D2C = DGN to CAD, C2D = CAD to DGN, DGNCFG = Cấu hình DGN, T2C = TAB to CAD,
 /// UAVCLIP = Cắt ảnh UAV theo biên,
-/// GOC = Đánh số góc tuyến, DUOITUYEN = Duỗi thẳng tuyến, KHUNG = Chèn khung bản đồ A0–A4 (1/200…1/5000),
+/// GOC = Đánh số góc tuyến, STT = Đánh số thứ tự tại điểm click, DUOITUYEN = Duỗi thẳng tuyến, KHUNG = Chèn khung bản đồ A0–A4 (1/200…1/5000),
 /// RAIKHUNG = Rải khung theo tuyến,
 /// AIA = Trợ lý AI (Admin-Only),
 /// CBD = Cắt Bình Đồ (CATBD), SCN = Scan (AUTOSCAN; "ASC" bị Telex thành "ác" nên dùng SCN),

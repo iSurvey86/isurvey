@@ -604,12 +604,54 @@ public partial class RouteLayoutWindow : Window
         && row.Field.Tag.Length == 5
         && row.Field.Tag[4] is >= '1' and <= '5';
 
+    private void Sample_Click(object sender, RoutedEventArgs e)
+    {
+        var folder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        try
+        {
+            var drawing = AcadApp.DocumentManager.MdiActiveDocument?.Name;
+            if (!string.IsNullOrEmpty(drawing) && System.IO.File.Exists(drawing))
+            {
+                var dir = System.IO.Path.GetDirectoryName(drawing);
+                if (!string.IsNullOrEmpty(dir))
+                    folder = dir;
+            }
+        }
+        catch
+        {
+            // bản vẽ chưa lưu: giữ Documents
+        }
+
+        using var dlg = new System.Windows.Forms.SaveFileDialog
+        {
+            Title = "Lưu file mẫu khung tên",
+            Filter = "Excel (*.xlsx)|*.xlsx",
+            FileName = "BangKe_KhungTen.xlsx",
+            InitialDirectory = folder,
+            OverwritePrompt = true
+        };
+        if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+            return;
+
+        try
+        {
+            FrameSheetImport.WriteSample(dlg.FileName);
+        }
+        catch (System.Exception ex)
+        {
+            System.Windows.MessageBox.Show(this, "Không lưu được file: " + ex.Message, "iSurvey", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        System.Windows.MessageBox.Show(this, "Đã lưu file mẫu:\n" + dlg.FileName, "iSurvey", MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
     private void Import_Click(object sender, RoutedEventArgs e)
     {
         using var dlg = new System.Windows.Forms.OpenFileDialog
         {
             Title = "Nhập thông tin khung tên",
-            Filter = "Excel (*.xlsx;*.xlsm;*.xls)|*.xlsx;*.xlsm;*.xls|TXT hoặc CSV (*.txt;*.csv)|*.txt;*.csv|Tất cả (*.*)|*.*",
+            Filter = "Excel (*.xlsx;*.xlsm;*.xls)|*.xlsx;*.xlsm;*.xls",
             CheckFileExists = true
         };
         if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)

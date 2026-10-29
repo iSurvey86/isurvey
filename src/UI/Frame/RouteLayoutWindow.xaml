@@ -222,8 +222,12 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <DockPanel Grid.Row="0" LastChildFill="True" Margin="0,0,0,8">
-                    <Button DockPanel.Dock="Right" Content="Nhập Excel/CSV" Padding="12,4" Click="Import_Click"
-                            ToolTip="Excel: cột STT và cột Nội dung. TXT/CSV: mỗi dòng MÃ;nội dung. Ô Tờ vẫn tự điền." />
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                        <Button Content="Tải file mẫu" Padding="12,4" Margin="0,0,8,0" Click="Sample_Click"
+                                ToolTip="Lưu file Excel mẫu. Ba cột: STT, Tiêu đề, Nội dung." />
+                        <Button Content="Nhập Excel" Padding="12,4" Click="Import_Click"
+                                ToolTip="Đọc cột STT và cột Nội dung từ Excel. Ô Tờ vẫn tự điền." />
+                    </StackPanel>
                     <TextBlock x:Name="FieldsTitle" Style="{StaticResource SectionTitle}" Margin="0" VerticalAlignment="Center"
                                Text="2. THÔNG TIN KHUNG TÊN" />
                 </DockPanel>
