@@ -1,0 +1,132 @@
+<Window x:Class="iSurvey.UI.DiemDo.ImportPointsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:iSurvey.UI.DiemDo"
+        Title="iSurvey — Nhập điểm đo"
+        Width="750" SizeToContent="Height"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ResizeMode="NoResize" ShowInTaskbar="False" FontFamily="Segoe UI"
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Border Background="White" CornerRadius="12" Margin="12">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="18" ShadowDepth="2" Opacity="0.28" />
+        </Border.Effect>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Background="#1D4ED8" CornerRadius="12,12,0,0" MouseLeftButtonDown="Header_Drag">
+                <DockPanel Margin="14,10">
+                    <Button DockPanel.Dock="Right" Content="&#xE8BB;" FontFamily="Segoe MDL2 Assets" Foreground="White"
+                            Background="Transparent" BorderThickness="0" FontSize="12" Width="28" Height="28"
+                            Click="Cancel_Click" ToolTip="Đóng" />
+                    <TextBlock Text="iSurvey — Nhập điểm đo" Foreground="White" FontWeight="SemiBold"
+                               VerticalAlignment="Center" />
+                </DockPanel>
+            </Border>
+
+            <StackPanel Grid.Row="1" Margin="16,14,16,8">
+                <DockPanel LastChildFill="True" Margin="0,0,0,10">
+                    <Button DockPanel.Dock="Right" Content="Mở tệp..." MinWidth="96" Margin="8,0,0,0" Padding="12,6"
+                            Click="Open_Click" Background="White" BorderBrush="#D1D5DB" BorderThickness="1" />
+                    <TextBox x:Name="PathBox" IsReadOnly="True" Padding="8,6" VerticalContentAlignment="Center"
+                             Text="{Binding FilePath}" />
+                </DockPanel>
+
+                <Grid Height="280">
+                <local:FaintCellGrid x:Name="GridLines" RowHeight="26" HorizontalAlignment="Left" />
+                <DataGrid x:Name="PointGrid" ItemsSource="{Binding Points}" AutoGenerateColumns="False" IsReadOnly="True"
+                          CanUserAddRows="False" CanUserDeleteRows="False" HeadersVisibility="Column"
+                          GridLinesVisibility="None" Background="Transparent" BorderBrush="#C4C4C4" BorderThickness="1"
+                          AlternatingRowBackground="#F8FAFC" RowHeight="26" HorizontalScrollBarVisibility="Disabled"
+                          LayoutUpdated="PointGrid_LayoutUpdated">
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#F3F4F6" />
+                            <Setter Property="Foreground" Value="#374151" />
+                            <Setter Property="BorderBrush" Value="#C4C4C4" />
+                            <Setter Property="BorderThickness" Value="0,0,1,1" />
+                            <Setter Property="Padding" Value="8,6" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+                    <DataGrid.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="BorderBrush" Value="#C4C4C4" />
+                            <Setter Property="BorderThickness" Value="0,0,1,1" />
+                            <Setter Property="Padding" Value="6,0" />
+                            <Setter Property="SnapsToDevicePixels" Value="True" />
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="#DBEAFE" />
+                                    <Setter Property="Foreground" Value="Black" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.CellStyle>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="STT" Binding="{Binding Stt}" Width="52">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                    <Setter Property="Foreground" Value="#6B7280" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Tên điểm" Binding="{Binding Name}" Width="80" />
+                        <DataGridTextColumn Header="Tọa độ X" Binding="{Binding XText}" Width="100">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="#1D4ED8" />
+                                    <Setter Property="Margin" Value="4,0" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Tọa độ Y" Binding="{Binding YText}" Width="100">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="#16A34A" />
+                                    <Setter Property="Margin" Value="4,0" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Cao độ (Z)" Binding="{Binding ZText}" Width="100" />
+                        <DataGridTextColumn Header="Mã/Ghi chú" Binding="{Binding Code}" Width="*" />
+                    </DataGrid.Columns>
+                </DataGrid>
+                </Grid>
+
+                <DockPanel Margin="0,10,0,0">
+                    <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center" Foreground="#374151">
+                        <Run Text="Tổng điểm đo: " />
+                        <Run Text="{Binding TotalText, Mode=OneWay}" FontWeight="SemiBold" Foreground="#1D4ED8" />
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Chiều cao chữ:" VerticalAlignment="Center" Foreground="#374151" />
+                        <TextBox Width="72" Margin="8,0,0,0" Padding="8,6"
+                                 Text="{Binding HeightText, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+                </DockPanel>
+            </StackPanel>
+
+            <Border Grid.Row="2" Background="#F8FAFC" CornerRadius="0,0,12,12" Padding="16,12">
+                <DockPanel LastChildFill="False">
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                        <Button x:Name="SwapButton" Content="⇄  Đảo cột X/Y" MinWidth="140" Padding="12,8" Margin="0,0,8,0"
+                                Click="Swap_Click" Background="#FEF9C3" BorderBrush="#FDE68A" BorderThickness="1"
+                                Foreground="#854D0E" />
+                        <Button Content="Hủy bỏ" MinWidth="88" Padding="12,8" Margin="0,0,8,0" Click="Cancel_Click"
+                                Background="White" BorderBrush="#D1D5DB" BorderThickness="1" />
+                        <Button Content="⤓  Tạo điểm CAD" MinWidth="140" Padding="12,8" Click="Create_Click"
+                                Background="#1D4ED8" Foreground="White" BorderThickness="0" FontWeight="SemiBold" />
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

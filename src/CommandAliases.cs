@@ -10,6 +10,7 @@ using iSurvey.Modules.Tuyen;
 using iSurvey.Modules.Ai;
 using iSurvey.Modules.Frame;
 using iSurvey.Modules.Uav;
+using iSurvey.Modules.DiemDo;
 
 namespace iSurvey;
 
@@ -21,10 +22,11 @@ namespace iSurvey;
 /// IG = Insert Google, SG = Satellite Google, XG = Xóa Google, EG = Export Google,
 /// INK = Import KML, EXK = Export KML (EG vẫn dùng được),
 /// D2C = DGN to CAD, C2D = CAD to DGN, DGNCFG = Cấu hình DGN, T2C = TAB to CAD,
-/// UAVCLIP = Cắt ảnh UAV theo biên,
+/// UAVCLIP = Cắt ảnh UAV theo biên, AK = bật tắt khung ảnh, AD = đưa ảnh xuống dưới,
 /// GOC = Đánh số góc tuyến, STT = Đánh số thứ tự tại điểm click, DUOITUYEN = Duỗi thẳng tuyến, KHUNG = Chèn khung bản đồ A0–A4 (1/200…1/5000),
-/// RAIKHUNG = Rải khung theo tuyến,
-/// AIA = Trợ lý AI (Admin-Only),
+/// RAIKHUNG = Rải khung theo tuyến, SK = sửa thông tin khung,
+/// UG = cập nhật ảnh Google, ND = nhập điểm đo, XD = xuất điểm đo,
+/// AIA = Trợ lý AI (Admin-Only), AIC = cấu hình AI,
 /// CBD = Cắt Bình Đồ (CATBD), SCN = Scan (AUTOSCAN; "ASC" bị Telex thành "ác" nên dùng SCN),
 /// LGI = Login (ISURVEY_LOGIN), UPD = Update, ABT = About, LGO = Logout.
 /// </remarks>
@@ -36,6 +38,7 @@ public sealed class CommandAliases
     private readonly TabImportModule _tab = new();
     private readonly DgnModule _dgn = new();
     private readonly UavModule _uav = new();
+    private readonly PointFileModule _points = new();
     private readonly AiAssistantModule _ai = new();
     private readonly VertexNumberingService _goc = new();
     private readonly StripMapService _strip = new();
@@ -52,6 +55,9 @@ public sealed class CommandAliases
 
     [CommandMethod("XG")]
     public void AliasDeleteGe() => _map.DeleteGeCommand();
+
+    [CommandMethod("UG")]
+    public void AliasUpdateGe() => _map.UpdateGeCommand();
 
     [CommandMethod("EG")]
     public void AliasExportKml() => _export.ExportKmlCommand();
@@ -76,6 +82,33 @@ public sealed class CommandAliases
 
     [CommandMethod("UAVCLIP")]
     public void AliasUavClip() => _uav.ClipCommand();
+
+    [CommandMethod("AK")]
+    public void AliasUavFrame() => _uav.FrameToggleCommand();
+
+    [CommandMethod("AD")]
+    public void AliasUavSendBack() => _uav.SendBackCommand();
+
+    [CommandMethod("AU")]
+    public void AliasUavInsert() => _uav.InsertStub();
+
+    [CommandMethod("DEM")]
+    public void AliasUavDem() => _uav.DemStub();
+
+    [CommandMethod("DM")]
+    public void AliasUavContour() => _uav.ContourStub();
+
+    [CommandMethod("HT")]
+    public void AliasUavCrs() => _uav.CrsStub();
+
+    [CommandMethod("NP")]
+    public void AliasPcImport() => _uav.PcImportStub();
+
+    [CommandMethod("LP")]
+    public void AliasPcFilter() => _uav.PcFilterStub();
+
+    [CommandMethod("RL")]
+    public void AliasPcGrid() => _uav.PcGridStub();
 
     [CommandMethod("GOC")]
     public void AliasGocTuyen() => _goc.NumberVerticesCommand();
@@ -113,8 +146,20 @@ public sealed class CommandAliases
     [CommandMethod("CODAN")]
     public void AliasFitTitle() => _frame.FitTitleCommand();
 
+    [CommandMethod("SK")]
+    public void AliasEditFrame() => _frame.EditFrameInfoCommand();
+
     [CommandMethod("AIA")]
     public void AliasAiAssist() => _ai.AssistCommand();
+
+    [CommandMethod("AIC")]
+    public void AliasAiSettings() => _ai.SettingsCommand();
+
+    [CommandMethod("ND")]
+    public void AliasImportPoints() => _points.ImportPointsCommand();
+
+    [CommandMethod("XD")]
+    public void AliasExportPoints() => _points.ExportPointsCommand();
 
     [CommandMethod("CBD")]
     public void AliasCutPlan() => _plan.CutPlanCommand();

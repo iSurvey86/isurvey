@@ -14,7 +14,7 @@ namespace iSurvey.Modules.Tuyen;
 /// <summary>STT: đánh số thứ tự tại từng điểm click. Thay dstt.lsp.</summary>
 public sealed class SequenceNumberService
 {
-    private const string LayerName = "KS-STT";
+    private const string LayerName = iSurvey.iSurveyLayers.SoThuTu;
     private const int WipeoutSides = 32;
     private const double RadiusFactor = 1.15;
 

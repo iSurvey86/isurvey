@@ -140,16 +140,7 @@ public static class RibbonBuilder
                     new Btn("Bảo Vệ Layer Khung", "KHOAKHUNG", RibbonIcons.KhoaKhung, false)
                 ]);
 
-            // Panel 4 — Biên tập Địa hình
-            AddPanel(tab, "Biên tập Địa hình",
-                [
-                    new Btn("Ghi Số\nĐồng Mức", "GHISODM", RibbonIcons.GhiSoDm, false)
-                ],
-                [
-                    new Btn("Lọc Giãn Điểm Mia", "LOCDIEM", RibbonIcons.LocDiem, false),
-                    new Btn("Ẩn / Hiện Lưới TIN", "ANTIN", RibbonIcons.AnTin, false),
-                    new Btn("Chuẩn Hóa Mã Font", "CHUYENFONT", RibbonIcons.ChuyenFont, false)
-                ]);
+            AddTerrainPanel(tab);
 
             // Panel 5 — Tuyến & Cột Điện
             AddPanel(tab, "Tuyến & Cột Điện",
@@ -315,6 +306,48 @@ public static class RibbonBuilder
         {
             // Icon tùy chọn — bỏ qua nếu lỗi
         }
+    }
+
+    /// <summary>Panel địa hình: ghi số đồng mức, nhập/xuất điểm đo, và các nút lưới.</summary>
+    private static void AddTerrainPanel(RibbonTab tab)
+    {
+        var source = new RibbonPanelSource { Title = "Biên tập Địa hình" };
+        source.Items.Add(CreateButton(
+            new Btn("Ghi Số\nĐồng Mức", "GHISODM", RibbonIcons.GhiSoDm, false),
+            isLarge: true,
+            gated: true));
+        source.Items.Add(CreateSplitButton(
+            text: "Biên tập\nĐiểm đo",
+            mainCommand: "BIENDIEM",
+            mainIcon: RibbonIcons.LocDiem,
+            mainImplemented: false,
+            tip: "Nhập, xuất và biên tập điểm đo",
+            dropdown:
+            [
+                new Btn("Nhập điểm đo", "NHAPDIEM", RibbonIcons.ImportTab, true, "Nhập điểm đo từ tệp tọa độ"),
+                new Btn("Xuất điểm đo", "XUATDIEM", RibbonIcons.ExportKml, true, "Xuất điểm đo ra tệp tọa độ"),
+                new Btn("Nâng hạ cao độ điểm đo", "NANGLCAO", RibbonIcons.KiemTraCaoDo, false),
+                new Btn("Tạo điểm từ đối tượng AutoCAD", "TAODIEMCAD", RibbonIcons.LocDiem, false),
+                new Btn("Hiện điểm đo theo mã", "HIENDIEMMA", RibbonIcons.AnTin, false),
+                new Btn("Lọc điểm đo theo mã", "LOCDIEMMA", RibbonIcons.LocDiem, false),
+                new Btn("Chèn địa vật theo mã điểm", "CHENDIAVAT", RibbonIcons.MapInsert, false),
+                new Btn("Tắt điểm đo trên bình đồ", "TATDIEMBD", RibbonIcons.MapDelete, false),
+                new Btn("Hiện điểm đo đã tắt", "HIENDIEMTAT", RibbonIcons.UpdateGe, false),
+                new Btn("Xóa điểm trong vùng", "XOADIEMVUNG", RibbonIcons.MapDelete, false),
+                new Btn("Nối điểm tự động", "NOIDIEM", RibbonIcons.DuoiTuyen, false),
+                new Btn("Gán cao độ điểm theo địa hình", "GANCAO", RibbonIcons.GhiSoDm, false),
+                new Btn("Phát sinh điểm trong vùng", "PHATSINHDIEM", RibbonIcons.PcGrid, false),
+                new Btn("Định vị điểm mia theo cọc", "DINHVIMIA", RibbonIcons.DanhSoGoc, false),
+                new Btn("Xoay điểm mia theo Polyline", "XOAYMIA", RibbonIcons.TileKhung, false)
+            ]));
+        source.Items.Add(CreateRows(
+            [
+                new Btn("Lọc Giãn Điểm Mia", "LOCDIEM", RibbonIcons.LocDiem, false),
+                new Btn("Ẩn / Hiện Lưới TIN", "ANTIN", RibbonIcons.AnTin, false),
+                new Btn("Chuẩn Hóa Mã Font", "CHUYENFONT", RibbonIcons.ChuyenFont, false)
+            ],
+            gated: true));
+        tab.Panels.Add(new RibbonPanel { Source = source });
     }
 
     /// <summary>

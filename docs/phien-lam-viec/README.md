@@ -16,8 +16,9 @@ Khi user nói **`làm cuối phiên đầy đủ`**, AI phải làm đủ theo t
 2. **File ngày** — tạo `YYYY-MM-DD-slug.md` trong thư mục này; link từ block HANDOFF.
 3. **Version** — bump `AppVersion` / `ComponentEntry Version` trong `deploy/iSurvey.bundle/PackageContents.xml` (và bản output nếu đang sync) khi phiên có thay đổi sản phẩm đáng kể; ghi số phiên bản trong block HANDOFF.
 4. **Docs sản phẩm** — cập nhật `README.md` gốc (và `docs/` workflow / HDSD khi đã có) cho đúng hành vi mới.
-5. **Changelog** — nếu đã có `docs/changelog/`, ghi mục phiên; nếu chưa thì ghi tóm tắt trong block HANDOFF là đủ.
-6. **Commit + push** — chỉ khi user đã yêu cầu cụm「làm cuối phiên đầy đủ」(đồng nghĩa cho phép commit/push handoff + thay đổi phiên đó).
+5. **Catalog lệnh** — cập nhật `docs/Danh_sach_lenh_iSurvey.xlsx`. Đối chiếu mọi `CommandMethod` trong `src`. Lệnh mới thêm một dòng. Lệnh đổi hành vi thì sửa dòng đó, kèm phiên bản và ngày. Không để catalog dừng ở bản cũ.
+6. **Changelog** — nếu đã có `docs/changelog/`, ghi mục phiên; nếu chưa thì ghi tóm tắt trong block HANDOFF là đủ.
+7. **Commit + push** — chỉ khi user đã yêu cầu cụm「làm cuối phiên đầy đủ」(đồng nghĩa cho phép commit/push handoff + thay đổi phiên đó).
 
 ### Cấu trúc một block HANDOFF
 

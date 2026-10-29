@@ -2,7 +2,7 @@
 
 Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), nhập và xuất **KML/KMZ**, cắt bình đồ theo biên (`CATBD`), quét cấu trúc bản vẽ (`AUTOSCAN`). Các lệnh nghiệp vụ khóa cho tới khi kích hoạt bằng Gmail + mã OTP.
 
-**Phiên bản bundle:** `1.8.9` (`deploy/iSurvey.bundle/PackageContents.xml`)
+**Phiên bản bundle:** `1.8.10` (`deploy/iSurvey.bundle/PackageContents.xml`)
 
 **Đồng bộ phiên làm việc (Cursor / đa máy):** đọc [docs/phien-lam-viec/HANDOFF.md](docs/phien-lam-viec/HANDOFF.md). Quy tắc cuối phiên: [docs/phien-lam-viec/README.md](docs/phien-lam-viec/README.md). Changelog: [docs/changelog/CHANGELOG.md](docs/changelog/CHANGELOG.md).
 
@@ -21,7 +21,7 @@ Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georefere
 |------|-------|--------|
 | `ISURVEY_MAP` | **IG** | Chèn basemap Google Earth (hộp thoại tỉnh / múi / loại ảnh) |
 | `ISURVEY_MAP_SAT` | **SG** | Chèn Google Satellite: 1 xem lướt (AutoRefresh) hoặc 2 ghép một ảnh HD theo đường bao |
-| `ISURVEY_UPDATE_GE` |  | Làm mới ảnh GE theo khung nhìn hiện tại |
+| `ISURVEY_UPDATE_GE` | **UG** | Làm mới ảnh GE theo khung nhìn hiện tại |
 | `ISURVEY_DELETE_GE` | **XG** | Xóa toàn bộ tile GE (xác nhận) |
 | `ISURVEY_IMPORT_KML` | **INK** | Nhập KML/KMZ vào layer `KML_IMPORT` (VN-2000), rồi phóng vừa vùng vừa nhập |
 | `ISURVEY_EXPORT_KML` | **EXK**, **EG** | Xuất CAD → KML/KMZ. Thiết lập → chọn đối tượng → lưu file → mở Google Earth nếu đã chọn |
@@ -38,7 +38,9 @@ Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georefere
 | `ISURVEY_GENOTP` |  | In mã kích hoạt trong ngày (chỉ máy Admin có `AdminSecret`) |
 | `ISURVEY_UAV_CLIP` | **UAVCLIP** | Clip biên ảnh UAV (polyline hoặc Auto-Clip nền trắng/đen) |
 | `ISURVEY_NUMBER_VERTICES` | **GOC** | Đánh số góc tuyến theo tỷ lệ bản đồ |
-| `STT` | **STT** | Đánh số thứ tự tại từng điểm click (nút «Đánh Số Thứ Tự»). Tiền tố + số + hậu tố, vòng tròn và wipeout trên layer `KS-STT`. Esc hoặc chuột phải để dừng |
+| `STT` | **STT** | Đánh số thứ tự tại từng điểm click (nút «Đánh Số Thứ Tự»). Tiền tố + số + hậu tố, vòng tròn và wipeout trên layer `iSurvey_STT`. Esc hoặc chuột phải để dừng |
+| `NHAPDIEM` | **ND** | Nhập điểm đo từ CSV/TXT. Tọa độ X có 7 chữ số trước dấu thập phân, Y có 6. Dấu điểm trên `iSurvey_DiemDo`, tên trên `iSurvey_DiemDo_Ten`, cao độ trên `iSurvey_DiemDo_CaoDo`. Tạo xong thì phóng vừa vùng điểm |
+| `XUATDIEM` | **XD** | Xuất điểm đo ra CSV: cột cách nhau bằng chấm phẩy, thập phân là dấu chấm, mặc định 3 số lẻ. Tên xếp từ số nhỏ đến lớn, rồi A–Z |
 | `ISURVEY_STRIP_MAP` | **DUOITUYEN** | Duỗi thẳng dải bản đồ dọc tuyến: chọn tim tuyến (click chỗ nào cũng được) + bắt buộc chọn điểm đầu (DD, G1…Gn, DC); cắt dải chữ nhật liền mạch; xuất bảng góc `.txt` (`Tên Điểm,X,Y,Khoảng Cách Cạnh Trước,Góc Rẽ` với `P/T độ phút giây`, X/Y 2 số lẻ) |
 | `ISURVEY_KHUNG` | **KHUNG** | Chèn **khung bản đồ** chuẩn TCVN 7285:2003 (ISO 5457) khổ A0–A4, tỷ lệ 1/200…1/5000: khung tên (ô DỰ ÁN mặc định «Đường dây và TBA 110KV KCN Minh Châu», logo EVN NPC vector), lưới tọa độ theo tọa độ CAD, mũi tên Bắc, thước tỷ lệ. Xoay: không / góc / theo tuyến |
 | `ISURVEY_KHUNG_BV` | **KHUNGBV** | Chèn **khung bản vẽ kỹ thuật** (cùng khung tên, không lưới tọa độ). Mẫu: `Contents\Templates\KhungBanDo_Chuan.dwg`; ghi đè bằng `%AppData%\iSurvey\KhungBanDo.dwg` |

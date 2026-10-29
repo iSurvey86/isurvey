@@ -26,11 +26,7 @@ public sealed partial class FrameService
     private static readonly int[] RouteScales = [200, 500, 1000, 2000, 5000, 10000];
 
     [CommandMethod("ISURVEY_ROUTE_SHEETS")]
-    public void RouteLayoutCommand() => RunRouteLayout(withDialog: true, "ISURVEY_ROUTE_SHEETS");
-
-    /// <summary>Như DANTRANG nhưng không hộp thoại: dùng thiết lập đã lưu (route_layout.json); layout trùng tên thì tạo tên mới. Dùng kiểm thử/tự động hóa.</summary>
-    [CommandMethod("ISURVEY_ROUTE_SHEETS_QUICK")]
-    public void RouteLayoutQuickCommand() => RunRouteLayout(withDialog: false, "ISURVEY_ROUTE_SHEETS_QUICK");
+    public void RouteLayoutCommand() => RunRouteLayout("ISURVEY_ROUTE_SHEETS");
 
     /// <summary>In lại layout BanDo_Tuyen đã có, không dựng trang mới.</summary>
     [CommandMethod("ISURVEY_ROUTE_PLOT", CommandFlags.UsePickSet | CommandFlags.Redraw)]
@@ -52,7 +48,7 @@ public sealed partial class FrameService
         }
     }
 
-    private static void RunRouteLayout(bool withDialog, string commandName)
+    private static void RunRouteLayout(string commandName)
     {
         if (!AuthManager.EnsureAuthenticated(track: false))
             return;
@@ -63,7 +59,7 @@ public sealed partial class FrameService
 
         try
         {
-            RouteLayoutRun(doc, withDialog, commandName);
+            RouteLayoutRun(doc, commandName);
         }
         catch (System.Exception ex)
         {
@@ -72,7 +68,7 @@ public sealed partial class FrameService
         }
     }
 
-    private static void RouteLayoutRun(Document doc, bool withDialog, string commandName)
+    private static void RouteLayoutRun(Document doc, string commandName)
     {
         var db = doc.Database;
         var ed = doc.Editor;
@@ -137,9 +133,7 @@ public sealed partial class FrameService
         opts.Rows = rows0;
         opts.Cols = cols0;
 
-        if (withDialog)
-        {
-            var input = new RouteLayoutDialogInput
+        var input = new RouteLayoutDialogInput
             {
                 RouteLengthM = routeLenM,
                 Sizes = Specs.Select(s => s.Name).ToArray(),
@@ -161,7 +155,6 @@ public sealed partial class FrameService
             }
 
             opts = result;
-        }
 
         var spec = Specs.First(s => s.Name.Equals(opts.Size, StringComparison.OrdinalIgnoreCase));
         scaleN = opts.Scale;
@@ -195,25 +188,22 @@ public sealed partial class FrameService
         var exists = LayoutExists(db, layoutName);
         if (exists)
         {
-            if (withDialog)
+            var pk = new PromptKeywordOptions($"\niSurvey: Layout {layoutName} đã có. Gõ 1 để ghi đè, 2 để tạo layout mới")
             {
-                var pk = new PromptKeywordOptions($"\niSurvey: Layout {layoutName} đã có. Gõ 1 để ghi đè, 2 để tạo layout mới")
-                {
-                    AllowNone = true,
-                    AppendKeywordsToMessage = true
-                };
-                pk.Keywords.Add("1", "1", "1");
-                pk.Keywords.Add("2", "2", "2");
-                pk.Keywords.Default = "2";
-                var rk = ed.GetKeywords(pk);
-                if (rk.Status is not (PromptStatus.OK or PromptStatus.None))
-                {
-                    ed.WriteMessage("\n[iSurvey] Đã hủy — chưa tạo layout.");
-                    return;
-                }
-
-                overwrite = rk.Status == PromptStatus.OK && rk.StringResult == "1";
+                AllowNone = true,
+                AppendKeywordsToMessage = true
+            };
+            pk.Keywords.Add("1", "1", "1");
+            pk.Keywords.Add("2", "2", "2");
+            pk.Keywords.Default = "2";
+            var rk = ed.GetKeywords(pk);
+            if (rk.Status is not (PromptStatus.OK or PromptStatus.None))
+            {
+                ed.WriteMessage("\n[iSurvey] Đã hủy — chưa tạo layout.");
+                return;
             }
+
+            overwrite = rk.Status == PromptStatus.OK && rk.StringResult == "1";
 
 
             if (!overwrite)
@@ -230,23 +220,20 @@ public sealed partial class FrameService
         if (opts.PlotPdf)
         {
             pdfPath = DefaultPdfPath(db, layoutName);
-            if (withDialog)
+            using var dlg = new System.Windows.Forms.SaveFileDialog
             {
-                using var dlg = new System.Windows.Forms.SaveFileDialog
-                {
-                    Title = "Lưu file PDF gộp",
-                    Filter = "PDF (*.pdf)|*.pdf",
-                    FileName = Path.GetFileName(pdfPath),
-                    InitialDirectory = Path.GetDirectoryName(pdfPath),
-                    OverwritePrompt = true
-                };
-                if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                    pdfPath = dlg.FileName;
-                else
-                {
-                    pdfPath = null;
-                    ed.WriteMessage("\n[iSurvey] Không chọn nơi lưu PDF — bỏ qua bước in.");
-                }
+                Title = "Lưu file PDF gộp",
+                Filter = "PDF (*.pdf)|*.pdf",
+                FileName = Path.GetFileName(pdfPath),
+                InitialDirectory = Path.GetDirectoryName(pdfPath),
+                OverwritePrompt = true
+            };
+            if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                pdfPath = dlg.FileName;
+            else
+            {
+                pdfPath = null;
+                ed.WriteMessage("\n[iSurvey] Không chọn nơi lưu PDF — bỏ qua bước in.");
             }
         }
 
@@ -285,17 +272,14 @@ public sealed partial class FrameService
             ed.WriteMessage("\n[iSurvey] Bỏ qua in PDF vì chưa đặt được máy in/khổ giấy cho layout.");
         }
 
-        if (withDialog)
-        {
-            var done = $"Dàn trang in đã xong.\n\nLayout {layoutName}: {built} tờ {spec.Name}, tỷ lệ 1/{scaleN}.";
-            if (pdfNote is not null)
-                done += $"\nĐã in {windows.Count} trang:\n{pdfPath}";
-            else if (pdfIssue is not null)
-                done += "\nChưa in được PDF: " + pdfIssue;
-            else
-                done += "\nChưa in PDF. Gõ INTUYEN khi muốn in layout này.";
-            System.Windows.MessageBox.Show(done, "iSurvey", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
-        }
+        var done = $"Dàn trang in đã xong.\n\nLayout {layoutName}: {built} tờ {spec.Name}, tỷ lệ 1/{scaleN}.";
+        if (pdfNote is not null)
+            done += $"\nĐã in {windows.Count} trang:\n{pdfPath}";
+        else if (pdfIssue is not null)
+            done += "\nChưa in được PDF: " + pdfIssue;
+        else
+            done += "\nChưa in PDF. Gõ INTUYEN khi muốn in layout này.";
+        System.Windows.MessageBox.Show(done, "iSurvey", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
 
         var note = $"layout {layoutName}: {built} khung {spec.Name} 1/{scaleN}, tuyến {routeLenM:0.#} m, chồng gối {opts.OverlapM:0.#} m{pdfNote}";
         ActivityLogger.Enqueue("dantrang", commandName, new

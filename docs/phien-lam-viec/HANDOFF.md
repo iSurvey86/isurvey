@@ -1,7 +1,45 @@
 # HANDOFF — Phiên làm việc (mới nhất ở trên)
 
 > **Máy khác:** `git pull` → đọc block **đầu tiên** dưới đây → tiếp tục chat.  
-> **Cuối phiên:** `làm cuối phiên đầy đủ` (= HANDOFF → bump version + docs + changelog → commit + push). Chi tiết: [README](./README.md).
+> **Cuối phiên:** `làm cuối phiên đầy đủ` (= HANDOFF → file ngày → bump version → docs → catalog lệnh → changelog → commit + push). Chi tiết: [README](./README.md).
+
+---
+
+## 2026-10-29 — Nhập xuất điểm đo, STT (1.8.10, đã phát hành)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ và phát hành. Gói UPD là **1.8.10**.
+
+### Đã chốt / đã làm
+
+- **NHAPDIEM** (`ND`): đọc CSV/TXT, nhận X khi có 7 chữ số và Y khi có 6. Dấu điểm, tên và cao độ mỗi cái một layer (`iSurvey_DiemDo`, `iSurvey_DiemDo_Ten`, `iSurvey_DiemDo_CaoDo`). Tạo xong thì zoom extents. Đã xem 5 điểm trên bản vẽ mới, rồi đóng không lưu.
+- **XUATDIEM** (`XD`): cột cách nhau bằng chấm phẩy, thập phân là dấu chấm, mặc định 3 số lẻ. Tên xếp số nhỏ đến lớn rồi A–Z. Đã mở lại bằng Excel: tọa độ giữ phần thập phân, không bị dính thành số nguyên.
+- **STT**: chữ và vòng tròn trên layer `iSurvey_STT`. Đối tượng cũ trên `KS-STT` không đổi.
+- Lệnh tắt thêm cho lệnh đã có: `UG`, `AK`, `AD`, `SK`, `AIC`, `ND`, `XD`. Hai lệnh rải khung dùng để kiểm thử đã bỏ.
+- Danh sách lệnh đã có đủ ba dòng. Không cần ghi chú thêm. Số phiên bản trên ba dòng đó là 1.8.10, vì 1.8.9 đã phát hành trước khi có các lệnh này.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Nhập / xuất điểm | `src/Modules/DiemDo/`, `src/UI/DiemDo/` |
+| Layer | `src/Core/iSurveyLayers.cs` |
+| STT | `src/Modules/Tuyen/SequenceNumberService.cs` |
+| Lệnh tắt | `src/CommandAliases.cs`, `src/UI/RibbonBuilder.cs` |
+| Catalog | `docs/Danh_sach_lenh_iSurvey.xlsx` |
+
+### Việc tiếp
+
+- [ ] Các máy khác chạy **UPD** để lấy 1.8.10.
+- [ ] Alignment Civil làm đầu vào RAIKHUNG: chưa thử.
+- [ ] Nét polyline có độ rộng hình học không đổi theo bảng màu.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff và tiếp tục. Đã phát hành 1.8.10: nhập điểm đo, xuất điểm đo, và STT trên layer iSurvey_STT. UPD lấy bản này. Tiếp: Alignment cho RAIKHUNG khi được yêu cầu.
+```
+
+**Lưu trữ ngày:** [2026-10-29-nhap-xuat-diem.md](./2026-10-29-nhap-xuat-diem.md)
 
 ---
 

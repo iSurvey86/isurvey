@@ -1,5 +1,19 @@
 # Changelog — iSurvey
 
+## 1.8.10 — 2026-10-29
+
+Đã phát hành. Gói 1.8.9 trên máy chủ chưa có đánh số thứ tự và điểm đo. **UPD** từ 1.8.9 nhận các phần dưới.
+
+### Điểm đo
+- **NHAPDIEM** (`ND`): đọc CSV/TXT. Cột có 7 chữ số trước dấu thập phân là X, 6 chữ số là Y. Dấu điểm nằm trên `iSurvey_DiemDo`, tên điểm trên `iSurvey_DiemDo_Ten`, cao độ trên `iSurvey_DiemDo_CaoDo`. Tạo xong thì phóng vừa vùng điểm.
+- **XUATDIEM** (`XD`): ghi cột cách nhau bằng chấm phẩy, thập phân là dấu chấm, mặc định 3 số lẻ. Tên xếp từ số nhỏ đến lớn, rồi A–Z.
+
+### Số thứ tự
+- **STT**: đánh số tại từng điểm click. Vòng tròn và chữ nằm trên layer `iSurvey_STT`. Số đã vẽ trên layer cũ `KS-STT` không tự chuyển.
+
+### Lệnh tắt
+- Thêm `UG`, `AK`, `AD`, `SK`, `AIC` cho các lệnh đã có. Bỏ hai lệnh rải khung dùng để kiểm thử, không có trên Ribbon.
+
 ## 1.8.9 — 2026-10-28
 
 Đã phát hành. Máy đang 1.8.7 cập nhật bằng **UPD** nhận luôn phần 1.8.8 (nét mỏng, chữ đọc ngang, nhớ logo và chữ ký).

@@ -1,6 +1,7 @@
 using Autodesk.AutoCAD.Runtime;
 using iSurvey.Auth;
 using iSurvey.Dgn;
+using iSurvey.Modules.DiemDo;
 using iSurvey.Modules.Export;
 using iSurvey.Modules.Import;
 using iSurvey.Modules.Map;
@@ -25,6 +26,7 @@ using iSurvey.UI;
 [assembly: CommandClass(typeof(AiAssistantModule))]
 [assembly: CommandClass(typeof(VertexNumberingService))]
 [assembly: CommandClass(typeof(SequenceNumberService))]
+[assembly: CommandClass(typeof(PointFileModule))]
 [assembly: CommandClass(typeof(StripMapService))]
 [assembly: CommandClass(typeof(FrameService))]
 [assembly: CommandClass(typeof(PlanModule))]

@@ -1,0 +1,15 @@
+---
+description: Cuối phiên phải cập nhật danh sách lệnh iSurvey
+alwaysApply: true
+---
+
+# Cập nhật danh sách lệnh cuối phiên
+
+File `docs/Danh_sach_lenh_iSurvey.xlsx` là catalog lệnh. Mỗi lệnh một dòng. Sheet mẫu ghi rõ: ghi ngay khi lệnh chạy được, và đồng bộ cuối phiên.
+
+Khi phiên thêm, đổi, hoặc bỏ một lệnh (`CommandMethod`, alias, nút Ribbon), cập nhật catalog trước khi kết thúc phiên. Không chờ người dùng nhắc, và không chờ cụm «làm cuối phiên đầy đủ».
+
+- Lệnh mới: thêm một dòng. Cột gồm nhóm, tên trên Ribbon, tên lệnh AutoCAD, shortcut, ý nghĩa, mô tả, cách dùng, phiên bản, ngày, trạng thái.
+- Lệnh đổi cách chạy: sửa dòng cũ, cập nhật phiên bản và ngày.
+- Lệnh chưa làm xong nhưng đã có tên: ghi trạng thái Đang làm.
+- Đối chiếu `CommandMethod` trong `src` với cột tên lệnh. Catalog không được dừng ở một bản cũ trong khi mã đã có lệnh mới.
