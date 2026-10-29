@@ -28,7 +28,11 @@ Ba lệnh đã có dòng trong `docs/Danh_sach_lenh_iSurvey.xlsx`. Không cần 
 
 Bản 1.8.10 tải và giải nén xong, nhưng `Quit()` bên trong lệnh không tắt Civil. Giao diện hết phản hồi. Trình cài chờ 4 phút rồi báo lỗi.
 
-Bản 1.8.11 đợi lệnh kết thúc rồi gửi cùng thông điệp nút đóng. Bản vẽ chưa lưu thì Civil hỏi lưu. Đã thấy câu «Save changes to Drawing1.dwg?» với Yes, No và Cancel. Chọn No, Civil tắt, không lưu file. Tắt xong thì cài ngay.
+Bản 1.8.11 đợi lệnh kết thúc rồi gửi cùng thông điệp nút đóng. Bản vẽ chưa lưu thì Civil hỏi lưu. Đã thấy câu «Save changes to Drawing1.dwg?» với Yes, No và Cancel.
+
+Bấm No thì Civil còn khoảng 3 giây mới tắt. Bản 1.8.11 tưởng là hủy và không cài. Bản 1.8.12 đợi tắt hẳn rồi cài. Bấm Cancel thì Civil vẫn mở và không cài.
+
+Bản 1.8.12 còn đợi khoảng 8 giây mới hiện câu hỏi lưu. Bản 1.8.13 nhận tín hiệu lệnh đã kết thúc rồi đóng ngay.
 
 ## Lệnh tắt
 

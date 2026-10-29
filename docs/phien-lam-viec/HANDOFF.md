@@ -5,6 +5,69 @@
 
 ---
 
+## 2026-10-29 — Hỏi lưu ngay sau khi giải nén (1.8.13, đã phát hành)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Gói UPD là **1.8.13**.
+
+### Đã chốt / đã làm
+
+- 1.8.12 đã cài được sau khi bấm No, nhưng hộp hỏi lưu xuất hiện khoảng 8 giây sau khi giải nén vì helper bỏ lỡ tín hiệu lệnh đã kết thúc.
+- 1.8.13 ghi một mã riêng cho lần đóng đó. Helper thấy mã là đóng ngay.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Tín hiệu đóng | `src/Auth/UpdateApplyService.cs`, `deploy/Apply-iSurveyUpdate.ps1` |
+
+### Việc tiếp
+
+- [ ] Các máy đang 1.8.10 trở xuống cài 1.8.13 khi Civil đã tắt. Bản đó gọi Quit() bên trong lệnh nên không tự đóng được.
+- [ ] Alignment Civil làm đầu vào RAIKHUNG: chưa thử.
+- [ ] Nét polyline có độ rộng hình học không đổi theo bảng màu.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff và tiếp tục. Đã phát hành 1.8.13: UPD đóng Civil ngay sau khi giải nén, như bấm nút đóng, chọn không lưu vẫn cài. Máy đang 1.8.10 trở xuống cần cài một lần khi Civil đã tắt. Tiếp: Alignment cho RAIKHUNG khi được yêu cầu.
+```
+
+**Lưu trữ ngày:** [2026-10-29-nhap-xuat-diem.md](./2026-10-29-nhap-xuat-diem.md)
+
+---
+
+## 2026-10-29 — Cài tiếp sau khi không lưu (1.8.12, đã phát hành)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Gói UPD là **1.8.12**.
+
+### Đã chốt / đã làm
+
+- UPD 1.8.11 đã đóng Civil và hiện «Save changes to Drawing1.dwg?». Bấm No thì Civil còn khoảng 3 giây mới tắt. Helper tưởng là hủy nên không cài.
+- 1.8.12 đợi Civil tắt hẳn sau câu trả lời đó rồi cài ngay. Bấm Cancel (Civil vẫn dùng được) thì không cài.
+- Đã chạy UPD trên bản vẽ mới, bấm không lưu, không ghi file Drawing1.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Helper đóng và cài | `deploy/Apply-iSurveyUpdate.ps1` |
+
+### Việc tiếp
+
+- [ ] Các máy đang bản cũ cài 1.8.12 khi Civil đã tắt. Bản 1.8.10 trở xuống tự kẹt ở bước đóng, không tự vượt qua được.
+- [ ] Alignment Civil làm đầu vào RAIKHUNG: chưa thử.
+- [ ] Nét polyline có độ rộng hình học không đổi theo bảng màu.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff và tiếp tục. Đã phát hành 1.8.12: UPD đóng Civil như bấm nút đóng, chọn không lưu vẫn cài. Máy đang bản cũ cần cài một lần khi Civil đã tắt. Tiếp: Alignment cho RAIKHUNG khi được yêu cầu.
+```
+
+**Lưu trữ ngày:** [2026-10-29-nhap-xuat-diem.md](./2026-10-29-nhap-xuat-diem.md)
+
+---
+
 ## 2026-10-29 — Đóng Civil khi cập nhật (1.8.11, đã phát hành)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Sửa lỗi UPD vừa gặp trên bản 1.8.10. Gói UPD là **1.8.11**.

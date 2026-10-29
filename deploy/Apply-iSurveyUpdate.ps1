@@ -5,7 +5,8 @@
 
 param(
     [Parameter(Mandatory = $true)][int]$ParentPid,
-    [Parameter(Mandatory = $true)][string]$SetupDir
+    [Parameter(Mandatory = $true)][string]$SetupDir,
+    [string]$Signal = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -15,8 +16,6 @@ Add-Type -AssemblyName System.Drawing
 $UpdatesRoot = Join-Path $env:LOCALAPPDATA "iSurvey\updates"
 New-Item -ItemType Directory -Force -Path $UpdatesRoot | Out-Null
 $LogFile = Join-Path $UpdatesRoot "update.log"
-$logMark = 0
-if (Test-Path $LogFile) { $logMark = (Get-Item $LogFile).Length }
 $ResultFile = Join-Path $UpdatesRoot "last-result.json"
 $started = Get-Date
 
@@ -185,18 +184,11 @@ if (-not (Test-Path $installPs1) -or -not (Test-Path $bundle)) {
 
 # Khong hien cua so len tren Civil luc nay: no che hop "Luu ban ve?".
 # Cho dong "close_hand_off" moi gui dong — luc do lenh UPD da sap ket thuc.
-$handOff = (Get-Date).AddSeconds(8)
+$handOff = (Get-Date).AddSeconds(3)
 while ((Get-Date) -lt $handOff) {
     $aliveNow = Get-Process -Id $ParentPid -ErrorAction SilentlyContinue
     if (-not $aliveNow) { break }
-    if ((Test-Path $LogFile) -and (Get-Item $LogFile).Length -gt $logMark) {
-        $fs = New-Object System.IO.FileStream($LogFile, 'Open', 'Read', 'ReadWrite')
-        [void]$fs.Seek($logMark, 'Begin')
-        $reader = New-Object System.IO.StreamReader($fs)
-        $tail = $reader.ReadToEnd()
-        $reader.Close()
-        if ($tail -match 'close_hand_off') { break }
-    }
+    if ($Signal -and (Select-String -Path $LogFile -Pattern $Signal -Quiet -ErrorAction SilentlyContinue)) { break }
     Start-Sleep -Milliseconds 100
 }
 Start-Sleep -Milliseconds 200
@@ -214,13 +206,30 @@ while ($alive -and -not $alive.HasExited) {
         $sawDialog = $true
     }
     elseif ($sawDialog) {
-        Start-Sleep -Milliseconds 400
+        # Hop thoai vua dong. No/Yes: Civil con vai giay de luu hoac tat. Cancel: cua so van tuong tac.
+        $answerDeadline = (Get-Date).AddSeconds(8)
+        $shutdownDeadline = (Get-Date).AddSeconds(60)
+        while ($true) {
+            $still = Get-Process -Id $ParentPid -ErrorAction SilentlyContinue
+            if (-not $still) { break }
+            try { if ($still.HasExited) { break } } catch { break }
+            if ([IswClose]::HasDialog([uint32]$ParentPid)) { break }
+            try { $still.Refresh() } catch { break }
+            if (-not $still.Responding) {
+                if ((Get-Date) -gt $shutdownDeadline) { break }
+                Start-Sleep -Milliseconds 200
+                continue
+            }
+            if ((Get-Date) -gt $answerDeadline) {
+                Write-Trace "close_cancelled"
+                Write-Result $false "wait" "Nguoi dung huy dong Civil" 2 $false
+                Show-Msg "Ban da khong dong Civil, nen chua cai dat.`nChay lai UPD khi muon cap nhat." "iSurvey Cap nhat"
+                exit 2
+            }
+            Start-Sleep -Milliseconds 200
+        }
         $still = Get-Process -Id $ParentPid -ErrorAction SilentlyContinue
         if (-not $still) { break }
-        Write-Trace "close_cancelled"
-        Write-Result $false "wait" "Nguoi dung huy dong Civil" 2 $false
-        Show-Msg "Ban da khong dong Civil, nen chua cai dat.`nChay lai UPD khi muon cap nhat." "iSurvey Cap nhat"
-        exit 2
     }
     elseif ($posts -lt 2 -and $frame -ne [IntPtr]::Zero -and (Get-Date) -ge $nextPost) {
         # WM_CLOSE = bam nut dong. Ban ve chua luu thi Civil hoi luu hay khong.

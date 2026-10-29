@@ -109,7 +109,6 @@ public sealed class AuthModule : ISurveyModule
         // Không gọi Application.Quit() trong lệnh: AutoCAD bỏ qua và tiến trình vẫn sống.
         // Lệnh kết thúc ngay. Helper gửi WM_CLOSE (cùng nút X): bản vẽ chưa lưu thì hỏi lưu.
         AuthManager.Print("\n[iSurvey] Đang đóng AutoCAD/Civil để cài đặt...");
-        UpdateApplyService.Trace("close_hand_off");
     }
 
     [CommandMethod("ISURVEY_LOGOUT")]

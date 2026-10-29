@@ -82,8 +82,9 @@ public static class UpdateApplyService
             var pid = Process.GetCurrentProcess().Id;
             WriteRelaunchInfo();
             WriteLogContext(latest);
+            var signal = Guid.NewGuid().ToString("N");
             var args =
-                $"-NoProfile -ExecutionPolicy Bypass -STA -File \"{helper}\" -ParentPid {pid} -SetupDir \"{setupDir}\"";
+                $"-NoProfile -ExecutionPolicy Bypass -STA -File \"{helper}\" -ParentPid {pid} -SetupDir \"{setupDir}\" -Signal {signal}";
 
             var psi = new ProcessStartInfo
             {
@@ -101,6 +102,7 @@ public static class UpdateApplyService
             }
 
             Trace($"helper_start pid={proc.Id} acadPid={pid} setup={setupDir}");
+            Trace("close_hand_off " + signal);
             return new ApplyResult(true, "Đã chạy trình cài (PID " + proc.Id + ").");
         }
         catch (Exception ex)

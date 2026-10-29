@@ -1,5 +1,15 @@
 # Changelog — iSurvey
 
+## 1.8.13 — 2026-10-29
+
+### Cập nhật
+- Hộp hỏi lưu hiện ngay khi gói đã giải nén. Bản 1.8.12 đợi thêm khoảng 8 giây vì không thấy tín hiệu lệnh đã kết thúc.
+
+## 1.8.12 — 2026-10-29
+
+### Cập nhật
+- Chọn không lưu khi đóng Civil thì vẫn cài. Bản 1.8.11 tưởng người dùng đã hủy vì Civil còn vài giây mới tắt hẳn.
+
 ## 1.8.11 — 2026-10-29
 
 ### Cập nhật
