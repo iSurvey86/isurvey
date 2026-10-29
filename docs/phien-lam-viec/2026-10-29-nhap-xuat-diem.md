@@ -24,6 +24,12 @@ Khi tạo điểm, dấu điểm nằm trên `iSurvey_DiemDo`, tên điểm trê
 
 Ba lệnh đã có dòng trong `docs/Danh_sach_lenh_iSurvey.xlsx`. Không cần ghi chú thêm. Cột phiên bản của ba dòng là 1.8.10, vì gói 1.8.9 đã lên máy chủ trước khi có các lệnh này.
 
+## Đóng Civil khi cập nhật
+
+Bản 1.8.10 tải và giải nén xong, nhưng `Quit()` bên trong lệnh không tắt Civil. Giao diện hết phản hồi. Trình cài chờ 4 phút rồi báo lỗi.
+
+Bản 1.8.11 đợi lệnh kết thúc rồi gửi cùng thông điệp nút đóng. Bản vẽ chưa lưu thì Civil hỏi lưu. Đã thấy câu «Save changes to Drawing1.dwg?» với Yes, No và Cancel. Chọn No, Civil tắt, không lưu file. Tắt xong thì cài ngay.
+
 ## Lệnh tắt
 
 Thêm `UG`, `AK`, `AD`, `SK`, `AIC`, `ND`, `XD` cho lệnh đã có. Hai lệnh rải khung dùng để kiểm thử đã bỏ khỏi mã nguồn.

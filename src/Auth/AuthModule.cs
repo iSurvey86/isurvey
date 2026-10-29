@@ -74,8 +74,6 @@ public sealed class AuthModule : ISurveyModule
 
         var man = result.Manifest;
         UpdateApplyService.Trace("quit_prepare setup=" + setupDir);
-        ActivityLogger.FlushNow();
-
         var launched = UpdateApplyService.LaunchHelper(setupDir, man.Latest);
         var quitDetail = new
         {
@@ -108,27 +106,10 @@ public sealed class AuthModule : ISurveyModule
             return;
         }
 
+        // Không gọi Application.Quit() trong lệnh: AutoCAD bỏ qua và tiến trình vẫn sống.
+        // Lệnh kết thúc ngay. Helper gửi WM_CLOSE (cùng nút X): bản vẽ chưa lưu thì hỏi lưu.
         AuthManager.Print("\n[iSurvey] Đang đóng AutoCAD/Civil để cài đặt...");
-        try
-        {
-            AcadApp.Quit();
-        }
-        catch (System.Exception ex)
-        {
-            UpdateApplyService.Trace("quit_fail " + ex.Message);
-            ActivityLogger.Enqueue("update_result", "UPD", new
-            {
-                current = AuthManager.AppVersion,
-                latest = man.Latest,
-                ok = false,
-                stage = "quit",
-                message = "Không thoát được AutoCAD: " + ex.Message
-            });
-            DarkDialog.ShowInfo(
-                "CẬP NHẬT iSurvey",
-                "Không thoát được AutoCAD/Civil",
-                note: ex.Message + "\n\nHãy lưu bản vẽ, đóng Civil, rồi chạy lại UPD.");
-        }
+        UpdateApplyService.Trace("close_hand_off");
     }
 
     [CommandMethod("ISURVEY_LOGOUT")]

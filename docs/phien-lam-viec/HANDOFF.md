@@ -5,6 +5,39 @@
 
 ---
 
+## 2026-10-29 — Đóng Civil khi cập nhật (1.8.11, đã phát hành)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Sửa lỗi UPD vừa gặp trên bản 1.8.10. Gói UPD là **1.8.11**.
+
+### Đã chốt / đã làm
+
+- Tải và giải nén 1.8.10 đã xong. `Application.Quit()` gọi bên trong lệnh UPD không thoát Civil: giao diện hết phản hồi, helper chờ đúng 4 phút rồi báo PID còn mở.
+- Bản 1.8.11 không gọi `Quit()` trong lệnh. Khi lệnh kết thúc, helper gửi cùng thông điệp nút đóng. Đã thử trên bản vẽ mới: hộp thoại hiện «Save changes to Drawing1.dwg?» với Yes / No / Cancel trong khoảng một giây. Chọn No thì Civil tắt. Không lưu bản vẽ đó.
+- Máy đang cài bản cũ không tự vượt qua bước đóng. Cài 1.8.11 một lần khi Civil đã tắt, các lần UPD sau mới đóng đúng.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Lệnh UPD | `src/Auth/AuthModule.cs` |
+| Helper đóng và cài | `deploy/Apply-iSurveyUpdate.ps1` |
+
+### Việc tiếp
+
+- [ ] Các máy khác cài 1.8.11 khi Civil đã tắt, rồi các lần sau dùng UPD.
+- [ ] Alignment Civil làm đầu vào RAIKHUNG: chưa thử.
+- [ ] Nét polyline có độ rộng hình học không đổi theo bảng màu.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff và tiếp tục. Đã phát hành 1.8.11: UPD đóng Civil như bấm nút đóng, bản vẽ chưa lưu thì hỏi lưu, tắt xong thì cài ngay. Tiếp: Alignment cho RAIKHUNG khi được yêu cầu.
+```
+
+**Lưu trữ ngày:** [2026-10-29-nhap-xuat-diem.md](./2026-10-29-nhap-xuat-diem.md)
+
+---
+
 ## 2026-10-29 — Nhập xuất điểm đo, STT (1.8.10, đã phát hành)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ và phát hành. Gói UPD là **1.8.10**.

@@ -69,7 +69,7 @@ public static class UpdateApplyService
         }
     }
 
-    /// <summary>Ghi script helper và chạy ngoài tiến trình CAD. Không gọi Quit — lệnh UPD thoát CAD sau khi hộp thoại đã đóng.</summary>
+    /// <summary>Ghi script helper và chạy ngoài tiến trình CAD. Helper gửi đóng cửa sổ (nút X) sau khi lệnh UPD kết thúc.</summary>
     public static ApplyResult LaunchHelper(string setupDir, string latest)
     {
         try

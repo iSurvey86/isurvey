@@ -3,7 +3,7 @@
                     AutodeskProduct="AutoCAD"
                     Name="iSurvey"
                     Description="iSurvey — Google Earth + VN-2000 cho AutoCAD / Civil 3D"
-                    AppVersion="1.8.10"
+                    AppVersion="1.8.11"
                     ProductCode="{8F3E2A1B-4C5D-6E7F-9012-3456789ABCDE}"
                     UpgradeCode="{1D2E3F4A-5B6C-7D8E-9F0A-1B2C3D4E5F6A}"
                     Author="iSurvey">
@@ -13,7 +13,7 @@
   <Components Description="iSurvey for AutoCAD / Civil 3D 2022-2024">
     <RuntimeRequirements OS="Win64" Platform="AutoCAD|Civil3D" SeriesMin="R24.1" SeriesMax="R24.3" />
     <ComponentEntry AppName="iSurvey.2023"
-                    Version="1.8.10"
+                    Version="1.8.11"
                     ModuleName="./Contents/Win64/2023/iSurvey.dll"
                     LoadOnAutoCADStartup="True"
                     LoadOnCommandInvocation="True">
@@ -81,7 +81,7 @@
   <Components Description="iSurvey for AutoCAD / Civil 3D 2025-2026">
     <RuntimeRequirements OS="Win64" Platform="AutoCAD|Civil3D" SeriesMin="R25.0" SeriesMax="R25.1" />
     <ComponentEntry AppName="iSurvey.2025"
-                    Version="1.8.10"
+                    Version="1.8.11"
                     ModuleName="./Contents/Win64/2025/iSurvey.dll"
                     LoadOnAutoCADStartup="True"
                     LoadOnCommandInvocation="True">
@@ -149,7 +149,7 @@
   <Components Description="iSurvey for AutoCAD / Civil 3D 2027">
     <RuntimeRequirements OS="Win64" Platform="AutoCAD|Civil3D" SeriesMin="R26.0" SeriesMax="R26.0" />
     <ComponentEntry AppName="iSurvey.2027"
-                    Version="1.8.10"
+                    Version="1.8.11"
                     ModuleName="./Contents/Win64/2027/iSurvey.dll"
                     LoadOnAutoCADStartup="True"
                     LoadOnCommandInvocation="True">

@@ -1,5 +1,12 @@
 # Changelog — iSurvey
 
+## 1.8.11 — 2026-10-29
+
+### Cập nhật
+- Sau khi tải và giải nén, iSurvey đóng Civil như bấm nút đóng cửa sổ. Bản vẽ chưa lưu thì hiện câu hỏi lưu hay không.
+- Không gọi lệnh thoát khi lệnh cập nhật còn đang chạy, vì Civil bỏ qua và đứng yên.
+- Khi Civil đã tắt thì cài ngay. Không còn chờ 4 phút.
+
 ## 1.8.10 — 2026-10-29
 
 Đã phát hành. Gói 1.8.9 trên máy chủ chưa có đánh số thứ tự và điểm đo. **UPD** từ 1.8.9 nhận các phần dưới.

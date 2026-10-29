@@ -2,7 +2,7 @@
 
 Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), nhập và xuất **KML/KMZ**, cắt bình đồ theo biên (`CATBD`), quét cấu trúc bản vẽ (`AUTOSCAN`). Các lệnh nghiệp vụ khóa cho tới khi kích hoạt bằng Gmail + mã OTP.
 
-**Phiên bản bundle:** `1.8.10` (`deploy/iSurvey.bundle/PackageContents.xml`)
+**Phiên bản bundle:** `1.8.11` (`deploy/iSurvey.bundle/PackageContents.xml`)
 
 **Đồng bộ phiên làm việc (Cursor / đa máy):** đọc [docs/phien-lam-viec/HANDOFF.md](docs/phien-lam-viec/HANDOFF.md). Quy tắc cuối phiên: [docs/phien-lam-viec/README.md](docs/phien-lam-viec/README.md). Changelog: [docs/changelog/CHANGELOG.md](docs/changelog/CHANGELOG.md).
 
@@ -34,7 +34,7 @@ Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georefere
 | `ISURVEY_LOGIN` | **LGI** | Đăng nhập / kích hoạt (Gmail + OTP 6 số) |
 | `ISURVEY_ABOUT` | **ABT** | Thông tin tài khoản và giấy phép trên máy |
 | `ISURVEY_LOGOUT` | **LGO** | Đăng xuất / đổi máy (trả suất thiết bị nếu đang trực tuyến) |
-| `ISURVEY_UPDATE` | **UPD** | Kiểm tra cập nhật: hộp thoại phiên bản + tính năng mới; tải gói, thoát Civil, cài, mở lại. Nhật ký ghi từng bước và kết quả |
+| `ISURVEY_UPDATE` | **UPD** | Kiểm tra cập nhật: tải gói và giải nén, rồi đóng Civil như bấm nút đóng. Bản vẽ chưa lưu thì hỏi lưu. Đóng xong thì cài ngay và mở lại |
 | `ISURVEY_GENOTP` |  | In mã kích hoạt trong ngày (chỉ máy Admin có `AdminSecret`) |
 | `ISURVEY_UAV_CLIP` | **UAVCLIP** | Clip biên ảnh UAV (polyline hoặc Auto-Clip nền trắng/đen) |
 | `ISURVEY_NUMBER_VERTICES` | **GOC** | Đánh số góc tuyến theo tỷ lệ bản đồ |
