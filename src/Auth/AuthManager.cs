@@ -18,8 +18,8 @@ public static class AuthManager
     /// <summary>Tổng thời gian tối đa cho cả chuỗi refresh + check (timeout ngắn, không làm phiền người dùng).</summary>
     private static readonly TimeSpan RecheckTimeout = TimeSpan.FromSeconds(5);
 
-    /// <summary>Hỏi server xem admin có cắt phiên không. Không cập nhật mốc "lần thấy".</summary>
-    private static readonly TimeSpan SessionWatchInterval = TimeSpan.FromMinutes(2);
+    /// <summary>Hỏi server xem admin có cắt phiên / khóa máy không. Không cập nhật mốc "lần thấy".</summary>
+    private static readonly TimeSpan SessionWatchInterval = TimeSpan.FromSeconds(15);
 
     private static readonly LicenseStorage Storage = new();
     private static LicenseInfo? _license;
@@ -407,7 +407,8 @@ public static class AuthManager
                     UI.Account.DarkDialog.ShowInfo(
                         "ĐĂNG XUẤT",
                         "Admin đã đăng xuất phiên trên máy này",
-                        note: "Máy không bị khóa. Hãy đăng nhập lại để dùng tiếp.");
+                        note: "Máy không bị khóa. Nhập lại Gmail và mã OTP để dùng tiếp.");
+                    ShowLogin();
                 }
                 catch (System.Exception ex)
                 {
@@ -443,7 +444,7 @@ public static class AuthManager
     }
 
     /// <summary>
-    /// Trong lúc Civil mở: khoảng 2 phút một lần hỏi cờ đăng xuất / khóa.
+    /// Trong lúc Civil mở: khoảng 15 giây một lần hỏi cờ đăng xuất / khóa.
     /// Chạy cả khi lúc mở Civil chưa đăng nhập, để phiên đăng nhập sau đó vẫn bị cắt được.
     /// </summary>
     private static void StartSessionWatch()
@@ -454,7 +455,7 @@ public static class AuthManager
         _sessionWatch = new System.Threading.Timer(
             _ => { _ = WatchSessionAsync(); },
             null,
-            TimeSpan.FromSeconds(20),
+            TimeSpan.FromSeconds(5),
             SessionWatchInterval);
     }
 

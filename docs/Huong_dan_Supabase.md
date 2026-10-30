@@ -60,9 +60,10 @@ File này ghi đè hằng mặc định. Để trống cả hai thì iSurvey ch�
 | Việc | Cách làm |
 |---|---|
 | Xem ai đang dùng, máy nào | Table Editor → `isurvey_licenses` |
-| **Khóa một thiết bị** | đặt `is_active = false` → máy đó bị khóa trong vòng 24 giờ sau khi mở Civil (hoặc ngay khi đăng nhập lại) |
-| Mở lại thiết bị | đặt `is_active = true` |
-| Giải phóng suất thiết bị cho người dùng đổi máy | xóa dòng (người dùng cũng tự làm được bằng nút **Đăng Xuất / Đổi Máy** nếu máy cũ còn mở được) |
+| **Đăng xuất một máy** | tab iSurvey → **Đăng xuất**: cắt phiên ngay, trả suất; đăng nhập lại = Gmail + OTP |
+| **Khóa một thiết bị** | tab iSurvey → **Khóa** (`is_active = false`): máy đó không đăng nhập được đến khi **Mở** |
+| Mở lại thiết bị | tab iSurvey → **Mở** (`is_active = true`) |
+| Giải phóng suất thiết bị cho người dùng đổi máy | người dùng bấm **Đăng Xuất / Đổi Máy** trên Ribbon, hoặc Admin bấm **Đăng xuất** trên trang quản trị |
 | **Khóa cả tài khoản** | Authentication → Users → chọn user → **Ban user**; đồng thời đặt `is_active = false` cho các dòng của user đó |
 | Tăng/giảm số thiết bị | sửa `c_max_devices` trong `isurvey_activate` rồi chạy lại hàm |
 | Xem nhật ký hoạt động | Table Editor → `isurvey_activity` (login / logout / command / update_check) |

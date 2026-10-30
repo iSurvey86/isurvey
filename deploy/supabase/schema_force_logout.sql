@@ -1,7 +1,8 @@
 -- =====================================================================
--- Đăng xuất từ xa (chạy một lần trên Supabase SQL Editor, sau schema.sql).
--- Khóa/mở (is_active) giữ nguyên. Cột này chỉ cắt phiên đang đăng nhập.
--- Có thể chạy lại.
+-- Đăng xuất từ xa (chạy trên Supabase SQL Editor, sau schema.sql). Có thể chạy lại.
+-- Khóa (is_active=false): cấm máy đăng nhập đến khi Admin bấm Mở.
+-- Đăng xuất (force_logout=true): cắt phiên ngay trên trang quản trị, trả suất máy.
+-- Plugin bản mới hỏi khoảng 15 giây rồi xóa giấy phép cục bộ; đăng nhập lại = Gmail + OTP.
 -- =====================================================================
 
 alter table public.isurvey_licenses
@@ -56,12 +57,15 @@ begin
            force_logout  = false
      where id = v_row.id;
 
-    select count(*) into v_count from public.isurvey_licenses where email = v_email;
+    select count(*) into v_count from public.isurvey_licenses
+     where email = v_email and (not is_active or not force_logout);
     return jsonb_build_object('status', 'ok', 'is_active', true,
                               'device_count', v_count, 'max_devices', c_max_devices);
   end if;
 
-  select count(*) into v_count from public.isurvey_licenses where email = v_email;
+  -- Máy khóa vẫn chiếm suất. Máy đã đăng xuất từ xa không chiếm suất.
+  select count(*) into v_count from public.isurvey_licenses
+   where email = v_email and (not is_active or not force_logout);
   if v_count >= c_max_devices then
     return jsonb_build_object('status', 'device_limit',
                               'device_count', v_count, 'max_devices', c_max_devices);

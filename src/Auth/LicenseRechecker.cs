@@ -12,7 +12,7 @@ public enum RecheckAction
     RotateOnly,
     /// <summary>Server trả rõ ràng thiết bị bị khóa (is_active=false) hoặc không còn đăng ký → khóa lại.</summary>
     Revoke,
-    /// <summary>Admin cắt phiên trên máy này. Xóa giấy phép cục bộ, không xóa suất thiết bị — đăng nhập lại được.</summary>
+    /// <summary>Admin cắt phiên trên máy này. Xóa giấy phép cục bộ; đăng nhập lại bằng Gmail + OTP.</summary>
     Logout
 }
 

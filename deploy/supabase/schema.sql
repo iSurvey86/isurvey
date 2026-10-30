@@ -16,8 +16,8 @@ create table if not exists public.isurvey_licenses (
   hwid          text not null,
   machine_name  text,
   app_version   text,
-  is_active     boolean not null default true,      -- Admin đặt false để khóa/thu hồi thiết bị
-  force_logout  boolean not null default false,     -- Admin bật để cắt phiên hiện tại; đăng nhập lại thì xóa
+  is_active     boolean not null default true,      -- Admin Khóa: cấm máy này đăng nhập cho đến khi Mở
+  force_logout  boolean not null default false,     -- Admin Đăng xuất: cắt phiên ngay; đăng nhập lại bằng Gmail + OTP
   activated_at  timestamptz not null default now(),
   last_login_at timestamptz not null default now(),
   note          text,
@@ -97,13 +97,16 @@ begin
            force_logout  = false
      where id = v_row.id;
 
-    select count(*) into v_count from public.isurvey_licenses where email = v_email;
+    select count(*) into v_count from public.isurvey_licenses
+     where email = v_email and (not is_active or not force_logout);
     return jsonb_build_object('status', 'ok', 'is_active', true,
                               'device_count', v_count, 'max_devices', c_max_devices);
   end if;
 
-  -- Thiết bị mới: tính cả thiết bị đang bị khóa để không né giới hạn bằng cách khóa/mở.
-  select count(*) into v_count from public.isurvey_licenses where email = v_email;
+  -- Thiết bị mới: máy đang khóa vẫn chiếm suất (không né bằng khóa/mở).
+  -- Máy Admin đã đăng xuất (force_logout) không chiếm suất — đăng nhập máy khác được ngay.
+  select count(*) into v_count from public.isurvey_licenses
+   where email = v_email and (not is_active or not force_logout);
   if v_count >= c_max_devices then
     return jsonb_build_object('status', 'device_limit',
                               'device_count', v_count, 'max_devices', c_max_devices);
@@ -120,7 +123,7 @@ $$;
 -- ---------------------------------------------------------------------
 -- isurvey_check: kiểm tra định kỳ và khi admin đăng xuất từ xa.
 -- Trả: ok | blocked | logout | not_registered | unauthenticated. KHÔNG tự đăng ký thiết bị.
--- p_touch: bản 24 giờ cập nhật last_login_at. Lần hỏi nhanh (khoảng 2 phút) truyền false
+-- p_touch: bản 24 giờ cập nhật last_login_at. Lần hỏi nhanh (plugin ~15 giây) truyền false
 -- để không biến "lần thấy" thành nhịp hỏi.
 -- Chữ ký cũ (1 tham số) phải xóa trước: thêm tham số mặc định là overload mới, không phải replace.
 -- ---------------------------------------------------------------------

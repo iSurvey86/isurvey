@@ -4,6 +4,10 @@
 
 Chưa đóng gói. Máy khác kéo mã này vẫn thấy gói UPD là 1.8.14 cho đến khi phát hành.
 
+### Đăng xuất từ xa
+- Admin bấm **Đăng xuất** trên tab Thiết bị: trạng thái thành **Đã đăng xuất** ngay, trả suất máy. Plugin hỏi khoảng 15 giây rồi xóa giấy phép cục bộ và mở hộp đăng nhập (Gmail + OTP).
+- **Khóa** khác **Đăng xuất**: khóa thì máy không đăng nhập được cho đến khi Admin bấm Mở.
+
 ### Khung và in
 - **RAIKHUNG** và **RAIMCD** chỉ dựng layout. Không in PDF ngay sau khi tạo.
 - **INTUYEN** hỏi in màu (`acad.ctb`) hoặc in đen trắng (`monochrome.ctb`), chèn chữ ký và đóng mộc đỏ. Chữ ký và mộc chỉ có trên PDF.
