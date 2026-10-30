@@ -6,8 +6,8 @@
         SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
-        Background="#2B303B"
-        Foreground="#E2E6ED"
+        Background="#F8FAFC"
+        Foreground="#1F2937"
         FontFamily="Segoe UI"
         FontSize="13"
         UseLayoutRounding="True"
@@ -15,10 +15,14 @@
         TextOptions.TextFormattingMode="Display"
         Loaded="OnLoaded">
     <Window.Resources>
-        <SolidColorBrush x:Key="Panel" Color="#2B303B"/>
-        <SolidColorBrush x:Key="Edge" Color="#454D5E"/>
-        <SolidColorBrush x:Key="Muted" Color="#8C96A8"/>
-        <SolidColorBrush x:Key="Text" Color="#E2E6ED"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/iSurvey;component/src/UI/CtaStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        <SolidColorBrush x:Key="Panel" Color="#F8FAFC"/>
+        <SolidColorBrush x:Key="Edge" Color="#D1D5DB"/>
+        <SolidColorBrush x:Key="Muted" Color="#6B7280"/>
+        <SolidColorBrush x:Key="Text" Color="#1F2937"/>
 
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="{StaticResource Text}"/>
@@ -66,31 +70,7 @@
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
 
-        <Style x:Key="Ghost" TargetType="Button">
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Background" Value="#1D4ED8"/>
-            <Setter Property="Height" Value="34"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="8">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Opacity" Value="0.85"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="Success" TargetType="Button" BasedOn="{StaticResource Ghost}">
-            <Setter Property="Background" Value="#059669"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-        </Style>
+        </ResourceDictionary>
     </Window.Resources>
 
     <StackPanel Margin="20,16,20,18">
@@ -149,10 +129,10 @@
             </Grid.ColumnDefinitions>
             <TextBlock x:Name="SeedInfo" Style="{StaticResource Hint}" VerticalAlignment="Center"
                        Margin="0,0,10,0" Text="Tự động dùng Seed chuẩn VN-2000"/>
-            <Button x:Name="BtnCancel" Grid.Column="1" Content="Hủy" Width="85" Style="{StaticResource Ghost}"
+            <Button x:Name="BtnCancel" Grid.Column="1" Content="Hủy" MinWidth="85" Style="{StaticResource CtaSoft}"
                     IsCancel="True" Click="BtnCancel_Click"/>
-            <Button x:Name="BtnExport" Grid.Column="2" Content="✓ Xuất file DGN" Width="125" Margin="8,0,0,0"
-                    Style="{StaticResource Success}" IsDefault="True" Click="BtnExport_Click"/>
+            <Button x:Name="BtnExport" Grid.Column="2" Content="Xuất file DGN" MinWidth="125" Margin="8,0,0,0"
+                    Style="{StaticResource CtaSuccess}" IsDefault="True" Click="BtnExport_Click"/>
         </Grid>
     </StackPanel>
 </Window>

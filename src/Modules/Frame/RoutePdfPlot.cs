@@ -13,7 +13,8 @@ namespace iSurvey.Modules.Frame;
 internal static class RoutePdfPlot
 {
     public static bool Plot(
-        Document doc, string layoutName, IReadOnlyList<Extents2d> windows, string pdfPath, double paperW, double paperH, out string? issue)
+        Document doc, string layoutName, IReadOnlyList<Extents2d> windows, string pdfPath, double paperW, double paperH,
+        bool monochrome, string? stampPath, out string? issue)
     {
         _ = paperW;
         _ = paperH;
@@ -56,10 +57,8 @@ internal static class RoutePdfPlot
             using var _ = doc.LockDocument();
             progress = PlotProgressWindow.ShowNew();
             var db = doc.Database;
-            string? stampPath = null;
-            var stampMemory = FrameMemory.Load(db);
-            if (stampMemory.StampOnPdf && !string.IsNullOrEmpty(stampMemory.StampPath) && File.Exists(stampMemory.StampPath))
-                stampPath = stampMemory.StampPath;
+            if (!string.IsNullOrEmpty(stampPath) && !File.Exists(stampPath))
+                stampPath = null;
             step = "CurrentLayout";
             progress.Report(0, windows.Count, "Đang mở layout " + layoutName + "...");
             LayoutManager.Current.CurrentLayout = layoutName;
@@ -91,10 +90,7 @@ internal static class RoutePdfPlot
                 step = "SetPlotType";
                 psv.SetPlotType(ps, Autodesk.AutoCAD.DatabaseServices.PlotType.Window);
                 step = "StyleSheet";
-                var sheet = ps.CurrentStyleSheet;
-                if (string.IsNullOrWhiteSpace(sheet) || sheet.Equals("None", StringComparison.OrdinalIgnoreCase))
-                    sheet = NamedPlotStyle.ColorFile;
-                NamedPlotStyle.Apply(ps, db, sheet);
+                NamedPlotStyle.Apply(ps, db, monochrome ? NamedPlotStyle.MonoFile : NamedPlotStyle.ColorFile);
                 var pi = new PlotInfo { Layout = lay.ObjectId, OverrideSettings = ps };
                 step = "Validate";
                 piv.Validate(pi);

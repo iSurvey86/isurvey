@@ -6,7 +6,7 @@ using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 
 namespace iSurvey.UI.Account;
 
-/// <summary>Hộp thoại WPF tối (cùng phong cách LoginWindow) dùng cho About / Update / xác nhận đăng xuất.</summary>
+/// <summary>Hộp thông báo nền sáng dùng cho About, cập nhật và xác nhận đăng xuất.</summary>
 public partial class DarkDialog : Window
 {
     private DarkDialog(string title)
@@ -49,14 +49,14 @@ public partial class DarkDialog : Window
         var l = new TextBlock
         {
             Text = label,
-            Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0x8C, 0x96, 0xA8)),
+            Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0x6B, 0x72, 0x80)),
             FontSize = 12.5,
             Margin = new Thickness(0, 4, 18, 4)
         };
         var v = new TextBlock
         {
             Text = value,
-            Foreground = System.Windows.Media.Brushes.White,
+            Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0x11, 0x18, 0x27)),
             FontSize = 13,
             FontWeight = FontWeights.SemiBold,
             TextWrapping = TextWrapping.Wrap,
@@ -117,7 +117,7 @@ public partial class DarkDialog : Window
         d.MessageText.Text = message;
         d.MessageText.Visibility = Visibility.Visible;
         d.PrimaryButton.Content = yesText;
-        d.PrimaryButton.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0xB8, 0x23, 0x18));
+        d.PrimaryButton.Style = (Style)d.FindResource("CtaDanger");
         d.SecondaryButton.Content = noText;
         d.SecondaryButton.Visibility = Visibility.Visible;
         d.PrimaryButton.IsDefault = false;

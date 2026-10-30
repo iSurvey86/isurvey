@@ -145,8 +145,10 @@ public partial class RouteLayoutWindow : Window
         RowsBox.Text = init.Rows.ToString(CultureInfo.InvariantCulture);
         ColsBox.Text = init.Cols.ToString(CultureInfo.InvariantCulture);
         GapBox.Text = Fmt(init.GapMm);
-        PdfCheck.IsChecked = !input.EditExisting || init.PlotPdf;
-        StyleBox.SelectedIndex = init.Monochrome ? 1 : 0;
+        PdfCheck.IsChecked = false;
+        PdfCheck.Visibility = Visibility.Collapsed;
+        StyleRow.Visibility = Visibility.Collapsed;
+        StyleBox.SelectedIndex = 0;
         _hideOwner = init.HideOwnerLogo;
         _hideDesign = init.HideDesignLogo;
         if (input.ExistingSignatures is not null)
@@ -400,7 +402,7 @@ public partial class RouteLayoutWindow : Window
             ContentLabel.Text = "Sửa đổi:";
             ContentBox.Text = row.Field.Auto ? "Tự động: số thứ tự tờ / tổng số tờ (ví dụ 3/9)" : row.Value;
             ContentBox.IsEnabled = !row.Field.Auto;
-            var sign = IsSignRow(row);
+            var sign = _in.EditExisting && IsSignRow(row);
             SignPanel.Visibility = sign ? Visibility.Visible : Visibility.Collapsed;
             if (sign)
                 ApplySignButton(row.Field.Tag);

@@ -234,14 +234,15 @@ public sealed partial class FrameService
             ed.WriteMessage($"\n[iSurvey] Chưa đặt được khổ giấy cho layout ({_pageSetupIssue}) — chọn khổ giấy {spec.Name}, tỷ lệ in 1:1 trong Page Setup.");
 
         ed.WriteMessage(
-            $"\n[iSurvey] Đã tạo layout {layoutName}: {built} tờ {spec.Name}, tỷ lệ {opts.ScaleText}. Viewport đã khóa. Kiểu in: {NamedPlotStyle.Label(opts.Monochrome)}.");
+            $"\n[iSurvey] Đã tạo layout {layoutName}: {built} tờ {spec.Name}, tỷ lệ {opts.ScaleText}. Viewport đã khóa. Gõ INTUYEN khi muốn in.");
 
         string? pdfNote = null;
         string? pdfIssue = null;
         if (pdfPath is not null && _pageSetupIssue is null)
         {
             var (pw, ph) = PaperSizeMm(spec);
-            var pdf = RoutePdfPlot.Plot(doc, layoutName, windows, pdfPath, pw, ph, out pdfIssue);
+            var stamp = opts.StampOnPdf && !string.IsNullOrEmpty(opts.StampPath) && File.Exists(opts.StampPath) ? opts.StampPath : null;
+            var pdf = RoutePdfPlot.Plot(doc, layoutName, windows, pdfPath, pw, ph, opts.Monochrome, stamp, out pdfIssue);
             if (pdf)
             {
                 ed.WriteMessage($"\n[iSurvey] Đã in {windows.Count} trang vào {pdfPath}");

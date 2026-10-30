@@ -10,16 +10,16 @@ using WpfTextBox = System.Windows.Controls.TextBox;
 namespace iSurvey.UI.Account;
 
 /// <summary>
-/// Cửa sổ đăng nhập Gmail + OTP 6 số (WPF dark theme). Mở bằng Application.ShowModalWindow().
+/// Cửa sổ đăng nhập Gmail + OTP 6 số, nền sáng. Mở bằng Application.ShowModalWindow().
 /// Không có nút xác nhận: đủ 6 số là tự xác thực.
 /// </summary>
 public partial class LoginWindow : Window
 {
     private const string HintText = "Nhập đủ 6 số để tự động xác thực.";
 
-    private static readonly SolidColorBrush Red = Frozen(0xFF, 0x6B, 0x6B);
-    private static readonly SolidColorBrush Green = Frozen(0x4A, 0xDE, 0x80);
-    private static readonly SolidColorBrush Muted = Frozen(0x8C, 0x96, 0xA8);
+    private static readonly SolidColorBrush Red = Frozen(0xDC, 0x26, 0x26);
+    private static readonly SolidColorBrush Green = Frozen(0x15, 0x80, 0x3D);
+    private static readonly SolidColorBrush Muted = Frozen(0x6B, 0x72, 0x80);
 
     private readonly WpfTextBox[] _boxes;
     private readonly DispatcherTimer _cooldownTimer = new() { Interval = TimeSpan.FromSeconds(1) };

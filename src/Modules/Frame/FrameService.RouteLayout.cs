@@ -247,7 +247,7 @@ public sealed partial class FrameService
 
         ed.WriteMessage(
             $"\n[iSurvey] Đã tạo layout {layoutName}: {built} khung {spec.Name} 1/{scaleN} (lưới {opts.Rows}×{opts.Cols}, cách {opts.GapMm:0.#} mm). " +
-            $"Đường bao mảnh vẽ trên Model (layer {LayerPiece}, không in). Viewport đã khóa tỷ lệ/hướng. Kiểu in: {NamedPlotStyle.Label(opts.Monochrome)}.");
+            $"Đường bao mảnh vẽ trên Model (layer {LayerPiece}, không in). Viewport đã khóa tỷ lệ/hướng. Gõ INTUYEN khi muốn in.");
 
         // 6) In PDF gộp
         string? pdfNote = null;
@@ -255,7 +255,8 @@ public sealed partial class FrameService
         if (pdfPath is not null && _pageSetupIssue is null)
         {
             var (pw, ph) = PaperSizeMm(spec);
-            var pdf = RoutePdfPlot.Plot(doc, layoutName, windows, pdfPath, pw, ph, out pdfIssue);
+            var stamp = opts.StampOnPdf && !string.IsNullOrEmpty(opts.StampPath) && File.Exists(opts.StampPath) ? opts.StampPath : null;
+            var pdf = RoutePdfPlot.Plot(doc, layoutName, windows, pdfPath, pw, ph, opts.Monochrome, stamp, out pdfIssue);
             if (pdf)
             {
                 ed.WriteMessage($"\n[iSurvey] Đã in {windows.Count} trang vào {pdfPath}");
@@ -1291,8 +1292,66 @@ public sealed partial class FrameService
         return true;
     }
 
+    /// <summary>Chèn chữ ký lên các tờ sắp in. Bản vẽ không giữ các block này sau khi xuất PDF.</summary>
+    private static List<ObjectId> PlacePrintSignatures(Document doc, string layoutName, IEnumerable<ObjectId> frameIds, IReadOnlyDictionary<string, string> files)
+    {
+        var opts = new RouteLayoutOptions();
+        foreach (var kv in files)
+        {
+            if (!string.IsNullOrWhiteSpace(kv.Value) && File.Exists(kv.Value))
+                opts.Signatures[kv.Key] = kv.Value;
+        }
+
+        if (opts.Signatures.Count == 0)
+            return [];
+
+        var imported = ImportSignatureBlocks(doc, opts);
+        if (imported.Count == 0)
+            return [];
+
+        var placed = new List<ObjectId>();
+        var db = doc.Database;
+        using var tr = db.TransactionManager.StartTransaction();
+        var dict = (DBDictionary)tr.GetObject(db.LayoutDictionaryId, OpenMode.ForRead);
+        if (!dict.Contains(layoutName))
+            return [];
+        var lay = (Layout)tr.GetObject(dict.GetAt(layoutName), OpenMode.ForRead);
+        var space = (BlockTableRecord)tr.GetObject(lay.BlockTableRecordId, OpenMode.ForWrite);
+        foreach (var id in frameIds)
+        {
+            if (tr.GetObject(id, OpenMode.ForRead, false) is BlockReference frame)
+                PlaceSignatures(tr, space, frame, imported, placed);
+        }
+
+        tr.Commit();
+        return placed;
+    }
+
+    private static void ErasePrintSignatures(Document doc, IReadOnlyList<ObjectId> ids)
+    {
+        if (ids.Count == 0)
+            return;
+        try
+        {
+            using var tr = doc.Database.TransactionManager.StartTransaction();
+            foreach (var id in ids)
+            {
+                if (id.IsNull || !id.IsValid || id.IsErased)
+                    continue;
+                if (tr.GetObject(id, OpenMode.ForWrite, false) is Entity ent)
+                    ent.Erase();
+            }
+
+            tr.Commit();
+        }
+        catch
+        {
+            // PDF đã ra: không chặn nếu gỡ chữ ký tạm thất bại
+        }
+    }
+
     /// <summary>Đặt block chữ ký vào ô ký bên phải họ tên trên một tờ.</summary>
-    private static void PlaceSignatures(Transaction tr, BlockTableRecord space, BlockReference frame, Dictionary<string, ObjectId> blocks)
+    private static void PlaceSignatures(Transaction tr, BlockTableRecord space, BlockReference frame, Dictionary<string, ObjectId> blocks, ICollection<ObjectId>? created = null)
     {
         if (blocks.Count == 0)
             return;
@@ -1341,6 +1400,7 @@ public sealed partial class FrameService
                 (sized.MinPoint.Y + sized.MaxPoint.Y) / 2,
                 0);
             ins.Position = target - (mid - ins.Position);
+            created?.Add(ins.ObjectId);
         }
     }
 
@@ -1469,6 +1529,31 @@ public sealed partial class FrameService
         return all.Where(s => wanted.Contains(s.Id)).ToList();
     }
 
+    /// <summary>Nhãn dòng chữ ký lúc in: chức danh đã ghi trên khung (VAITRO_n), không dùng «Họ tên n».</summary>
+    private static Dictionary<string, string> SignatureRoleLabels(Database db, IReadOnlyList<PlotSheet> sheets)
+    {
+        var labels = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        if (sheets.Count == 0)
+            return labels;
+        using var tr = db.TransactionManager.StartTransaction();
+        if (tr.GetObject(sheets[0].Id, OpenMode.ForRead, false) is not BlockReference frame)
+            return labels;
+        var attrs = ReadAttributes(tr, frame);
+        for (var i = 1; i <= 5; i++)
+        {
+            var tag = "VAITRO_" + i.ToString(CultureInfo.InvariantCulture);
+            if (!attrs.TryGetValue(tag, out var role))
+                continue;
+            role = FrameFields.Clean(role);
+            if (role.Length == 0)
+                continue;
+            labels["TEN_" + i.ToString(CultureInfo.InvariantCulture)] = role;
+        }
+
+        tr.Commit();
+        return labels;
+    }
+
     private static void PlotExistingRoute(Document doc)
     {
         var db = doc.Database;
@@ -1528,6 +1613,13 @@ public sealed partial class FrameService
             return;
         }
 
+        var print = PlotPrintWindow.Show(doc.Database, SignatureRoleLabels(db, allSheets));
+        if (print is null)
+        {
+            ed.WriteMessage("\n[iSurvey] Đã hủy in.");
+            return;
+        }
+
         if (!TryChooseSheets(doc, layoutName, allSheets, preselected, out var sheets, out var scope))
             return;
 
@@ -1555,7 +1647,19 @@ public sealed partial class FrameService
             pdfPath = dlg.FileName;
         }
 
-        var ok = RoutePdfPlot.Plot(doc, layoutName, windows, pdfPath, paperW, paperH, out var issue);
+        var placed = print.InsertSignatures
+            ? PlacePrintSignatures(doc, layoutName, sheets.Select(s => s.Id), print.Signatures)
+            : [];
+        var ok = false;
+        string? issue;
+        try
+        {
+            ok = RoutePdfPlot.Plot(doc, layoutName, windows, pdfPath, paperW, paperH, print.Monochrome, print.StampPath, out issue);
+        }
+        finally
+        {
+            ErasePrintSignatures(doc, placed);
+        }
         if (!ok)
         {
             if (issue == "đã hủy")

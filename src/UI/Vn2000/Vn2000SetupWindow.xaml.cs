@@ -286,9 +286,9 @@ public partial class Vn2000SetupWindow : Window
 
     private static void ApplyDarkCombo(System.Windows.Controls.ComboBox combo)
     {
-        var bg = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0x1E, 0x22, 0x2A));
-        var fg = System.Windows.Media.Brushes.White;
-        var hi = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0x1B, 0x6C, 0xA8));
+        var bg = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0xFF, 0xFF, 0xFF));
+        var fg = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0x11, 0x18, 0x27));
+        var hi = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0xDB, 0xEA, 0xFE));
         combo.Resources[System.Windows.SystemColors.WindowBrushKey] = bg;
         combo.Resources[System.Windows.SystemColors.WindowTextBrushKey] = fg;
         combo.Resources[System.Windows.SystemColors.ControlBrushKey] = bg;

@@ -1,5 +1,17 @@
 # Changelog — iSurvey
 
+## Chưa phát hành — vẫn 1.8.14
+
+Chưa đóng gói. Máy khác kéo mã này vẫn thấy gói UPD là 1.8.14 cho đến khi phát hành.
+
+### Khung và in
+- **RAIKHUNG** và **RAIMCD** chỉ dựng layout. Không in PDF ngay sau khi tạo.
+- **INTUYEN** hỏi in màu (`acad.ctb`) hoặc in đen trắng (`monochrome.ctb`), chèn chữ ký và đóng mộc đỏ. Chữ ký và mộc chỉ có trên PDF.
+- Dòng chữ ký lấy chức danh đã ghi trên khung, ví dụ Tổng giám đốc, không ghi Họ tên 1 đến Họ tên 5.
+
+### Hộp thoại
+- Hộp kiểm tra cập nhật, đăng nhập, xuất DGN, hệ tọa độ và trợ lý AI chuyển nền sáng, cùng kiểu nút với các hộp còn lại.
+
 ## 1.8.14 — 2026-10-30
 
 Đã phát hành.

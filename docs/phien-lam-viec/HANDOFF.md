@@ -5,6 +5,44 @@
 
 ---
 
+## 2026-10-30 — Rải khung chỉ layout, in lúc INTUYEN (1.8.14, chưa phát hành)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Số phiên bản giữ **1.8.14**. Chưa phát hành. Gói trên Supabase vẫn là bản đã phát hành sáng nay. Máy này đã nạp DLL mới vào bundle cục bộ.
+
+### Đã chốt / đã làm
+
+- **RAIKHUNG** và **RAIMCD** chỉ dựng layout. Hộp thoại không còn kiểu in và không in PDF ngay.
+- **INTUYEN** hỏi in màu hoặc in đen trắng, chèn chữ ký, đóng mộc đỏ. Chữ ký và mộc chỉ trên PDF, rồi được gỡ khỏi bản vẽ.
+- Dòng chữ ký hiện chức danh đã ghi trên khung. Đã thử trên bản vẽ trắng: Tổng giám đốc, C.N.D.A, C.N.K.S, Kiểm soát, Khảo sát.
+- Bỏ dòng ghi chú đầu hộp thoại in.
+- Hộp thoại còn nền tối chuyển nền sáng: cập nhật, đăng nhập, xuất DGN, hệ tọa độ, trợ lý AI.
+- Hướng dẫn trên ksnpsc đã có ảnh hộp thoại rải khung và hộp thoại in. Đã đẩy trang đó.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Rải khung | `src/UI/Frame/RouteLayoutWindow.xaml`, `src/Modules/Frame/FrameService.RouteLayout.cs` |
+| In | `src/UI/Frame/PlotPrintWindow.cs`, `src/Modules/Frame/RoutePdfPlot.cs` |
+| Hộp thoại sáng | `src/UI/Account/DarkDialog.xaml`, `src/UI/Account/LoginWindow.xaml`, `src/Dgn/DgnExportWindow.xaml` |
+
+### Việc tiếp
+
+- [ ] Chưa phát hành. Máy khác vẫn chạy 1.8.14 đã đóng gói: hộp thoại tối và rải khung vẫn có thể in ngay.
+- [ ] Các máy đang 1.8.10 trở xuống cài một lần khi AutoCAD hoặc Civil đã tắt.
+- [ ] Alignment Civil làm đầu vào RAIKHUNG: chưa thử.
+- [ ] Chưa nhìn lại PDF thật để đo vòng mộc 36 mm.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff và tiếp tục. Vẫn 1.8.14, chưa phát hành. RAIKHUNG và RAIMCD chỉ dựng layout. INTUYEN mới hỏi in màu hoặc đen trắng, chữ ký theo chức danh trên khung, và mộc đỏ. Hướng dẫn web đã cập nhật. Tiếp: phát hành khi được yêu cầu.
+```
+
+**Lưu trữ ngày:** [2026-10-30-rai-khung-in-tuyen.md](./2026-10-30-rai-khung-in-tuyen.md)
+
+---
+
 ## 2026-10-30 — Hướng dẫn web, xuất điểm, mộc PDF (1.8.14, đã phát hành)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Gói UPD là **1.8.14**. Trang hướng dẫn nằm trên ksnpsc, đã đẩy trước bản này.

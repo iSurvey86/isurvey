@@ -238,8 +238,8 @@ public partial class AiChatWindow : Window
         var border = new Border
         {
             Background = isUser
-                ? new SolidColorBrush(WpfColor.FromRgb(0x37, 0x30, 0xA3))
-                : new SolidColorBrush(WpfColor.FromRgb(0x1E, 0x22, 0x2A)),
+                ? new SolidColorBrush(WpfColor.FromRgb(0xDB, 0xEA, 0xFE))
+                : new SolidColorBrush(WpfColor.FromRgb(0xF3, 0xF4, 0xF6)),
             CornerRadius = new CornerRadius(8),
             Padding = new Thickness(10, 8, 10, 8),
             Margin = new Thickness(isUser ? 40 : 0, 0, isUser ? 0 : 40, 8),
@@ -254,14 +254,16 @@ public partial class AiChatWindow : Window
             Text = who,
             FontSize = 10,
             FontWeight = FontWeights.SemiBold,
-            Foreground = new SolidColorBrush(WpfColor.FromRgb(0xA5, 0xB4, 0xFC)),
+            Foreground = new SolidColorBrush(isUser
+                ? WpfColor.FromRgb(0x1D, 0x4E, 0xD8)
+                : WpfColor.FromRgb(0x6B, 0x72, 0x80)),
             Margin = new Thickness(0, 0, 0, 4)
         });
         stack.Children.Add(new TextBlock
         {
             Text = text,
             TextWrapping = TextWrapping.Wrap,
-            Foreground = WpfBrushes.White,
+            Foreground = new SolidColorBrush(WpfColor.FromRgb(0x11, 0x18, 0x27)),
             FontSize = 12.5
         });
         border.Child = stack;
