@@ -5,6 +5,44 @@
 
 ---
 
+## 2026-10-30 — Hướng dẫn web, xuất điểm, mộc PDF (1.8.14, đã phát hành)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Gói UPD là **1.8.14**. Trang hướng dẫn nằm trên ksnpsc, đã đẩy trước bản này.
+
+### Đã chốt / đã làm
+
+- **HD** mở https://ksnpsc.vercel.app/huong-dan/isurvey. Không cần đăng nhập. Trang có danh sách lệnh hai cột, số La Mã, và ghi AutoCAD lẫn Civil 3D từ 2022 đến 2026.
+- **XUATDIEM** chọn Point, Block, Text, MText. CSV theo dấu phân cách của máy. TXT là tab. Thập phân là dấu chấm.
+- In PDF xong có nút Mở thư mục. Mộc đỏ PNG chỉ đóng lên PDF, đường kính 36 mm, rồi gỡ khỏi bản vẽ.
+- Nhắp đúp khung giữ chặn EATTEDIT thêm 700 ms.
+- Hộp thoại dùng nút bo tròn nền sáng.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Hướng dẫn | `src/Auth/AuthModule.cs`, `src/UI/RibbonBuilder.cs` |
+| Xuất điểm | `src/Modules/DiemDo/PointSelection.cs`, `src/UI/DiemDo/ExportPointsWindow.xaml` |
+| Mộc và in | `src/Modules/Frame/FrameService.Stamp.cs`, `src/Modules/Frame/PdfResultDialog.cs` |
+| Nút hộp thoại | `src/UI/CtaStyles.xaml` |
+
+### Việc tiếp
+
+- [ ] Các máy đang 1.8.10 trở xuống cài một lần khi AutoCAD hoặc Civil đã tắt. Bản đó gọi Quit() bên trong lệnh nên không tự đóng được.
+- [ ] Alignment Civil làm đầu vào RAIKHUNG: chưa thử.
+- [ ] Nét polyline có độ rộng hình học không đổi theo bảng màu.
+- [ ] Chưa nhìn lại PDF thật để đo vòng mộc 36 mm và hộp EATTEDIT sau 700 ms.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff và tiếp tục. Đã phát hành 1.8.14: HD mở hướng dẫn trên web, XUATDIEM nhận chữ và block, in PDF có nút Mở thư mục và mộc đỏ chỉ trên file in. Máy đang 1.8.10 trở xuống cần cài một lần khi CAD đã tắt. Tiếp: Alignment cho RAIKHUNG khi được yêu cầu.
+```
+
+**Lưu trữ ngày:** [2026-10-30-hdsd-xuat-diem-moc.md](./2026-10-30-hdsd-xuat-diem-moc.md)
+
+---
+
 ## 2026-10-29 — Hỏi lưu ngay sau khi giải nén (1.8.13, đã phát hành)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Gói UPD là **1.8.13**.

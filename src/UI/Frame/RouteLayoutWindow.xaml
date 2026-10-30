@@ -6,7 +6,10 @@
         WindowStartupLocation="CenterScreen" ShowInTaskbar="False"
         Background="#F3F5F8" FontFamily="Segoe UI" FontSize="13" PreviewKeyDown="Window_PreviewKeyDown">
     <Window.Resources>
-        <SolidColorBrush x:Key="Accent" Color="#1F6FD1" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/iSurvey;component/src/UI/CtaStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
         <Style x:Key="SectionTitle" TargetType="TextBlock">
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="Foreground" Value="#1F4E8C" />
@@ -23,32 +26,6 @@
         </Style>
         <Style TargetType="ComboBox">
             <Setter Property="Padding" Value="4,3" />
-        </Style>
-        <Style x:Key="PrimaryButton" TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource Accent}" />
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Padding" Value="22,7" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="3"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="#2A82EA" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="bd" Property="Background" Value="#A9B6C8" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
         </Style>
         <Style x:Key="FieldGrid" TargetType="DataGrid">
             <Setter Property="AutoGenerateColumns" Value="False" />
@@ -127,6 +104,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        </ResourceDictionary>
     </Window.Resources>
 
     <Grid Margin="14">
@@ -223,9 +201,9 @@
                 </Grid.RowDefinitions>
                 <DockPanel Grid.Row="0" LastChildFill="True" Margin="0,0,0,8">
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                        <Button Content="Tải file mẫu" Padding="12,4" Margin="0,0,8,0" Click="Sample_Click"
+                        <Button Content="Tải file mẫu" Style="{StaticResource CtaSoft}" Margin="0,0,8,0" Click="Sample_Click"
                                 ToolTip="Lưu file Excel mẫu. Ba cột: STT, Tiêu đề, Nội dung." />
-                        <Button Content="Nhập Excel" Padding="12,4" Click="Import_Click"
+                        <Button Content="Nhập Excel" Style="{StaticResource CtaPrimary}" Click="Import_Click"
                                 ToolTip="Đọc cột STT và cột Nội dung từ Excel. Ô Tờ vẫn tự điền." />
                     </StackPanel>
                     <TextBlock x:Name="FieldsTitle" Style="{StaticResource SectionTitle}" Margin="0" VerticalAlignment="Center"
@@ -262,16 +240,23 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock x:Name="ContentLabel" Grid.Column="0" Style="{StaticResource Lbl}" Text="Sửa đổi:" FontWeight="SemiBold" Foreground="#1F4E8C" />
                     <TextBox x:Name="ContentBox" Grid.Column="1" MinHeight="28" TextChanged="Content_TextChanged" LostFocus="Content_LostFocus" />
-                    <StackPanel x:Name="SignPanel" Grid.Column="2" Orientation="Horizontal" Margin="8,0,0,0" Visibility="Collapsed">
-                        <Button x:Name="SignButton" Content="Chèn chữ ký" MinWidth="108" Padding="10,4" Click="Sign_Click"
+                    <StackPanel x:Name="SignPanel" Grid.Column="2" Orientation="Horizontal" Margin="8,0,0,0" VerticalAlignment="Center" Visibility="Collapsed">
+                        <Button x:Name="SignButton" Content="Đổi chữ ký" MinWidth="108" Style="{StaticResource CtaSoft}" Click="Sign_Click"
                                 ToolTip="Chọn file DWG chữ ký cho ô họ tên này." />
+                        <Border x:Name="SignPreviewBox" Width="72" Height="32" Margin="8,0,0,0" BorderBrush="#D1D5DB" BorderThickness="1" Visibility="Collapsed">
+                            <Image x:Name="SignPreview" Stretch="Uniform" />
+                        </Border>
+                        <Button x:Name="SignClearButton" Content="Xóa" Margin="6,0,0,0" Click="SignClear_Click"
+                                Style="{StaticResource CtaDanger}" Visibility="Collapsed"
+                                ToolTip="Gỡ chữ ký khỏi ô họ tên này." />
                     </StackPanel>
                     <StackPanel x:Name="LogoPanel" Grid.Column="2" Orientation="Horizontal" Margin="8,0,0,0" Visibility="Collapsed">
-                        <Button x:Name="LogoButton" Content="Thay Logo..." Padding="10,4" Click="Logo_Click"
+                        <Button x:Name="LogoButton" Content="Thay Logo..." Style="{StaticResource CtaSoft}" Click="Logo_Click"
                                 ToolTip="Chọn ảnh logo thay cho logo EVN trong khung tên (áp dụng cho cả bản vẽ khi bấm Tạo Layout)" />
-                        <Button x:Name="HideButton" Content="Ẩn logo" Padding="10,4" Margin="6,0,0,0" Click="HideLogo_Click"
+                        <Button x:Name="HideButton" Content="Ẩn logo" Margin="6,0,0,0" Style="{StaticResource CtaSoft}" Click="HideLogo_Click"
                                 ToolTip="Ẩn hoặc hiện logo này (tắt layer logo trong khung tên, áp dụng cho cả bản vẽ)" />
-                        <Button x:Name="LogoClearButton" Content="✕" Padding="8,4" Margin="4,0,0,0" Click="LogoClear_Click"
+                        <Button x:Name="LogoClearButton" Content="✕" Margin="4,0,0,0" Click="LogoClear_Click"
+                                Style="{StaticResource CtaDanger}"
                                 ToolTip="Bỏ logo đã chọn (giữ nguyên logo hiện có)" Visibility="Collapsed" />
                     </StackPanel>
                 </Grid>
@@ -283,14 +268,27 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,12,0">
+            <StackPanel x:Name="FooterLeft" Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center" Margin="0,0,12,0">
                 <CheckBox x:Name="ApplyAllCheck" Content="Áp dụng cho toàn bộ khung" IsChecked="True" Visibility="Collapsed"
+                          Foreground="#1D4ED8" VerticalAlignment="Center"
                           ToolTip="Bỏ chọn để chỉ sửa khung vừa nhắp. Ô Tờ và tỷ lệ giữ nguyên." />
+                <StackPanel x:Name="StampBar" Orientation="Horizontal" VerticalAlignment="Center" Visibility="Collapsed">
+                    <CheckBox x:Name="StampCheck" Content="Đóng mộc đỏ (khi xuất PDF)" Margin="16,0,8,0" Foreground="#DC2626"
+                              VerticalAlignment="Center" Checked="Stamp_Changed" Unchecked="Stamp_Changed"
+                              ToolTip="Dấu chỉ có trên file PDF. Bản vẽ không giữ ảnh này." />
+                    <Button x:Name="StampPickButton" Content="Chọn ảnh (.png)" Style="{StaticResource CtaSoft}" Click="StampPick_Click" IsEnabled="False" />
+                    <Border x:Name="StampPreviewBox" Width="32" Height="32" Margin="8,0,0,0" BorderBrush="#E5E7EB" BorderThickness="1" Visibility="Collapsed">
+                        <Image x:Name="StampPreview" Stretch="Uniform" />
+                    </Border>
+                    <Button x:Name="StampClearButton" Content="Xóa" Margin="6,0,0,0" Click="StampClear_Click"
+                            Style="{StaticResource CtaDanger}" Visibility="Collapsed"
+                            ToolTip="Bỏ ảnh mộc đỏ." />
+                </StackPanel>
                 <TextBlock x:Name="LogoNote" Foreground="#555" FontSize="12" TextWrapping="Wrap" />
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                <Button Content="Hủy bỏ" Padding="22,7" Margin="0,0,10,0" Click="Cancel_Click" />
-                <Button x:Name="OkButton" Content="▷  Tạo Layout" Style="{StaticResource PrimaryButton}" IsDefault="False" Click="Ok_Click" />
+                <Button Content="Hủy bỏ" Style="{StaticResource CtaSoft}" Margin="0,0,10,0" Click="Cancel_Click" />
+                <Button x:Name="OkButton" Content="▷  Tạo Layout" Style="{StaticResource CtaPrimary}" IsDefault="False" Click="Ok_Click" />
             </StackPanel>
         </Grid>
     </Grid>

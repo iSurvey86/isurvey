@@ -265,7 +265,7 @@ public sealed partial class FrameService
             done += "\nChưa in được PDF: " + pdfIssue;
         else
             done += "\nChưa in PDF. Gõ INTUYEN khi muốn in layout này.";
-        System.Windows.MessageBox.Show(done, "iSurvey", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+        PdfResultDialog.Show(done, pdfNote is not null ? pdfPath : null);
 
         ActivityLogger.Enqueue("raimcd", commandName, new
         {

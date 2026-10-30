@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -16,6 +17,7 @@ internal static class AuthIcons
     public static BitmapSource UserActive(int size) => Render(size, Grad(0x10B981, 0x047857), DrawUserWithDot);
     public static BitmapSource Refresh(int size) => Render(size, Solid(0x0096C7), DrawRefresh);
     public static BitmapSource Info(int size) => Render(size, Solid(0x7209B7), DrawInfo);
+    public static BitmapSource Help(int size) => Render(size, Solid(0x1D4ED8), DrawHelp);
     public static BitmapSource Power(int size) => Render(size, Solid(0xB82318), DrawPower);
 
     // ---------- Helpers ----------
@@ -133,6 +135,21 @@ internal static class AuthIcons
         var hg = new PathGeometry();
         hg.Figures.Add(head);
         dc.DrawGeometry(WpfBrushes.White, null, hg);
+    }
+
+    private static void DrawHelp(DrawingContext dc, double s)
+    {
+        var pen = Stroke(s, 0.07);
+        dc.DrawEllipse(null, pen, P(s, 0.5, 0.5), s * 0.30, s * 0.30);
+        var text = new FormattedText(
+            "?",
+            CultureInfo.InvariantCulture,
+            System.Windows.FlowDirection.LeftToRight,
+            new Typeface(new System.Windows.Media.FontFamily("Segoe UI"), FontStyles.Normal, FontWeights.Bold, FontStretches.Normal),
+            s * 0.42,
+            WpfBrushes.White,
+            1.0);
+        dc.DrawText(text, new WpfPoint(s * 0.5 - text.Width / 2, s * 0.5 - text.Height / 2 - s * 0.02));
     }
 
     private static void DrawInfo(DrawingContext dc, double s)

@@ -71,7 +71,8 @@ public sealed partial class FrameService
             tr.Commit();
         }
 
-        var result = RouteLayoutWindow.ShowEdit(attrs, signs);
+        var memory = FrameMemory.Load(doc.Database);
+        var result = RouteLayoutWindow.ShowEdit(attrs, signs, memory.StampPath, memory.StampOnPdf, memory.SignFiles);
         if (result is null)
             return;
 
@@ -123,12 +124,28 @@ public sealed partial class FrameService
             tr.Commit();
         }
 
-        SyncSignatureMemory(doc.Database, imported, drop);
+        SyncSignatureMemory(doc.Database, imported, drop, result.Signatures);
+        RememberStamp(doc.Database, result);
 
         ed.Regen();
         var scope = result.ApplyToAll ? "toàn bộ khung" : "khung đang chọn";
         ed.WriteMessage($"\n[iSurvey] Đã cập nhật thông tin {count} khung ({scope}).");
+        if (!string.IsNullOrEmpty(result.StampPath))
+        {
+            ed.WriteMessage(result.StampOnPdf
+                ? "\n[iSurvey] Mộc đỏ sẽ đóng khi xuất PDF, không nằm trong bản vẽ."
+                : "\n[iSurvey] Đã tắt mộc đỏ. Bản vẽ không có dấu.");
+        }
+
         ActivityLogger.Result("ISURVEY_FRAME_EDIT", $"sửa {scope}, {count} khung");
+    }
+
+    private static void RememberStamp(Database db, RouteLayoutOptions result)
+    {
+        var data = FrameMemory.Load(db);
+        data.StampOnPdf = result.StampOnPdf;
+        data.StampPath = string.IsNullOrWhiteSpace(result.StampPath) ? null : result.StampPath.Trim();
+        FrameMemory.Save(db, data);
     }
 
     internal static bool IsFrameName(string name) =>

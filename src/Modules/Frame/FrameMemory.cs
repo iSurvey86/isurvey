@@ -3,7 +3,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 namespace iSurvey.Modules.Frame;
 
 /// <summary>
-/// Nhớ logo và chữ ký trong chính file bản vẽ (Named Objects Dictionary).
+/// Nhớ logo, chữ ký và đường dẫn mộc đỏ trong chính file bản vẽ (Named Objects Dictionary).
 /// File khác, hoặc file mới, không có mục này nên bắt đầu trống.
 /// </summary>
 internal static class FrameMemory
@@ -18,6 +18,15 @@ internal static class FrameMemory
         public string? LogoOwner { get; set; }
 
         public string? LogoDesign { get; set; }
+
+        /// <summary>File DWG chữ ký theo tag TEN_n. Khác với <see cref="Signs"/>, vốn lưu tên block trong bản vẽ.</summary>
+        public Dictionary<string, string> SignFiles { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>Ảnh PNG mộc đỏ. Chỉ được vẽ lúc xuất PDF, không chèn vào bản vẽ.</summary>
+        public string? StampPath { get; set; }
+
+        /// <summary>true = xuất PDF sẽ đóng dấu. Không có ảnh thì bỏ qua.</summary>
+        public bool StampOnPdf { get; set; } = true;
     }
 
     public static Data Load(Database db)
@@ -39,6 +48,12 @@ internal static class FrameMemory
                 data.LogoOwner = value;
             else if (kind == "LG" && key == "2")
                 data.LogoDesign = value;
+            else if (kind == "CKF" && IsSignTag(key))
+                data.SignFiles[key] = value;
+            else if (kind == "MD" && key == "P")
+                data.StampPath = value;
+            else if (kind == "MD" && key == "E")
+                data.StampOnPdf = value == "1";
         }
 
         tr.Commit();
@@ -59,6 +74,18 @@ internal static class FrameMemory
             values.Add("LG|1|" + data.LogoOwner);
         if (!string.IsNullOrEmpty(data.LogoDesign))
             values.Add("LG|2|" + data.LogoDesign);
+        foreach (var kv in data.SignFiles)
+        {
+            if (IsSignTag(kv.Key) && !string.IsNullOrEmpty(kv.Value))
+                values.Add("CKF|" + kv.Key + "|" + kv.Value);
+        }
+
+        if (!string.IsNullOrEmpty(data.StampPath) || !data.StampOnPdf)
+        {
+            values.Add("MD|E|" + (data.StampOnPdf ? "1" : "0"));
+            if (!string.IsNullOrEmpty(data.StampPath))
+                values.Add("MD|P|" + data.StampPath);
+        }
 
         var nod = (DBDictionary)tr.GetObject(db.NamedObjectsDictionaryId, OpenMode.ForRead);
         if (values.Count == 0)

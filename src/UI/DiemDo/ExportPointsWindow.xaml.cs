@@ -1,10 +1,10 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
 using iSurvey.Modules.DiemDo;
 using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 
@@ -19,18 +19,11 @@ public sealed class ExportPointsRequest
 public partial class ExportPointsWindow : Window
 {
     private readonly ExportPointsForm _form = new();
-    private static readonly SolidColorBrush IdleFill = Freeze(248, 250, 252);
-    private static readonly SolidColorBrush IdleBorder = Freeze(209, 213, 219);
-    private static readonly SolidColorBrush IdleText = Freeze(31, 41, 55);
-    private static readonly SolidColorBrush ChosenFill = Freeze(219, 234, 254);
-    private static readonly SolidColorBrush ChosenBorder = Freeze(29, 78, 216);
 
     public ExportPointsWindow()
     {
         InitializeComponent();
         DataContext = _form;
-        foreach (var button in new[] { WindowButton, PolyButton, DirectButton })
-            Paint(button, chosen: false);
     }
 
     public ExportPointsRequest? Request { get; private set; }
@@ -63,16 +56,7 @@ public partial class ExportPointsWindow : Window
         }
     }
 
-    private void Window_Click(object sender, RoutedEventArgs e) =>
-        Pick(WindowButton, (editor, db, layer) => PointSelection.CrossingWindow(editor, db, layer));
-
-    private void Poly_Click(object sender, RoutedEventArgs e) =>
-        Pick(PolyButton, (editor, db, layer) => PointSelection.CrossingPolyline(editor, db, layer));
-
-    private void Direct_Click(object sender, RoutedEventArgs e) =>
-        Pick(DirectButton, (editor, db, layer) => PointSelection.Direct(editor, db, layer));
-
-    private void Pick(System.Windows.Controls.Button button, Func<Autodesk.AutoCAD.EditorInput.Editor, Autodesk.AutoCAD.DatabaseServices.Database, string?, List<SurveyPoint>?> select)
+    private void Pick_Click(object sender, RoutedEventArgs e)
     {
         var doc = AcadApp.DocumentManager.MdiActiveDocument;
         if (doc is null)
@@ -88,12 +72,10 @@ public partial class ExportPointsWindow : Window
 
             List<SurveyPoint>? points;
             using (doc.Editor.StartUserInteraction(this))
-                points = select(doc.Editor, doc.Database, layer);
+                points = PointSelection.Select(doc.Editor, doc.Database, layer);
             if (points is null)
                 return;
             _form.SetPoints(points);
-            foreach (var item in new[] { WindowButton, PolyButton, DirectButton })
-                Paint(item, ReferenceEquals(item, button));
         }
         catch (System.Exception ex)
         {
@@ -104,10 +86,7 @@ public partial class ExportPointsWindow : Window
     private void Save_Click(object sender, RoutedEventArgs e)
     {
         if (_form.Points.Count == 0)
-        {
-            System.Windows.MessageBox.Show(this, "Chưa chọn điểm nào.", "iSurvey");
             return;
-        }
 
         if (!int.TryParse(_form.DecimalsText.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var digits)
             || digits < 0 || digits > 12)
@@ -116,24 +95,39 @@ public partial class ExportPointsWindow : Window
             return;
         }
 
-        var format = new PointFileFormat(';', decimalComma: false);
         var dialog = new Microsoft.Win32.SaveFileDialog
         {
-            Filter = "CSV (*.csv)|*.csv|Văn bản (*.txt)|*.txt",
+            Filter = "CSV (*.csv)|*.csv|Văn bản phân cách tab (*.txt)|*.txt",
             FileName = "DiemDo.csv",
             InitialDirectory = InitialDirectory()
         };
         if (dialog.ShowDialog(this) != true)
             return;
 
+        var format = FormatFor(dialog.FileName);
         try
         {
-            PointFileWriter.Write(dialog.FileName, _form.Points.ToList(), format, digits, _form.SwapAxes);
+            PointFileWriter.Write(dialog.FileName, _form.Points.ToList(), format, digits, swapAxes: false);
         }
         catch (System.Exception ex)
         {
             System.Windows.MessageBox.Show(this, ex.Message, "iSurvey");
             return;
+        }
+
+        System.Windows.MessageBox.Show(this, "Đã xuất thành công.\n" + dialog.FileName, "iSurvey");
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "explorer.exe",
+                Arguments = "/select,\"" + dialog.FileName + "\"",
+                UseShellExecute = true
+            });
+        }
+        catch
+        {
+            // tệp đã ghi, chỉ không mở được thư mục
         }
 
         Request = new ExportPointsRequest
@@ -142,6 +136,16 @@ public partial class ExportPointsWindow : Window
             FileName = Path.GetFileName(dialog.FileName)
         };
         Close();
+    }
+
+    private static PointFileFormat FormatFor(string path)
+    {
+        if (path.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
+            return new PointFileFormat('\t', decimalComma: false);
+
+        var separator = CultureInfo.CurrentCulture.TextInfo.ListSeparator;
+        var delimiter = separator.Length == 1 ? separator[0] : ',';
+        return new PointFileFormat(delimiter, decimalComma: false);
     }
 
     private void Cancel_Click(object sender, RoutedEventArgs e)
@@ -164,22 +168,6 @@ public partial class ExportPointsWindow : Window
         Close();
     }
 
-    private static void Paint(System.Windows.Controls.Button button, bool chosen)
-    {
-        button.Background = chosen ? ChosenFill : IdleFill;
-        button.BorderBrush = chosen ? ChosenBorder : IdleBorder;
-        button.Foreground = IdleText;
-        button.BorderThickness = new Thickness(1);
-        button.FontWeight = chosen ? FontWeights.SemiBold : FontWeights.Normal;
-    }
-
-    private static SolidColorBrush Freeze(byte r, byte g, byte b)
-    {
-        var brush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(r, g, b));
-        brush.Freeze();
-        return brush;
-    }
-
     private static string InitialDirectory()
     {
         var path = AcadApp.DocumentManager.MdiActiveDocument?.Database?.Filename;
@@ -199,18 +187,13 @@ public sealed class ExportPointsForm : INotifyPropertyChanged
     private bool _filterByLayer;
     private string _layerName = "";
     private string _decimalsText = "3";
-    private bool _swapAxes;
 
     public ObservableCollection<SurveyPoint> Points { get; } = new();
 
     public bool FilterByLayer
     {
         get => _filterByLayer;
-        set
-        {
-            if (Set(ref _filterByLayer, value))
-                Notify(nameof(Hint));
-        }
+        set => Set(ref _filterByLayer, value);
     }
 
     public string LayerName
@@ -222,35 +205,12 @@ public sealed class ExportPointsForm : INotifyPropertyChanged
     public string DecimalsText
     {
         get => _decimalsText;
-        set
-        {
-            if (Set(ref _decimalsText, value ?? ""))
-                Notify(nameof(Hint));
-        }
+        set => Set(ref _decimalsText, value ?? "");
     }
 
-    public bool SwapAxes
-    {
-        get => _swapAxes;
-        set
-        {
-            if (Set(ref _swapAxes, value))
-                Notify(nameof(Hint));
-        }
-    }
+    public string StatusText => $"Đã chọn: {Points.Count} điểm";
 
-    public string Hint
-    {
-        get
-        {
-            var count = $"Đã chọn {Points.Count} điểm.";
-            var digits = 3;
-            if (!int.TryParse(DecimalsText.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out digits))
-                digits = 3;
-            var swap = SwapAxes ? "Đảo X/Y. " : "";
-            return $"{swap}Ghi phân cách chấm phẩy, thập phân là dấu chấm, {digits} số lẻ, xếp tên từ nhỏ đến lớn. {count}";
-        }
-    }
+    public bool CanExport => Points.Count > 0;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -259,7 +219,8 @@ public sealed class ExportPointsForm : INotifyPropertyChanged
         Points.Clear();
         foreach (var point in points)
             Points.Add(point);
-        Notify(nameof(Hint));
+        Notify(nameof(StatusText));
+        Notify(nameof(CanExport));
     }
 
     private bool Set<T>(ref T field, T value, [CallerMemberName] string? name = null)

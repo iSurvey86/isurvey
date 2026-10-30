@@ -13,17 +13,14 @@
         Loaded="OnLoaded">
 
     <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/iSurvey;component/src/UI/CtaStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
         <SolidColorBrush x:Key="TextPrimary" Color="#1F2937"/>
         <SolidColorBrush x:Key="TextSecondary" Color="#6B7280"/>
         <SolidColorBrush x:Key="Accent" Color="#2563EB"/>
         <SolidColorBrush x:Key="Border" Color="#E5E7EB"/>
-        <Style TargetType="Button">
-            <Setter Property="Height" Value="34"/>
-            <Setter Property="MinWidth" Value="88"/>
-            <Setter Property="Padding" Value="14,0"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Cursor" Value="Hand"/>
-        </Style>
         <Style TargetType="RadioButton">
             <Setter Property="Margin" Value="0,4,0,0"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
@@ -44,6 +41,7 @@
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
             <Setter Property="BorderBrush" Value="{StaticResource Border}"/>
         </Style>
+        </ResourceDictionary>
     </Window.Resources>
 
     <Border Padding="20">
@@ -102,11 +100,8 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="1" Content="Xuất..." Click="Export_Click" Margin="0,0,8,0"
-                        Background="{StaticResource Accent}" Foreground="White"
-                        BorderBrush="{StaticResource Accent}" FontWeight="SemiBold"/>
-                <Button Grid.Column="2" Content="Hủy" Click="Cancel_Click"
-                        Background="White" Foreground="{StaticResource TextPrimary}"
-                        BorderBrush="{StaticResource Border}"/>
+                        Style="{StaticResource CtaPrimary}"/>
+                <Button Grid.Column="2" Content="Hủy" Click="Cancel_Click" Style="{StaticResource CtaSoft}"/>
             </Grid>
         </StackPanel>
     </Border>

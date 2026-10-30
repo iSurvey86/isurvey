@@ -1,5 +1,7 @@
 using System.Globalization;
 using System.Windows;
+using System.Windows.Input;
+using System.Windows.Media;
 using iSurvey.Models;
 using iSurvey.Modules.Import;
 using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
@@ -72,16 +74,30 @@ public partial class TabImportWindow : Window
             if (summary.DefaultLabelField is not null)
                 LabelField.SelectedItem = summary.DefaultLabelField;
             LabelField.IsEnabled = summary.Fields.Count > 0;
-            Status.Text = summary.StatusText + " Layer tô và viền: TAB_[MDSD] (trống → TAB_KHAC). Nhãn: TAB_LABELS.";
+            SetStatus(summary.StatusText + " Layer tô và viền: TAB_[MDSD] (trống → TAB_KHAC). Nhãn: TAB_LABELS.", false);
             OkButton.IsEnabled = true;
         }
         catch (Exception ex)
         {
             var root = ex.GetBaseException().Message;
-            Status.Text = root == ex.Message
+            SetStatus(root == ex.Message
                 ? "Không đọc được file: " + ex.Message
-                : "Không đọc được file: " + ex.Message + " — " + root;
+                : "Không đọc được file: " + ex.Message + " — " + root, true);
         }
+    }
+
+    private void SetStatus(string text, bool error)
+    {
+        Status.Text = text;
+        Status.Foreground = new SolidColorBrush(error
+            ? System.Windows.Media.Color.FromRgb(0xB9, 0x1C, 0x1C)
+            : System.Windows.Media.Color.FromRgb(0x33, 0x41, 0x55));
+        StatusCard.Background = new SolidColorBrush(error
+            ? System.Windows.Media.Color.FromRgb(0xFE, 0xF2, 0xF2)
+            : System.Windows.Media.Color.FromRgb(0xF8, 0xFA, 0xFC));
+        StatusCard.BorderBrush = new SolidColorBrush(error
+            ? System.Windows.Media.Color.FromRgb(0xFE, 0xCA, 0xCA)
+            : System.Windows.Media.Color.FromRgb(0xE5, 0xE7, 0xEB));
     }
 
     private void Ok_Click(object sender, RoutedEventArgs e)
@@ -91,7 +107,7 @@ public partial class TabImportWindow : Window
         if (!double.TryParse(TextHeight.Text.Trim().Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out var height)
             || height <= 0)
         {
-            Status.Text = "Chiều cao chữ phải là số dương.";
+            SetStatus("Chiều cao chữ phải là số dương.", true);
             return;
         }
 
@@ -114,4 +130,17 @@ public partial class TabImportWindow : Window
     }
 
     private void Cancel_Click(object sender, RoutedEventArgs e) => Close();
+
+    private void Header_Drag(object sender, MouseButtonEventArgs e)
+    {
+        if (e.LeftButton == MouseButtonState.Pressed)
+            DragMove();
+    }
+
+    private void Window_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key != Key.Escape)
+            return;
+        Close();
+    }
 }

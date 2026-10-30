@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
@@ -27,6 +28,23 @@ public sealed class AuthModule : ISurveyModule
             ShowAbout();
         else
             AuthManager.ShowLogin();
+    }
+
+    /// <summary>Mở HDSD iSurvey trên web. Không cần đăng nhập.</summary>
+    [CommandMethod("ISURVEY_HDSD")]
+    public void HelpCommand()
+    {
+        const string url = "https://ksnpsc.vercel.app/huong-dan/isurvey";
+        try
+        {
+            Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
+            AuthManager.Print("\n[iSurvey] Da mo huong dan tren trinh duyet.");
+            ActivityLogger.Enqueue("hdsd", "ISURVEY_HDSD");
+        }
+        catch (System.Exception ex)
+        {
+            AuthManager.Print("\n[iSurvey] Khong mo duoc huong dan: " + ex.Message);
+        }
     }
 
     [CommandMethod("ISURVEY_ABOUT")]

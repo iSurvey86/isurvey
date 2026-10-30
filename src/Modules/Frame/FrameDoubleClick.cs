@@ -19,6 +19,7 @@ internal static class FrameDoubleClick
     private static int _launchTries;
     private static short _savedDblClick = -1;
     private static System.Windows.Forms.Timer? _watch;
+    private static System.Windows.Forms.Timer? _releaseTimer;
     private static TimerProc? _nativeProc;
     private static IntPtr _nativeTimer;
 
@@ -53,6 +54,7 @@ internal static class FrameDoubleClick
         _suppress = 0;
         RestoreDoubleClick();
         _watch?.Stop();
+        _releaseTimer?.Stop();
         KillNativeTimer();
     }
 
@@ -72,7 +74,7 @@ internal static class FrameDoubleClick
         return id;
     }
 
-    /// <summary>Gọi khi lệnh sửa khung kết thúc. Chặn thêm một nhịp để EATTEDIT xếp hàng không mở sau hộp thoại.</summary>
+    /// <summary>Gọi khi lệnh sửa khung kết thúc. Giữ chặn thêm một lúc để EATTEDIT xếp hàng không mở sau hộp thoại.</summary>
     public static void Release()
     {
         if (_suppress == 0)
@@ -81,10 +83,26 @@ internal static class FrameDoubleClick
             return;
         }
 
-        _suppress = 0;
-        RestoreDoubleClick();
-        _watch?.Stop();
-        KillNativeTimer();
+        _suppress = 2;
+        ArmWatch();
+        ArmNativeTimer();
+        if (_releaseTimer is null)
+        {
+            _releaseTimer = new System.Windows.Forms.Timer { Interval = 700 };
+            _releaseTimer.Tick += (_, _) =>
+            {
+                _releaseTimer.Stop();
+                if (_suppress != 2)
+                    return;
+                _suppress = 0;
+                RestoreDoubleClick();
+                _watch?.Stop();
+                KillNativeTimer();
+            };
+        }
+
+        _releaseTimer.Stop();
+        _releaseTimer.Start();
     }
 
     private static void EndSuppress(object? sender, EventArgs e)
@@ -135,14 +153,6 @@ internal static class FrameDoubleClick
         doc?.SendStringToExecute("\x03", true, false, false);
         ArmNativeTimer();
         CloseNativeAttributeEditor();
-        if (_suppress == 2)
-        {
-            _suppress = 0;
-            AcadApp.Idle -= EndSuppress;
-            RestoreDoubleClick();
-            _watch?.Stop();
-        KillNativeTimer();
-        }
     }
 
     private static void ArmWatch()

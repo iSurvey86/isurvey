@@ -7,37 +7,10 @@
         Background="#F3F5F7" FontFamily="Segoe UI" FontSize="13"
         Foreground="#1C2430" ShowInTaskbar="False">
     <Window.Resources>
-        <Style TargetType="Button" x:Key="ToolBtn">
-            <Setter Property="Height" Value="30"/>
-            <Setter Property="Padding" Value="12,0"/>
-            <Setter Property="Margin" Value="0,0,8,0"/>
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="Foreground" Value="#1C2430"/>
-            <Setter Property="BorderBrush" Value="#C9D2DC"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="1" CornerRadius="4" Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#F7F9FB"/>
-                                <Setter Property="BorderBrush" Value="#9AA8B5"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Foreground" Value="#9AA3AD"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/iSurvey;component/src/UI/CtaStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
         <Style TargetType="RadioButton">
             <Setter Property="Margin" Value="0,0,0,8"/>
             <Setter Property="Foreground" Value="#1C2430"/>
@@ -48,6 +21,7 @@
             <Setter Property="Margin" Value="0,0,0,8"/>
             <Setter Property="Foreground" Value="#1C2430"/>
         </Style>
+        </ResourceDictionary>
     </Window.Resources>
 
     <Grid Margin="16">
@@ -62,10 +36,10 @@
                 <TextBlock x:Name="TotalLabel" DockPanel.Dock="Right" VerticalAlignment="Center"
                            Foreground="#5C6B7A" Text="Tổng số: 0 tệp"/>
                 <StackPanel Orientation="Horizontal">
-                    <Button x:Name="AddBtn" Content="Thêm tệp..." Style="{StaticResource ToolBtn}" Click="Add_Click"/>
-                    <Button x:Name="UpBtn" Content="Lên trên" Style="{StaticResource ToolBtn}" Click="Up_Click"/>
-                    <Button x:Name="DownBtn" Content="Xuống dưới" Style="{StaticResource ToolBtn}" Click="Down_Click"/>
-                    <Button x:Name="RemoveBtn" Content="Xóa" Style="{StaticResource ToolBtn}" Margin="0" Click="Remove_Click"/>
+                    <Button x:Name="AddBtn" Content="Thêm tệp..." Style="{StaticResource CtaPrimary}" Margin="0,0,8,0" Click="Add_Click"/>
+                    <Button x:Name="UpBtn" Content="Lên trên" Style="{StaticResource CtaSoft}" Margin="0,0,8,0" Click="Up_Click"/>
+                    <Button x:Name="DownBtn" Content="Xuống dưới" Style="{StaticResource CtaSoft}" Margin="0,0,8,0" Click="Down_Click"/>
+                    <Button x:Name="RemoveBtn" Content="Xóa" Style="{StaticResource CtaDanger}" Margin="0" Click="Remove_Click"/>
                 </StackPanel>
             </DockPanel>
 
@@ -134,37 +108,9 @@
         </DockPanel>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
-            <Button x:Name="CancelBtn" Content="Hủy" MinWidth="110" Height="38" Click="Cancel_Click"
-                    Background="White" Foreground="#1C2430" BorderBrush="#C9D2DC" BorderThickness="1"
-                    Cursor="Hand" FontSize="14">
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="1" CornerRadius="4" Padding="16,0">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
-            <Button x:Name="OkBtn" Content="Nhập DGN" MinWidth="160" Height="42" Margin="10,0,0,0"
-                    Click="Confirm_Click" Background="#16803C" Foreground="White" BorderThickness="0"
-                    Cursor="Hand" FontSize="15" FontWeight="SemiBold">
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="4" Padding="18,0">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#146C32"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Bd" Property="Background" Value="#B7C4B8"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
+            <Button x:Name="CancelBtn" Content="Hủy" MinWidth="110" Click="Cancel_Click" Style="{StaticResource CtaSoft}"/>
+            <Button x:Name="OkBtn" Content="Nhập DGN" MinWidth="160" Margin="10,0,0,0"
+                    Click="Confirm_Click" Style="{StaticResource CtaSuccess}"/>
         </StackPanel>
 
         <Border Grid.Row="1" Background="White" BorderBrush="#D5DCE3" BorderThickness="1" CornerRadius="4" Padding="14,10,14,6">

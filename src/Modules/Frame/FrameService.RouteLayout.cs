@@ -279,7 +279,7 @@ public sealed partial class FrameService
             done += "\nChưa in được PDF: " + pdfIssue;
         else
             done += "\nChưa in PDF. Gõ INTUYEN khi muốn in layout này.";
-        System.Windows.MessageBox.Show(done, "iSurvey", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+        PdfResultDialog.Show(done, pdfNote is not null ? pdfPath : null);
 
         var note = $"layout {layoutName}: {built} khung {spec.Name} 1/{scaleN}, tuyến {routeLenM:0.#} m, chồng gối {opts.OverlapM:0.#} m{pdfNote}";
         ActivityLogger.Enqueue("dantrang", commandName, new
@@ -1051,7 +1051,10 @@ public sealed partial class FrameService
         foreach (var tag in opts.ClearSignatures)
         {
             if (!imported.ContainsKey(tag))
+            {
                 data.Signs.Remove(tag);
+                data.SignFiles.Remove(tag);
+            }
         }
 
         using (var tr = db.TransactionManager.StartTransaction())
@@ -1063,6 +1066,12 @@ public sealed partial class FrameService
                 data.Signs[kv.Key] = def.Name;
             }
 
+            foreach (var kv in opts.Signatures)
+            {
+                if (imported.ContainsKey(kv.Key) && !string.IsNullOrWhiteSpace(kv.Value))
+                    data.SignFiles[kv.Key] = kv.Value;
+            }
+
             var stale = new List<string>();
             foreach (var kv in data.Signs)
             {
@@ -1071,7 +1080,10 @@ public sealed partial class FrameService
             }
 
             foreach (var tag in stale)
+            {
                 data.Signs.Remove(tag);
+                data.SignFiles.Remove(tag);
+            }
             tr.Commit();
         }
 
@@ -1097,13 +1109,26 @@ public sealed partial class FrameService
     }
 
     /// <summary>Sửa khung: lựa chọn chữ ký mới trở thành lựa chọn của cả file cho lần rải sau.</summary>
-    private static void SyncSignatureMemory(Database db, Dictionary<string, ObjectId> imported, HashSet<string> drop)
+    private static void SyncSignatureMemory(
+        Database db,
+        Dictionary<string, ObjectId> imported,
+        HashSet<string> drop,
+        IReadOnlyDictionary<string, string> files)
     {
         var data = FrameMemory.Load(db);
         foreach (var tag in drop)
         {
             if (!imported.ContainsKey(tag))
+            {
                 data.Signs.Remove(tag);
+                data.SignFiles.Remove(tag);
+            }
+        }
+
+        foreach (var kv in files)
+        {
+            if (imported.ContainsKey(kv.Key) && !string.IsNullOrWhiteSpace(kv.Value))
+                data.SignFiles[kv.Key] = kv.Value;
         }
 
         using (var tr = db.TransactionManager.StartTransaction())
@@ -1546,11 +1571,7 @@ public sealed partial class FrameService
 
         ed.WriteMessage($"\n[iSurvey] Đã in {windows.Count} trang ({scope}) vào {pdfPath}");
         ActivityLogger.Result("ISURVEY_ROUTE_PLOT", $"in lại {layoutName}, {scope}, {windows.Count} trang, {Path.GetFileName(pdfPath)}");
-        System.Windows.MessageBox.Show(
-            $"Đã in {windows.Count} trang.\n{pdfPath}",
-            "iSurvey",
-            System.Windows.MessageBoxButton.OK,
-            System.Windows.MessageBoxImage.Information);
+        PdfResultDialog.Show($"Đã in {windows.Count} trang.\n{pdfPath}", pdfPath);
     }
 }
 

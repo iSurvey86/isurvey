@@ -177,6 +177,9 @@ public sealed class CommandAliases
     [CommandMethod("ABT")]
     public void AliasAbout() => _auth.AboutCommand();
 
+    [CommandMethod("HD")]
+    public void AliasHelp() => _auth.HelpCommand();
+
     [CommandMethod("LGO")]
     public void AliasLogout() => _auth.LogoutCommand();
 }

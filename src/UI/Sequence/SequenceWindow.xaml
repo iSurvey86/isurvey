@@ -8,6 +8,10 @@
         ResizeMode="NoResize" ShowInTaskbar="False" FontFamily="Segoe UI"
         PreviewKeyDown="Window_PreviewKeyDown">
     <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/iSurvey;component/src/UI/CtaStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
         <Style TargetType="ComboBox">
             <Setter Property="Background" Value="White" />
             <Setter Property="Foreground" Value="#1F2937" />
@@ -55,6 +59,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        </ResourceDictionary>
     </Window.Resources>
     <Border Background="White" CornerRadius="12" Margin="12">
         <Border.Effect>
@@ -69,9 +74,8 @@
 
             <Border Grid.Row="0" Background="#1D4ED8" CornerRadius="12,12,0,0" MouseLeftButtonDown="Header_Drag">
                 <DockPanel Margin="14,10">
-                    <Button DockPanel.Dock="Right" Content="&#xE8BB;" FontFamily="Segoe MDL2 Assets" Foreground="White"
-                            Background="Transparent" BorderThickness="0" FontSize="12" Width="28" Height="28"
-                            Click="Cancel_Click" ToolTip="Đóng" />
+                    <Button DockPanel.Dock="Right" Content="&#xE8BB;" FontFamily="Segoe MDL2 Assets" FontSize="12"
+                            Style="{StaticResource CtaClose}" Click="Cancel_Click" ToolTip="Đóng" />
                     <Border DockPanel.Dock="Left" Background="White" CornerRadius="4" Padding="6,2" Margin="0,0,8,0" VerticalAlignment="Center">
                         <TextBlock Text="CAD" Foreground="#1D4ED8" FontWeight="Bold" FontSize="11" />
                     </Border>
@@ -154,10 +158,10 @@
 
             <Border Grid.Row="2" Background="#F8FAFC" CornerRadius="0,0,12,12" Padding="16,12">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="Hủy bỏ" MinWidth="96" Padding="14,8" Margin="0,0,8,0" Click="Cancel_Click"
-                            Background="White" BorderBrush="#D1D5DB" BorderThickness="1" />
-                    <Button Content="&#x25B7;  Bắt đầu Tick" MinWidth="140" Padding="14,8" Click="Start_Click"
-                            Background="#1D4ED8" Foreground="White" BorderThickness="0" FontWeight="SemiBold" IsDefault="True" />
+                    <Button Content="Hủy bỏ" MinWidth="96" Margin="0,0,8,0" Click="Cancel_Click"
+                            Style="{StaticResource CtaSoft}" />
+                    <Button Content="&#x25B7;  Bắt đầu Tick" MinWidth="140" Click="Start_Click"
+                            Style="{StaticResource CtaPrimary}" IsDefault="True" />
                 </StackPanel>
             </Border>
         </Grid>

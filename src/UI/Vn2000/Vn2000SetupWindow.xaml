@@ -121,14 +121,14 @@
 
         <Style x:Key="Ghost" TargetType="Button">
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Background" Value="#3A4150"/>
+            <Setter Property="Background" Value="#1D4ED8"/>
             <Setter Property="Height" Value="36"/>
             <Setter Property="MinWidth" Value="88"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="6">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="8">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -142,7 +142,7 @@
         </Style>
 
         <Style x:Key="Primary" TargetType="Button" BasedOn="{StaticResource Ghost}">
-            <Setter Property="Background" Value="#1B6CA8"/>
+            <Setter Property="Background" Value="#0284C7"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="MinWidth" Value="180"/>
             <Setter Property="Margin" Value="8,0,0,0"/>

@@ -1,5 +1,24 @@
 # Changelog — iSurvey
 
+## 1.8.14 — 2026-10-30
+
+Đã phát hành.
+
+### Hướng dẫn
+- **HD** (`ISURVEY_HDSD`): nút Hướng dẫn trên Ribbon mở trang hướng dẫn trên web. Không cần đăng nhập.
+
+### Điểm đo
+- **XUATDIEM** nhận Point, Block, Text và MText. Chữ là số thì ghi vào cao độ. Block lấy tên và mã từ thuộc tính quen thuộc.
+- CSV dùng dấu phân cách danh sách của Windows. TXT dùng tab. Thập phân luôn là dấu chấm.
+
+### Khung và in
+- Sửa khung nhớ ảnh mộc đỏ. Khi xuất PDF, dấu tròn 36 mm chỉ nằm trên file in, rồi được gỡ khỏi bản vẽ.
+- In xong, hộp kết quả có nút Mở thư mục.
+- Nhắp đúp khung vẫn mở hộp sửa của iSurvey. Hộp thuộc tính của AutoCAD bị giữ thêm một lúc cho khỏi mở đè.
+
+### Hộp thoại
+- Nút trên các hộp thoại dùng cùng kiểu bo tròn, nền sáng.
+
 ## 1.8.13 — 2026-10-29
 
 ### Cập nhật

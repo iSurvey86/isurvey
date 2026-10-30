@@ -8,6 +8,7 @@ using WpfProgressBar = System.Windows.Controls.ProgressBar;
 using WpfSolid = System.Windows.Media.SolidColorBrush;
 using WpfStack = System.Windows.Controls.StackPanel;
 using WpfText = System.Windows.Controls.TextBlock;
+using iSurvey.UI;
 using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 
 namespace iSurvey.Modules.Frame;
@@ -63,8 +64,8 @@ internal sealed class PlotProgressWindow : Window
             HorizontalAlignment = System.Windows.HorizontalAlignment.Right,
             Margin = new Thickness(0, 16, 0, 0),
             MinWidth = 88,
-            Padding = new Thickness(16, 6, 16, 6),
-            IsCancel = true
+            IsCancel = true,
+            Style = Cta.Style("CtaDanger")
         };
         cancel.Click += (_, _) => Cancelled = true;
 

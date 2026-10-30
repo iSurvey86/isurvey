@@ -31,6 +31,8 @@ internal static class RoutePdfPlot
         }
 
         object? oldBg = null;
+        object? oldFrame = null;
+        var stampUsed = false;
         try
         {
             oldBg = AcadApp.GetSystemVariable("BACKGROUNDPLOT");
@@ -54,6 +56,10 @@ internal static class RoutePdfPlot
             using var _ = doc.LockDocument();
             progress = PlotProgressWindow.ShowNew();
             var db = doc.Database;
+            string? stampPath = null;
+            var stampMemory = FrameMemory.Load(db);
+            if (stampMemory.StampOnPdf && !string.IsNullOrEmpty(stampMemory.StampPath) && File.Exists(stampMemory.StampPath))
+                stampPath = stampMemory.StampPath;
             step = "CurrentLayout";
             progress.Report(0, windows.Count, "Đang mở layout " + layoutName + "...");
             LayoutManager.Current.CurrentLayout = layoutName;
@@ -102,6 +108,25 @@ internal static class RoutePdfPlot
                 return false;
             }
 
+            step = "Stamp";
+            var stamps = string.IsNullOrEmpty(stampPath)
+                ? new FrameService.PlotStamp(ObjectId.Null, [])
+                : FrameService.PlacePlotStamps(tr, db, lay.BlockTableRecordId, stampPath, windows);
+            if (stamps.Images.Count > 0)
+            {
+                stampUsed = true;
+                doc.Editor.WriteMessage("\n[iSurvey] Đóng mộc đỏ trên PDF.");
+                try
+                {
+                    oldFrame = AcadApp.GetSystemVariable("IMAGEFRAME");
+                    AcadApp.SetSystemVariable("IMAGEFRAME", (short)0);
+                }
+                catch
+                {
+                    oldFrame = null;
+                }
+            }
+
             step = "BeginPlot";
             using var pe = PlotFactory.CreatePublishEngine();
             pe.BeginPlot(null, null);
@@ -131,7 +156,10 @@ internal static class RoutePdfPlot
             step = "EndDocument";
             pe.EndDocument(null);
             pe.EndPlot(null);
-            tr.Commit();
+            RestoreImageFrame(oldFrame);
+            oldFrame = null;
+            if (FrameService.ErasePlotStamps(tr, stamps))
+                tr.Commit();
             DisposeSettings(settingsKeep);
 
             if (cancelled)
@@ -168,12 +196,27 @@ internal static class RoutePdfPlot
 
             try
             {
+                RestoreImageFrame(oldFrame);
                 if (oldBg is not null)
                     AcadApp.SetSystemVariable("BACKGROUNDPLOT", oldBg);
             }
             catch
             {
                 // không chặn
+            }
+
+            if (stampUsed)
+            {
+                try
+                {
+                    var open = AcadApp.DocumentManager.MdiActiveDocument;
+                    if (open is not null)
+                        FrameService.RemoveLeftoverStamps(open.Database);
+                }
+                catch
+                {
+                    // không chặn
+                }
             }
         }
     }
@@ -183,6 +226,20 @@ internal static class RoutePdfPlot
         foreach (var ps in settings)
             ps.Dispose();
         settings.Clear();
+    }
+
+    private static void RestoreImageFrame(object? oldFrame)
+    {
+        if (oldFrame is null)
+            return;
+        try
+        {
+            AcadApp.SetSystemVariable("IMAGEFRAME", oldFrame);
+        }
+        catch
+        {
+            // không chặn
+        }
     }
 
     private static void TryDelete(string pdfPath)

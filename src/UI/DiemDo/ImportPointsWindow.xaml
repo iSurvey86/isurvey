@@ -8,6 +8,13 @@
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         ResizeMode="NoResize" ShowInTaskbar="False" FontFamily="Segoe UI"
         PreviewKeyDown="Window_PreviewKeyDown">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/iSurvey;component/src/UI/CtaStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Border Background="White" CornerRadius="12" Margin="12">
         <Border.Effect>
             <DropShadowEffect BlurRadius="18" ShadowDepth="2" Opacity="0.28" />
@@ -21,9 +28,8 @@
 
             <Border Grid.Row="0" Background="#1D4ED8" CornerRadius="12,12,0,0" MouseLeftButtonDown="Header_Drag">
                 <DockPanel Margin="14,10">
-                    <Button DockPanel.Dock="Right" Content="&#xE8BB;" FontFamily="Segoe MDL2 Assets" Foreground="White"
-                            Background="Transparent" BorderThickness="0" FontSize="12" Width="28" Height="28"
-                            Click="Cancel_Click" ToolTip="Đóng" />
+                    <Button DockPanel.Dock="Right" Content="&#xE8BB;" FontFamily="Segoe MDL2 Assets" FontSize="12"
+                            Style="{StaticResource CtaClose}" Click="Cancel_Click" ToolTip="Đóng" />
                     <TextBlock Text="iSurvey — Nhập điểm đo" Foreground="White" FontWeight="SemiBold"
                                VerticalAlignment="Center" />
                 </DockPanel>
@@ -31,8 +37,8 @@
 
             <StackPanel Grid.Row="1" Margin="16,14,16,8">
                 <DockPanel LastChildFill="True" Margin="0,0,0,10">
-                    <Button DockPanel.Dock="Right" Content="Mở tệp..." MinWidth="96" Margin="8,0,0,0" Padding="12,6"
-                            Click="Open_Click" Background="White" BorderBrush="#D1D5DB" BorderThickness="1" />
+                    <Button DockPanel.Dock="Right" Content="Mở tệp..." MinWidth="96" Margin="8,0,0,0"
+                            Click="Open_Click" Style="{StaticResource CtaSoft}" />
                     <TextBox x:Name="PathBox" IsReadOnly="True" Padding="8,6" VerticalContentAlignment="Center"
                              Text="{Binding FilePath}" />
                 </DockPanel>
@@ -117,13 +123,12 @@
             <Border Grid.Row="2" Background="#F8FAFC" CornerRadius="0,0,12,12" Padding="16,12">
                 <DockPanel LastChildFill="False">
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                        <Button x:Name="SwapButton" Content="⇄  Đảo cột X/Y" MinWidth="140" Padding="12,8" Margin="0,0,8,0"
-                                Click="Swap_Click" Background="#FEF9C3" BorderBrush="#FDE68A" BorderThickness="1"
-                                Foreground="#854D0E" />
-                        <Button Content="Hủy bỏ" MinWidth="88" Padding="12,8" Margin="0,0,8,0" Click="Cancel_Click"
-                                Background="White" BorderBrush="#D1D5DB" BorderThickness="1" />
-                        <Button Content="⤓  Tạo điểm CAD" MinWidth="140" Padding="12,8" Click="Create_Click"
-                                Background="#1D4ED8" Foreground="White" BorderThickness="0" FontWeight="SemiBold" />
+                        <Button x:Name="SwapButton" Content="⇄  Đảo cột X/Y" MinWidth="140" Margin="0,0,8,0"
+                                Click="Swap_Click" Style="{StaticResource CtaWarn}" />
+                        <Button Content="Hủy bỏ" MinWidth="88" Margin="0,0,8,0" Click="Cancel_Click"
+                                Style="{StaticResource CtaSoft}" />
+                        <Button Content="⤓  Tạo điểm CAD" MinWidth="140" Click="Create_Click"
+                                Style="{StaticResource CtaPrimary}" />
                     </StackPanel>
                 </DockPanel>
             </Border>

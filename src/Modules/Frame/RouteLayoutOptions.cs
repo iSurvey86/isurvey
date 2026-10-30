@@ -75,6 +75,14 @@ public sealed class RouteLayoutOptions
     [JsonIgnore]
     public bool ApplyToAll { get; set; }
 
+    /// <summary>Đóng mộc đỏ lúc xuất PDF. Bản vẽ không giữ ảnh này.</summary>
+    [JsonIgnore]
+    public bool StampOnPdf { get; set; } = true;
+
+    /// <summary>File PNG mộc đỏ. Trống = không đóng dấu.</summary>
+    [JsonIgnore]
+    public string? StampPath { get; set; }
+
     /// <summary>Giá trị ô khung tên theo tag (đã gồm giá trị mặc định của khung mẫu).</summary>
     public Dictionary<string, string> Attributes { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 

@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 using iSurvey.Modules.Frame;
 using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using DataGrid = System.Windows.Controls.DataGrid;
@@ -33,6 +34,14 @@ public sealed class RouteLayoutDialogInput
 
     /// <summary>Tag TEN_n đã có chữ ký trong bản vẽ này.</summary>
     public IReadOnlyCollection<string>? ExistingSignatures { get; init; }
+
+    /// <summary>File DWG chữ ký đã nhớ theo tag TEN_n.</summary>
+    public IReadOnlyDictionary<string, string>? SignatureFiles { get; init; }
+
+    /// <summary>Ảnh PNG mộc đỏ đã nhớ. Chỉ dùng khi sửa khung.</summary>
+    public string? StampPath { get; init; }
+
+    public bool StampOnPdf { get; init; } = true;
 
     /// <summary>Tên file logo đang dùng trong bản vẽ. Trống nếu chưa thay.</summary>
     public string? KeptLogoOwner { get; init; }
@@ -104,8 +113,11 @@ public partial class RouteLayoutWindow : Window
     private bool _hideOwner;
     private bool _hideDesign;
     private readonly Dictionary<string, string> _signatures = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, string> _knownSignFiles = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, BitmapSource?> _signThumbs = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _existingSigns = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _clearedSigns = new(StringComparer.OrdinalIgnoreCase);
+    private string? _stampPath;
     private bool _allowEdit;
 
     public RouteLayoutWindow(RouteLayoutDialogInput input)
@@ -142,6 +154,17 @@ public partial class RouteLayoutWindow : Window
             foreach (var tag in input.ExistingSignatures)
                 _existingSigns.Add(tag);
         }
+
+        if (input.SignatureFiles is not null)
+        {
+            foreach (var kv in input.SignatureFiles)
+            {
+                if (!string.IsNullOrWhiteSpace(kv.Value) && System.IO.File.Exists(kv.Value))
+                    _knownSignFiles[kv.Key] = kv.Value;
+            }
+        }
+
+        _stampPath = string.IsNullOrWhiteSpace(input.StampPath) ? null : input.StampPath;
 
         foreach (var f in FrameFields.All)
         {
@@ -181,7 +204,10 @@ public partial class RouteLayoutWindow : Window
     /// <summary>Sửa thông tin một khung đã có. Không dựng lại viewport.</summary>
     public static RouteLayoutOptions? ShowEdit(
         IReadOnlyDictionary<string, string> attributes,
-        IReadOnlyCollection<string> existingSignatures)
+        IReadOnlyCollection<string> existingSignatures,
+        string? stampPath = null,
+        bool stampOnPdf = true,
+        IReadOnlyDictionary<string, string>? signatureFiles = null)
     {
         var input = new RouteLayoutDialogInput
         {
@@ -198,7 +224,10 @@ public partial class RouteLayoutWindow : Window
             MapWidthM = (_, _) => 1,
             SuggestGrid = _ => (1, 1),
             EditExisting = true,
-            ExistingSignatures = existingSignatures
+            ExistingSignatures = existingSignatures,
+            SignatureFiles = signatureFiles,
+            StampPath = stampPath,
+            StampOnPdf = stampOnPdf
         };
         return Show(input);
     }
@@ -223,6 +252,12 @@ public partial class RouteLayoutWindow : Window
         OkButton.Content = "Cập nhật";
         OkButton.IsEnabled = true;
         FieldsTitle.Text = "THÔNG TIN TRÊN KHUNG";
+        FooterLeft.Orientation = System.Windows.Controls.Orientation.Horizontal;
+        LogoNote.Visibility = Visibility.Collapsed;
+        StampBar.Visibility = Visibility.Visible;
+        ApplyAllCheck.Margin = new Thickness(0, 0, 4, 0);
+        StampCheck.IsChecked = _in.StampOnPdf;
+        RefreshStampPreview();
         UpdateContentEditor();
         UpdateLogoNote();
     }
@@ -698,17 +733,34 @@ public partial class RouteLayoutWindow : Window
 
     private void ApplySignButton(string tag)
     {
+        SignButton.Content = "Đổi chữ ký";
+        var path = SignPreviewPath(tag);
         var has = HasSign(tag);
-        SignButton.Content = has ? "Xóa chữ ký" : "Chèn chữ ký";
-        if (!has)
+        SignClearButton.Visibility = has ? Visibility.Visible : Visibility.Collapsed;
+        SignButton.ToolTip = path is null
+            ? "Chọn file DWG chữ ký cho ô họ tên này."
+            : "Đổi chữ ký " + System.IO.Path.GetFileName(path);
+        BitmapSource? thumb = null;
+        if (path is not null)
         {
-            SignButton.ToolTip = "Chọn file DWG chữ ký cho ô họ tên này.";
-            return;
+            if (!_signThumbs.TryGetValue(path, out thumb))
+            {
+                thumb = DwgThumbnail.TryLoad(path);
+                _signThumbs[path] = thumb;
+            }
         }
 
-        SignButton.ToolTip = _signatures.TryGetValue(tag, out var path)
-            ? "Bỏ chữ ký " + System.IO.Path.GetFileName(path)
-            : "Bỏ chữ ký đang gắn trên ô này.";
+        SignPreview.Source = thumb;
+        SignPreviewBox.Visibility = thumb is null ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    private string? SignPreviewPath(string tag)
+    {
+        if (_clearedSigns.Contains(tag) && !_signatures.ContainsKey(tag))
+            return null;
+        if (_signatures.TryGetValue(tag, out var chosen))
+            return chosen;
+        return _knownSignFiles.TryGetValue(tag, out var known) ? known : null;
     }
 
     private void Sign_Click(object sender, RoutedEventArgs e)
@@ -716,16 +768,6 @@ public partial class RouteLayoutWindow : Window
         var row = Selected;
         if (row is null || !IsSignRow(row))
             return;
-        if (HasSign(row.Field.Tag))
-        {
-            _signatures.Remove(row.Field.Tag);
-            if (_existingSigns.Contains(row.Field.Tag))
-                _clearedSigns.Add(row.Field.Tag);
-            UpdateLogoNote();
-            UpdateContentEditor();
-            return;
-        }
-
         using var dlg = new System.Windows.Forms.OpenFileDialog
         {
             Title = "Chọn bản vẽ chữ ký cho " + row.Label,
@@ -738,6 +780,78 @@ public partial class RouteLayoutWindow : Window
         _clearedSigns.Remove(row.Field.Tag);
         UpdateLogoNote();
         UpdateContentEditor();
+    }
+
+    private void SignClear_Click(object sender, RoutedEventArgs e)
+    {
+        var row = Selected;
+        if (row is null || !IsSignRow(row))
+            return;
+        _signatures.Remove(row.Field.Tag);
+        if (_existingSigns.Contains(row.Field.Tag))
+            _clearedSigns.Add(row.Field.Tag);
+        UpdateLogoNote();
+        UpdateContentEditor();
+    }
+
+    private void Stamp_Changed(object sender, RoutedEventArgs e)
+    {
+        if (_loading || StampPickButton is null)
+            return;
+        RefreshStampPreview();
+    }
+
+    private void StampPick_Click(object sender, RoutedEventArgs e)
+    {
+        using var dlg = new System.Windows.Forms.OpenFileDialog
+        {
+            Title = "Chọn ảnh mộc đỏ",
+            Filter = "Ảnh PNG (*.png)|*.png",
+            CheckFileExists = true
+        };
+        if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+            return;
+        _stampPath = dlg.FileName;
+        StampCheck.IsChecked = true;
+        RefreshStampPreview();
+    }
+
+    private void StampClear_Click(object sender, RoutedEventArgs e)
+    {
+        _stampPath = null;
+        RefreshStampPreview();
+    }
+
+    private void RefreshStampPreview()
+    {
+        var on = StampCheck.IsChecked == true;
+        StampPickButton.IsEnabled = on;
+        var path = _stampPath;
+        var has = !string.IsNullOrEmpty(path) && System.IO.File.Exists(path);
+        StampClearButton.Visibility = has ? Visibility.Visible : Visibility.Collapsed;
+        if (!has)
+        {
+            StampPreview.Source = null;
+            StampPreviewBox.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        try
+        {
+            var image = new BitmapImage();
+            image.BeginInit();
+            image.CacheOption = BitmapCacheOption.OnLoad;
+            image.UriSource = new Uri(path!);
+            image.EndInit();
+            image.Freeze();
+            StampPreview.Source = image;
+            StampPreviewBox.Visibility = Visibility.Visible;
+        }
+        catch
+        {
+            StampPreview.Source = null;
+            StampPreviewBox.Visibility = Visibility.Collapsed;
+        }
     }
     // ---- Nút ----
     private void Cancel_Click(object sender, RoutedEventArgs e)
@@ -803,7 +917,9 @@ public partial class RouteLayoutWindow : Window
             HideDesignLogo = _hideDesign,
             Signatures = new Dictionary<string, string>(_signatures, StringComparer.OrdinalIgnoreCase),
             ClearSignatures = new HashSet<string>(_clearedSigns, StringComparer.OrdinalIgnoreCase),
-            ApplyToAll = ApplyAllCheck.IsChecked == true
+            ApplyToAll = ApplyAllCheck.IsChecked == true,
+            StampOnPdf = StampCheck.IsChecked == true,
+            StampPath = _stampPath
         };
     }
 }
