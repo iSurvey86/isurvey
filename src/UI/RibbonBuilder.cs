@@ -95,6 +95,13 @@ public static class RibbonBuilder
                 Id = TabId
             };
 
+            AddPanel(tab, "Dữ liệu",
+            [
+                new Btn("Bảng\nDữ liệu", "ISURVEY_PALETTE", RibbonIcons.BangDuLieu, true,
+                    "Mở hoặc đóng bảng dữ liệu neo bên trái (BANGIS)")
+            ],
+            null);
+
             // Panel 1 — Bản đồ
             AddPanel(tab, "Bản đồ",
                 [

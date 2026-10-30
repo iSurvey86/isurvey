@@ -207,4 +207,14 @@ internal static partial class RibbonIcons
         Seg(dc, Stroke(s, 0.05), s, 0.52, 0.20, 0.52, 0.80);
         Poly(dc, WpfBrushes.White, null, s, true, 0.52, 0.50, 0.64, 0.42, 0.64, 0.58);
     }
+
+    public static BitmapSource BangDuLieu(int size) => Render(size, Solid(0x1D4ED8), DrawPalette);
+
+    private static void DrawPalette(DrawingContext dc, double s)
+    {
+        var pen = Stroke(s, 0.07);
+        Box(dc, null, pen, s, 0.14, 0.16, 0.72, 0.68);
+        Seg(dc, pen, s, 0.58, 0.16, 0.58, 0.84);
+        Seg(dc, pen, s, 0.14, 0.50, 0.58, 0.50);
+    }
 }

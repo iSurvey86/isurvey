@@ -2,7 +2,7 @@
 
 Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), nhập và xuất **KML/KMZ**, cắt bình đồ theo biên (`CATBD`), quét cấu trúc bản vẽ (`AUTOSCAN`). Các lệnh nghiệp vụ khóa cho tới khi kích hoạt bằng Gmail + mã OTP.
 
-**Phiên bản bundle:** `1.8.14` (`deploy/iSurvey.bundle/PackageContents.xml`)
+**Phiên bản bundle:** `1.8.15` (`deploy/iSurvey.bundle/PackageContents.xml`)
 
 **Đồng bộ phiên làm việc (Cursor / đa máy):** đọc [docs/phien-lam-viec/HANDOFF.md](docs/phien-lam-viec/HANDOFF.md). Quy tắc cuối phiên: [docs/phien-lam-viec/README.md](docs/phien-lam-viec/README.md). Changelog: [docs/changelog/CHANGELOG.md](docs/changelog/CHANGELOG.md).
 
@@ -47,6 +47,7 @@ Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georefere
 | `ISURVEY_LOGO` | **ANLOGO** | Ẩn hoặc hiện một logo trên khung tên. Gõ `1` logo chủ đầu tư, `2` logo đơn vị thiết kế. `ANLOGO1` và `ANLOGO2` chọn thẳng, không hỏi |
 | `ISURVEY_LOGO_REPLACE` | **THAYLOGO** | Thay logo EVN bằng ảnh (chủ đầu tư hoặc đơn vị thiết kế); gõ `K` để khôi phục |
 | `ISURVEY_ROUTE_SHEETS` | **RAIKHUNG** | Rải khung in dọc tuyến (nút Ribbon «Rải Khung Theo Tuyến»): một layout lưới khung + viewport xoay. Chữ trong vùng tờ đọc ngang trên layout, góc và cao chữ bên Model không đổi. Hộp thoại hai cột: bố cục in bên trái, 25 ô khung tên bên phải. Nhập Excel theo cột STT và Nội dung, có file mẫu .xlsx. Không in PDF ở bước này. Logo đã chèn được nhớ trong file. Nhấp đúp khung để sửa thông tin |
+| `ISURVEY_PALETTE` | **BANGIS** | Mở hoặc đóng bảng dữ liệu neo bên trái. Nền xám, mỗi mục có icon. Bốn tab: Khảo sát, Khung in, UAV, Bản đồ. Cây khảo sát là vỏ, chưa đọc mô hình hay tuyến. `RAIMCD` vẫn chỉ rải khung |
 | `ISURVEY_PROFILE_SHEETS` | **RAIMCD** | Rải khung mặt cắt dọc đã vẽ: chọn góc dưới-trái hàng cuối. Tỷ lệ trên khung `1/500; 1/5000` (hoặc `1/200; 1/2000`). Cao quá khổ thì tăng khổ giấy, giữ tỷ lệ. Layout `MatCat_Doc`. Trục đứng lùi 2,5 m so với điểm chọn. Phần thừa bên trái và bên dưới được che trên layout, Model không bị xóa. Cùng hộp thoại bố cục như RAIKHUNG, không in PDF ở bước này |
 | `ISURVEY_ROUTE_PLOT` | **INTUYEN** | In layout `BanDo_Tuyen` hoặc `MatCat_Doc` đã rải. Hộp thoại: In màu (`acad.ctb`) hoặc In đen trắng (`monochrome.ctb`), chèn chữ ký DWG theo chức danh đã ghi trên khung, đóng mộc đỏ PNG. Chữ ký và mộc chỉ trên PDF. Rồi hỏi `1` khung đang chọn, `2` tất cả. Không dựng trang mới. In xong có nút Mở thư mục |
 | `ISURVEY_FIT_TITLE` | **CODAN** | Co ô chủ đầu tư và đại diện chủ đầu tư về một dòng. Ô tên bản vẽ vẫn xuống dòng trong khung |

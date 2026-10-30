@@ -5,9 +5,10 @@ alwaysApply: true
 
 # Kiểm tra trên Civil trước khi hoàn thành
 
-Khi sửa lệnh, hộp thoại, hoặc cách bản vẽ hiện ra trong AutoCAD / Civil 3D, tự mở Civil và kiểm tra trước khi báo xong. Không chờ người dùng nhắc.
+Khi sửa lệnh, hộp thoại, hoặc cách bản vẽ hiện ra trong AutoCAD / Civil 3D, tự mở Civil 3D và kiểm tra trước khi báo xong. Không chờ người dùng nhắc. Biên dịch xong chưa phải đã kiểm tra.
 
 - Chỉ thử trên bản sao hoặc bản vẽ mới. Không ghi đè file gốc của người dùng.
-- Civil đang mở và đang khóa DLL thì đóng bản vẽ trắng (không lưu) rồi mở lại sau khi chép DLL. Không tắt bản vẽ người dùng đang sửa nếu chưa được bảo.
-- Chạy đúng lệnh vừa sửa, nhìn kết quả trên màn hình (hộp thoại hoặc bản vẽ), rồi mới kết luận.
-- Không mở được Civil thì nói rõ phần nào chưa nhìn thấy.
+- Chép DLL mới vào bundle rồi mở Civil 3D (Metric). Chạy đúng lệnh vừa sửa. Nhìn hộp thoại hoặc bản vẽ trên màn hình, rồi mới kết luận.
+- Process không có cửa sổ, dịch vụ nền, hoặc phần mềm khác (ví dụ ADS Civil) không phải Civil 3D đang mở. Không lấy đó làm lý do bỏ qua.
+- Civil 3D đang mở và đang khóa DLL thì đóng bản vẽ trắng (không lưu) rồi mở lại sau khi chép DLL. Không tắt bản vẽ người dùng đang sửa nếu chưa được bảo.
+- Chỉ được nói «chưa nhìn thấy» khi đã thử mở Civil 3D và việc mở thất bại. Ghi rõ lỗi mở, không dừng ở câu «có process khác đang chạy».

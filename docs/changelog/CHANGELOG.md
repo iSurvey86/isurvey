@@ -1,8 +1,8 @@
 # Changelog — iSurvey
 
-## Chưa phát hành — vẫn 1.8.14
+## 1.8.15 — 2026-10-30
 
-Chưa đóng gói. Máy khác kéo mã này vẫn thấy gói UPD là 1.8.14 cho đến khi phát hành.
+Chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14.
 
 ### Đăng xuất từ xa
 - Admin bấm **Đăng xuất** trên tab Thiết bị: trạng thái thành **Đã đăng xuất** ngay, trả suất máy. Plugin hỏi khoảng 15 giây rồi xóa giấy phép cục bộ và mở hộp đăng nhập (Gmail + OTP).
@@ -30,8 +30,11 @@ Chưa đóng gói. Máy khác kéo mã này vẫn thấy gói UPD là 1.8.14 cho
 - Bìa PDF không còn tên NPSC / Xí nghiệp Tư vấn. Chân trang: Tài liệu Hướng dẫn sử dụng Plugin iSurvey. Bảng thông tin tài liệu viết phổ quát. Việc này nằm repo ksnpsc, chưa có trong plugin.
 
 ### Nghiên cứu mặt cắt dọc
-- Chưa có lệnh mới, không tăng số phiên bản. `RAIMCD` vẫn chỉ rải khung in. Tên dự kiến lệnh vẽ: `VEMCD` (catalog: Đang làm).
+- `RAIMCD` vẫn chỉ rải khung in. Tên dự kiến lệnh vẽ: `VEMCD` (catalog: Đang làm, chưa có lệnh).
 - Báo cáo theo dõi: `docs/Bao_cao_phan_tich_module_ve_mat_cat_doc_iSurvey.docx`.
+
+### Bảng dữ liệu
+- **BANGIS** (`ISURVEY_PALETTE`): vỏ bảng neo trái. Bốn tab Khảo sát, Khung in, UAV, Bản đồ. Nền xám, không thẻ trắng. Mỗi mục Điểm đo, Mô hình địa hình, Tuyến, Trắc dọc có icon nhỏ. Ô thuộc tính viền đứt. Cây chưa đọc bản vẽ. Đã nhìn trên Civil 3D 2026, bản vẽ trắng. Đặc tả: `docs/nghien-cuu/dac-ta-bangis-palette.md`.
 
 ## 1.8.14 — 2026-10-30
 

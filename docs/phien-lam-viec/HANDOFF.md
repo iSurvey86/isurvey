@@ -5,6 +5,44 @@
 
 ---
 
+## 2026-10-30 — Vỏ bảng BANGIS, nền xám và icon (1.8.15, chưa phát hành)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ. Bump **1.8.15**. Chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14.
+
+### Đã chốt / đã làm
+
+- Lệnh **BANGIS** (`ISURVEY_PALETTE`): bảng neo trái. Bốn tab Khảo sát, Khung in, UAV, Bản đồ. Cây: Điểm đo → Mô hình địa hình → Tuyến → Trắc dọc.
+- Nền xám, bỏ thẻ trắng. Mỗi mục một icon nhỏ (chấm xanh, lớp xanh lá, nét cam, tờ tím). Ô dưới nhãn THUỘC TÍNH, viền đứt.
+- Cây chưa đọc bản vẽ. Chuột phải: nhập/xuất điểm gọi lệnh thật. Tạo mô hình, tạo tuyến, vẽ mặt cắt chỉ báo dòng lệnh.
+- Đã nhìn trên Civil 3D 2026, bản vẽ trắng Drawing1. Không mở bản vẽ người dùng.
+- `RAIMCD` vẫn chỉ rải khung. `VEMCD` vẫn là tên catalog, chưa có lệnh.
+- Số **1.8.15** gồm luôn phần chưa đóng gói sau bản đã phát hành 1.8.14: đăng xuất từ xa, rải khung chỉ layout, INTUYEN chọn kiểu in, bỏ DGNCFG, icon ribbon riêng, last seen.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Bảng | `src/UI/Palette/` |
+| Đặc tả | `docs/nghien-cuu/dac-ta-bangis-palette.md` |
+| Ribbon | `src/UI/RibbonBuilder.cs` |
+
+### Việc tiếp
+
+- [ ] Chưa phát hành 1.8.15. Máy khác kéo mã vẫn thấy gói UPD là 1.8.14 cho đến khi đóng gói.
+- [ ] Pha 1: tạo mô hình, thêm điểm/đồng mức/bao, xây dựng TIN. Cây BANGIS đọc mô hình khi pha đó xong.
+- [ ] SQL `schema_last_seen.sql` và `schema_force_logout.sql` vẫn phải chạy trên Supabase nếu chưa chạy.
+- [ ] HDSD PDF và nhật ký phân trang nằm repo ksnpsc.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff đầu. iSurvey 1.8.15, chưa phát hành. BANGIS là vỏ bảng: nền xám, icon từng mục, cây chưa đọc bản vẽ. RAIMCD chỉ rải khung. VEMCD chưa có lệnh. Tiếp: pha 1 mô hình khi được yêu cầu, hoặc phát hành 1.8.15 khi được yêu cầu.
+```
+
+**Lưu trữ ngày:** [2026-10-30-bangis-palette.md](./2026-10-30-bangis-palette.md)
+
+---
+
 ## 2026-10-30 — Nghiên cứu module vẽ mặt cắt dọc (chưa code, 1.8.14)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng. ADS Civil NW 2026 cài tại `C:\Program Files\BZS\ADSCivil NW 2026 For Autocad` (bản quyền người dùng). Cuối phiên đầy đủ, **không bump**. Số iSurvey vẫn **1.8.14**, chưa phát hành.

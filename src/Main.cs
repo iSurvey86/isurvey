@@ -32,6 +32,7 @@ using iSurvey.UI;
 [assembly: CommandClass(typeof(PlanModule))]
 [assembly: CommandClass(typeof(ScanModule))]
 [assembly: CommandClass(typeof(AuthModule))]
+[assembly: CommandClass(typeof(iSurvey.UI.Palette.PaletteModule))]
 [assembly: CommandClass(typeof(iSurvey.CommandAliases))]
 #endif
 
@@ -105,5 +106,6 @@ public sealed class Main : IExtensionApplication
         _mapModule?.Terminate();
         _mapModule = null;
         RibbonBuilder.Cleanup();
+        iSurvey.UI.Palette.SurveyPaletteManager.Shutdown();
     }
 }

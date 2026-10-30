@@ -11,6 +11,7 @@ using iSurvey.Modules.Ai;
 using iSurvey.Modules.Frame;
 using iSurvey.Modules.Uav;
 using iSurvey.Modules.DiemDo;
+using iSurvey.UI.Palette;
 
 namespace iSurvey;
 
@@ -46,6 +47,7 @@ public sealed class CommandAliases
     private readonly PlanModule _plan = new();
     private readonly ScanModule _scan = new();
     private readonly AuthModule _auth = new();
+    private readonly PaletteModule _palette = new();
 
     [CommandMethod("IG")]
     public void AliasInsertMap() => _map.InsertMapCommand();
@@ -179,5 +181,8 @@ public sealed class CommandAliases
 
     [CommandMethod("LGO")]
     public void AliasLogout() => _auth.LogoutCommand();
+
+    [CommandMethod("BANGIS")]
+    public void AliasPalette() => _palette.ShowCommand();
 }
 

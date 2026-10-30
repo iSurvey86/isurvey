@@ -12,7 +12,7 @@ Khi làm DTM / tuyến / trắc dọc / trắc ngang:
 - Chỉ học tư duy nghiệp vụ từ ADS Civil (bản quyền máy người dùng). Không sao chép mã, icon, CUIX, mẫu `.td`, lớp `KS-TUY-*` / `KS-DHI-*`, object `.dbx`.
 - Vẽ bằng entity AutoCAD/Civil chuẩn. Dữ liệu iSurvey (NOD/JSON). Lệnh và icon riêng.
 - Thứ tự bắt buộc: **tạo mô hình → thêm điểm/đồng mức/bao → xây dựng TIN → tuyến → cọc → vẽ TD → hiệu chỉnh TD**. Không nhảy thẳng tới vẽ cắt dọc khi chưa có nguồn Z.
-- Giao diện chuỗi này: **bảng neo tab dọc iSurvey** (PaletteSet + WPF), không copy tab/cây/icon ADS. Tab iSurvey: Khảo sát, Khung in, UAV, Bản đồ. Cây Khảo sát: Điểm đo → Mô hình → Tuyến → Trắc dọc. Menu chuột phải trên cây; ô dưới là thuộc tính. Không hiện module chưa làm.
+- Giao diện chuỗi này: **bảng neo tab dọc iSurvey** (PaletteSet + WPF), không copy tab/cây/icon ADS. Tab iSurvey: Khảo sát, Khung in, UAV, Bản đồ. Cây Khảo sát: Điểm đo → Mô hình → Tuyến → Trắc dọc. Menu chuột phải trên cây; ô dưới là thuộc tính. Vỏ `BANGIS` đã chạy (nền xám, icon từng mục); cây chưa đọc bản vẽ. Không hiện module chưa làm.
 - Ribbon giữ lệnh một phát (nhập điểm, rải khung, UAV, GIS). Palette là nơi thấy đối tượng bản vẽ.
 - **VEMCD** vẽ mặt cắt dọc trên Model. **RAIMCD** chỉ rải khung in lên hình đã vẽ. Không gộp, không đổi vai trò `RAIMCD`.
 - Trắc ngang, đường đỏ, địa chất, khối lượng: ghi nhớ, chưa làm cho đến khi mô hình + TD tự nhiên ổn.
