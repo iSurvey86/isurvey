@@ -191,30 +191,6 @@ public sealed class DgnModule : ISurveyModule
         public IntPtr Handle { get; } = handle;
     }
 
-    [CommandMethod("ISURVEY_DGN_CONFIG")]
-    public void DgnConfigCommand()
-    {
-        if (!AuthManager.EnsureAuthenticated())
-            return;
-
-        var doc = AcadApp.DocumentManager.MdiActiveDocument;
-        var ed = doc?.Editor;
-        try
-        {
-            var drawingPath = doc is null || string.IsNullOrWhiteSpace(doc.Database.Filename)
-                ? null
-                : doc.Database.Filename;
-            if (DgnImportDialog.ShowConfig(drawingPath))
-                ed?.WriteMessage("\n[iSurvey] Đã lưu cấu hình DGN.");
-            else
-                ed?.WriteMessage("\n[iSurvey] Đã hủy cấu hình DGN.");
-        }
-        catch (System.Exception ex)
-        {
-            ed?.WriteMessage($"\n[iSurvey] Không mở được cấu hình DGN: {ex.Message}");
-        }
-    }
-
     private static void WriteBatchSummary(
         Autodesk.AutoCAD.EditorInput.Editor ed, IReadOnlyList<DgnBatchFileResult> results, string? combined)
     {

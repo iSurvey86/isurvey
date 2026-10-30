@@ -19,19 +19,20 @@ internal static partial class RibbonIcons
     public static BitmapSource MapInsert(int size) => Render(size, Solid(0x3B7D3B), DrawMapLayers);
     public static BitmapSource MapDelete(int size) => Render(size, Solid(0xB82318), DrawTrash);
     public static BitmapSource ExportGe(int size) => Render(size, Solid(0x0C59CF), DrawExport);
-    public static BitmapSource ImportKml(int size) => Render(size, Grad(0x2B9348, 0x1B6CA8), DrawFileDown);
-    public static BitmapSource ImportTab(int size) => Render(size, Grad(0x0F766E, 0x1B6CA8), DrawFileDown);
-    public static BitmapSource ExportKml(int size) => Render(size, Grad(0x0C59CF, 0x023E8A), DrawFileUp);
-    public static BitmapSource UpdateGe(int size) => Render(size, Solid(0x0096C7), DrawRefresh);
+    public static BitmapSource ImportKml(int size) => Render(size, Grad(0x2B9348, 0x1B6CA8), DrawGlobeDown);
+    public static BitmapSource ImportTab(int size) => Render(size, Grad(0x0F766E, 0x134E4A), DrawParcels);
+    public static BitmapSource ExportKml(int size) => Render(size, Grad(0x0C59CF, 0x023E8A), DrawGlobeUp);
+    public static BitmapSource UpdateGe(int size) => Render(size, Solid(0x0096C7), DrawMapRefresh);
 
     // ---------- Panel 2: Khung & Cáº¯t BÃ¬nh Äá»“ ----------
     public static BitmapSource TaoKhung(int size) => Render(size, Grad(0x0096C7, 0x023E8A), DrawFrames);
     public static BitmapSource CatBd(int size) => Render(size, Grad(0xF77F00, 0xD62828), DrawScissors);
-    public static BitmapSource RaiKhung(int size) => Render(size, Solid(0x0096C7), DrawFramesChain);
+    public static BitmapSource RaiKhung(int size) => Render(size, Solid(0x0284C7), DrawRouteSheets);
+    public static BitmapSource RaiMcd(int size) => Render(size, Solid(0x0F766E), DrawProfileSheets);
     public static BitmapSource KhungChuan(int size) => Render(size, Grad(0x1D6FA5, 0x0B3C5D), DrawStdFrame);
     public static BitmapSource KhungBanVe(int size) => Render(size, Grad(0x2A9D8F, 0x264653), DrawTechFrame);
     public static BitmapSource TileKhung(int size) => Render(size, Solid(0x2A9D8F), DrawScaleArrows);
-    public static BitmapSource KhoaKhung(int size) => Render(size, Solid(0xE09F3E), DrawLock);
+    public static BitmapSource KhoaKhung(int size) => Render(size, Solid(0xE09F3E), DrawFrameLock);
 
     // ---------- Panel 3: BiÃªn táº­p Äá»‹a hÃ¬nh ----------
     public static BitmapSource GhiSoDm(int size) => Render(size, Grad(0x2A9D8F, 0x264653), DrawContourLabel);
@@ -51,7 +52,7 @@ internal static partial class RibbonIcons
     public static BitmapSource BangToaDo(int size) => Render(size, Grad(0xE09F3E, 0x9E2A2B), DrawTable);
     public static BitmapSource KiemTraCaoDo(int size) => Render(size, Solid(0x3B7D3B), DrawCheck);
     public static BitmapSource AutoScan(int size) => Render(size, Solid(0x0096C7), DrawMagnifier);
-    public static BitmapSource XuatExcel(int size) => Render(size, Solid(0x2A9D8F), DrawDocument);
+    public static BitmapSource XuatExcel(int size) => Render(size, Solid(0x15803D), DrawExcelSheet);
 
     // ---------- Panel Admin: Trợ lý AI ----------
     public static BitmapSource AiAssist(int size) => Render(size, Grad(0x7C3AED, 0x4F46E5), DrawAiSpark);
@@ -453,5 +454,106 @@ internal static partial class RibbonIcons
             var y1 = 0.50 + 0.40 * Math.Sin(a);
             Seg(dc, pen, s, x0, y0, x1, y1);
         }
+    }
+
+    /// <summary>Địa cầu + mũi tên xuống — nhập KML.</summary>
+    private static void DrawGlobeDown(DrawingContext dc, double s)
+    {
+        var pen = Stroke(s, 0.05);
+        dc.DrawEllipse(null, pen, new WpfPoint(s * 0.50, s * 0.38), s * 0.22, s * 0.22);
+        Seg(dc, pen, s, 0.28, 0.38, 0.72, 0.38);
+        Seg(dc, pen, s, 0.50, 0.16, 0.50, 0.60);
+        Seg(dc, pen, s, 0.50, 0.64, 0.50, 0.82);
+        Poly(dc, WpfBrushes.White, null, s, true, 0.38, 0.74, 0.62, 0.74, 0.50, 0.90);
+    }
+
+    /// <summary>Địa cầu + mũi tên lên — xuất KML.</summary>
+    private static void DrawGlobeUp(DrawingContext dc, double s)
+    {
+        var pen = Stroke(s, 0.05);
+        dc.DrawEllipse(null, pen, new WpfPoint(s * 0.50, s * 0.62), s * 0.22, s * 0.22);
+        Seg(dc, pen, s, 0.28, 0.62, 0.72, 0.62);
+        Seg(dc, pen, s, 0.50, 0.40, 0.50, 0.84);
+        Seg(dc, pen, s, 0.50, 0.34, 0.50, 0.16);
+        Poly(dc, WpfBrushes.White, null, s, true, 0.38, 0.24, 0.62, 0.24, 0.50, 0.08);
+    }
+
+    /// <summary>Thửa đất MapInfo — nhập TAB.</summary>
+    private static void DrawParcels(DrawingContext dc, double s)
+    {
+        var pen = Stroke(s, 0.055);
+        Poly(dc, null, pen, s, true, 0.12, 0.28, 0.48, 0.16, 0.52, 0.48, 0.16, 0.58);
+        Poly(dc, null, pen, s, true, 0.52, 0.20, 0.88, 0.28, 0.84, 0.62, 0.50, 0.52);
+        Poly(dc, null, pen, s, true, 0.18, 0.62, 0.50, 0.56, 0.82, 0.68, 0.46, 0.88);
+    }
+
+    /// <summary>Lớp bản đồ + cung làm mới — cập nhật ảnh GE.</summary>
+    private static void DrawMapRefresh(DrawingContext dc, double s)
+    {
+        var pen = Stroke(s, 0.05);
+        Box(dc, null, pen, s, 0.14, 0.22, 0.46, 0.34);
+        Box(dc, null, pen, s, 0.22, 0.16, 0.46, 0.34);
+        var fig = new PathFigure { StartPoint = new WpfPoint(s * 0.86, s * 0.52), IsClosed = false };
+        fig.Segments.Add(new ArcSegment(
+            new WpfPoint(s * 0.58, s * 0.82),
+            new System.Windows.Size(s * 0.18, s * 0.18),
+            0, true, SweepDirection.Clockwise, true));
+        var geo = new PathGeometry();
+        geo.Figures.Add(fig);
+        dc.DrawGeometry(null, Stroke(s, 0.06), geo);
+        Poly(dc, WpfBrushes.White, null, s, true, 0.78, 0.44, 0.94, 0.48, 0.84, 0.62);
+    }
+
+    /// <summary>Tuyến gấp khúc + tờ khung dọc tuyến — RAIKHUNG.</summary>
+    private static void DrawRouteSheets(DrawingContext dc, double s)
+    {
+        var pen = Stroke(s, 0.055);
+        Poly(dc, null, pen, s, false, 0.10, 0.78, 0.36, 0.42, 0.62, 0.62, 0.90, 0.22);
+        Box(dc, null, pen, s, 0.18, 0.18, 0.16, 0.22);
+        Box(dc, null, pen, s, 0.42, 0.08, 0.16, 0.22);
+        Box(dc, null, pen, s, 0.68, 0.48, 0.16, 0.22);
+    }
+
+    /// <summary>Ba dải mặt cắt xếp chồng — RAIMCD.</summary>
+    private static void DrawProfileSheets(DrawingContext dc, double s)
+    {
+        var pen = Stroke(s, 0.055);
+        Box(dc, null, pen, s, 0.12, 0.14, 0.76, 0.20);
+        Box(dc, null, pen, s, 0.12, 0.40, 0.76, 0.20);
+        Box(dc, null, pen, s, 0.12, 0.66, 0.76, 0.20);
+        var thin = Stroke(s, 0.045);
+        Seg(dc, thin, s, 0.20, 0.28, 0.40, 0.18);
+        Seg(dc, thin, s, 0.40, 0.18, 0.58, 0.26);
+        Seg(dc, thin, s, 0.20, 0.54, 0.46, 0.44);
+        Seg(dc, thin, s, 0.46, 0.44, 0.72, 0.54);
+    }
+
+    /// <summary>Khung bản vẽ + ổ khóa nhỏ — bảo vệ layer khung.</summary>
+    private static void DrawFrameLock(DrawingContext dc, double s)
+    {
+        var pen = Stroke(s, 0.06);
+        Box(dc, null, pen, s, 0.12, 0.14, 0.76, 0.72);
+        Box(dc, WpfBrushes.White, null, s, 0.54, 0.52, 0.28, 0.24);
+        var fig = new PathFigure { StartPoint = new WpfPoint(s * 0.60, s * 0.52), IsClosed = false };
+        fig.Segments.Add(new LineSegment(new WpfPoint(s * 0.60, s * 0.44), true));
+        fig.Segments.Add(new ArcSegment(new WpfPoint(s * 0.76, s * 0.44),
+            new System.Windows.Size(s * 0.08, s * 0.08), 0, false, SweepDirection.Clockwise, true));
+        fig.Segments.Add(new LineSegment(new WpfPoint(s * 0.76, s * 0.52), true));
+        var geo = new PathGeometry();
+        geo.Figures.Add(fig);
+        dc.DrawGeometry(null, Stroke(s, 0.05), geo);
+    }
+
+    /// <summary>Bảng Excel: lưới + chữ X.</summary>
+    private static void DrawExcelSheet(DrawingContext dc, double s)
+    {
+        var pen = Stroke(s, 0.05);
+        Box(dc, null, pen, s, 0.16, 0.16, 0.68, 0.68);
+        Seg(dc, pen, s, 0.16, 0.38, 0.84, 0.38);
+        Seg(dc, pen, s, 0.16, 0.60, 0.84, 0.60);
+        Seg(dc, pen, s, 0.38, 0.16, 0.38, 0.84);
+        Seg(dc, pen, s, 0.16, 0.16, 0.38, 0.38);
+        Seg(dc, Stroke(s, 0.07), s, 0.48, 0.48, 0.76, 0.76);
+        Seg(dc, Stroke(s, 0.07), s, 0.76, 0.48, 0.48, 0.76);
     }
 }

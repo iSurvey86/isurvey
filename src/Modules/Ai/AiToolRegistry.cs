@@ -26,7 +26,6 @@ public static class AiToolRegistry
         "D2C", "ISURVEY_DGN_TO_CAD",
         "T2C", "ISURVEY_TAB_TO_CAD",
         "C2D", "ISURVEY_CAD_TO_DGN",
-        "DGNCFG", "ISURVEY_DGN_CONFIG",
         "INK", "ISURVEY_IMPORT_KML",
         "EXK", "EG", "ISURVEY_EXPORT_KML",
         "IG", "ISURVEY_MAP",

@@ -1,7 +1,6 @@
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WpfBrushes = System.Windows.Media.Brushes;
-using WpfPoint = System.Windows.Point;
 
 namespace iSurvey.UI;
 
@@ -14,9 +13,6 @@ internal static partial class RibbonIcons
 
     public static BitmapSource CadToDgn(int size) =>
         Render(size, Grad(0x8B5CF6, 0x5B21B6), (dc, s) => DrawConvert(dc, s, leftIsDgn: false));
-
-    public static BitmapSource DgnConfig(int size) =>
-        Render(size, Grad(0x64748B, 0x334155), DrawGear);
 
     /// <summary>Hai khung + mũi tên: khung "DGN" có hai vạch ngang (level), khung "CAD" có dấu chéo.</summary>
     private static void DrawConvert(DrawingContext dc, double s, bool leftIsDgn)
@@ -49,21 +45,4 @@ internal static partial class RibbonIcons
         }
     }
 
-    /// <summary>Bánh răng: vòng tròn + 8 răng.</summary>
-    private static void DrawGear(DrawingContext dc, double s)
-    {
-        var ring = Stroke(s, 0.09);
-        dc.DrawEllipse(null, ring, new WpfPoint(s * 0.5, s * 0.5), s * 0.17, s * 0.17);
-
-        var teeth = Stroke(s, 0.12);
-        for (var i = 0; i < 8; i++)
-        {
-            var a = i * Math.PI / 4;
-            var cos = Math.Cos(a);
-            var sin = Math.Sin(a);
-            Seg(dc, teeth, s, 0.5 + cos * 0.27, 0.5 + sin * 0.27, 0.5 + cos * 0.38, 0.5 + sin * 0.38);
-        }
-
-        dc.DrawEllipse(WpfBrushes.White, null, new WpfPoint(s * 0.5, s * 0.5), Math.Max(1.2, s * 0.05), Math.Max(1.2, s * 0.05));
-    }
 }

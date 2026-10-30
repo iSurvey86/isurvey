@@ -17,6 +17,7 @@ Script tạo bảng `isurvey_licenses`, bật RLS (client chỉ đọc được 
 Giới hạn thiết bị: hằng `c_max_devices := 2` trong `isurvey_activate`.
 
 Chạy thêm `deploy/supabase/schema_activity.sql` (nhật ký hoạt động): bảng `isurvey_activity` + RPC `isurvey_log_event`.
+Chạy thêm `deploy/supabase/schema_last_seen.sql` (cột `last_seen_at`; mỗi nhật ký cập nhật VER + lần thấy trên máy).
 Chạy thêm `deploy/supabase/schema_admin.sql` (view tổng hợp Admin: thiết bị / top lệnh / lỗi).
 
 Admin xem:

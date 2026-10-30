@@ -8,6 +8,14 @@
 alter table public.isurvey_licenses
   add column if not exists force_logout boolean not null default false;
 
+alter table public.isurvey_licenses
+  add column if not exists last_seen_at timestamptz;
+update public.isurvey_licenses
+   set last_seen_at = last_login_at
+ where last_seen_at is null;
+alter table public.isurvey_licenses
+  alter column last_seen_at set default now();
+
 -- Đăng nhập lại trên đúng máy thì hết lệnh đăng xuất.
 create or replace function public.isurvey_activate(
   p_hwid         text,
@@ -54,6 +62,7 @@ begin
            machine_name  = coalesce(left(p_machine_name, 120), machine_name),
            app_version   = coalesce(left(p_app_version, 40), app_version),
            last_login_at = now(),
+           last_seen_at  = now(),
            force_logout  = false
      where id = v_row.id;
 
@@ -113,7 +122,9 @@ begin
   end if;
 
   if p_touch then
-    update public.isurvey_licenses set last_login_at = now() where id = v_row.id;
+    update public.isurvey_licenses
+       set last_login_at = now(), last_seen_at = now()
+     where id = v_row.id;
   end if;
 
   return jsonb_build_object('status', 'ok', 'is_active', true);
@@ -140,9 +151,10 @@ select
   force_logout,
   activated_at,
   last_login_at,
+  last_seen_at,
   note,
-  (now() - last_login_at) < interval '24 hours' as seen_24h,
-  (now() - last_login_at) < interval '7 days'   as seen_7d
+  (now() - coalesce(last_seen_at, last_login_at)) < interval '24 hours' as seen_24h,
+  (now() - coalesce(last_seen_at, last_login_at)) < interval '7 days'   as seen_7d
 from public.isurvey_licenses;
 
 revoke all on public.isurvey_v_devices from public, anon, authenticated;

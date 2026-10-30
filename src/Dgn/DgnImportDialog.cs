@@ -8,16 +8,8 @@ public static class DgnImportDialog
 {
     public static DgnImportOptions? ShowImport(string? drawingPath)
     {
-        var window = new DgnImportWindow(drawingPath, configOnly: false);
+        var window = new DgnImportWindow(drawingPath);
         _ = new WindowInteropHelper(window) { Owner = AcadApp.MainWindow.Handle };
         return window.ShowDialog() == true ? window.Result : null;
-    }
-
-    /// <summary>Chỉ thiết lập mặc định (không nhập). Trả true nếu người dùng bấm Lưu.</summary>
-    public static bool ShowConfig(string? drawingPath)
-    {
-        var window = new DgnImportWindow(drawingPath, configOnly: true);
-        _ = new WindowInteropHelper(window) { Owner = AcadApp.MainWindow.Handle };
-        return window.ShowDialog() == true;
     }
 }

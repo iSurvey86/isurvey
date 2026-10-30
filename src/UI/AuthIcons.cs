@@ -15,7 +15,7 @@ internal static class AuthIcons
 {
     public static BitmapSource UserLocked(int size) => Render(size, Grad(0xF77F00, 0xD62828), DrawUserWithLock);
     public static BitmapSource UserActive(int size) => Render(size, Grad(0x10B981, 0x047857), DrawUserWithDot);
-    public static BitmapSource Refresh(int size) => Render(size, Solid(0x0096C7), DrawRefresh);
+    public static BitmapSource Refresh(int size) => Render(size, Solid(0x0369A1), DrawUpdateDownload);
     public static BitmapSource Info(int size) => Render(size, Solid(0x7209B7), DrawInfo);
     public static BitmapSource Help(int size) => Render(size, Solid(0x1D4ED8), DrawHelp);
     public static BitmapSource Power(int size) => Render(size, Solid(0xB82318), DrawPower);
@@ -104,37 +104,24 @@ internal static class AuthIcons
         dc.DrawEllipse(new SolidColorBrush(Hex(0x2EC4B6)), ring, P(s, 0.79, 0.79), s * 0.12, s * 0.12);
     }
 
-    private static void DrawRefresh(DrawingContext dc, double s)
+    /// <summary>Khay + mũi tên xuống — kiểm tra / tải bản cập nhật, khác icon làm mới ảnh GE.</summary>
+    private static void DrawUpdateDownload(DrawingContext dc, double s)
     {
-        const double cx = 0.5, cy = 0.5, r = 0.26;
-        var startDeg = -50.0;
-        var endDeg = 230.0; // quét 280° theo chiều kim đồng hồ
-
-        static WpfPoint At(double s, double cx, double cy, double r, double deg) =>
-            new(s * (cx + r * Math.Cos(deg * Math.PI / 180)), s * (cy + r * Math.Sin(deg * Math.PI / 180)));
-
-        var pen = Stroke(s, 0.075);
-        var arc = new PathFigure { StartPoint = At(s, cx, cy, r, startDeg), IsClosed = false, IsFilled = false };
-        arc.Segments.Add(new ArcSegment(At(s, cx, cy, r, endDeg), new System.Windows.Size(s * r, s * r), 0, true,
-            SweepDirection.Clockwise, true));
-        var g = new PathGeometry();
-        g.Figures.Add(arc);
-        dc.DrawGeometry(null, pen, g);
-
-        // Đầu mũi tên tại điểm cuối, hướng theo tiếp tuyến
-        var end = At(s, cx, cy, r, endDeg);
-        var rad = endDeg * Math.PI / 180;
-        var dir = new Vector(-Math.Sin(rad), Math.Cos(rad));
-        var normal = new Vector(-dir.Y, dir.X);
-        var tip = end + dir * (s * 0.13);
-        var b1 = end + normal * (s * 0.10);
-        var b2 = end - normal * (s * 0.10);
-        var head = new PathFigure { StartPoint = tip, IsClosed = true, IsFilled = true };
-        head.Segments.Add(new LineSegment(b1, true));
-        head.Segments.Add(new LineSegment(b2, true));
+        var pen = Stroke(s, 0.07);
+        dc.DrawLine(pen, P(s, 0.50, 0.14), P(s, 0.50, 0.54));
+        var head = new PathFigure { StartPoint = P(s, 0.32, 0.46), IsClosed = true, IsFilled = true };
+        head.Segments.Add(new LineSegment(P(s, 0.68, 0.46), true));
+        head.Segments.Add(new LineSegment(P(s, 0.50, 0.68), true));
         var hg = new PathGeometry();
         hg.Figures.Add(head);
         dc.DrawGeometry(WpfBrushes.White, null, hg);
+        var tray = new PathFigure { StartPoint = P(s, 0.22, 0.62), IsClosed = false };
+        tray.Segments.Add(new LineSegment(P(s, 0.22, 0.82), true));
+        tray.Segments.Add(new LineSegment(P(s, 0.78, 0.82), true));
+        tray.Segments.Add(new LineSegment(P(s, 0.78, 0.62), true));
+        var tg = new PathGeometry();
+        tg.Figures.Add(tray);
+        dc.DrawGeometry(null, pen, tg);
     }
 
     private static void DrawHelp(DrawingContext dc, double s)

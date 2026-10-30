@@ -73,7 +73,7 @@ public static class ActivityLogger
         return string.Join(", ", names.Take(max)) + $" và {names.Count - max} file nữa";
     }
 
-    /// <summary>Heartbeat khi giấy phép Online còn hiệu lực (sau recheck 24h / đăng nhập).</summary>
+    /// <summary>Heartbeat khi giấy phép Online còn hiệu lực (đăng nhập, recheck 24h, Civil còn mở).</summary>
     public static void TrackHeartbeat(string? reason = null) =>
         Enqueue("heartbeat", detail: reason is null ? null : new { reason });
 

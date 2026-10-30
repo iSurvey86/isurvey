@@ -10,15 +10,13 @@ namespace iSurvey.Dgn;
 public partial class DgnImportWindow : Window
 {
     private readonly string? _drawingPath;
-    private readonly bool _configOnly;
     private readonly ObservableCollection<DgnFileItem> _files = [];
 
     public DgnImportOptions? Result { get; private set; }
 
-    public DgnImportWindow(string? drawingPath, bool configOnly = false)
+    public DgnImportWindow(string? drawingPath)
     {
         _drawingPath = drawingPath;
-        _configOnly = configOnly;
         InitializeComponent();
         FileGrid.ItemsSource = _files;
         Loaded += OnLoaded;
@@ -44,17 +42,6 @@ public partial class DgnImportWindow : Window
 
         FontCheck.IsChecked = s.DgnFixFonts;
         ExplodeCheck.IsChecked = s.DgnExplodeCells;
-
-        if (_configOnly)
-        {
-            Title = "iSurvey — Cấu hình DGN";
-            FilePanel.Visibility = Visibility.Collapsed;
-            if (Content is Grid grid && grid.RowDefinitions.Count > 0)
-                grid.RowDefinitions[0].Height = new GridLength(0);
-            OkBtn.Content = "Lưu cấu hình";
-            MinHeight = 280;
-            Height = 320;
-        }
 
         RefreshTotal();
         UpdateMoveButtons();
@@ -218,7 +205,7 @@ public partial class DgnImportWindow : Window
 
     private void Confirm_Click(object sender, RoutedEventArgs e)
     {
-        if (!_configOnly && _files.Count == 0)
+        if (_files.Count == 0)
         {
             System.Windows.MessageBox.Show(this, "Hãy thêm ít nhất một tệp DGN.", "iSurvey",
                 MessageBoxButton.OK, MessageBoxImage.Information);
@@ -252,13 +239,6 @@ public partial class DgnImportWindow : Window
         }
 
         UserSettingsStore.Save(_drawingPath, settings);
-
-        if (_configOnly)
-        {
-            DialogResult = true;
-            Close();
-            return;
-        }
 
         var options = DgnImportOptions.FromSettings(settings, _files[0].FullPath);
         options.FilePath = _files[0].FullPath;

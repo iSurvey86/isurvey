@@ -18,9 +18,10 @@ select
   force_logout,
   activated_at,
   last_login_at,
+  last_seen_at,
   note,
-  (now() - last_login_at) < interval '24 hours' as seen_24h,
-  (now() - last_login_at) < interval '7 days'   as seen_7d
+  (now() - coalesce(last_seen_at, last_login_at)) < interval '24 hours' as seen_24h,
+  (now() - coalesce(last_seen_at, last_login_at)) < interval '7 days'   as seen_7d
 from public.isurvey_licenses;
 
 -- Top lệnh (30 ngày gần nhất)

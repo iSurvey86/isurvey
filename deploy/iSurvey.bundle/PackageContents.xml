@@ -26,7 +26,6 @@
         <Command Local="ISURVEY_UPDATE_GE" Global="ISURVEY_UPDATE_GE" />
         <Command Local="ISURVEY_DGN_TO_CAD" Global="ISURVEY_DGN_TO_CAD" />
         <Command Local="ISURVEY_CAD_TO_DGN" Global="ISURVEY_CAD_TO_DGN" />
-        <Command Local="ISURVEY_DGN_CONFIG" Global="ISURVEY_DGN_CONFIG" />
         <Command Local="ISURVEY_UAV_INSERT" Global="ISURVEY_UAV_INSERT" />
         <Command Local="ISURVEY_UAV_CLIP" Global="ISURVEY_UAV_CLIP" />
         <Command Local="ISURVEY_UAV_FRAME_TOGGLE" Global="ISURVEY_UAV_FRAME_TOGGLE" />
@@ -56,7 +55,6 @@
         <Command Local="ISURVEY_TAB_TO_CAD" Global="ISURVEY_TAB_TO_CAD" />
         <Command Local="T2C" Global="T2C" />
         <Command Local="C2D" Global="C2D" />
-        <Command Local="DGNCFG" Global="DGNCFG" />
         <Command Local="UAVCLIP" Global="UAVCLIP" />
         <Command Local="GOC" Global="GOC" />
         <Command Local="AIA" Global="AIA" />
@@ -94,7 +92,6 @@
         <Command Local="ISURVEY_UPDATE_GE" Global="ISURVEY_UPDATE_GE" />
         <Command Local="ISURVEY_DGN_TO_CAD" Global="ISURVEY_DGN_TO_CAD" />
         <Command Local="ISURVEY_CAD_TO_DGN" Global="ISURVEY_CAD_TO_DGN" />
-        <Command Local="ISURVEY_DGN_CONFIG" Global="ISURVEY_DGN_CONFIG" />
         <Command Local="ISURVEY_UAV_INSERT" Global="ISURVEY_UAV_INSERT" />
         <Command Local="ISURVEY_UAV_CLIP" Global="ISURVEY_UAV_CLIP" />
         <Command Local="ISURVEY_UAV_FRAME_TOGGLE" Global="ISURVEY_UAV_FRAME_TOGGLE" />
@@ -124,7 +121,6 @@
         <Command Local="ISURVEY_TAB_TO_CAD" Global="ISURVEY_TAB_TO_CAD" />
         <Command Local="T2C" Global="T2C" />
         <Command Local="C2D" Global="C2D" />
-        <Command Local="DGNCFG" Global="DGNCFG" />
         <Command Local="UAVCLIP" Global="UAVCLIP" />
         <Command Local="GOC" Global="GOC" />
         <Command Local="AIA" Global="AIA" />
@@ -162,7 +158,6 @@
         <Command Local="ISURVEY_UPDATE_GE" Global="ISURVEY_UPDATE_GE" />
         <Command Local="ISURVEY_DGN_TO_CAD" Global="ISURVEY_DGN_TO_CAD" />
         <Command Local="ISURVEY_CAD_TO_DGN" Global="ISURVEY_CAD_TO_DGN" />
-        <Command Local="ISURVEY_DGN_CONFIG" Global="ISURVEY_DGN_CONFIG" />
         <Command Local="ISURVEY_UAV_INSERT" Global="ISURVEY_UAV_INSERT" />
         <Command Local="ISURVEY_UAV_CLIP" Global="ISURVEY_UAV_CLIP" />
         <Command Local="ISURVEY_UAV_FRAME_TOGGLE" Global="ISURVEY_UAV_FRAME_TOGGLE" />
@@ -192,7 +187,6 @@
         <Command Local="ISURVEY_TAB_TO_CAD" Global="ISURVEY_TAB_TO_CAD" />
         <Command Local="T2C" Global="T2C" />
         <Command Local="C2D" Global="C2D" />
-        <Command Local="DGNCFG" Global="DGNCFG" />
         <Command Local="UAVCLIP" Global="UAVCLIP" />
         <Command Local="GOC" Global="GOC" />
         <Command Local="AIA" Global="AIA" />

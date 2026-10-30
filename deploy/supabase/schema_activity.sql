@@ -70,6 +70,16 @@ begin
          else p_detail end
   );
 
+  -- VER + last seen: lần cuối plugin còn chạy trên máy đó (không tính lệnh Đăng xuất trên web).
+  if left(trim(p_event_type), 40) <> 'remote_logout' then
+    update public.isurvey_licenses
+       set last_seen_at = now(),
+           app_version  = coalesce(nullif(left(p_app_version, 40), ''), app_version),
+           machine_name = coalesce(nullif(left(p_machine_name, 120), ''), machine_name)
+     where email = v_email
+       and hwid  = left(p_hwid, 64);
+  end if;
+
   return jsonb_build_object('status', 'ok');
 end;
 $$;

@@ -29,7 +29,10 @@ public static class AuthManager
     private static int _rechecking;
     private static int _watching;
     private static int _watchStarted;
+    private static int _cadClosing;
+    private static DateTimeOffset _lastAliveUtc;
     private static System.Threading.Timer? _sessionWatch;
+    private static readonly TimeSpan AliveHeartbeatInterval = TimeSpan.FromMinutes(5);
 
     // ---------- Token Supabase dùng chung (nhật ký + kiểm tra định kỳ) ----------
     // Supabase đổi refresh token mỗi lần dùng → mọi nơi gọi RefreshAsync phải đi qua TokenGate
@@ -107,6 +110,14 @@ public static class AuthManager
     public static void Initialize()
     {
         _ui = Dispatcher.CurrentDispatcher;
+        try
+        {
+            AcadApp.QuitWillStart += (_, _) => OnCadClosing();
+        }
+        catch (System.Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine("[iSurvey] QuitWillStart: " + ex.Message);
+        }
         Refresh();
     }
 
@@ -184,7 +195,10 @@ public static class AuthManager
         RaiseChanged();
         ActivityLogger.Enqueue("login", detail: new { email, mode = _license.Mode.ToString() });
         if (_license.Mode == LicenseMode.Online)
+        {
+            _lastAliveUtc = DateTimeOffset.UtcNow;
             ActivityLogger.TrackHeartbeat("login");
+        }
     }
 
     public static void SignOut()
@@ -435,7 +449,10 @@ public static class AuthManager
             }
 
             if (outcome.Action == RecheckAction.Verified)
+            {
+                _lastAliveUtc = DateTimeOffset.UtcNow;
                 ActivityLogger.TrackHeartbeat("recheck");
+            }
         }
         catch (System.Exception ex)
         {
@@ -492,7 +509,10 @@ public static class AuthManager
                 _ => (RecheckAction?)null
             };
             if (action is null)
+            {
+                MaybeTrackAlive();
                 return;
+            }
 
             var current = _license;
             if (current is null || current.Email != lic.Email || current.HardwareId != lic.HardwareId)
@@ -521,6 +541,37 @@ public static class AuthManager
         {
             Interlocked.Exchange(ref _watching, 0);
         }
+    }
+
+    /// <summary>Civil/CAD đang đóng: ghi mốc kết thúc phiên, không xóa giấy phép.</summary>
+    internal static void OnCadClosing()
+    {
+        if (Interlocked.Exchange(ref _cadClosing, 1) == 1)
+            return;
+
+        try
+        {
+            _sessionWatch?.Dispose();
+            _sessionWatch = null;
+            if (_license is { Mode: LicenseMode.Online })
+            {
+                ActivityLogger.Enqueue("session_end", detail: new { reason = "cad_quit" });
+                ActivityLogger.FlushNow();
+            }
+        }
+        catch (System.Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine("[iSurvey] OnCadClosing: " + ex.Message);
+        }
+    }
+
+    private static void MaybeTrackAlive()
+    {
+        var now = DateTimeOffset.UtcNow;
+        if (now - _lastAliveUtc < AliveHeartbeatInterval)
+            return;
+        _lastAliveUtc = now;
+        ActivityLogger.TrackHeartbeat("alive");
     }
 
     private static async Task ReleaseDeviceAsync(LicenseInfo lic)

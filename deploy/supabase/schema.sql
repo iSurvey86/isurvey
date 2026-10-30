@@ -20,6 +20,7 @@ create table if not exists public.isurvey_licenses (
   force_logout  boolean not null default false,     -- Admin Đăng xuất: cắt phiên ngay; đăng nhập lại bằng Gmail + OTP
   activated_at  timestamptz not null default now(),
   last_login_at timestamptz not null default now(),
+  last_seen_at  timestamptz not null default now(),  -- lần cuối plugin còn chạy trên CAD
   note          text,
   unique (email, hwid)
 );
@@ -30,6 +31,14 @@ create index if not exists isurvey_licenses_email_idx   on public.isurvey_licens
 -- Bảng đã tạo trước khi có đăng xuất từ xa: thêm cột, không đụng dữ liệu cũ.
 alter table public.isurvey_licenses
   add column if not exists force_logout boolean not null default false;
+
+alter table public.isurvey_licenses
+  add column if not exists last_seen_at timestamptz;
+update public.isurvey_licenses
+   set last_seen_at = last_login_at
+ where last_seen_at is null;
+alter table public.isurvey_licenses
+  alter column last_seen_at set default now();
 
 alter table public.isurvey_licenses enable row level security;
 
@@ -94,6 +103,7 @@ begin
            machine_name  = coalesce(left(p_machine_name, 120), machine_name),
            app_version   = coalesce(left(p_app_version, 40), app_version),
            last_login_at = now(),
+           last_seen_at  = now(),
            force_logout  = false
      where id = v_row.id;
 
@@ -161,7 +171,9 @@ begin
   end if;
 
   if p_touch then
-    update public.isurvey_licenses set last_login_at = now() where id = v_row.id;
+    update public.isurvey_licenses
+       set last_login_at = now(), last_seen_at = now()
+     where id = v_row.id;
   end if;
 
   return jsonb_build_object('status', 'ok', 'is_active', true);

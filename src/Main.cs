@@ -97,6 +97,7 @@ public sealed class Main : IExtensionApplication
 
     public void Terminate()
     {
+        iSurvey.Auth.AuthManager.OnCadClosing();
         Autodesk.AutoCAD.ApplicationServices.Application.Idle -= OnFirstIdle;
         FrameDoubleClick.Stop();
         _exportModule?.Terminate();

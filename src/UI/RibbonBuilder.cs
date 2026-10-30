@@ -113,9 +113,7 @@ public static class RibbonBuilder
                     new Btn("Nhập DGN ➔ CAD", "ISURVEY_DGN_TO_CAD", RibbonIcons.DgnToCad, true,
                         "Nhập file MicroStation (.dgn V7/V8) vào bản vẽ hiện hành hoặc chuyển hàng loạt sang .dwg (Lệnh tắt: D2C)"),
                     new Btn("Xuất CAD ➔ DGN", "ISURVEY_CAD_TO_DGN", RibbonIcons.CadToDgn, true,
-                        "Xuất bản vẽ AutoCAD (.dwg) sang MicroStation (.dgn V8) chuẩn Seed VN-2000 (Lệnh tắt: C2D)"),
-                    new Btn("Cấu Hình DGN", "ISURVEY_DGN_CONFIG", RibbonIcons.DgnConfig, true,
-                        "Thiết lập mặc định Đơn vị DGN, Ánh xạ Level ➔ Layer và Chuyển mã Font TCVN3 ➔ Unicode (Lệnh tắt: DGNCFG)")
+                        "Xuất bản vẽ AutoCAD (.dwg) sang MicroStation (.dgn V8) chuẩn Seed VN-2000 (Lệnh tắt: C2D)")
                 ]);
 
             // Panel 2 — UAV & LiDAR (SplitButton gọn cho màn 14")
@@ -134,7 +132,7 @@ public static class RibbonBuilder
                 [
                     new Btn("Rải Khung Theo Tuyến", "RAIKHUNG", RibbonIcons.RaiKhung, true,
                         "Rải khung in dọc tuyến: một layout, nhiều tờ, viewport xoay (RAIKHUNG)"),
-                    new Btn("Rải Khung Mặt Cắt", "RAIMCD", RibbonIcons.RaiKhung, true,
+                    new Btn("Rải Khung Mặt Cắt", "RAIMCD", RibbonIcons.RaiMcd, true,
                         "Rải khung in mặt cắt dọc: chọn góc dưới-trái hàng cuối, tỷ lệ 1/500; 1/5000 (RAIMCD)"),
                     new Btn("Thiết Lập Tỉ Lệ Khung", "TILEKHUNG", RibbonIcons.TileKhung, false),
                     new Btn("Bảo Vệ Layer Khung", "KHOAKHUNG", RibbonIcons.KhoaKhung, false)
@@ -320,30 +318,30 @@ public static class RibbonBuilder
         source.Items.Add(CreateSplitButton(
             text: "Biên tập\nĐiểm đo",
             mainCommand: "BIENDIEM",
-            mainIcon: RibbonIcons.LocDiem,
+            mainIcon: RibbonIcons.BienDiem,
             mainImplemented: false,
             tip: "Nhập, xuất và biên tập điểm đo",
             dropdown:
             [
-                new Btn("Nhập điểm đo", "NHAPDIEM", RibbonIcons.ImportTab, true, "Nhập điểm đo từ tệp tọa độ"),
-                new Btn("Xuất điểm đo", "XUATDIEM", RibbonIcons.ExportKml, true, "Xuất điểm đo ra tệp tọa độ"),
-                new Btn("Nâng hạ cao độ điểm đo", "NANGLCAO", RibbonIcons.KiemTraCaoDo, false),
-                new Btn("Tạo điểm từ đối tượng AutoCAD", "TAODIEMCAD", RibbonIcons.LocDiem, false),
-                new Btn("Hiện điểm đo theo mã", "HIENDIEMMA", RibbonIcons.AnTin, false),
-                new Btn("Lọc điểm đo theo mã", "LOCDIEMMA", RibbonIcons.LocDiem, false),
-                new Btn("Chèn địa vật theo mã điểm", "CHENDIAVAT", RibbonIcons.MapInsert, false),
-                new Btn("Tắt điểm đo trên bình đồ", "TATDIEMBD", RibbonIcons.MapDelete, false),
-                new Btn("Hiện điểm đo đã tắt", "HIENDIEMTAT", RibbonIcons.UpdateGe, false),
-                new Btn("Xóa điểm trong vùng", "XOADIEMVUNG", RibbonIcons.MapDelete, false),
-                new Btn("Nối điểm tự động", "NOIDIEM", RibbonIcons.DuoiTuyen, false),
-                new Btn("Gán cao độ điểm theo địa hình", "GANCAO", RibbonIcons.GhiSoDm, false),
-                new Btn("Phát sinh điểm trong vùng", "PHATSINHDIEM", RibbonIcons.PcGrid, false),
-                new Btn("Định vị điểm mia theo cọc", "DINHVIMIA", RibbonIcons.DanhSoGoc, false),
-                new Btn("Xoay điểm mia theo Polyline", "XOAYMIA", RibbonIcons.TileKhung, false)
+                new Btn("Nhập điểm đo", "NHAPDIEM", RibbonIcons.ImportPoints, true, "Nhập điểm đo từ tệp tọa độ"),
+                new Btn("Xuất điểm đo", "XUATDIEM", RibbonIcons.ExportPoints, true, "Xuất điểm đo ra tệp tọa độ"),
+                new Btn("Nâng hạ cao độ điểm đo", "NANGLCAO", RibbonIcons.NangCao, false),
+                new Btn("Tạo điểm từ đối tượng AutoCAD", "TAODIEMCAD", RibbonIcons.TaoDiemCad, false),
+                new Btn("Hiện điểm đo theo mã", "HIENDIEMMA", RibbonIcons.HienDiemMa, false),
+                new Btn("Lọc điểm đo theo mã", "LOCDIEMMA", RibbonIcons.LocDiemMa, false),
+                new Btn("Chèn địa vật theo mã điểm", "CHENDIAVAT", RibbonIcons.ChenDiavat, false),
+                new Btn("Tắt điểm đo trên bình đồ", "TATDIEMBD", RibbonIcons.TatDiemBd, false),
+                new Btn("Hiện điểm đo đã tắt", "HIENDIEMTAT", RibbonIcons.HienDiemTat, false),
+                new Btn("Xóa điểm trong vùng", "XOADIEMVUNG", RibbonIcons.XoaDiemVung, false),
+                new Btn("Nối điểm tự động", "NOIDIEM", RibbonIcons.NoiDiem, false),
+                new Btn("Gán cao độ điểm theo địa hình", "GANCAO", RibbonIcons.GanCao, false),
+                new Btn("Phát sinh điểm trong vùng", "PHATSINHDIEM", RibbonIcons.PhatSinhDiem, false),
+                new Btn("Định vị điểm mia theo cọc", "DINHVIMIA", RibbonIcons.DinhViMia, false),
+                new Btn("Xoay điểm mia theo Polyline", "XOAYMIA", RibbonIcons.XoayMia, false)
             ]));
         source.Items.Add(CreateRows(
             [
-                new Btn("Lọc Giãn Điểm Mia", "LOCDIEM", RibbonIcons.LocDiem, false),
+                new Btn("Lọc Giãn Điểm Mia", "LOCDIEM", RibbonIcons.LocGianDiem, false),
                 new Btn("Ẩn / Hiện Lưới TIN", "ANTIN", RibbonIcons.AnTin, false),
                 new Btn("Chuẩn Hóa Mã Font", "CHUYENFONT", RibbonIcons.ChuyenFont, false)
             ],

@@ -10,18 +10,18 @@ internal static partial class RibbonIcons
 {
     // Nhóm ảnh UAV — xanh dương
     public static BitmapSource UavInsert(int size) => Render(size, Grad(0x2563EB, 0x1D4ED8), DrawUavImage);
-    public static BitmapSource UavClip(int size) => Render(size, Grad(0x0EA5E9, 0x0369A1), DrawScissors);
+    public static BitmapSource UavClip(int size) => Render(size, Grad(0x0EA5E9, 0x0369A1), DrawCropPhoto);
     public static BitmapSource UavFrame(int size) => Render(size, Solid(0x0284C7), DrawImageFrame);
     public static BitmapSource UavSendBack(int size) => Render(size, Solid(0x0369A1), DrawSendBack);
 
     // Nhóm bề mặt — cam
     public static BitmapSource UavDem(int size) => Render(size, Grad(0xF77F00, 0xD62828), DrawDem);
-    public static BitmapSource UavContour(int size) => Render(size, Solid(0xE09F3E), DrawContourLabel);
+    public static BitmapSource UavContour(int size) => Render(size, Solid(0xD97706), DrawContourWaves);
     public static BitmapSource UavCrs(int size) => Render(size, Solid(0xF59E0B), DrawCrs);
 
     // Point cloud — xám xanh
     public static BitmapSource PcImport(int size) => Render(size, Grad(0x64748B, 0x334155), DrawPointCloud);
-    public static BitmapSource PcFilter(int size) => Render(size, Solid(0x475569), DrawFunnel);
+    public static BitmapSource PcFilter(int size) => Render(size, Solid(0x475569), DrawGroundFilter);
     public static BitmapSource PcGrid(int size) => Render(size, Solid(0x334155), DrawPointGrid);
 
     /// <summary>Ảnh chữ nhật + cánh quạt UAV nhỏ.</summary>
@@ -95,5 +95,49 @@ internal static partial class RibbonIcons
         for (var j = 0; j < 4; j++)
             dc.DrawEllipse(WpfBrushes.White, null,
                 new WpfPoint(s * (0.22 + i * 0.18), s * (0.22 + j * 0.18)), r, r);
+    }
+
+    /// <summary>Ảnh + góc cắt — cắt ảnh UAV theo biên.</summary>
+    private static void DrawCropPhoto(DrawingContext dc, double s)
+    {
+        var pen = Stroke(s, 0.06);
+        Box(dc, null, pen, s, 0.22, 0.22, 0.56, 0.56);
+        Seg(dc, pen, s, 0.10, 0.22, 0.22, 0.22);
+        Seg(dc, pen, s, 0.22, 0.10, 0.22, 0.22);
+        Seg(dc, pen, s, 0.78, 0.22, 0.90, 0.22);
+        Seg(dc, pen, s, 0.78, 0.10, 0.78, 0.22);
+        Seg(dc, pen, s, 0.10, 0.78, 0.22, 0.78);
+        Seg(dc, pen, s, 0.22, 0.78, 0.22, 0.90);
+        Seg(dc, pen, s, 0.78, 0.78, 0.90, 0.78);
+        Seg(dc, pen, s, 0.78, 0.78, 0.78, 0.90);
+    }
+
+    /// <summary>Ba đường đồng mức lượn sóng — vẽ từ DEM.</summary>
+    private static void DrawContourWaves(DrawingContext dc, double s)
+    {
+        var pen = Stroke(s, 0.055);
+        foreach (var y in new[] { 0.28, 0.50, 0.72 })
+        {
+            var fig = new PathFigure { StartPoint = new WpfPoint(s * 0.10, s * y), IsClosed = false };
+            fig.Segments.Add(new QuadraticBezierSegment(new WpfPoint(s * 0.32, s * (y - 0.16)), new WpfPoint(s * 0.50, s * y), true));
+            fig.Segments.Add(new QuadraticBezierSegment(new WpfPoint(s * 0.68, s * (y + 0.16)), new WpfPoint(s * 0.90, s * y), true));
+            var geo = new PathGeometry();
+            geo.Figures.Add(fig);
+            dc.DrawGeometry(null, pen, geo);
+        }
+    }
+
+    /// <summary>Đám mây điểm + đường mặt đất — lọc điểm mặt đất.</summary>
+    private static void DrawGroundFilter(DrawingContext dc, double s)
+    {
+        var r = Math.Max(1.2, s * 0.045);
+        foreach (var (x, y) in new[] { (0.22, 0.22), (0.40, 0.18), (0.58, 0.26), (0.76, 0.20), (0.30, 0.40), (0.52, 0.38), (0.72, 0.44) })
+            dc.DrawEllipse(WpfBrushes.White, null, new WpfPoint(s * x, s * y), r, r);
+        var pen = Stroke(s, 0.07);
+        Seg(dc, pen, s, 0.12, 0.72, 0.34, 0.62);
+        Seg(dc, pen, s, 0.34, 0.62, 0.58, 0.70);
+        Seg(dc, pen, s, 0.58, 0.70, 0.88, 0.58);
+        foreach (var (x, y) in new[] { (0.28, 0.66), (0.50, 0.66), (0.74, 0.64) })
+            dc.DrawEllipse(WpfBrushes.White, null, new WpfPoint(s * x, s * y), r, r);
     }
 }

@@ -16,6 +16,23 @@ Chưa đóng gói. Máy khác kéo mã này vẫn thấy gói UPD là 1.8.14 cho
 ### Hộp thoại
 - Hộp kiểm tra cập nhật, đăng nhập, xuất DGN, hệ tọa độ và trợ lý AI chuyển nền sáng, cùng kiểu nút với các hộp còn lại.
 
+### DGN
+- Bỏ lệnh **Cấu Hình DGN** (`DGNCFG`). Cài đặt nằm trên hộp **Nhập DGN** và **Xuất DGN**; lần nhập sau nhớ lựa chọn vừa dùng.
+
+### Ribbon
+- Mỗi nút tab iSurvey một icon riêng. Không còn dùng chung glyph cho lệnh khác nhau (nhập TAB/KML, rải khung/mặt cắt, kéo cắt, phễu lọc, mũi tên làm mới).
+
+### Quản trị thiết bị
+- **Ver** lấy bản DLL máy đó gửi lần gần nhất, không giữ bản lúc kích hoạt lần đầu.
+- **Last seen** là lần cuối iSurvey còn chạy trên Civil/CAD. Phiên kết thúc khi đóng Civil, không lấy giờ đăng nhập OTP.
+
+### Hướng dẫn PDF
+- Bìa PDF không còn tên NPSC / Xí nghiệp Tư vấn. Chân trang: Tài liệu Hướng dẫn sử dụng Plugin iSurvey. Bảng thông tin tài liệu viết phổ quát. Việc này nằm repo ksnpsc, chưa có trong plugin.
+
+### Nghiên cứu mặt cắt dọc
+- Chưa có lệnh mới, không tăng số phiên bản. `RAIMCD` vẫn chỉ rải khung in. Tên dự kiến lệnh vẽ: `VEMCD` (catalog: Đang làm).
+- Báo cáo theo dõi: `docs/Bao_cao_phan_tich_module_ve_mat_cat_doc_iSurvey.docx`.
+
 ## 1.8.14 — 2026-10-30
 
 Đã phát hành.

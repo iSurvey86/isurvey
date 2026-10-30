@@ -5,6 +5,48 @@
 
 ---
 
+## 2026-10-30 — Nghiên cứu module vẽ mặt cắt dọc (chưa code, 1.8.14)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng. ADS Civil NW 2026 cài tại `C:\Program Files\BZS\ADSCivil NW 2026 For Autocad` (bản quyền người dùng). Cuối phiên đầy đủ, **không bump**. Số iSurvey vẫn **1.8.14**, chưa phát hành.
+
+### Đã chốt / đã làm
+
+- Chỉ **học ý tưởng**. Không copy mã, icon, CUIX, mẫu `.td`, lớp `KS-TUY-*` / `KS-DHI-*`.
+- Báo cáo Word đầy đủ (theo dõi triển khai): `docs/Bao_cao_phan_tich_module_ve_mat_cat_doc_iSurvey.docx`. Bản ngắn: `docs/nghien-cuu/ADSCivil-mat-cat-doc.md`. Rule: `.cursor/rules/mat-cat-doc.mdc`.
+- **Thứ tự đúng (đã đối chiếu nguồn, không nhảy vẽ TD trước):** Tạo mô hình → thêm điểm/đồng mức/bao → **Xây dựng** = TIN → thêm tuyến (bám bề mặt) → phát sinh cọc (Z từ TIN) → vẽ cắt dọc → hiệu chỉnh trắc dọc.
+- Tạo ≠ Xây dựng. “Vẽ lưới tam giác” chỉ hiện TIN đã build. Đồng mức vừa là **đầu vào** (breakline) vừa là **đầu ra** sau TIN.
+- ADS tách Survey (điểm/DTM) và Road (tuyến/cọc/TD/TN). iSurvey có điểm + `ANTIN` ẩn/hiện lưới có sẵn; **chưa** có mô hình đặt tên / build TIN / tuyến / cọc / vẽ TD. `RAIMCD` chỉ rải khung.
+- Pha khi được lệnh code: **UI bảng tab dọc** → **1 mô hình** → **2 tuyến+cọc** → **3 `VEMCD`**. Không vẽ TD khi chưa lấy Z từ lưới.
+- **`RAIMCD` giữ nguyên: chỉ rải khung in.** Lệnh vẽ mặt cắt dọc là lệnh khác: **`VEMCD`**. Không dùng `RAIMCD` để vẽ.
+- **Giao diện chốt:** palette neo tab dọc iSurvey (học cây trên / thuộc tính dưới / tab phải). Bốn tab của mình: **Khảo sát, Khung in, UAV, Bản đồ**. Cây Khảo sát: Điểm đo → Mô hình địa hình → Tuyến → Trắc dọc. Không copy tab Nút giao / Thoát nước / San nền / Quản lý dự án. Ribbon = lệnh một phát + nút mở bảng.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Báo cáo Word (theo dõi) | `docs/Bao_cao_phan_tich_module_ve_mat_cat_doc_iSurvey.docx` |
+| Báo cáo ngắn | `docs/nghien-cuu/ADSCivil-mat-cat-doc.md` |
+| Rule | `.cursor/rules/mat-cat-doc.mdc` |
+| Rải khung sẵn có | `src/Modules/Frame/FrameService.ProfileLayout.cs` |
+
+### Việc tiếp
+
+- [ ] Chưa viết lệnh. Khi code: vỏ palette (`BANGIS`) trước hoặc cùng pha 1 mô hình.
+- [ ] Máy khác: `git pull`, đọc báo cáo trên; **không** cần ADS Civil để đọc ý tưởng. Cài ADS chỉ nếu muốn đối chiếu UI trên máy có bản quyền.
+- [ ] Catalog: **không có CommandMethod VEMCD**. Dòng catalog trạng thái Đang làm, để khỏi nhầm với `RAIMCD`. `DGNCFG` đã ghi Bỏ.
+- [ ] Cùng commit (vẫn 1.8.14, chưa đóng gói): bỏ `DGNCFG`, icon ribbon riêng, heartbeat / last seen. SQL `schema_last_seen.sql` và `schema_force_logout.sql` vẫn phải chạy trên Supabase nếu chưa chạy.
+- [ ] HDSD PDF và nhật ký phân trang nằm repo **ksnpsc**, không có trong commit iSurvey này.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff đầu, docs/nghien-cuu/ADSCivil-mat-cat-doc.md và Word trong docs. Vẫn 1.8.14, không bump. RAIMCD chỉ rải khung. VEMCD là tên lệnh vẽ, chưa code. Chuỗi: mô hình → tuyến → cọc → VEMCD. UI: palette tab dọc iSurvey. Tiếp: vỏ palette rồi pha 1 mô hình khi được yêu cầu.
+```
+
+**Lưu trữ ngày:** [2026-10-30-nghien-cuu-mat-cat-doc.md](./2026-10-30-nghien-cuu-mat-cat-doc.md)
+
+---
+
 ## 2026-10-30 — Rải khung chỉ layout, in lúc INTUYEN (1.8.14, chưa phát hành)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Số phiên bản giữ **1.8.14**. Chưa phát hành. Gói trên Supabase vẫn là bản đã phát hành sáng nay. Máy này đã nạp DLL mới vào bundle cục bộ.

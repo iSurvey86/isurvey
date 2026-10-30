@@ -27,7 +27,6 @@ Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georefere
 | `ISURVEY_EXPORT_KML` | **EXK**, **EG** | Xuất CAD → KML/KMZ. Thiết lập → chọn đối tượng → lưu file → mở Google Earth nếu đã chọn |
 | `ISURVEY_DGN_TO_CAD` | **D2C** | Nhập nhiều file MicroStation `.dgn` (V7/V8). **Ghép thành một file .dwg:** chèn tất cả vào Model Space bản vẽ đang mở. **Rời từng file .dwg:** mỗi file một `.dwg` cùng thư mục. Layer giữ Level gốc hoặc thêm tiền tố (mặc định `iSurvey_`); TCVN3 ➔ Unicode và Explode Cell theo tùy chọn. Dọn linetype/layer rác luôn chạy; Zoom Extents một lần khi ghép xong. `UNDO` hai lần để hoàn tác (hậu xử lý + DGNIMPORT) |
 | `ISURVEY_CAD_TO_DGN` | **C2D** | Xuất CAD ➔ MicroStation DGN V8/V7: toàn bộ Model Space hoặc đối tượng đang chọn; Purge trên bản sao tạm (bản vẽ gốc không đổi); tự chọn seed 2D/3D đi kèm bộ cài (V7 và V8), tự điền hộp thoại seed |
-| `ISURVEY_DGN_CONFIG` | **DGNCFG** | Lưu mặc định hộp thoại nhập DGN: ghép/rời, layer giữ nguyên hoặc tiền tố, TCVN3, Explode Cell |
 | `ISURVEY_TAB_TO_CAD` | **T2C** | Nhập MapInfo TAB: tô đặc đúng màu MapInfo, layer theo MDSD, nhãn tại điểm trong thửa |
 | `CATBD` | **CBD** | Cắt bình đồ theo đường biên (giữ Z, không dùng TRIM) |
 | `AUTOSCAN` | **SCN** | Quét cấu trúc bản vẽ, xuất `CAD_AutoScan_Report.txt` |
@@ -52,6 +51,8 @@ Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georefere
 | `ISURVEY_ROUTE_PLOT` | **INTUYEN** | In layout `BanDo_Tuyen` hoặc `MatCat_Doc` đã rải. Hộp thoại: In màu (`acad.ctb`) hoặc In đen trắng (`monochrome.ctb`), chèn chữ ký DWG theo chức danh đã ghi trên khung, đóng mộc đỏ PNG. Chữ ký và mộc chỉ trên PDF. Rồi hỏi `1` khung đang chọn, `2` tất cả. Không dựng trang mới. In xong có nút Mở thư mục |
 | `ISURVEY_FIT_TITLE` | **CODAN** | Co ô chủ đầu tư và đại diện chủ đầu tư về một dòng. Ô tên bản vẽ vẫn xuống dòng trong khung |
 | `ISURVEY_AI_ASSIST` | **AIA** | Trợ lý AI điều khiển Civil/CAD bằng Command Line (**chỉ Admin**, thử nghiệm). Xem [docs/Huong_dan_Tro_ly_AI.md](docs/Huong_dan_Tro_ly_AI.md) |
+
+**Đang nghiên cứu, chưa có lệnh vẽ:** mặt cắt dọc đi theo chuỗi mô hình địa hình → tuyến → cọc → vẽ. `RAIMCD` chỉ rải khung in. Tên dự kiến lệnh vẽ là `VEMCD` (chưa chạy). Báo cáo: [docs/Bao_cao_phan_tich_module_ve_mat_cat_doc_iSurvey.docx](docs/Bao_cao_phan_tich_module_ve_mat_cat_doc_iSurvey.docx).
 
 Catalog đầy đủ: [docs/Danh_sach_lenh_iSurvey.xlsx](docs/Danh_sach_lenh_iSurvey.xlsx). Supabase: [docs/Huong_dan_Supabase.md](docs/Huong_dan_Supabase.md). Phát hành Setup/update: [docs/Huong_dan_Phat_hanh.md](docs/Huong_dan_Phat_hanh.md). Admin nhật ký (ksnpsc): [docs/Huong_dan_Admin_ksnpsc.md](docs/Huong_dan_Admin_ksnpsc.md).
 

@@ -21,7 +21,7 @@ namespace iSurvey;
 /// <remarks>
 /// IG = Insert Google, SG = Satellite Google, XG = Xóa Google, EG = Export Google,
 /// INK = Import KML, EXK = Export KML (EG vẫn dùng được),
-/// D2C = DGN to CAD, C2D = CAD to DGN, DGNCFG = Cấu hình DGN, T2C = TAB to CAD,
+/// D2C = DGN to CAD, C2D = CAD to DGN, T2C = TAB to CAD,
 /// UAVCLIP = Cắt ảnh UAV theo biên, AK = bật tắt khung ảnh, AD = đưa ảnh xuống dưới,
 /// GOC = Đánh số góc tuyến, STT = Đánh số thứ tự tại điểm click, DUOITUYEN = Duỗi thẳng tuyến, KHUNG = Chèn khung bản đồ A0–A4 (1/200…1/5000),
 /// RAIKHUNG = Rải khung theo tuyến, SK = sửa thông tin khung,
@@ -76,9 +76,6 @@ public sealed class CommandAliases
 
     [CommandMethod("C2D")]
     public void AliasCadToDgn() => _dgn.CadToDgnCommand();
-
-    [CommandMethod("DGNCFG")]
-    public void AliasDgnConfig() => _dgn.DgnConfigCommand();
 
     [CommandMethod("UAVCLIP")]
     public void AliasUavClip() => _uav.ClipCommand();

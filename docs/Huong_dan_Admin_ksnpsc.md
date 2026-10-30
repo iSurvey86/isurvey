@@ -40,4 +40,6 @@ Cũng cần `NEXT_PUBLIC_SUPABASE_URL` + key của **ksnpsc** để API xác min
 ## Lưu ý
 - User thường không thấy tab (cùng gate với QL hệ thống).
 - Heartbeat / error đầy đủ hơn sau khi user chạy bản DLL có `ActivityLogger.TrackHeartbeat` / `TrackError`.
-- “Máy đang dùng” ≈ `last_login_at` trong 24h (cập nhật khi `isurvey_check` / login), không phải socket realtime.
+- **Ver** = bản DLL máy đó gửi lần gần nhất (nhật ký lệnh / heartbeat), không phải bản lúc kích hoạt lần đầu.
+- **Last seen** = lần cuối iSurvey còn chạy trên Civil/CAD (lệnh, heartbeat ~5 phút, hoặc đóng Civil). Không phải giờ đăng nhập OTP (`last_login_at`).
+- SQL: `deploy/supabase/schema_last_seen.sql` (cập nhật `app_version` + `last_seen_at` trên bảng giấy phép khi có nhật ký).
