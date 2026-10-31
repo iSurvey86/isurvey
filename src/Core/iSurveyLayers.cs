@@ -10,4 +10,5 @@ public static class iSurveyLayers
     public const string DiemDoCaoDo = DiemDo + "_CaoDo";
     public const string SoThuTu = Prefix + "STT";
     public const string RanhGioiManh = Prefix + "RanhGioiManh";
+    public const string MoHinh = Prefix + "MoHinh";
 }

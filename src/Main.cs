@@ -33,6 +33,7 @@ using iSurvey.UI;
 [assembly: CommandClass(typeof(ScanModule))]
 [assembly: CommandClass(typeof(AuthModule))]
 [assembly: CommandClass(typeof(iSurvey.UI.Palette.PaletteModule))]
+[assembly: CommandClass(typeof(iSurvey.Modules.Terrain.TerrainModule))]
 [assembly: CommandClass(typeof(iSurvey.CommandAliases))]
 #endif
 

@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace iSurvey.Modules.DiemDo;
 
-/// <summary>Một điểm đo. X là Easting, Y là Northing, đúng trục bản vẽ.</summary>
+/// <summary>Một điểm trên bảng nhập. X là X trắc địa (Bắc), Y là Y trắc địa (Đông). Lúc vẽ CAD mới đảo trục.</summary>
 public sealed class SurveyPoint : INotifyPropertyChanged
 {
     private int _stt;

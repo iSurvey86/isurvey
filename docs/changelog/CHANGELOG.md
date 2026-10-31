@@ -1,5 +1,16 @@
 # Changelog — iSurvey
 
+## 1.8.16 — 2026-10-31
+
+Chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14.
+
+### Điểm đo
+- **NHAPDIEM**: bảng sửa được, thêm và xóa dòng. Cao chữ, kiểu điểm (chấm / trống / tròn gạch chéo) và cỡ điểm theo phần trăm màn hình. Cột X, Y trên bảng vẫn là trắc địa. Khi vẽ, CAD nhận Đông trên trục X và Bắc trên trục Y.
+
+### Mô hình địa hình
+- **TAOMOHINH** tạo mô hình đặt tên trong bản vẽ. Không có cạnh dài nhất. **THEMMOHINH** gắn điểm, đứt gãy, đường đồng mức hoặc đường bao. **XAYMOHINH** dựng lưới tam giác: đứt gãy và đồng mức là cạnh bắt buộc, đường bao là chỗ cắt duy nhất. Không có đường bao thì lưới là bao lồi. **ANTIN** ẩn hoặc hiện lưới của mô hình. **TRACAOD** lấy cao độ tại một điểm trên lưới.
+- **BANGIS** hiện từng mô hình đã lưu. Chuột phải trên tên mô hình để thêm, xây dựng, ẩn/hiện và tra cao độ. Đã nhìn hộp tạo mô hình trên Civil 3D 2026, bản vẽ trắng.
+
 ## 1.8.15 — 2026-10-30
 
 Chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14.

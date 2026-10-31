@@ -53,6 +53,11 @@
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Actions.Count}" Value="0">
+                        <Setter Property="ContextMenu" Value="{x:Null}"/>
+                    </DataTrigger>
+                </Style.Triggers>
             </Style>
             <Style x:Key="SideTab" TargetType="TabItem">
                 <Setter Property="Background" Value="#E7EBF0"/>

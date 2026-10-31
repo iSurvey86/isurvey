@@ -17,6 +17,8 @@ internal static class SurveyPaletteManager
     private static PaletteViewModel? _model;
     private static bool _hooked;
 
+    public static void Reload() => LoadCurrent();
+
     public static void Toggle()
     {
         Ensure();

@@ -1,4 +1,5 @@
 using Autodesk.AutoCAD.ApplicationServices;
+using iSurvey.Modules.Terrain;
 using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 
 namespace iSurvey.UI.Palette;
@@ -12,6 +13,13 @@ internal static class PaletteCommands
     public static RelayCommand Run(string command) => new(() => Send(command));
 
     public static RelayCommand Later(string message) => new(() => Tell(message));
+
+    public static RelayCommand ForModel(string command, string? modelId, string? kind) => new(() =>
+    {
+        TerrainContext.ModelId = modelId;
+        TerrainContext.AddKind = kind;
+        Send(command);
+    });
 
     private static void Send(string command)
     {

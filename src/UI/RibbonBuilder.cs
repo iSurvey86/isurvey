@@ -349,7 +349,7 @@ public static class RibbonBuilder
         source.Items.Add(CreateRows(
             [
                 new Btn("Lọc Giãn Điểm Mia", "LOCDIEM", RibbonIcons.LocGianDiem, false),
-                new Btn("Ẩn / Hiện Lưới TIN", "ANTIN", RibbonIcons.AnTin, false),
+                new Btn("Ẩn / Hiện Lưới TIN", "ANTIN", RibbonIcons.AnTin, true, "Ẩn hoặc hiện lưới của mô hình địa hình"),
                 new Btn("Chuẩn Hóa Mã Font", "CHUYENFONT", RibbonIcons.ChuyenFont, false)
             ],
             gated: true));

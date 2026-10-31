@@ -11,12 +11,17 @@ public static class PointDrawService
 {
     private const string AppName = "ISURVEY_DIEM";
 
-    public static int Draw(Autodesk.AutoCAD.ApplicationServices.Document doc, IReadOnlyList<SurveyPoint> points, double textHeight)
+    public static int Draw(
+        Autodesk.AutoCAD.ApplicationServices.Document doc,
+        IReadOnlyList<SurveyPoint> points,
+        double textHeight,
+        int pointMode,
+        double pointSizePercent)
     {
         try
         {
-            if (Convert.ToInt32(AcadApp.GetSystemVariable("PDMODE")) == 0)
-                AcadApp.SetSystemVariable("PDMODE", 35);
+            AcadApp.SetSystemVariable("PDMODE", pointMode);
+            AcadApp.SetSystemVariable("PDSIZE", -Math.Abs(pointSizePercent));
         }
         catch
         {
@@ -35,7 +40,7 @@ public static class PointDrawService
             var styleId = doc.Database.Textstyle;
             foreach (var point in points)
             {
-                var position = new Point3d(point.X, point.Y, point.Z);
+                var position = ToCad(point);
                 AddPoint(tr, space, position, point);
                 var gap = textHeight * 0.4;
                 if (!string.IsNullOrWhiteSpace(point.Name))
@@ -58,6 +63,9 @@ public static class PointDrawService
         doc.Editor.Regen();
         return made;
     }
+
+    /// <summary>Bảng giữ trắc địa. CAD nhận Đông trên trục X và Bắc trên trục Y.</summary>
+    internal static Point3d ToCad(SurveyPoint point) => new(point.Y, point.X, point.Z);
 
     private static void AddPoint(Transaction tr, BlockTableRecord space, Point3d position, SurveyPoint source)
     {

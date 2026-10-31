@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:iSurvey.UI.DiemDo"
         Title="iSurvey — Nhập điểm đo"
-        Width="750" SizeToContent="Height"
+        Width="860" SizeToContent="Height"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         ResizeMode="NoResize" ShowInTaskbar="False" FontFamily="Segoe UI"
@@ -13,6 +13,16 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/iSurvey;component/src/UI/CtaStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <local:SurveyNumberConverter x:Key="SurveyNumber"/>
+            <Style x:Key="MarkerButton" TargetType="Button" BasedOn="{StaticResource CtaSoft}">
+                <Setter Property="Width" Value="34"/>
+                <Setter Property="Height" Value="30"/>
+                <Setter Property="MinHeight" Value="30"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="Margin" Value="4,0,0,0"/>
+                <Setter Property="Background" Value="White"/>
+                <Setter Property="BorderBrush" Value="#D1D5DB"/>
+            </Style>
         </ResourceDictionary>
     </Window.Resources>
     <Border Background="White" CornerRadius="12" Margin="12">
@@ -45,8 +55,10 @@
 
                 <Grid Height="280">
                 <local:FaintCellGrid x:Name="GridLines" RowHeight="26" HorizontalAlignment="Left" />
-                <DataGrid x:Name="PointGrid" ItemsSource="{Binding Points}" AutoGenerateColumns="False" IsReadOnly="True"
+                <DataGrid x:Name="PointGrid" ItemsSource="{Binding Points}" SelectedItem="{Binding Selected}"
+                          AutoGenerateColumns="False" IsReadOnly="False"
                           CanUserAddRows="False" CanUserDeleteRows="False" HeadersVisibility="Column"
+                          SelectionMode="Single" SelectionUnit="FullRow"
                           GridLinesVisibility="None" Background="Transparent" BorderBrush="#C4C4C4" BorderThickness="1"
                           AlternatingRowBackground="#F8FAFC" RowHeight="26" HorizontalScrollBarVisibility="Disabled"
                           LayoutUpdated="PointGrid_LayoutUpdated">
@@ -76,7 +88,7 @@
                         </Style>
                     </DataGrid.CellStyle>
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="STT" Binding="{Binding Stt}" Width="52">
+                        <DataGridTextColumn Header="STT" Binding="{Binding Stt}" Width="52" IsReadOnly="True">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Center" />
@@ -84,51 +96,99 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Header="Tên điểm" Binding="{Binding Name}" Width="80" />
-                        <DataGridTextColumn Header="Tọa độ X" Binding="{Binding XText}" Width="100">
+                        <DataGridTextColumn Header="Tên điểm" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Width="*" />
+                        <DataGridTextColumn Header="Tọa độ X" Binding="{Binding X, Converter={StaticResource SurveyNumber}, UpdateSourceTrigger=LostFocus}" Width="1.4*">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="#1D4ED8" />
+                                    <Setter Property="Foreground" Value="#60A5FA" />
                                     <Setter Property="Margin" Value="4,0" />
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Header="Tọa độ Y" Binding="{Binding YText}" Width="100">
+                        <DataGridTextColumn Header="Tọa độ Y" Binding="{Binding Y, Converter={StaticResource SurveyNumber}, UpdateSourceTrigger=LostFocus}" Width="1.4*">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="#16A34A" />
+                                    <Setter Property="Foreground" Value="#4ADE80" />
                                     <Setter Property="Margin" Value="4,0" />
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Header="Cao độ (Z)" Binding="{Binding ZText}" Width="100" />
-                        <DataGridTextColumn Header="Mã/Ghi chú" Binding="{Binding Code}" Width="*" />
+                        <DataGridTextColumn Header="Cao độ (Z)" Binding="{Binding Z, Converter={StaticResource SurveyNumber}, UpdateSourceTrigger=LostFocus}" Width="*" />
+                        <DataGridTextColumn Header="Mã/Ghi chú" Binding="{Binding Code, UpdateSourceTrigger=PropertyChanged}" Width="*" />
                     </DataGrid.Columns>
                 </DataGrid>
                 </Grid>
 
-                <DockPanel Margin="0,10,0,0">
-                    <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center" Foreground="#374151">
-                        <Run Text="Tổng điểm đo: " />
-                        <Run Text="{Binding TotalText, Mode=OneWay}" FontWeight="SemiBold" Foreground="#1D4ED8" />
-                    </TextBlock>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Chiều cao chữ:" VerticalAlignment="Center" Foreground="#374151" />
-                        <TextBox Width="72" Margin="8,0,0,0" Padding="8,6"
-                                 Text="{Binding HeightText, UpdateSourceTrigger=PropertyChanged}" />
-                    </StackPanel>
-                </DockPanel>
+                <Border Margin="0,12,0,0" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1" Padding="0,0,0,10">
+                    <DockPanel LastChildFill="False">
+                        <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center">
+                            <Run Text="Tổng điểm đo: " Foreground="#374151" />
+                            <Run Text="{Binding TotalText, Mode=OneWay}" FontWeight="SemiBold" Foreground="#1D4ED8" />
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Cao chữ:" VerticalAlignment="Center" Foreground="#374151" />
+                            <TextBox Width="64" Margin="8,0,16,0" Padding="8,6" VerticalContentAlignment="Center"
+                                     Text="{Binding HeightText, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Text="Kiểu điểm:" VerticalAlignment="Center" Foreground="#374151" />
+                            <Button Margin="8,0,0,0" Click="MarkerDot_Click" ToolTip="Dấu chấm">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource MarkerButton}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Marker}" Value="Dot">
+                                                <Setter Property="Background" Value="#DBEAFE" />
+                                                <Setter Property="BorderBrush" Value="#2563EB" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <Ellipse Width="8" Height="8" Fill="#334155" />
+                            </Button>
+                            <Button Click="MarkerNone_Click" ToolTip="Không dấu">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource MarkerButton}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Marker}" Value="None">
+                                                <Setter Property="Background" Value="#DBEAFE" />
+                                                <Setter Property="BorderBrush" Value="#2563EB" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <Border Width="12" Height="12" BorderBrush="#64748B" BorderThickness="1.2" Background="Transparent" />
+                            </Button>
+                            <Button Click="MarkerCross_Click" ToolTip="Tròn gạch chéo">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource MarkerButton}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Marker}" Value="CircleCross">
+                                                <Setter Property="Background" Value="#DBEAFE" />
+                                                <Setter Property="BorderBrush" Value="#2563EB" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <TextBlock Text="&#x2297;" FontSize="16" Foreground="#334155" />
+                            </Button>
+                            <TextBlock Text="Point size:" Margin="16,0,0,0" VerticalAlignment="Center" Foreground="#374151" />
+                            <TextBox Width="52" Margin="8,0,6,0" Padding="8,6" VerticalContentAlignment="Center"
+                                     Text="{Binding PointSizeText, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Text="%" VerticalAlignment="Center" Foreground="#374151" />
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
             </StackPanel>
 
             <Border Grid.Row="2" Background="#F8FAFC" CornerRadius="0,0,12,12" Padding="16,12">
                 <DockPanel LastChildFill="False">
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                        <Button Content="+  Thêm điểm" MinWidth="120" Margin="0,0,8,0" Click="Add_Click"
+                                Style="{StaticResource CtaSoft}" />
+                        <Button Content="Xóa điểm" MinWidth="110" Click="Delete_Click" Style="{StaticResource CtaSoft}" />
+                    </StackPanel>
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                        <Button x:Name="SwapButton" Content="⇄  Đảo cột X/Y" MinWidth="140" Margin="0,0,8,0"
-                                Click="Swap_Click" Style="{StaticResource CtaWarn}" />
                         <Button Content="Hủy bỏ" MinWidth="88" Margin="0,0,8,0" Click="Cancel_Click"
                                 Style="{StaticResource CtaSoft}" />
-                        <Button Content="⤓  Tạo điểm CAD" MinWidth="140" Click="Create_Click"
-                                Style="{StaticResource CtaPrimary}" />
+                        <Button Content="↑  Nhập điểm" MinWidth="130" Click="Create_Click" Style="{StaticResource CtaPrimary}" />
                     </StackPanel>
                 </DockPanel>
             </Border>

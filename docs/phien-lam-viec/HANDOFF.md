@@ -5,6 +5,45 @@
 
 ---
 
+## 2026-10-31 — Nhập điểm và mô hình địa hình (1.8.16, chưa phát hành)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ. Bump **1.8.16**. Chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14.
+
+### Đã chốt / đã làm
+
+- **NHAPDIEM**: bảng sửa được, thêm và xóa dòng. Cao chữ, kiểu điểm (chấm / trống / tròn gạch chéo), cỡ điểm theo phần trăm màn hình. Cột trên bảng vẫn là trắc địa. Khi vẽ, CAD nhận Đông trên trục X và Bắc trên trục Y. Giữ cả chữ tên và chữ cao độ.
+- **TAOMOHINH** tạo mô hình đặt tên, chỉ có tên và lớp. Không có cạnh dài nhất. Đã nhìn hộp thoại trên Civil 3D 2026, bản vẽ trắng Drawing1.
+- **THEMMOHINH** gắn điểm, đứt gãy, đường đồng mức hoặc đường bao. **XAYMOHINH** dựng lưới: đứt gãy và đồng mức là cạnh bắt buộc; đường bao là chỗ cắt duy nhất. Không có bao thì lưới là bao lồi và dòng lệnh nói rõ. **ANTIN** ẩn hoặc hiện lưới của mô hình. **TRACAOD** lấy cao độ trên lưới.
+- Kiểm tra tính toán: cạnh chéo bắt buộc cho đúng cao độ tại giữa cạnh; điểm ngoài đường bao không còn cao độ. Chưa vẽ lưới lên một bản vẽ có điểm thật.
+- **BANGIS** đọc mô hình đã lưu trong bản vẽ. Chuột phải: thêm, xây dựng, ẩn/hiện, tra cao độ. Tuyến và trắc dọc vẫn chưa có đối tượng. `VEMCD` chưa có lệnh. `RAIMCD` chỉ rải khung.
+- Lỗ địa hình và đám mây điểm chưa làm.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Nhập điểm | `src/UI/DiemDo/`, `src/Modules/DiemDo/PointDrawService.cs` |
+| Mô hình | `src/Modules/Terrain/`, `src/UI/Terrain/` |
+| Bảng | `src/UI/Palette/PaletteViewModel.cs` |
+| Đề cương | `docs/nghien-cuu/ADSCivil-mat-cat-doc.md` |
+
+### Việc tiếp
+
+- [ ] Chưa phát hành 1.8.16. Máy khác kéo mã vẫn thấy gói UPD là 1.8.14 cho đến khi đóng gói.
+- [ ] Pha 2: tuyến và cọc, cao độ lấy từ lưới. Chưa vẽ mặt cắt khi chưa có Z từ lưới.
+- [ ] SQL `schema_last_seen.sql` và `schema_force_logout.sql` vẫn phải chạy trên Supabase nếu chưa chạy.
+- [ ] HDSD PDF và nhật ký phân trang nằm repo ksnpsc.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff đầu. iSurvey 1.8.16, chưa phát hành. NHAPDIEM đổi trục lúc vẽ. Mô hình địa hình không lọc cạnh dài; đứt gãy và đồng mức là cạnh bắt buộc; đường bao là chỗ cắt. BANGIS đọc mô hình trong bản vẽ. RAIMCD chỉ rải khung. VEMCD chưa có lệnh. Tiếp: pha 2 tuyến và cọc khi được yêu cầu, hoặc phát hành 1.8.16 khi được yêu cầu.
+```
+
+**Lưu trữ ngày:** [2026-10-31-mo-hinh-dia-hinh.md](./2026-10-31-mo-hinh-dia-hinh.md)
+
+---
+
 ## 2026-10-30 — Vỏ bảng BANGIS, nền xám và icon (1.8.15, chưa phát hành)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ. Bump **1.8.15**. Chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14.

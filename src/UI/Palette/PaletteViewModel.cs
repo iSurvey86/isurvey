@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using Autodesk.AutoCAD.ApplicationServices;
+using iSurvey.Modules.Terrain;
 
 namespace iSurvey.UI.Palette;
 
@@ -90,7 +91,7 @@ internal sealed class PaletteViewModel : ObservableObject
         SelectedNode = null;
         TreeNodes.Clear();
         TreeNodes.Add(Points());
-        TreeNodes.Add(Terrain());
+        TreeNodes.Add(Terrain(document));
         TreeNodes.Add(Route());
         TreeNodes.Add(Profile());
     }
@@ -107,15 +108,45 @@ internal sealed class PaletteViewModel : ObservableObject
         return node;
     }
 
-    private static TreeNodeViewModel Terrain()
+    private static TreeNodeViewModel Terrain(Document? document)
     {
+        List<TerrainRecord> models;
+        try
+        {
+            models = document is null ? new List<TerrainRecord>() : TerrainStore.Load(document.Database);
+        }
+        catch (System.Exception)
+        {
+            models = new List<TerrainRecord>();
+        }
+
         var node = new TreeNodeViewModel(
             "Mô hình địa hình",
             "Phải chuột để tạo...",
-            "Chưa có mô hình. Tạo và xây dựng lưới là pha 1.",
+            models.Count == 0 ? "Chưa có mô hình trong bản vẽ này." : models.Count + " mô hình.",
             "Terrain");
-        node.Actions.Add(new NodeAction("Tạo mô hình...", PaletteCommands.Later(
-            "Tạo mô hình chưa có. Làm ở pha 1, sau khi bảng này ổn.")));
+        node.Actions.Add(new NodeAction("Tạo mô hình...", PaletteCommands.Run("TAOMOHINH")));
+        foreach (var model in models)
+        {
+            var child = new TreeNodeViewModel(model.Name, "", model.Summary(), "Terrain")
+            {
+                Tag = model.Id
+            };
+            child.Actions.Add(new NodeAction("Thêm điểm", PaletteCommands.ForModel("THEMMOHINH", model.Id, "point")));
+            child.Actions.Add(new NodeAction("Thêm đứt gãy", PaletteCommands.ForModel("THEMMOHINH", model.Id, "break")));
+            child.Actions.Add(new NodeAction("Thêm đường đồng mức", PaletteCommands.ForModel("THEMMOHINH", model.Id, "contour")));
+            child.Actions.Add(new NodeAction("Thêm đường bao", PaletteCommands.ForModel("THEMMOHINH", model.Id, "boundary")));
+            child.Actions.Add(new NodeAction("Xây dựng", PaletteCommands.ForModel("XAYMOHINH", model.Id, null)));
+            child.Actions.Add(new NodeAction("Ẩn / hiện lưới", PaletteCommands.ForModel("ANTIN", model.Id, null)));
+            child.Actions.Add(new NodeAction("Tra cao độ", PaletteCommands.ForModel("TRACAOD", model.Id, null)));
+            child.Children.Add(new TreeNodeViewModel("Điểm (" + model.Points.Count + ")", "", "Điểm khống chế cao độ.", "Point"));
+            child.Children.Add(new TreeNodeViewModel("Đứt gãy (" + model.Breaklines.Count + ")", "", "Cạnh bắt buộc của lưới, ví dụ mép ta luy.", "Route"));
+            child.Children.Add(new TreeNodeViewModel("Đường đồng mức (" + model.Contours.Count + ")", "", "Cạnh bắt buộc, cao độ không đổi dọc cạnh.", "Route"));
+            var bao = string.IsNullOrEmpty(model.Boundary) ? "chưa có" : "có";
+            child.Children.Add(new TreeNodeViewModel("Đường bao (" + bao + ")", "", "Chỉ giữ tam giác nằm trong đường bao.", "Profile"));
+            node.Children.Add(child);
+        }
+
         return node;
     }
 

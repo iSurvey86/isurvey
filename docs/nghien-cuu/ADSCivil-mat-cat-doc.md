@@ -61,7 +61,7 @@ Tham số mặc định trong `ads-config.xml` (`DTMSETTING`): cạnh dài nhấ
 - **Vào mô hình:** polyline 3D (hoặc đường có Z) làm cạnh bắt buộc khi tam giác hóa.
 - **Ra khỏi mô hình:** vẽ lại đồng mức sau khi đã có TIN (và tùy chọn tự cập nhật khi rebuild).
 
-iSurvey hôm nay: nhập điểm, `GHISODM` ghi số đồng mức, `ANTIN` ẩn/hiện lưới có sẵn. **Chưa** có đối tượng mô hình đặt tên, chưa thêm thành phần, chưa lệnh Xây dựng.
+iSurvey 1.8.16: nhập điểm, `GHISODM` ghi số đồng mức, mô hình đặt tên (`TAOMOHINH`), thêm điểm / đứt gãy / đồng mức / đường bao (`THEMMOHINH`), xây dựng lưới (`XAYMOHINH`). Không lọc cạnh dài. Đứt gãy và đồng mức là cạnh bắt buộc. Đường bao là chỗ cắt duy nhất. `ANTIN` ẩn hoặc hiện lưới của mô hình. `TRACAOD` lấy cao độ trên lưới. Chưa có tuyến, cọc, `VEMCD`.
 
 ### 2.2 Road — tuyến bám bề mặt, rồi mới cọc và TD
 
@@ -142,7 +142,7 @@ Cùng tuyến + cọc + **cùng TIN**. Mỗi cọc một lát vuông góc tim. Z
 
 | Đã có | Chưa có |
 |--------|---------|
-| Nhập/xuất điểm, ghi số đồng mức, ẩn/hiện lưới TIN có sẵn (`ANTIN`) | **Mô hình địa hình** đặt tên: tạo vỏ, thêm điểm/đồng mức/bao, xây dựng TIN |
+| Nhập/xuất điểm, ghi số đồng mức, mô hình đặt tên, thêm điểm/đứt gãy/đồng mức/bao, xây dựng TIN, ẩn/hiện lưới, tra cao độ | Lỗ địa hình và đám mây điểm trong lưới |
 | `DUOITUYEN` — dải 100 m trên bình đồ | Tuyến nội bộ + lý trình (chưa phải Alignment Civil) |
 | | Phát sinh cọc, lấy Z từ TIN dọc tuyến |
 | `RAIMCD` — rải layout lên mặt cắt **đã vẽ** | **Vẽ** đường đất + đầu bảng |
@@ -150,7 +150,7 @@ Cùng tuyến + cọc + **cùng TIN**. Mỗi cọc một lát vuông góc tim. Z
 
 Pha đề xuất khi được lệnh code (độc lập, không copy ADS):
 
-1. **Pha 1 — mô hình địa hình:** tạo mô hình, thêm điểm / polyline đồng mức / đường bao, xây dựng lưới tam giác, hiện/ẩn lưới. Có thể đọc TIN Civil hoặc 3DFace có sẵn thay vì bắt buộc dựng từ đầu.
+1. **Pha 1 — mô hình địa hình:** đã có trong 1.8.16. Tạo mô hình, thêm điểm / đứt gãy / đồng mức / đường bao, xây dựng lưới, hiện/ẩn, tra cao độ. Không lọc cạnh dài.
 2. **Pha 2 — tuyến + cọc:** polyline → tuyến + lý trình gốc; phát sinh cọc; Z từ mô hình.
 3. **Pha 3 — vẽ TD tự nhiên + hiệu chỉnh;** rồi `RAIMCD`.
 4. Sau: TN tự nhiên, đường đỏ, địa chất.
@@ -163,7 +163,7 @@ Không nhảy thẳng pha 3 khi chưa có nguồn Z ổn định.
 
 Tên chỉ là hướng; khi code đặt trong namespace iSurvey.
 
-- `TerrainModel` — id, tên, lớp, cạnh lớn nhất, danh sách thành phần (điểm, breakline, bao), lưới tam giác.
+- `TerrainModel` — id, tên, lớp, điểm, đứt gãy, đồng mức, đường bao, lưới tam giác. Không có cạnh dài nhất.
 - `Route` — id, tên, polyline Id, lý trình gốc, chiều, id mô hình bám.
 - `Station` — tên, chainage, Z tự nhiên, ghi chú.
 - `GroundSample` — chainage, offset, Z, nguồn (tin/point/manual).
@@ -215,6 +215,7 @@ Cây tab **Khảo sát** (mở dần khi có dữ liệu):
 Mô hình địa hình
   └ [Tên mô hình]     ← phải chuột: Thêm đối tượng, Xây dựng, Ẩn/hiện lưới, Tra cao độ
        ├ Điểm
+       ├ Đứt gãy
        ├ Đường đồng mức
        └ Đường bao
 Tuyến
@@ -236,7 +237,6 @@ Gốc chưa có con: phải chuột «Tạo…». Không dùng chữ «Lưới t
 
 ## 10. Việc tiếp theo (khi được yêu cầu code)
 
-1. Pha UI: vỏ palette tab dọc (cây Khảo sát trống + 4 tab), chưa TIN.
-2. Pha 1: tạo / thêm / xây dựng mô hình — điền vào cây, menu phải chuột.
-3. Không vẽ TD cho đến khi lấy Z từ lưới được.
-4. Catalog lệnh + HDSD khi lệnh chạy được.
+1. Pha UI và pha 1 mô hình đã có trong 1.8.16, chưa phát hành.
+2. Pha 2: tuyến + cọc, Z lấy từ lưới. Không vẽ TD cho đến khi lấy Z được.
+3. Pha 3: `VEMCD`. `RAIMCD` vẫn chỉ rải khung.

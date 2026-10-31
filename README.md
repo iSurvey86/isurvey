@@ -2,7 +2,7 @@
 
 Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), nhập và xuất **KML/KMZ**, cắt bình đồ theo biên (`CATBD`), quét cấu trúc bản vẽ (`AUTOSCAN`). Các lệnh nghiệp vụ khóa cho tới khi kích hoạt bằng Gmail + mã OTP.
 
-**Phiên bản bundle:** `1.8.15` (`deploy/iSurvey.bundle/PackageContents.xml`)
+**Phiên bản bundle:** `1.8.16` (`deploy/iSurvey.bundle/PackageContents.xml`)
 
 **Đồng bộ phiên làm việc (Cursor / đa máy):** đọc [docs/phien-lam-viec/HANDOFF.md](docs/phien-lam-viec/HANDOFF.md). Quy tắc cuối phiên: [docs/phien-lam-viec/README.md](docs/phien-lam-viec/README.md). Changelog: [docs/changelog/CHANGELOG.md](docs/changelog/CHANGELOG.md).
 
@@ -39,7 +39,7 @@ Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georefere
 | `ISURVEY_UAV_CLIP` | **UAVCLIP** | Clip biên ảnh UAV (polyline hoặc Auto-Clip nền trắng/đen) |
 | `ISURVEY_NUMBER_VERTICES` | **GOC** | Đánh số góc tuyến theo tỷ lệ bản đồ |
 | `STT` | **STT** | Đánh số thứ tự tại từng điểm click (nút «Đánh Số Thứ Tự»). Tiền tố + số + hậu tố, vòng tròn và wipeout trên layer `iSurvey_STT`. Esc hoặc chuột phải để dừng |
-| `NHAPDIEM` | **ND** | Nhập điểm đo từ CSV/TXT. Tọa độ X có 7 chữ số trước dấu thập phân, Y có 6. Dấu điểm trên `iSurvey_DiemDo`, tên trên `iSurvey_DiemDo_Ten`, cao độ trên `iSurvey_DiemDo_CaoDo`. Tạo xong thì phóng vừa vùng điểm |
+| `NHAPDIEM` | **ND** | Nhập điểm đo từ CSV/TXT. Bảng giữ X Bắc (7 chữ số) và Y Đông (6 chữ số). Khi vẽ, CAD nhận Đông trên trục X và Bắc trên trục Y. Dấu điểm trên `iSurvey_DiemDo`, tên trên `iSurvey_DiemDo_Ten`, cao độ trên `iSurvey_DiemDo_CaoDo`. Kiểu điểm và cỡ điểm (%) lấy từ hộp thoại. Tạo xong thì phóng vừa vùng điểm |
 | `XUATDIEM` | **XD** | Xuất điểm, block hoặc chữ. CSV dùng dấu phân cách danh sách của Windows. TXT dùng tab. Thập phân luôn là dấu chấm. Chữ đọc được thành số thì thành cao độ và để trống tên. Tên xếp từ số nhỏ đến lớn, rồi A–Z |
 | `ISURVEY_STRIP_MAP` | **DUOITUYEN** | Duỗi thẳng dải bản đồ dọc tuyến: chọn tim tuyến (click chỗ nào cũng được) + bắt buộc chọn điểm đầu (DD, G1…Gn, DC); cắt dải chữ nhật liền mạch; xuất bảng góc `.txt` (`Tên Điểm,X,Y,Khoảng Cách Cạnh Trước,Góc Rẽ` với `P/T độ phút giây`, X/Y 2 số lẻ) |
 | `ISURVEY_KHUNG` | **KHUNG** | Chèn **khung bản đồ** chuẩn TCVN 7285:2003 (ISO 5457) khổ A0–A4, tỷ lệ 1/200…1/5000: khung tên (ô DỰ ÁN mặc định «Đường dây và TBA 110KV KCN Minh Châu», logo EVN NPC vector), lưới tọa độ theo tọa độ CAD, mũi tên Bắc, thước tỷ lệ. Xoay: không / góc / theo tuyến |
@@ -47,7 +47,12 @@ Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georefere
 | `ISURVEY_LOGO` | **ANLOGO** | Ẩn hoặc hiện một logo trên khung tên. Gõ `1` logo chủ đầu tư, `2` logo đơn vị thiết kế. `ANLOGO1` và `ANLOGO2` chọn thẳng, không hỏi |
 | `ISURVEY_LOGO_REPLACE` | **THAYLOGO** | Thay logo EVN bằng ảnh (chủ đầu tư hoặc đơn vị thiết kế); gõ `K` để khôi phục |
 | `ISURVEY_ROUTE_SHEETS` | **RAIKHUNG** | Rải khung in dọc tuyến (nút Ribbon «Rải Khung Theo Tuyến»): một layout lưới khung + viewport xoay. Chữ trong vùng tờ đọc ngang trên layout, góc và cao chữ bên Model không đổi. Hộp thoại hai cột: bố cục in bên trái, 25 ô khung tên bên phải. Nhập Excel theo cột STT và Nội dung, có file mẫu .xlsx. Không in PDF ở bước này. Logo đã chèn được nhớ trong file. Nhấp đúp khung để sửa thông tin |
-| `ISURVEY_PALETTE` | **BANGIS** | Mở hoặc đóng bảng dữ liệu neo bên trái. Nền xám, mỗi mục có icon. Bốn tab: Khảo sát, Khung in, UAV, Bản đồ. Cây khảo sát là vỏ, chưa đọc mô hình hay tuyến. `RAIMCD` vẫn chỉ rải khung |
+| `ISURVEY_PALETTE` | **BANGIS** | Mở hoặc đóng bảng dữ liệu neo bên trái. Bốn tab: Khảo sát, Khung in, UAV, Bản đồ. Cây Khảo sát hiện mô hình địa hình của bản vẽ đang mở |
+| `ISURVEY_TERRAIN_NEW` | **TAOMOHINH** | Tạo mô hình địa hình: tên và lớp lưới. Chưa có tam giác |
+| `ISURVEY_TERRAIN_ADD` | **THEMMOHINH** | Gắn điểm, đứt gãy, đường đồng mức hoặc đường bao vào mô hình |
+| `ISURVEY_TERRAIN_BUILD` | **XAYMOHINH** | Dựng lưới tam giác. Đứt gãy và đồng mức là cạnh bắt buộc. Có đường bao thì bỏ tam giác phía ngoài |
+| `ISURVEY_TERRAIN_TOGGLE` | **ANTIN** | Ẩn hoặc hiện lưới của mô hình |
+| `ISURVEY_TERRAIN_Z` | **TRACAOD** | Tra cao độ một điểm trên lưới |
 | `ISURVEY_PROFILE_SHEETS` | **RAIMCD** | Rải khung mặt cắt dọc đã vẽ: chọn góc dưới-trái hàng cuối. Tỷ lệ trên khung `1/500; 1/5000` (hoặc `1/200; 1/2000`). Cao quá khổ thì tăng khổ giấy, giữ tỷ lệ. Layout `MatCat_Doc`. Trục đứng lùi 2,5 m so với điểm chọn. Phần thừa bên trái và bên dưới được che trên layout, Model không bị xóa. Cùng hộp thoại bố cục như RAIKHUNG, không in PDF ở bước này |
 | `ISURVEY_ROUTE_PLOT` | **INTUYEN** | In layout `BanDo_Tuyen` hoặc `MatCat_Doc` đã rải. Hộp thoại: In màu (`acad.ctb`) hoặc In đen trắng (`monochrome.ctb`), chèn chữ ký DWG theo chức danh đã ghi trên khung, đóng mộc đỏ PNG. Chữ ký và mộc chỉ trên PDF. Rồi hỏi `1` khung đang chọn, `2` tất cả. Không dựng trang mới. In xong có nút Mở thư mục |
 | `ISURVEY_FIT_TITLE` | **CODAN** | Co ô chủ đầu tư và đại diện chủ đầu tư về một dòng. Ô tên bản vẽ vẫn xuống dòng trong khung |

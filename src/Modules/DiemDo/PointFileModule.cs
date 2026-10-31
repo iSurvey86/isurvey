@@ -44,7 +44,8 @@ public sealed class PointFileModule
 
         try
         {
-            var made = PointDrawService.Draw(doc, request.Points, request.TextHeight);
+            var made = PointDrawService.Draw(
+                doc, request.Points, request.TextHeight, request.PointMode, request.PointSizePercent);
             doc.Editor.WriteMessage($"\n[iSurvey] Đã tạo {made} điểm trên layer {iSurveyLayers.DiemDo}.");
             if (made > 0)
             {

@@ -23,6 +23,9 @@ internal sealed class TreeNodeViewModel : ObservableObject
 
     public string Detail { get; }
 
+    /// <summary>Id mô hình khi nút này là một mô hình trong bản vẽ.</summary>
+    public string? Tag { get; set; }
+
     public ObservableCollection<TreeNodeViewModel> Children { get; } = new();
 
     public ObservableCollection<NodeAction> Actions { get; } = new();
