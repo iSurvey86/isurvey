@@ -60,7 +60,7 @@ Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georefere
 
 **Đang nghiên cứu, chưa có lệnh vẽ:** mặt cắt dọc đi theo chuỗi mô hình địa hình → tuyến → cọc → vẽ. `RAIMCD` chỉ rải khung in. Tên dự kiến lệnh vẽ là `VEMCD` (chưa chạy). Báo cáo: [docs/Bao_cao_phan_tich_module_ve_mat_cat_doc_iSurvey.docx](docs/Bao_cao_phan_tich_module_ve_mat_cat_doc_iSurvey.docx).
 
-Catalog đầy đủ: [docs/Danh_sach_lenh_iSurvey.xlsx](docs/Danh_sach_lenh_iSurvey.xlsx). Supabase: [docs/Huong_dan_Supabase.md](docs/Huong_dan_Supabase.md). Phát hành Setup/update: [docs/Huong_dan_Phat_hanh.md](docs/Huong_dan_Phat_hanh.md). Admin nhật ký (ksnpsc): [docs/Huong_dan_Admin_ksnpsc.md](docs/Huong_dan_Admin_ksnpsc.md).
+Catalog đầy đủ: [docs/Danh_sach_lenh_iSurvey.xlsx](docs/Danh_sach_lenh_iSurvey.xlsx). Video hướng dẫn theo phiên bản: [docs/video/QUY_TRINH.md](docs/video/QUY_TRINH.md), sổ [docs/video/CATALOG.md](docs/video/CATALOG.md). Supabase: [docs/Huong_dan_Supabase.md](docs/Huong_dan_Supabase.md). Phát hành Setup/update: [docs/Huong_dan_Phat_hanh.md](docs/Huong_dan_Phat_hanh.md). Admin nhật ký (ksnpsc): [docs/Huong_dan_Admin_ksnpsc.md](docs/Huong_dan_Admin_ksnpsc.md).
 
 ## Biên dịch
 

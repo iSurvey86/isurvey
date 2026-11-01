@@ -32,3 +32,10 @@ license.dat
 # AutoCAD lock files
 *.dwl
 *.dwl2
+
+# Video hướng dẫn — thành phẩm và bí mật YouTube (kịch bản vẫn commit)
+docs/video/thanh-pham/
+*.mp4
+client_secret.json
+token.json
+tools/video/.venv/

@@ -1,7 +1,44 @@
 # HANDOFF — Phiên làm việc (mới nhất ở trên)
 
 > **Máy khác:** `git pull` → đọc block **đầu tiên** dưới đây → tiếp tục chat.  
-> **Cuối phiên:** `làm cuối phiên đầy đủ` (= HANDOFF → file ngày → bump version → docs → catalog lệnh → changelog → commit + push). Chi tiết: [README](./README.md).
+> **Cuối phiên:** `làm cuối phiên đầy đủ` (= HANDOFF → file ngày → bump khi có thay đổi sản phẩm → docs → catalog lệnh → changelog → kịch bản video nếu lệnh đã đổi → commit + push). Chi tiết: [README](./README.md).
+
+---
+
+## 2026-11-01 — Video Nhập DGN (1.8.16, chưa phát hành, không bump)
+
+**Máy / ngữ cảnh:** Cursor — máy chỉ có AutoCAD 2023, không có Civil 3D. Cuối phiên đầy đủ. **Không bump.** Vẫn **1.8.16**, chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14.
+
+### Đã chốt / đã làm
+
+- Đường ống video hướng dẫn: kịch bản trong repo, quay cửa sổ CAD bằng ffmpeg, giọng `vi-VN-HoaiMyNeural`, ghép, đăng YouTube khi có khóa OAuth ngoài repo.
+- Video mẫu **Nhập file DGN phiên bản 1.8.15** đã ghép, khoảng 1 phút 52 giây. Hành vi có từ 1.8.15. Quay trên AutoCAD 2023, bản vẽ mới, file DGN mẫu tự tạo. Không ghi đè bản vẽ người dùng.
+- Chưa đăng YouTube. Thiếu `client_secret.json` tại `%AppData%\iSurvey\youtube\`.
+- Không thêm lệnh, không đổi hành vi CAD. Catalog lệnh Excel không sửa.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Quy trình | `docs/video/QUY_TRINH.md`, `docs/video/YOUTUBE.md`, `docs/video/CATALOG.md` |
+| Kịch bản | `docs/video/kich-ban/d2c-1.8.15.md` |
+| Script | `tools/video/` |
+| Rule | `.cursor/rules/video-huong-dan.mdc` |
+
+### Việc tiếp
+
+- [ ] Đặt `client_secret.json` theo `docs/video/YOUTUBE.md`, rồi đăng video D2C ở chế độ không công khai.
+- [ ] Chưa phát hành 1.8.16. Gói UPD trên máy chủ vẫn là 1.8.14.
+- [ ] Nhìn lại cây BANGIS trên Civil: bốn mục con và nét đứt.
+- [ ] Pha 2: tuyến và cọc. `VEMCD` chưa có lệnh.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff đầu. iSurvey 1.8.16, chưa phát hành, không bump. Video Nhập file DGN phiên bản 1.8.15 đã ghép, chưa đăng YouTube (thiếu client_secret.json). Quay trên AutoCAD 2023. RAIMCD lề và nhiều đường bao vẫn như phiên sáng. VEMCD chưa có lệnh. Tiếp: đăng video khi đã có khóa Google, hoặc nhìn cây BANGIS, hoặc pha 2 tuyến và cọc, hoặc phát hành 1.8.16 khi được yêu cầu.
+```
+
+**Lưu trữ ngày:** [2026-11-01-video-d2c.md](./2026-11-01-video-d2c.md)
 
 ---
 

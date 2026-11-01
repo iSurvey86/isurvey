@@ -4,6 +4,11 @@
 
 Chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14. Ngày 2026-11-01 không tăng số phiên bản.
 
+### Video hướng dẫn
+
+- Quy trình quay màn hình CAD thật, giọng máy tiếng Việt, đăng YouTube: `docs/video/QUY_TRINH.md`.
+- Video mẫu **Nhập file DGN phiên bản 1.8.15** đã ghép, chưa đăng. Quay trên AutoCAD 2023 vì máy đó không cài Civil 3D. Hành vi Nhập DGN trong video có từ 1.8.15.
+
 ### Khung mặt cắt
 
 - **RAIMCD**: dòng ngang vừa chọn cách lề trong dưới 10 mm. Số liệu dừng trước khung tên 3 mm. Đã xem trên bản sao mặt cắt dài: 8 tờ A2, tỷ lệ 1/500; 1/5000. F12 bật lại khi lệnh xong.

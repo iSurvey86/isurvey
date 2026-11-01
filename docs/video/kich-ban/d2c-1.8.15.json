@@ -1,0 +1,57 @@
+{
+  "id": "d2c-1.8.15",
+  "command": "D2C",
+  "commandFull": "ISURVEY_DGN_TO_CAD",
+  "feature": "Nhập file DGN",
+  "version": "1.8.15",
+  "title": "Nhập file DGN phiên bản 1.8.15",
+  "privacy": "unlisted",
+  "voice": "vi-VN-HoaiMyNeural",
+  "rate": "-8%",
+  "tags": ["iSurvey", "Civil 3D", "AutoCAD", "DGN", "MicroStation", "D2C"],
+  "description": "Cách nhập file MicroStation DGN vào AutoCAD hoặc Civil 3D bằng iSurvey.\n\nHành vi trong video có từ iSurvey 1.8.15 (lệnh D2C, lệnh đủ ISURVEY_DGN_TO_CAD).\nBản iSurvey mới hơn, nếu không đổi phần Nhập DGN, vẫn dùng video này.\nKhi chức năng đổi, sẽ có video phiên bản mới. Video này được giữ lại.\n\nQuay trên AutoCAD 2023, vì máy quay không cài Civil 3D. Cùng hộp thoại iSurvey, bản bundle 1.8.16.\nGói phát hành trên máy chủ tại thời điểm quay vẫn là 1.8.14. Cách nhập trong video là hành vi đã có từ bản 1.8.15.",
+  "shots": [
+    {
+      "id": "01-mo-dau",
+      "type": "card",
+      "lines": ["Nhập file DGN", "phiên bản 1.8.15"],
+      "narration": "Nhập file DGN, phiên bản một chấm tám chấm mười lăm. Video này chỉ cách đưa file MicroStation vào AutoCAD hoặc Civil 3D bằng iSurvey."
+    },
+    {
+      "id": "02-lenh",
+      "type": "screen",
+      "action": "Ribbon iSurvey, bấm Nhập DGN sang CAD. Hộp thoại Nhập DGN mở.",
+      "narration": "Trên ribbon iSurvey, bấm Nhập DGN sang CAD. Cũng có thể gõ lệnh D hai C. Hộp thoại Nhập DGN mở ra. Cần đứng ở Model Space, và đã đăng nhập."
+    },
+    {
+      "id": "03-them-tep",
+      "type": "screen",
+      "action": "Bấm Thêm tệp, chọn mau.dgn, dừng khi bảng có một dòng.",
+      "narration": "Bấm Thêm tệp, rồi chọn file dgn. Bảng liệt kê số thứ tự, tên tệp, thư mục và kích thước. Có thể thêm nhiều tệp, đổi thứ tự, hoặc xóa bớt."
+    },
+    {
+      "id": "04-che-do",
+      "type": "screen",
+      "action": "Chỉ Ghép thành một file dwg, rê qua Rời từng file, rồi chọn lại Ghép.",
+      "narration": "Ghép thành một file dwg đưa các tệp vào đúng bản vẽ đang mở, và giữ tọa độ gốc. Rời từng file dwg thì mỗi dgn thành một file dwg nằm cạnh file nguồn. Lần này chọn chế độ ghép."
+    },
+    {
+      "id": "05-cai-dat",
+      "type": "screen",
+      "action": "Chọn Thêm tiền tố iSurvey_, TCVN3 bật, Explode tắt.",
+      "narration": "Về layer, có thể giữ nguyên Level gốc, hoặc thêm tiền tố. Tiền tố mặc định là iSurvey gạch dưới. Chuyển TCVN3 sang Unicode đang bật. Phá khối DGN Cell đang tắt. Dọn layer và kiểu đường rác luôn chạy, không có ô chọn riêng."
+    },
+    {
+      "id": "06-nhap",
+      "type": "screen",
+      "action": "Bấm Nhập DGN. Đợi phóng vừa bản vẽ và dòng kết quả.",
+      "narration": "Bấm Nhập DGN. iSurvey chèn file vào Model Space, rồi phóng vừa vùng vừa nhập. Muốn hoàn tác thì gõ UNDO hai lần. Một lần cho phần xử lý sau nhập, một lần cho lệnh nhập của Civil."
+    },
+    {
+      "id": "07-ket",
+      "type": "card",
+      "lines": ["Lệnh D2C", "ISURVEY_DGN_TO_CAD", "Có từ iSurvey 1.8.15"],
+      "narration": "Lệnh tắt là D hai C. Lệnh đủ là ISURVEY DGN TO CAD. Cách làm này có từ iSurvey một chấm tám chấm mười lăm. Khi chức năng đổi, sẽ có video phiên bản mới. Video này vẫn được giữ."
+    }
+  ]
+}

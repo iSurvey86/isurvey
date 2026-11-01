@@ -1,0 +1,19 @@
+---
+description: Khi một chức năng đã nhìn trên Civil, viết kịch bản video kèm số phiên bản. Chỉ quay và đăng YouTube khi user nói làm video.
+alwaysApply: true
+---
+
+# Video hướng dẫn theo phiên bản
+
+Quy trình đầy đủ: `docs/video/QUY_TRINH.md`. Sổ video: `docs/video/CATALOG.md`.
+
+Số trên tiêu đề là bản iSurvey **cuối cùng làm đổi chức năng đó** (mục trong `docs/changelog/CHANGELOG.md`), không phải số bundle nếu bản mới không đụng chức năng. Tiêu đề dạng «Nhập file DGN phiên bản 1.8.15» nghĩa là cách làm trong video có từ iSurvey 1.8.15. Bản sau không đổi chức năng thì không làm video mới. Khi chức năng đổi, thêm video mới; video cũ giữ nguyên.
+
+Cuối phiên, hoặc ngay khi một lệnh người dùng thấy đã chạy được trên Civil:
+
+- Thêm `docs/video/kich-ban/<lenh>-<phien-ban>.md` và file json cùng tên.
+- Thêm một dòng vào `docs/video/CATALOG.md`, trạng thái **Chưa quay**.
+
+Chỉ quay màn hình Civil và đăng YouTube khi user nói **làm video** kèm tên chức năng. Không tự mở Civil để quay trong mọi phiên. Quay trên bản vẽ mới. Không ghi đè và không tắt bản vẽ người dùng đang sửa. Không dùng video AI để giả hộp thoại.
+
+Đăng lần đầu ở chế độ không công khai. Token và `client_secret.json` nằm ở `%AppData%\iSurvey\youtube\`, không đưa vào git.

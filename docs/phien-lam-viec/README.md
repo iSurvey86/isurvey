@@ -18,7 +18,8 @@ Khi user nói **`làm cuối phiên đầy đủ`**, AI phải làm đủ theo t
 4. **Docs sản phẩm** — cập nhật `README.md` gốc (và `docs/` workflow / HDSD khi đã có) cho đúng hành vi mới.
 5. **Catalog lệnh** — cập nhật `docs/Danh_sach_lenh_iSurvey.xlsx`. Đối chiếu mọi `CommandMethod` trong `src`. Lệnh mới thêm một dòng. Lệnh đổi hành vi thì sửa dòng đó, kèm phiên bản và ngày. Không để catalog dừng ở bản cũ.
 6. **Changelog** — nếu đã có `docs/changelog/`, ghi mục phiên; nếu chưa thì ghi tóm tắt trong block HANDOFF là đủ.
-7. **Commit + push** — chỉ khi user đã yêu cầu cụm「làm cuối phiên đầy đủ」(đồng nghĩa cho phép commit/push handoff + thay đổi phiên đó).
+7. **Video hướng dẫn** — nếu một lệnh người dùng thấy đã đổi và đã nhìn trên Civil: thêm kịch bản `docs/video/kich-ban/` và một dòng trong `docs/video/CATALOG.md`, trạng thái Chưa quay. Không tự quay, không tự đăng. Chi tiết: `docs/video/QUY_TRINH.md`.
+8. **Commit + push** — chỉ khi user đã yêu cầu cụm「làm cuối phiên đầy đủ」(đồng nghĩa cho phép commit/push handoff + thay đổi phiên đó).
 
 ### Cấu trúc một block HANDOFF
 
