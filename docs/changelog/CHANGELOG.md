@@ -11,13 +11,13 @@ Chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14. Ngày 2026-11-01 
 
 ### Khung mặt cắt
 
-- **RAIMCD**: dòng ngang vừa chọn cách lề trong dưới 10 mm. Số liệu dừng trước khung tên 3 mm. Đã xem trên bản sao mặt cắt dài: 8 tờ A2, tỷ lệ 1/500; 1/5000. F12 bật lại khi lệnh xong.
+- **RAIMCD**: dòng ngang vừa chọn cách lề trong dưới 10 mm. Số liệu dừng trước khung tên 3 mm. Đoạn mặt cắt cao hơn khung được thêm tờ phía trên, cùng tỷ lệ, không ép sang khổ lớn. PDF in lại đúng tờ vì lớp viewport được in và cửa sổ in khớp góc khung.
 
 ### Điểm đo
 - **NHAPDIEM**: bảng sửa được, thêm và xóa dòng. Cao chữ, kiểu điểm (chấm / trống / tròn gạch chéo) và cỡ điểm theo phần trăm màn hình. Cột X, Y trên bảng vẫn là trắc địa. Khi vẽ, CAD nhận Đông trên trục X và Bắc trên trục Y.
 
 ### Mô hình địa hình
-- **TAOMOHINH** tạo mô hình đặt tên trong bản vẽ. Không có cạnh dài nhất. **THEMMOHINH** gắn điểm, đứt gãy, đường đồng mức hoặc nhiều đường bao. **XAYMOHINH** dựng lưới tam giác: đứt gãy và đồng mức là cạnh bắt buộc. Có đường bao thì chỉ giữ tam giác có tâm nằm trong một đường bao. Không có bao thì lưới là bao lồi. **ANTIN** ẩn hoặc hiện lưới của mô hình. **TRACAOD** lấy cao độ tại một điểm trên lưới.
+- **TAOMOHINH** tạo mô hình đặt tên trong bản vẽ. Không có cạnh dài nhất. **THEMMOHINH** gắn điểm, đứt gãy, đường đồng mức hoặc nhiều đường bao. Khi thêm điểm, hộp thoại chọn loại: điểm, block và chữ số bật sẵn; đường nối điểm tắt sẵn và chỉ lấy đỉnh, không thành đứt gãy. Chữ không đọc được thành số thì bỏ. **XAYMOHINH** dựng lưới tam giác: đứt gãy và đồng mức là cạnh bắt buộc. Có đường bao thì chỉ giữ tam giác có tâm nằm trong một đường bao. Không có bao thì lưới là bao lồi. **ANTIN** ẩn hoặc hiện lưới của mô hình. **TRACAOD** lấy cao độ tại một điểm trên lưới.
 - **BANGIS** hiện từng mô hình đã lưu, kèm số điểm, đứt gãy, đồng mức và đường bao. Chuột phải trên tên mô hình để thêm, xây dựng, ẩn/hiện và tra cao độ. Đã nhìn hộp tạo mô hình trên Civil 3D 2026, bản vẽ trắng. Cây mục con chưa nhìn lại trong phiên 2026-11-01.
 
 ## 1.8.15 — 2026-10-30

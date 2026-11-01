@@ -57,6 +57,7 @@ internal static class RoutePdfPlot
             using var _ = doc.LockDocument();
             progress = PlotProgressWindow.ShowNew();
             var db = doc.Database;
+            FrameService.MakeViewportsPlottable(db);
             if (!string.IsNullOrEmpty(stampPath) && !File.Exists(stampPath))
                 stampPath = null;
             step = "CurrentLayout";

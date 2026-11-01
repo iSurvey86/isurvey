@@ -48,17 +48,90 @@ public static class TerrainService
         return models[picked.Value - 1];
     }
 
+    public static int AddPoints(
+        Autodesk.AutoCAD.ApplicationServices.Document doc,
+        TerrainRecord model,
+        bool points,
+        bool blocks,
+        bool labels,
+        bool chains)
+    {
+        var names = new List<string>();
+        if (points)
+            names.Add("POINT");
+        if (blocks)
+            names.Add("INSERT");
+        if (labels)
+        {
+            names.Add("TEXT");
+            names.Add("MTEXT");
+        }
+
+        if (chains)
+        {
+            names.Add("LINE");
+            names.Add("LWPOLYLINE");
+            names.Add("POLYLINE");
+        }
+
+        if (names.Count == 0)
+            return 0;
+        model.Points ??= new List<string>();
+        var editor = doc.Editor;
+        var selection = editor.GetSelection(
+            new PromptSelectionOptions { MessageForAdding = "\nChọn đối tượng đưa vào mô hình: " },
+            new SelectionFilter(new[] { new TypedValue((int)DxfCode.Start, string.Join(",", names)) }));
+        if (selection.Status != PromptStatus.OK || selection.Value is null)
+            return 0;
+
+        var added = 0;
+        var skippedLabels = 0;
+        using (doc.LockDocument())
+        using (var tr = doc.Database.TransactionManager.StartTransaction())
+        {
+            foreach (SelectedObject item in selection.Value)
+            {
+                if (item is null)
+                    continue;
+                if (tr.GetObject(item.ObjectId, OpenMode.ForRead) is not Entity entity || entity.IsErased)
+                    continue;
+                if (entity is DBText or MText)
+                {
+                    if (!TryLabelVertex(entity, out _))
+                    {
+                        skippedLabels++;
+                        continue;
+                    }
+                }
+
+                var handle = entity.Handle.ToString();
+                if (model.Points.Exists(itemHandle => string.Equals(itemHandle, handle, StringComparison.OrdinalIgnoreCase)))
+                    continue;
+                model.Points.Add(handle);
+                added++;
+            }
+
+            tr.Commit();
+        }
+
+        if (skippedLabels > 0)
+            editor.WriteMessage("\n[iSurvey] Bỏ qua " + skippedLabels + " chữ không đọc được thành số.");
+        if (added > 0)
+            TerrainStore.Save(doc.Database, model);
+        return added;
+    }
+
     public static int Add(Autodesk.AutoCAD.ApplicationServices.Document doc, TerrainRecord model, string kind)
     {
         var editor = doc.Editor;
         model.Breaklines ??= new List<string>();
-        var dxf = kind == "point" ? "POINT,LWPOLYLINE,POLYLINE" : "LWPOLYLINE,POLYLINE";
+        var dxf = "LWPOLYLINE,POLYLINE";
         var message = kind switch
         {
             "contour" => "\nChọn đường đồng mức: ",
             "break" => "\nChọn đường đứt gãy: ",
             "boundary" => "\nChọn đường bao kín: ",
-            _ => "\nChọn điểm đo hoặc đường nối điểm: "
+            _ => "\nChọn đường: "
         };
         var selection = editor.GetSelection(
             new PromptSelectionOptions { MessageForAdding = message },
@@ -252,6 +325,36 @@ public static class TerrainService
             return 0;
         }
 
+        if (entity is BlockReference block)
+        {
+            target.Add(new TinVertex(block.Position.X, block.Position.Y, block.Position.Z));
+            return 0;
+        }
+
+        if (entity is DBText or MText)
+        {
+            if (TryLabelVertex(entity, out var label))
+                target.Add(label);
+            return 0;
+        }
+
+        if (entity is Line line)
+        {
+            var start = new TinVertex(line.StartPoint.X, line.StartPoint.Y, line.StartPoint.Z);
+            var end = new TinVertex(line.EndPoint.X, line.EndPoint.Y, line.EndPoint.Z);
+            target.Add(start);
+            target.Add(end);
+            if (links is not null)
+            {
+                var dx = start.X - end.X;
+                var dy = start.Y - end.Y;
+                if (dx * dx + dy * dy > 1e-8)
+                    links.Add(new TinSegment(start, end));
+            }
+
+            return 0;
+        }
+
         var vertices = Vertices(tr, entity);
         if (vertices.Count == 0)
             return 1;
@@ -318,6 +421,53 @@ public static class TerrainService
         }
 
         return list;
+    }
+
+    private static bool TryLabelVertex(Entity entity, out TinVertex vertex)
+    {
+        string raw;
+        Point3d anchor;
+        if (entity is DBText text)
+        {
+            raw = text.TextString ?? "";
+            anchor = text.HorizontalMode == TextHorizontalMode.TextLeft
+                && text.VerticalMode == TextVerticalMode.TextBase
+                ? text.Position
+                : text.AlignmentPoint;
+        }
+        else if (entity is MText mtext)
+        {
+            raw = mtext.Text ?? "";
+            anchor = mtext.Location;
+        }
+        else
+        {
+            vertex = default;
+            return false;
+        }
+
+        if (!TryElevation(raw, out var elevation))
+        {
+            vertex = default;
+            return false;
+        }
+
+        vertex = new TinVertex(anchor.X, anchor.Y, elevation);
+        return true;
+    }
+
+    private static bool TryElevation(string text, out double value)
+    {
+        var label = text.Replace('\r', ' ').Replace('\n', ' ').Trim();
+        if (label.Length == 0)
+        {
+            value = 0;
+            return false;
+        }
+
+        if (double.TryParse(label, NumberStyles.Float, CultureInfo.InvariantCulture, out value))
+            return true;
+        return double.TryParse(label.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out value);
     }
 
     private static bool IsClosed(Transaction tr, Entity entity)
