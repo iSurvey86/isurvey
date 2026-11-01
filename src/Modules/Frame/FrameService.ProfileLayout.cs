@@ -111,7 +111,7 @@ public sealed partial class FrameService
             return;
         }
 
-        if (!TryMeasureProfile(db, pick.Value, out var band, out var why))
+        if (!TryMeasureProfile(db, pick.Value, out var band, out var segs, out var why))
         {
             ed.WriteMessage("\n[iSurvey] " + why);
             return;
@@ -152,7 +152,7 @@ public sealed partial class FrameService
         };
 
         int CountPieces(string size, int scale, double ovM) =>
-            SliceStations(band, size, scale, ovM, unitM).Count;
+            BuildFrames(segs, band, size, scale, ovM, unitM).Sum(g => g.Count);
 
         string? Reject(string size, int scale) => FitIssue(band, size, scale, unitM);
 
@@ -196,16 +196,16 @@ public sealed partial class FrameService
         }
 
         var spec = Specs.First(s => s.Name.Equals(opts.Size, StringComparison.OrdinalIgnoreCase));
-        var slices = SliceStations(band, opts.Size, opts.Scale, opts.OverlapM, unitM);
-        if (opts.Rows * opts.Cols < slices.Count)
-        {
-            SuggestGrid(slices.Count, out var r, out var c);
-            opts.Rows = r;
-            opts.Cols = c;
-        }
+        var groups = BuildFrames(segs, band, opts.Size, opts.Scale, opts.OverlapM, unitM);
+        var sheetCount = groups.Sum(g => g.Count);
+        var extra = sheetCount - groups.Count;
+        if (opts.Cols < 1)
+            opts.Cols = 1;
+        if (extra > 0)
+            ed.WriteMessage($"\n[iSurvey] {extra} tờ thêm phía trên các đoạn cao hơn khung. Tỷ lệ giữ nguyên, tờ dưới vẫn ghim dòng đã chọn.");
 
         ed.WriteMessage(
-            $"\n[iSurvey] {slices.Count} tờ {spec.Name}, tỷ lệ {opts.ScaleText}, chồng gối {opts.OverlapM:0.#} m, lưới {opts.Rows}×{opts.Cols}.");
+            $"\n[iSurvey] {sheetCount} tờ {spec.Name}, tỷ lệ {opts.ScaleText}, chồng gối {opts.OverlapM:0.#} m, {groups.Count} đoạn lý trình.");
 
         SaveProfileChoices(opts, defaults);
 
@@ -261,7 +261,7 @@ public sealed partial class FrameService
         }
 
         _pageSetupIssue = null;
-        var built = BuildProfileLayout(doc, spec, template, opts, unitM, band, slices, layoutName, overwrite, out var windows);
+        var built = BuildProfileLayout(doc, spec, template, opts, unitM, band, groups, layoutName, overwrite, out var windows);
         ed.Regen();
 
         if (_pageSetupIssue is not null)
@@ -329,11 +329,12 @@ public sealed partial class FrameService
         public bool Vertical => Math.Abs(X1 - X0) < 0.8 && Math.Abs(Y1 - Y0) > 20;
     }
 
-    private static bool TryMeasureProfile(Database db, Point3d pick, out ProfileBand band, out string why)
+    private static bool TryMeasureProfile(Database db, Point3d pick, out ProfileBand band, out List<Seg> segs, out string why)
     {
         band = default;
+        segs = [];
         why = "";
-        var segs = new List<Seg>();
+        var found = new List<Seg>();
         using (var tr = db.TransactionManager.StartTransaction())
         {
             var bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
@@ -344,7 +345,7 @@ public sealed partial class FrameService
                     continue;
                 try
                 {
-                    CollectSegs(ent, segs);
+                    CollectSegs(ent, found);
                 }
                 catch
                 {
@@ -355,6 +356,7 @@ public sealed partial class FrameService
             tr.Commit();
         }
 
+        segs = found;
         Seg? cutLine = null;
         var bestDy = double.MaxValue;
         foreach (var s in segs)
@@ -514,16 +516,6 @@ public sealed partial class FrameService
     private static double ProfileMapWidth(Spec spec) =>
         Math.Max(80, spec.Mx1 - spec.Mx0 - ProfileRightGapMm);
 
-    /// <summary>
-    /// Ghim dòng ngang vừa chọn lên vạch cách lề trong dưới 10 mm.
-    /// Vạch đó trùng đường ngang đáy của khung tên.
-    /// </summary>
-    private static double ProfileCenterY(ProfileBand band, double paperH, double custom)
-    {
-        var cutPaper = ProfileInnerBottomMm + ProfileCutAboveInnerMm;
-        return band.YCut - (cutPaper - paperH / 2.0) / custom;
-    }
-
     private static string FirstFittingSize(ProfileBand band, double unitM, int scale)
     {
         foreach (var name in ProfileSizes)
@@ -543,12 +535,7 @@ public sealed partial class FrameService
         var custom = 1000.0 * unitM / scale;
         if (custom <= 0)
             return "Tỷ lệ không hợp lệ.";
-        // Khung 1/5000 là cả tờ giấy (A3 = 420×297 mm) nhân mẫu số / 1000.
-        // Phần trong của khung ngắn hơn 20 mm; mặt cắt được vẽ vừa tờ, không vừa mỗi đường trong.
-        var capacity = PaperSizeMm(spec).h / custom;
-        var need = band.YTop - band.YCut;
-        if (need > capacity + 0.5)
-            return $"Khổ {size} ở tỷ lệ này cao {capacity:0} đơn vị, dải mặt cắt cần {need:0}. Chọn khổ lớn hơn.";
+        // Cao hơn tờ giấy thì thêm tờ phía trên, không ép sang khổ lớn.
         var labelMm = (band.XSplit - band.XLeft) * custom;
         var mapW = ProfileMapWidth(spec);
         if (labelMm > mapW * 0.45)
@@ -608,9 +595,102 @@ public sealed partial class FrameService
         return list;
     }
 
+    /// <summary>Một tờ: đoạn lý trình và mức cao độ neo ở lề dưới.</summary>
+    private readonly record struct ProfileFrame(double X0, double X1, double YAnchor, bool PinTable);
+
+    /// <summary>
+    /// Chia theo lý trình, rồi mỗi đoạn cao hơn khung được tách thêm tờ phía trên.
+    /// Tờ dưới ghim dòng đã chọn. Tờ trên giữ cùng tỷ lệ, không đổi khổ giấy.
+    /// </summary>
+    private static List<List<ProfileFrame>> BuildFrames(
+        List<Seg> segs, ProfileBand band, string size, int scale, double overlapM, double unitM)
+    {
+        var slices = SliceStations(band, size, scale, overlapM, unitM);
+        var groups = new List<List<ProfileFrame>>();
+        foreach (var slice in slices)
+            groups.Add(SplitHeight(segs, band.YCut, slice.X0, slice.X1, size, scale, unitM));
+        return groups;
+    }
+
+    private static List<ProfileFrame> SplitHeight(
+        List<Seg> segs, double yCut, double x0, double x1, string size, int scale, double unitM)
+    {
+        var spec = Specs.First(s => s.Name.Equals(size, StringComparison.OrdinalIgnoreCase));
+        var custom = 1000.0 * unitM / scale;
+        var paperH = PaperSizeMm(spec).h;
+        var overlap = 20.0 / custom;
+        var localTop = LocalTop(segs, x0, x1, yCut);
+        var frames = new List<ProfileFrame>();
+        var anchor = yCut;
+        var pin = true;
+        var guard = 0;
+        while (guard++ < 16)
+        {
+            frames.Add(new ProfileFrame(x0, x1, anchor, pin));
+            var top = VisibleTop(anchor, pin, paperH, custom);
+            if (localTop <= top + 0.5)
+                break;
+            var next = top - overlap;
+            if (next <= anchor + 1)
+                break;
+            anchor = next;
+            pin = false;
+        }
+
+        if (frames.Count > 1)
+        {
+            var last = frames[^1];
+            var top = VisibleTop(last.YAnchor, last.PinTable, paperH, custom);
+            if (localTop > top + 0.5)
+            {
+                var room = (paperH - ProfileInnerBottomMm - ProfileInnerBottomMm) / custom;
+                frames[^1] = new ProfileFrame(last.X0, last.X1, Math.Max(frames[^2].YAnchor + 1, localTop - room), false);
+            }
+        }
+
+        return frames;
+    }
+
+    /// <summary>Mức model tại mép trên vùng vẽ, chừa 10 mm lề trong trên.</summary>
+    private static double VisibleTop(double anchor, bool pinTable, double paperH, double custom)
+    {
+        var bottomMm = pinTable ? ProfileInnerBottomMm + ProfileCutAboveInnerMm : ProfileInnerBottomMm;
+        return anchor + (paperH - bottomMm - ProfileInnerBottomMm) / custom;
+    }
+
+    private static double FrameCenterY(double anchor, bool pinTable, double paperH, double custom)
+    {
+        var bottomMm = pinTable ? ProfileInnerBottomMm + ProfileCutAboveInnerMm : ProfileInnerBottomMm;
+        return anchor - (bottomMm - paperH / 2.0) / custom;
+    }
+
+    /// <summary>
+    /// Đỉnh mặt cắt trong một đoạn lý trình.
+    /// Lấy phân vị cao, không lấy một nét lạc lên bản đồ.
+    /// </summary>
+    private static double LocalTop(List<Seg> segs, double x0, double x1, double yCut)
+    {
+        var ys = new List<double>();
+        foreach (var s in segs)
+        {
+            if (s.MaxY - s.MinY > 8000)
+                continue;
+            if (s.MaxX < x0 - 2 || s.MinX > x1 + 2)
+                continue;
+            if (s.MaxY < yCut + 5 || s.MinY > yCut + 20000)
+                continue;
+            ys.Add(s.MaxY);
+        }
+
+        if (ys.Count == 0)
+            return yCut;
+        ys.Sort();
+        return ys[(int)((ys.Count - 1) * 0.99)];
+    }
+
     private static int BuildProfileLayout(
         Document doc, Spec spec, string template, RouteLayoutOptions opts, double unitM, ProfileBand band,
-        List<(double X0, double X1)> slices, string layoutName, bool overwrite, out List<Extents2d> windows)
+        List<List<ProfileFrame>> groups, string layoutName, bool overwrite, out List<Extents2d> windows)
     {
         var db = doc.Database;
         var ed = doc.Editor;
@@ -631,7 +711,8 @@ public sealed partial class FrameService
         var margin = ProfileAxisMarginM / unitM;
         var marginMm = margin * custom;
         var viewH = paperH / custom;
-        var centerY = ProfileCenterY(band, paperH, custom);
+        var sheetTotal = groups.Sum(g => g.Count);
+        var sheetNo = 0;
 
         ObjectId blockId;
         string frameLayer;
@@ -641,7 +722,7 @@ public sealed partial class FrameService
             EnsureLayer(trS, db, LayerViewport);
             var lt = (LayerTable)trS.GetObject(db.LayerTableId, OpenMode.ForRead);
             var ltr = (LayerTableRecord)trS.GetObject(lt[LayerViewport], OpenMode.ForWrite);
-            ltr.IsPlottable = false;
+            ltr.IsPlottable = true;
             frameLayer = lt.Has("KB_KHUNG") ? "KB_KHUNG" : "0";
             trS.Commit();
         }
@@ -680,62 +761,76 @@ public sealed partial class FrameService
                     attDefs.Add(ad);
             }
 
-            for (var i = 0; i < slices.Count; i++)
+            var cols = Math.Max(1, opts.Cols);
+            var stationRows = (int)Math.Ceiling(groups.Count / (double)cols);
+            var yBase = 0.0;
+            for (var sr = 0; sr < stationRows; sr++)
             {
-                var slice = slices[i];
-                var row = i / opts.Cols;
-                var col = i % opts.Cols;
-                var cx = col * (paperW + opts.GapMm);
-                var cy = (opts.Rows - 1 - row) * (paperH + opts.GapMm);
-                windows.Add(new Extents2d(cx, cy, cx + paperW, cy + paperH));
-
-                var br = new BlockReference(new Point3d(cx, cy, 0), blockId) { Layer = frameLayer };
-                ps.AppendEntity(br);
-                tr.AddNewlyCreatedDBObject(br, true);
-                frameIds.Add(br.ObjectId);
-                foreach (var ad in attDefs)
+                var rowGroups = groups.Skip(sr * cols).Take(cols).ToList();
+                var bandCount = rowGroups.Max(g => g.Count);
+                for (var col = 0; col < rowGroups.Count; col++)
                 {
-                    var ar = new AttributeReference();
-                    ar.SetAttributeFromBlock(ad, br.BlockTransform);
-                    ar.TextString = SheetAttributeText(ad.Tag, opts, i + 1, slices.Count, opts.Scale);
-                    br.AttributeCollection.AppendAttribute(ar);
-                    tr.AddNewlyCreatedDBObject(ar, true);
-                    TitleBlockFit.Fit(tr, ar, br);
+                    var bands = rowGroups[col];
+                    for (var b = 0; b < bands.Count; b++)
+                    {
+                        var frame = bands[b];
+                        var cx = col * (paperW + opts.GapMm);
+                        var cy = yBase + b * (paperH + opts.GapMm);
+                        windows.Add(new Extents2d(cx, cy, cx + paperW, cy + paperH));
+                        sheetNo++;
+
+                        var br = new BlockReference(new Point3d(cx, cy, 0), blockId) { Layer = frameLayer };
+                        ps.AppendEntity(br);
+                        tr.AddNewlyCreatedDBObject(br, true);
+                        frameIds.Add(br.ObjectId);
+                        foreach (var ad in attDefs)
+                        {
+                            var ar = new AttributeReference();
+                            ar.SetAttributeFromBlock(ad, br.BlockTransform);
+                            ar.TextString = SheetAttributeText(ad.Tag, opts, sheetNo, sheetTotal, opts.Scale);
+                            br.AttributeCollection.AppendAttribute(ar);
+                            tr.AddNewlyCreatedDBObject(ar, true);
+                            TitleBlockFit.Fit(tr, ar, br);
+                        }
+
+                        PlaceSignatures(tr, ps, br, signBlocks);
+
+                        var centerY = FrameCenterY(frame.YAnchor, frame.PinTable, paperH, custom);
+                        var leftPaper = cx + ProfileLeftInsetMm;
+                        var leftWidth = labelMm + marginMm;
+                        var leftModel = (band.XLeft - margin + band.XSplit) / 2.0;
+                        var paperY = cy + paperH / 2.0;
+                        viewportIds.Add(AddProfileViewport(tr, ps,
+                            leftPaper + leftWidth / 2.0, paperY,
+                            leftWidth, paperH,
+                            leftModel, centerY, viewH, custom));
+
+                        var rightPaper = leftPaper + leftWidth - marginMm;
+                        var rightModel = frame.X0 - margin + (stationMm / custom) / 2.0;
+                        viewportIds.Add(AddProfileViewport(tr, ps,
+                            rightPaper + stationMm / 2.0, paperY,
+                            stationMm, paperH,
+                            rightModel, centerY, viewH, custom));
+
+                        var mapRight = rightPaper + stationMm;
+                        var sheetTop = cy + paperH;
+                        if (frame.PinTable)
+                        {
+                            var xLeftPaper = leftPaper + leftWidth / 2.0 + (band.XLeft - leftModel) * custom;
+                            var yCutPaper = paperY + (band.YCut - centerY) * custom;
+                            foreach (var id in AddProfileCover(tr, ps, frameLayer,
+                                leftPaper, cy, mapRight, sheetTop,
+                                xLeftPaper, yCutPaper))
+                                coverIds.Add(id);
+                        }
+
+                        var innerTop = sheetTop - ProfileInnerBottomMm;
+                        if (innerTop < sheetTop && mapRight - leftPaper > 0.2)
+                            coverIds.Add(AddCover(tr, ps, frameLayer, leftPaper, innerTop, mapRight, sheetTop));
+                    }
                 }
 
-                PlaceSignatures(tr, ps, br, signBlocks);
-
-                var leftPaper = cx + ProfileLeftInsetMm;
-                var leftWidth = labelMm + marginMm;
-                var leftModel = (band.XLeft - margin + band.XSplit) / 2.0;
-                var paperY = cy + paperH / 2.0;
-                viewportIds.Add(AddProfileViewport(tr, ps,
-                    leftPaper + leftWidth / 2.0, paperY,
-                    leftWidth, paperH,
-                    leftModel, centerY, viewH, custom));
-
-                var rightPaper = leftPaper + leftWidth - marginMm;
-                var rightModel = slice.X0 - margin + (stationMm / custom) / 2.0;
-                viewportIds.Add(AddProfileViewport(tr, ps,
-                    rightPaper + stationMm / 2.0, paperY,
-                    stationMm, paperH,
-                    rightModel, centerY, viewH, custom));
-
-                var xLeftPaper = leftPaper + leftWidth / 2.0 + (band.XLeft - leftModel) * custom;
-                var yCutPaper = paperY + (band.YCut - centerY) * custom;
-                foreach (var id in AddProfileCover(tr, ps, frameLayer,
-                    leftPaper, cy, rightPaper + stationMm, cy + paperH,
-                    xLeftPaper, yCutPaper))
-                    coverIds.Add(id);
-
-                var mapRight = rightPaper + stationMm;
-                var sheetRight = cx + paperW;
-                var sheetTop = cy + paperH;
-                if (sheetRight - mapRight > 0.2)
-                    coverIds.Add(AddCover(tr, ps, frameLayer, mapRight, cy, sheetRight, sheetTop));
-                var innerTop = sheetTop - ProfileInnerBottomMm;
-                if (innerTop < sheetTop && mapRight - leftPaper > 0.2)
-                    coverIds.Add(AddCover(tr, ps, frameLayer, leftPaper, innerTop, mapRight, sheetTop));
+                yBase += bandCount * (paperH + opts.GapMm);
             }
 
             tr.Commit();
@@ -794,7 +889,7 @@ public sealed partial class FrameService
             // chỉ để nhìn thấy cả lưới
         }
 
-        return slices.Count;
+        return sheetNo;
     }
 
     private static ObjectId AddProfileViewport(
@@ -853,6 +948,22 @@ public sealed partial class FrameService
         };
         cover.SetFrom(pts, Vector3d.ZAxis);
         return cover.ObjectId;
+    }
+
+    /// <summary>Lớp viewport phải in được, nếu không PDF chỉ còn nền trắng.</summary>
+    internal static void MakeViewportsPlottable(Database db)
+    {
+        using var tr = db.TransactionManager.StartTransaction();
+        var lt = (LayerTable)tr.GetObject(db.LayerTableId, OpenMode.ForRead);
+        if (!lt.Has(LayerViewport))
+        {
+            tr.Commit();
+            return;
+        }
+
+        var ltr = (LayerTableRecord)tr.GetObject(lt[LayerViewport], OpenMode.ForWrite);
+        ltr.IsPlottable = true;
+        tr.Commit();
     }
 
     private static void SaveProfileChoices(RouteLayoutOptions opts, Dictionary<string, string> defaults)

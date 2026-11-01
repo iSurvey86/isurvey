@@ -98,7 +98,32 @@ public sealed class TerrainModule
         var kind = Kind(doc.Editor);
         if (kind is null)
             return;
-        var added = TerrainService.Add(doc, model, kind);
+        int added;
+        if (kind == "point")
+        {
+            PointSourceChoice? choice;
+            try
+            {
+                choice = AddPointSourcesWindow.Prompt();
+            }
+            catch (System.Exception ex)
+            {
+                doc.Editor.WriteMessage("\n[iSurvey] Không mở được hộp thoại: " + ex.Message);
+                return;
+            }
+
+            if (choice is null)
+            {
+                doc.Editor.WriteMessage("\n[iSurvey] Đã hủy thêm điểm.");
+                return;
+            }
+
+            added = TerrainService.AddPoints(doc, model, choice.Points, choice.Blocks, choice.Labels, choice.Chains);
+        }
+        else
+        {
+            added = TerrainService.Add(doc, model, kind);
+        }
         var label = kind switch
         {
             "contour" => "đường đồng mức",

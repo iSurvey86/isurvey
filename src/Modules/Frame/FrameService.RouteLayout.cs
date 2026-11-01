@@ -1421,10 +1421,20 @@ public sealed partial class FrameService
             if (spec is null)
                 continue;
             var (pw, ph) = PaperSizeMm(spec);
-            var originX = pw - spec.Fw - 5.0;
-            var originY = (ph - spec.Fh) / 2.0;
-            var cx = br.Position.X - originX;
-            var cy = br.Position.Y - originY;
+            double cx;
+            double cy;
+            if (layoutName.StartsWith(ProfileLayoutName, StringComparison.OrdinalIgnoreCase))
+            {
+                cx = br.Position.X;
+                cy = br.Position.Y;
+            }
+            else
+            {
+                var originX = pw - spec.Fw - 5.0;
+                var originY = (ph - spec.Fh) / 2.0;
+                cx = br.Position.X - originX;
+                cy = br.Position.Y - originY;
+            }
             found.Add(new PlotSheet(br.ObjectId, cx, cy, new Extents2d(cx, cy, cx + pw, cy + ph), pw, ph));
         }
 

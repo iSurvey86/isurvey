@@ -5,14 +5,53 @@
 
 ---
 
+## 2026-11-01 — Thêm điểm và mức so sánh (1.8.16, chưa phát hành)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ. **Không bump.** Vẫn **1.8.16**, chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14.
+
+### Đã chốt / đã làm
+
+- **THEMMOHINH** khi thêm điểm mở hộp chọn loại. Điểm, block và chữ số bật sẵn. Đường nối điểm tắt sẵn, chỉ lấy đỉnh, không thành đứt gãy. Chữ không phải số thì bỏ. Đứt gãy, đồng mức và đường bao vẫn chọn đường. Đã nhìn hộp trên Civil 3D 2026 Metric, bản vẽ trắng Drawing1, rồi hủy.
+- Khi vẽ mặt cắt (`VEMCD`, chưa có lệnh), đoạn vượt khung thì đặt lại mức so sánh và gợi ý mức mới theo khoảng lý trình. **RAIMCD** không đổi mức so sánh.
+- **RAIMCD** thêm tờ phía trên khi đoạn cao hơn một tờ, cùng tỷ lệ. Tờ dưới ghim dòng chọn cách lề trong 10 mm. Số liệu dừng trước khung tên 3 mm. Lần chạy nền trên bản sao dài khoảng 18 km ra 63 tờ A3. Chưa nhìn đỉnh trên layout của Civil đang mở từ trước.
+- **INTUYEN** tờ `MatCat_Doc`: lớp viewport in được, cửa sổ in lấy góc khung. Chưa in lại PDF trong lần này.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Thêm điểm | `src/Modules/Terrain/TerrainService.cs`, `src/UI/Terrain/AddPointSourcesWindow.xaml` |
+| Rải mặt cắt | `src/Modules/Frame/FrameService.ProfileLayout.cs` |
+| In mặt cắt | `src/Modules/Frame/RoutePdfPlot.cs`, `FrameService.RouteLayout.cs` |
+| Mức so sánh | `docs/nghien-cuu/ADSCivil-mat-cat-doc.md` |
+
+### Việc tiếp
+
+- [ ] Chưa phát hành 1.8.16. Máy khác kéo mã vẫn thấy gói UPD là 1.8.14 cho đến khi đóng gói.
+- [ ] Civil đang mở từ trước còn DLL cũ. Đóng và mở lại trước khi thử THEMMOHINH hoặc RAIMCD. Cửa sổ thử Drawing1: đóng và không lưu nếu còn mở.
+- [ ] Nhìn đỉnh RAIMCD trên layout sau khi nạp DLL mới. Nhìn lại cây BANGIS trên Civil.
+- [ ] Pha 2: tuyến và cọc. `VEMCD` chưa có lệnh. Khi vẽ, đoạn vượt khung thì đặt lại mức so sánh và gợi ý mức mới.
+- [ ] SQL `schema_last_seen.sql` và `schema_force_logout.sql` vẫn phải chạy trên Supabase nếu chưa chạy.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff đầu. iSurvey 1.8.16, chưa phát hành, không bump thêm. THEMMOHINH thêm điểm mở hộp: điểm, block, chữ số bật sẵn; đường nối điểm tắt sẵn. Đã nhìn hộp trên bản vẽ trắng. VEMCD chưa có lệnh; khi vẽ, đoạn vượt khung thì đặt lại mức so sánh và gợi ý mức mới. RAIMCD không đổi mức, đoạn cao thêm tờ phía trên cùng tỷ lệ. Civil mở từ trước cần đóng và mở lại mới nạp DLL mới. Tiếp: nhìn đỉnh trên layout sau khi mở lại Civil, hoặc pha 2 tuyến và cọc, hoặc phát hành 1.8.16 khi được yêu cầu.
+```
+
+**Lưu trữ ngày:** [2026-11-01-them-diem.md](./2026-11-01-them-diem.md)
+
+---
+
 ## 2026-11-01 — Lề RAIMCD và nhiều đường bao (1.8.16, chưa phát hành)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ. **Không bump.** Vẫn **1.8.16**, chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14.
 
 ### Đã chốt / đã làm
 
-- **RAIMCD** trên bản sao `MCD so bo.dwg` (file gốc không ghi đè). Bản dài, khổ nhỏ nhất còn chứa là A2, tỷ lệ 1/500; 1/5000, 8 tờ, layout `MatCat_Doc`.
-- Dòng ngang vừa chọn cách lề trong dưới **10 mm** (cách mép giấy 20 mm; lề trong dưới ở 10 mm). Số liệu dừng trước vạch trái khung tên **3 mm** (cửa sổ kết thúc 531 mm, khung tên bắt đầu 534 mm trên tờ A2). Đã nhìn góc khung tên trên Civil. F12 bật lại khi lệnh xong.
+- **THEMMOHINH** khi thêm điểm mở hộp chọn loại. Điểm, block và chữ số bật sẵn. Đường nối điểm tắt sẵn, chỉ lấy đỉnh, không thành đứt gãy. Chữ không phải số thì bỏ. Đứt gãy, đồng mức và đường bao vẫn chọn đường. Không thêm mục đối tượng khác.
+- **RAIMCD** không ép khổ lớn khi mặt cắt cao. Tờ dưới ghim dòng chọn cách lề trong **10 mm**. Đoạn cao hơn khung được xếp thêm tờ phía trên, cùng tỷ lệ. Số liệu dừng trước khung tên **3 mm**. Trên bản sao dài 18 km, khổ A3 ra nhiều tờ vì có đoạn cao hơn một tờ.
+- **INTUYEN** tờ mặt cắt bị trắng vì lớp viewport không in và cửa sổ in lệch góc khung. Đã cho lớp đó in được, và cửa sổ in của `MatCat_Doc` lấy đúng góc khối khung.
 - Mô hình giữ **nhiều đường bao**. Tam giác được giữ khi tâm nằm trong một đường bao bất kỳ. Không có bao thì lưới vẫn là bao lồi. Đường bao cũ một chuỗi vẫn được đọc.
 - **BANGIS** liệt kê dưới mỗi mô hình: điểm, đứt gãy, đồng mức, đường bao, có nét đứt nối. Chưa mở lại bảng này trên Civil trong phiên.
 
@@ -28,13 +67,13 @@
 
 - [ ] Chưa phát hành 1.8.16. Máy khác kéo mã vẫn thấy gói UPD là 1.8.14 cho đến khi đóng gói.
 - [ ] Nhìn lại cây BANGIS trên Civil: bốn mục con và nét đứt.
-- [ ] Pha 2: tuyến và cọc. `VEMCD` chưa có lệnh.
+- [ ] Pha 2: tuyến và cọc. `VEMCD` chưa có lệnh. Khi vẽ, đoạn nào vượt khung thì đặt lại mức so sánh và gợi ý mức mới theo khoảng lý trình. `RAIMCD` không đổi mức so sánh.
 - [ ] SQL `schema_last_seen.sql` và `schema_force_logout.sql` vẫn phải chạy trên Supabase nếu chưa chạy.
 
 ### Câu mở phiên sau
 
 ```text
-git pull, đọc handoff đầu. iSurvey 1.8.16, chưa phát hành, không bump thêm. RAIMCD: dòng chọn cách lề trong dưới 10 mm, số liệu dừng trước khung tên 3 mm, đã xem trên bản sao MCD so bo. Mô hình nhận nhiều đường bao. BANGIS có mục con điểm, đứt gãy, đồng mức, đường bao. VEMCD chưa có lệnh. Tiếp: nhìn cây BANGIS trên Civil khi được yêu cầu, hoặc pha 2 tuyến và cọc, hoặc phát hành 1.8.16 khi được yêu cầu.
+git pull, đọc handoff đầu. iSurvey 1.8.16, chưa phát hành, không bump thêm. RAIMCD: dòng chọn cách lề trong dưới 10 mm, số liệu dừng trước khung tên 3 mm, đã xem trên bản sao MCD so bo. Mô hình nhận nhiều đường bao. BANGIS có mục con điểm, đứt gãy, đồng mức, đường bao. VEMCD chưa có lệnh. Khi vẽ mặt cắt, đoạn vượt khung thì đặt lại mức so sánh và gợi ý mức mới; RAIMCD không đổi mức. Tiếp: nhìn cây BANGIS trên Civil khi được yêu cầu, hoặc pha 2 tuyến và cọc, hoặc phát hành 1.8.16 khi được yêu cầu.
 ```
 
 **Lưu trữ ngày:** [2026-11-01-raimcd-le.md](./2026-11-01-raimcd-le.md)
