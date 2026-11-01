@@ -85,8 +85,8 @@ public static class TerrainService
                         continue;
                     }
 
-                    model.Boundary = handle;
-                    added = 1;
+                    model.RememberBoundary(handle);
+                    added++;
                 }
                 else
                 {
@@ -115,7 +115,7 @@ public static class TerrainService
     {
         var points = new List<TinVertex>();
         var constraints = new List<TinSegment>();
-        List<TinVertex>? boundary = null;
+        var boundaries = new List<List<TinVertex>>();
         var missing = 0;
         model.Breaklines ??= new List<string>();
         using (var tr = doc.Database.TransactionManager.StartTransaction())
@@ -126,13 +126,12 @@ public static class TerrainService
                 missing += Collect(tr, doc.Database, handle, points, constraints);
             foreach (var handle in model.Contours)
                 missing += Collect(tr, doc.Database, handle, points, constraints);
-            var boundaryHandle = model.Boundary;
-            if (!string.IsNullOrEmpty(boundaryHandle))
+            foreach (var boundaryHandle in model.BoundaryHandles())
             {
                 var ring = new List<TinVertex>();
                 missing += Collect(tr, doc.Database, boundaryHandle, ring, null);
                 if (ring.Count >= 3)
-                    boundary = ring;
+                    boundaries.Add(ring);
             }
 
             tr.Commit();
@@ -146,8 +145,8 @@ public static class TerrainService
             return 0;
         }
 
-        var triangles = TinBuilder.Build(points, constraints, boundary, out var unforced);
-        if (boundary is null)
+        var triangles = TinBuilder.Build(points, constraints, boundaries.Count == 0 ? null : boundaries, out var unforced);
+        if (boundaries.Count == 0)
             doc.Editor.WriteMessage("\n[iSurvey] Chưa có đường bao. Lưới giữ bao lồi, kể cả tam giác dài giữa các cụm điểm.");
         if (unforced > 0)
             doc.Editor.WriteMessage("\n[iSurvey] " + unforced + " cạnh đứt gãy hoặc đồng mức chưa ép được vào lưới.");

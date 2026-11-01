@@ -32,17 +32,54 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="TreeViewItem">
                             <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
-                                <Border x:Name="Row" Grid.Row="0" Background="{TemplateBinding Background}"
-                                        CornerRadius="6" Padding="6,5" Margin="0,1">
+                                <Grid Grid.Column="0" Grid.Row="0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <Line x:Name="GuideUp" Grid.Row="0" X1="0" Y1="0" X2="0" Y2="1" Stretch="Fill"
+                                          Stroke="#64748B" StrokeThickness="1" StrokeDashArray="1.2 1.6"
+                                          HorizontalAlignment="Center"/>
+                                    <Line x:Name="GuideDownHead" Grid.Row="1" X1="0" Y1="0" X2="0" Y2="1" Stretch="Fill"
+                                          Stroke="#64748B" StrokeThickness="1" StrokeDashArray="1.2 1.6"
+                                          HorizontalAlignment="Center"/>
+                                    <Line X1="0" Y1="0" X2="1" Y2="0" Stretch="Fill" Grid.RowSpan="2"
+                                          Stroke="#64748B" StrokeThickness="1" StrokeDashArray="1.2 1.6"
+                                          VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                </Grid>
+                                <Line x:Name="GuideDownBody" Grid.Column="0" Grid.Row="1" X1="0" Y1="0" X2="0" Y2="1"
+                                      Stretch="Fill" Stroke="#64748B" StrokeThickness="1" StrokeDashArray="1.2 1.6"
+                                      HorizontalAlignment="Center"/>
+                                <Border x:Name="Row" Grid.Column="1" Grid.Row="0" Background="{TemplateBinding Background}"
+                                        CornerRadius="6" Padding="2,4" Margin="0,1">
                                     <ContentPresenter ContentSource="Header" HorizontalAlignment="Stretch"/>
                                 </Border>
-                                <ItemsPresenter Grid.Row="1" Margin="22,0,0,0"/>
+                                <Grid Grid.Column="1" Grid.Row="1">
+                                    <Line x:Name="ChildTrunk" X1="0" Y1="0" X2="0" Y2="1" Stretch="Fill"
+                                          Stroke="#64748B" StrokeThickness="1" StrokeDashArray="1.2 1.6"
+                                          HorizontalAlignment="Left" Margin="8,0,0,0"/>
+                                    <ItemsPresenter/>
+                                </Grid>
                             </Grid>
                             <ControlTemplate.Triggers>
+                                <DataTrigger Binding="{Binding GuideUp}" Value="False">
+                                    <Setter TargetName="GuideUp" Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding GuideDown}" Value="False">
+                                    <Setter TargetName="GuideDownHead" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="GuideDownBody" Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                                <Trigger Property="HasItems" Value="False">
+                                    <Setter TargetName="ChildTrunk" Property="Visibility" Value="Collapsed"/>
+                                </Trigger>
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter TargetName="Row" Property="Background" Value="#DDE3EA"/>
                                 </Trigger>
@@ -89,9 +126,9 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Grid Width="16" Height="16" VerticalAlignment="Center" Margin="0,1,0,0">
-                        <Ellipse Width="14" Height="14" Fill="#3B82F6">
-                            <Ellipse.Style>
-                                <Style TargetType="Ellipse">
+                        <Grid>
+                            <Grid.Style>
+                                <Style TargetType="Grid">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IconKind}" Value="Point">
@@ -99,20 +136,26 @@
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </Ellipse.Style>
-                        </Ellipse>
-                        <Ellipse Width="4" Height="4" Fill="White">
-                            <Ellipse.Style>
-                                <Style TargetType="Ellipse">
+                            </Grid.Style>
+                            <Ellipse Width="13" Height="13" Stroke="#2563EB" StrokeThickness="1.4" Fill="#DBEAFE"/>
+                            <Path Data="M8,3.5 V12.5 M3.5,8 H12.5" Stroke="#2563EB" StrokeThickness="1.2"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                        </Grid>
+                        <Canvas Width="16" Height="16">
+                            <Canvas.Style>
+                                <Style TargetType="Canvas">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IconKind}" Value="Point">
+                                        <DataTrigger Binding="{Binding IconKind}" Value="Spot">
                                             <Setter Property="Visibility" Value="Visible"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </Ellipse.Style>
-                        </Ellipse>
+                            </Canvas.Style>
+                            <Ellipse Canvas.Left="1" Canvas.Top="8" Width="4.5" Height="4.5" Fill="#1D4ED8"/>
+                            <Ellipse Canvas.Left="6" Canvas.Top="2" Width="4.5" Height="4.5" Fill="#2563EB"/>
+                            <Ellipse Canvas.Left="10" Canvas.Top="9" Width="4.5" Height="4.5" Fill="#60A5FA"/>
+                        </Canvas>
                         <Path Data="M1,5 L8,2 L15,5 L8,8 Z M1,9 L8,6 L15,9 L8,12 Z" Stroke="#16A34A" StrokeThickness="1.3"
                               StrokeLineJoin="Round" Fill="Transparent" Stretch="Uniform">
                             <Path.Style>
@@ -126,6 +169,58 @@
                                 </Style>
                             </Path.Style>
                         </Path>
+                        <Path Data="M8,2 L14,13 H2 Z" Stroke="#15803D" StrokeThickness="1.3" Fill="#DCFCE7"
+                              StrokeLineJoin="Round" Stretch="Uniform">
+                            <Path.Style>
+                                <Style TargetType="Path">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IconKind}" Value="Mesh">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Path.Style>
+                        </Path>
+                        <Path Data="M1,12 L4,4 L8,12 L12,4 L15,12" Stroke="#B91C1C" StrokeThickness="1.4"
+                              StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Stretch="Uniform">
+                            <Path.Style>
+                                <Style TargetType="Path">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IconKind}" Value="Break">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Path.Style>
+                        </Path>
+                        <Path Data="M1,4 C4,1 6,7 15,4 M1,8 C4,5 6,11 15,8 M1,12 C4,9 6,15 15,12" Stroke="#A16207"
+                              StrokeThickness="1.2" StrokeStartLineCap="Round" Stretch="Uniform">
+                            <Path.Style>
+                                <Style TargetType="Path">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IconKind}" Value="Contour">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Path.Style>
+                        </Path>
+                        <Rectangle Width="12" Height="12" Stroke="#0F766E" StrokeThickness="1.3"
+                                   StrokeDashArray="2 1.2" RadiusX="1" RadiusY="1" Fill="Transparent">
+                            <Rectangle.Style>
+                                <Style TargetType="Rectangle">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IconKind}" Value="Boundary">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Rectangle.Style>
+                        </Rectangle>
                         <Path Data="M2,12 L8,4 L14,9" Stroke="#EA580C" StrokeThickness="1.5"
                               StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stretch="Uniform">
                             <Path.Style>

@@ -13,22 +13,25 @@ namespace iSurvey.Modules.Frame;
 
 /// <summary>
 /// RAIMCD: rải khung mặt cắt dọc đã vẽ sẵn. Người dùng chọn góc dưới-trái của hàng cuối cần in.
+/// Mặt cắt ghi 1/500 và 1/5000 thì áp đúng khung 1/5000 (viewport 1:5000), khổ nhỏ nhất còn chứa dải.
 /// Mỗi tờ là khung kỹ thuật, hai viewport cùng tỷ lệ: trái cố định tên hàng, phải trượt theo lý trình.
-/// Tỷ lệ in mặc định 1/500; 1/5000 (viewport 1:5000). Không sửa hình trên Model.
+/// Không sửa hình trên Model.
 /// </summary>
 public sealed partial class FrameService
 {
     private const string ProfileLayoutName = "MatCat_Doc";
-    private const double ProfileBottomMargin = 15;
-    private const double ProfileTopMargin = 15;
 
-    /// <summary>Mặt đất nằm ở khoảng này, tính từ đáy vùng vẽ (0 = đáy, 1 = đỉnh).</summary>
-    private const double ProfileGroundFraction = 0.64;
+    /// <summary>Mép trái vùng vẽ, trùng cột đóng tập 20 mm của khung mẫu. Gốc block là góc tờ giấy.</summary>
+    private const double ProfileLeftInsetMm = 20;
 
-    /// <summary>
-    /// Mép trái vùng vẽ của khung mẫu nằm ở 20 mm (cột đóng tập). Đặt góc chọn ngay trong mép đó.
-    /// </summary>
-    private const double ProfileLeftInsetMm = 22;
+    /// <summary>Lề trong dưới của khung mẫu, tính từ mép tờ giấy.</summary>
+    private const double ProfileInnerBottomMm = 10;
+
+    /// <summary>Dòng ngang vừa chọn nằm cao hơn lề trong dưới chừng này, trùng vạch đáy khung tên.</summary>
+    private const double ProfileCutAboveInnerMm = 10;
+
+    /// <summary>Cửa sổ dừng trước vạch đứng của khung tên, để số liệu không tràn vào ô tên.</summary>
+    private const double ProfileRightGapMm = 3;
 
     /// <summary>Trục đứng nằm trong cửa sổ, cách điểm chọn về bên trái chừng này (mét) để không bị cắt mép.</summary>
     private const double ProfileAxisMarginM = 2.5;
@@ -54,6 +57,36 @@ public sealed partial class FrameService
         {
             ActivityLogger.TrackError(ex, commandName);
             doc.Editor.WriteMessage($"\n[iSurvey] Rải khung mặt cắt dọc lỗi: {ex.Message}");
+        }
+        finally
+        {
+            EnableScreenTyping();
+        }
+    }
+
+    /// <summary>
+    /// F12: gõ trên màn hình. Gán trong một lệnh thì AutoCAD trả lại giá trị cũ
+    /// ngay khi lệnh đó thoát. Phải gán ở ngữ cảnh ứng dụng, lúc không còn lệnh nào.
+    /// </summary>
+    private static void EnableScreenTyping()
+    {
+        try
+        {
+            AcadApp.DocumentManager.ExecuteInApplicationContext(_ =>
+            {
+                try
+                {
+                    AcadApp.SetSystemVariable("DYNMODE", 3);
+                }
+                catch
+                {
+                    // không chặn lệnh
+                }
+            }, null);
+        }
+        catch
+        {
+            // không chặn lệnh
         }
     }
 
@@ -84,9 +117,10 @@ public sealed partial class FrameService
             return;
         }
 
-        var unitM = UnitMeters(db.Insunits, out var unitNote);
-        if (unitNote is not null)
-            ed.WriteMessage("\n[iSurvey] " + unitNote);
+        // Mặt cắt vẽ theo mét. Khung 1/5000 luôn coi 1 đơn vị = 1 m, kể cả khi INSUNITS để Feet.
+        var unitM = 1.0;
+        if (db.Insunits is not (UnitsValue.Meters or UnitsValue.Undefined))
+            ed.WriteMessage("\n[iSurvey] Khung 1/5000 tính 1 đơn vị bản vẽ = 1 m.");
 
         var stationM = Math.Max(0, (band.XRight - band.XSplit) * unitM);
         ed.WriteMessage(
@@ -95,7 +129,7 @@ public sealed partial class FrameService
         var saved = ProfileSheetSettings.Load();
         var routeSaved = RouteLayoutSettings.Load();
         var scaleN = Array.IndexOf(ProfileScales, saved.Scale) >= 0 ? saved.Scale : 5000;
-        var sizeName = FirstFittingSize(band, unitM, scaleN, saved.Size);
+        var sizeName = FirstFittingSize(band, unitM, scaleN);
         var overlapM = saved.OverlapM >= 0 ? saved.OverlapM : 100;
 
         var defaults = ReadFrameDefaults(template, sizeName);
@@ -295,14 +329,11 @@ public sealed partial class FrameService
         public bool Vertical => Math.Abs(X1 - X0) < 0.8 && Math.Abs(Y1 - Y0) > 20;
     }
 
-    private readonly record struct Box(double X0, double Y0, double X1, double Y1);
-
     private static bool TryMeasureProfile(Database db, Point3d pick, out ProfileBand band, out string why)
     {
         band = default;
         why = "";
         var segs = new List<Seg>();
-        var boxes = new List<Box>();
         using (var tr = db.TransactionManager.StartTransaction())
         {
             var bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
@@ -314,11 +345,6 @@ public sealed partial class FrameService
                 try
                 {
                     CollectSegs(ent, segs);
-                    var ext = ent.GeometricExtents;
-                    var b = new Box(ext.MinPoint.X, ext.MinPoint.Y, ext.MaxPoint.X, ext.MaxPoint.Y);
-                    if (b.X1 - b.X0 > 250000 || b.Y1 - b.Y0 > 20000)
-                        continue;
-                    boxes.Add(b);
                 }
                 catch
                 {
@@ -384,29 +410,30 @@ public sealed partial class FrameService
         if (xSplit - xLeft < 60 || xSplit - xLeft > 800)
             xSplit = xLeft + 250;
 
-        var top = yCut;
+        // Bề ngang theo các nét của bảng. Không đi theo tuyến kéo dài lên bản đồ.
         var right = xSplit;
         var grew = true;
         var guard = 0;
-        while (grew && guard++ < 30)
+        while (grew && guard++ < 40)
         {
             grew = false;
-            foreach (var b in boxes)
+            foreach (var s in segs)
             {
-                if (b.X1 < xLeft - 8 || b.X0 < xLeft - 80)
+                if (s.MaxY - s.MinY > 8000)
                     continue;
-                if (b.Y1 < yCut - 1 || b.Y0 > top + 300)
+                if (s.MaxX < xLeft - 8 || s.MinX < xLeft - 80 || s.MinX > right + 80)
                     continue;
-                if (b.Y1 > top + 0.5)
+                if (s.MinY > yCut + 700 || s.MaxY < yCut - 1)
+                    continue;
+                if (s.MaxX > right)
                 {
-                    top = b.Y1;
+                    right = s.MaxX;
                     grew = true;
                 }
-
-                if (b.X1 > right)
-                    right = b.X1;
             }
         }
+
+        var top = ProfileCeiling(segs, xLeft, right, yCut);
 
         if (right - xSplit < 20 || top - yCut < 40)
         {
@@ -428,6 +455,30 @@ public sealed partial class FrameService
         var yGround = tops.Count > 0 ? tops[tops.Count / 2] : yCut + (top - yCut) * 0.72;
         band = new ProfileBand(xLeft, xSplit, right, yCut, top, yGround);
         return true;
+    }
+
+    /// <summary>
+    /// Trần lưới mặt cắt: mức cao của các nét chạm bảng.
+    /// Không lấy nét tuyến kéo từ bảng lên bản đồ hàng cây số.
+    /// </summary>
+    private static double ProfileCeiling(List<Seg> segs, double xLeft, double xRight, double yCut)
+    {
+        var tops = new List<double>();
+        foreach (var s in segs)
+        {
+            if (s.MaxX < xLeft - 8 || s.MinX > xRight + 20)
+                continue;
+            if (s.MinY > yCut + 800 || s.MaxY < yCut + 200)
+                continue;
+            if (s.MaxY - s.MinY > 8000)
+                continue;
+            tops.Add(s.MaxY);
+        }
+
+        if (tops.Count == 0)
+            return yCut + 800;
+        tops.Sort();
+        return tops[(int)((tops.Count - 1) * 0.7)];
     }
 
     private static void CollectSegs(Entity ent, List<Seg> segs)
@@ -461,27 +512,20 @@ public sealed partial class FrameService
         scaleN == 2000 ? "1/200; 1/2000" : "1/500; 1/5000";
 
     private static double ProfileMapWidth(Spec spec) =>
-        Math.Max(80, spec.Mx1 - spec.Mx0 - ProfileLeftInsetMm);
+        Math.Max(80, spec.Mx1 - spec.Mx0 - ProfileRightGapMm);
 
-    /// <summary>Đưa mặt đất lên khoảng trên-giữa, vẫn giữ đáy bảng và đỉnh lý trình trong khung.</summary>
-    private static double ProfileCenterY(ProfileBand band, double viewH)
+    /// <summary>
+    /// Ghim dòng ngang vừa chọn lên vạch cách lề trong dưới 10 mm.
+    /// Vạch đó trùng đường ngang đáy của khung tên.
+    /// </summary>
+    private static double ProfileCenterY(ProfileBand band, double paperH, double custom)
     {
-        var wanted = band.YGround - (ProfileGroundFraction - 0.5) * viewH;
-        var minCenter = band.YTop + ProfileTopMargin - viewH / 2.0;
-        var maxCenter = band.YCut - ProfileBottomMargin + viewH / 2.0;
-        if (minCenter > maxCenter)
-            return maxCenter;
-        if (wanted < minCenter)
-            return minCenter;
-        if (wanted > maxCenter)
-            return maxCenter;
-        return wanted;
+        var cutPaper = ProfileInnerBottomMm + ProfileCutAboveInnerMm;
+        return band.YCut - (cutPaper - paperH / 2.0) / custom;
     }
 
-    private static string FirstFittingSize(ProfileBand band, double unitM, int scale, string preferred)
+    private static string FirstFittingSize(ProfileBand band, double unitM, int scale)
     {
-        if (Array.IndexOf(ProfileSizes, preferred) >= 0 && FitIssue(band, preferred, scale, unitM) is null)
-            return preferred;
         foreach (var name in ProfileSizes)
         {
             if (FitIssue(band, name, scale, unitM) is null)
@@ -499,9 +543,11 @@ public sealed partial class FrameService
         var custom = 1000.0 * unitM / scale;
         if (custom <= 0)
             return "Tỷ lệ không hợp lệ.";
-        var need = (band.YTop - band.YCut) + ProfileBottomMargin + ProfileTopMargin;
-        var capacity = (spec.My1 - spec.My0) / custom;
-        if (need > capacity + 1)
+        // Khung 1/5000 là cả tờ giấy (A3 = 420×297 mm) nhân mẫu số / 1000.
+        // Phần trong của khung ngắn hơn 20 mm; mặt cắt được vẽ vừa tờ, không vừa mỗi đường trong.
+        var capacity = PaperSizeMm(spec).h / custom;
+        var need = band.YTop - band.YCut;
+        if (need > capacity + 0.5)
             return $"Khổ {size} ở tỷ lệ này cao {capacity:0} đơn vị, dải mặt cắt cần {need:0}. Chọn khổ lớn hơn.";
         var labelMm = (band.XSplit - band.XLeft) * custom;
         var mapW = ProfileMapWidth(spec);
@@ -579,16 +625,13 @@ public sealed partial class FrameService
 
         var (paperW, paperH) = PaperSizeMm(spec);
         var mapW = ProfileMapWidth(spec);
-        var mapH = spec.My1 - spec.My0;
-        var originX = paperW - spec.Fw - 5.0;
-        var originY = (paperH - spec.Fh) / 2.0;
         var custom = 1000.0 * unitM / opts.Scale;
         var labelMm = (band.XSplit - band.XLeft) * custom;
         var stationMm = mapW - labelMm;
         var margin = ProfileAxisMarginM / unitM;
         var marginMm = margin * custom;
-        var viewH = mapH / custom;
-        var centerY = ProfileCenterY(band, viewH);
+        var viewH = paperH / custom;
+        var centerY = ProfileCenterY(band, paperH, custom);
 
         ObjectId blockId;
         string frameLayer;
@@ -612,6 +655,7 @@ public sealed partial class FrameService
         lm.CurrentLayout = "Model";
 
         var viewportIds = new List<ObjectId>();
+        var frameIds = new List<ObjectId>();
         var coverIds = new List<ObjectId>();
         using (var tr = db.TransactionManager.StartTransaction())
         {
@@ -645,9 +689,10 @@ public sealed partial class FrameService
                 var cy = (opts.Rows - 1 - row) * (paperH + opts.GapMm);
                 windows.Add(new Extents2d(cx, cy, cx + paperW, cy + paperH));
 
-                var br = new BlockReference(new Point3d(cx + originX, cy + originY, 0), blockId) { Layer = frameLayer };
+                var br = new BlockReference(new Point3d(cx, cy, 0), blockId) { Layer = frameLayer };
                 ps.AppendEntity(br);
                 tr.AddNewlyCreatedDBObject(br, true);
+                frameIds.Add(br.ObjectId);
                 foreach (var ad in attDefs)
                 {
                     var ar = new AttributeReference();
@@ -660,28 +705,37 @@ public sealed partial class FrameService
 
                 PlaceSignatures(tr, ps, br, signBlocks);
 
-                var leftPaper = cx + originX + spec.Mx0 + ProfileLeftInsetMm;
+                var leftPaper = cx + ProfileLeftInsetMm;
                 var leftWidth = labelMm + marginMm;
                 var leftModel = (band.XLeft - margin + band.XSplit) / 2.0;
-                var paperY = cy + originY + spec.Cy;
+                var paperY = cy + paperH / 2.0;
                 viewportIds.Add(AddProfileViewport(tr, ps,
                     leftPaper + leftWidth / 2.0, paperY,
-                    leftWidth, mapH,
+                    leftWidth, paperH,
                     leftModel, centerY, viewH, custom));
 
                 var rightPaper = leftPaper + leftWidth - marginMm;
                 var rightModel = slice.X0 - margin + (stationMm / custom) / 2.0;
                 viewportIds.Add(AddProfileViewport(tr, ps,
                     rightPaper + stationMm / 2.0, paperY,
-                    stationMm, mapH,
+                    stationMm, paperH,
                     rightModel, centerY, viewH, custom));
 
                 var xLeftPaper = leftPaper + leftWidth / 2.0 + (band.XLeft - leftModel) * custom;
                 var yCutPaper = paperY + (band.YCut - centerY) * custom;
                 foreach (var id in AddProfileCover(tr, ps, frameLayer,
-                    leftPaper, paperY - mapH / 2.0, rightPaper + stationMm, paperY + mapH / 2.0,
+                    leftPaper, cy, rightPaper + stationMm, cy + paperH,
                     xLeftPaper, yCutPaper))
                     coverIds.Add(id);
+
+                var mapRight = rightPaper + stationMm;
+                var sheetRight = cx + paperW;
+                var sheetTop = cy + paperH;
+                if (sheetRight - mapRight > 0.2)
+                    coverIds.Add(AddCover(tr, ps, frameLayer, mapRight, cy, sheetRight, sheetTop));
+                var innerTop = sheetTop - ProfileInnerBottomMm;
+                if (innerTop < sheetTop && mapRight - leftPaper > 0.2)
+                    coverIds.Add(AddCover(tr, ps, frameLayer, leftPaper, innerTop, mapRight, sheetTop));
             }
 
             tr.Commit();
@@ -706,15 +760,26 @@ public sealed partial class FrameService
                 vp.Locked = true;
             }
 
-            if (coverIds.Count > 0)
+            if (frameIds.Count > 0 || coverIds.Count > 0)
             {
                 var lay = (Layout)tr.GetObject(layoutId, OpenMode.ForRead);
                 var space = (BlockTableRecord)tr.GetObject(lay.BlockTableRecordId, OpenMode.ForRead);
                 var order = (DrawOrderTable)tr.GetObject(space.DrawOrderTableId, OpenMode.ForWrite);
-                var ids = new ObjectIdCollection();
-                foreach (var id in coverIds)
-                    ids.Add(id);
-                order.MoveToTop(ids);
+                if (coverIds.Count > 0)
+                {
+                    var ids = new ObjectIdCollection();
+                    foreach (var id in coverIds)
+                        ids.Add(id);
+                    order.MoveToTop(ids);
+                }
+
+                if (frameIds.Count > 0)
+                {
+                    var frames = new ObjectIdCollection();
+                    foreach (var id in frameIds)
+                        frames.Add(id);
+                    order.MoveToTop(frames);
+                }
             }
 
             tr.Commit();

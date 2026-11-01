@@ -94,6 +94,16 @@ internal sealed class PaletteViewModel : ObservableObject
         TreeNodes.Add(Terrain(document));
         TreeNodes.Add(Route());
         TreeNodes.Add(Profile());
+        LinkGuides(TreeNodes, connectUp: false);
+    }
+
+    private static void LinkGuides(System.Collections.Generic.IList<TreeNodeViewModel> nodes, bool connectUp)
+    {
+        for (var i = 0; i < nodes.Count; i++)
+        {
+            nodes[i].SetGuide(connectUp || i > 0, i < nodes.Count - 1);
+            LinkGuides(nodes[i].Children, connectUp: true);
+        }
     }
 
     private static TreeNodeViewModel Points()
@@ -128,7 +138,7 @@ internal sealed class PaletteViewModel : ObservableObject
         node.Actions.Add(new NodeAction("Tạo mô hình...", PaletteCommands.Run("TAOMOHINH")));
         foreach (var model in models)
         {
-            var child = new TreeNodeViewModel(model.Name, "", model.Summary(), "Terrain")
+            var child = new TreeNodeViewModel(model.Name, "", model.Summary(), "Mesh")
             {
                 Tag = model.Id
             };
@@ -139,11 +149,27 @@ internal sealed class PaletteViewModel : ObservableObject
             child.Actions.Add(new NodeAction("Xây dựng", PaletteCommands.ForModel("XAYMOHINH", model.Id, null)));
             child.Actions.Add(new NodeAction("Ẩn / hiện lưới", PaletteCommands.ForModel("ANTIN", model.Id, null)));
             child.Actions.Add(new NodeAction("Tra cao độ", PaletteCommands.ForModel("TRACAOD", model.Id, null)));
-            child.Children.Add(new TreeNodeViewModel("Điểm (" + model.Points.Count + ")", "", "Điểm khống chế cao độ.", "Point"));
-            child.Children.Add(new TreeNodeViewModel("Đứt gãy (" + model.Breaklines.Count + ")", "", "Cạnh bắt buộc của lưới, ví dụ mép ta luy.", "Route"));
-            child.Children.Add(new TreeNodeViewModel("Đường đồng mức (" + model.Contours.Count + ")", "", "Cạnh bắt buộc, cao độ không đổi dọc cạnh.", "Route"));
-            var bao = string.IsNullOrEmpty(model.Boundary) ? "chưa có" : "có";
-            child.Children.Add(new TreeNodeViewModel("Đường bao (" + bao + ")", "", "Chỉ giữ tam giác nằm trong đường bao.", "Profile"));
+            child.Children.Add(new TreeNodeViewModel(
+                "Điểm (" + model.Points.Count + ")",
+                "",
+                model.Points.Count + " đối tượng điểm khống chế cao độ.",
+                "Spot"));
+            child.Children.Add(new TreeNodeViewModel(
+                "Đứt gãy (" + model.Breaklines.Count + ")",
+                "",
+                model.Breaklines.Count + " đường đứt gãy. Cạnh bắt buộc, ví dụ mép ta luy.",
+                "Break"));
+            child.Children.Add(new TreeNodeViewModel(
+                "Đường đồng mức (" + model.Contours.Count + ")",
+                "",
+                model.Contours.Count + " đường đồng mức. Cạnh bắt buộc, cao độ không đổi dọc cạnh.",
+                "Contour"));
+            var bao = model.BoundaryCount;
+            child.Children.Add(new TreeNodeViewModel(
+                "Đường bao (" + bao + ")",
+                "",
+                bao + " đường bao kín. Chỉ giữ tam giác nằm trong các đường bao.",
+                "Boundary"));
             node.Children.Add(child);
         }
 

@@ -42,6 +42,7 @@ public static class TerrainStore
                 model.Points ??= new List<string>();
                 model.Breaklines ??= new List<string>();
                 model.Contours ??= new List<string>();
+                model.Boundaries ??= new List<string>();
                 model.Mesh ??= new List<double>();
                 list.Add(model);
             }

@@ -16,8 +16,22 @@ internal sealed class TreeNodeViewModel : ObservableObject
 
     public string Name { get; }
 
-    /// <summary>Point, Terrain, Route hoặc Profile.</summary>
+    /// <summary>Point, Spot, Terrain, Mesh, Break, Contour, Boundary, Route hoặc Profile.</summary>
     public string IconKind { get; }
+
+    /// <summary>Nét đứt phía trên, nối với mục anh em trước hoặc với cha.</summary>
+    public bool GuideUp { get; private set; }
+
+    /// <summary>Nét đứt phía dưới, nối với mục anh em sau.</summary>
+    public bool GuideDown { get; private set; }
+
+    public void SetGuide(bool up, bool down)
+    {
+        GuideUp = up;
+        GuideDown = down;
+        Raise(nameof(GuideUp));
+        Raise(nameof(GuideDown));
+    }
 
     public string EmptyHint { get; }
 

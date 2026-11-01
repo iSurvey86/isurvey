@@ -57,7 +57,7 @@ public static class TinBuilder
     public static List<TinTriangle> Build(
         IReadOnlyList<TinVertex> source,
         IReadOnlyList<TinSegment>? constraints,
-        IReadOnlyList<TinVertex>? boundary,
+        IReadOnlyList<IReadOnlyList<TinVertex>>? boundaries,
         out int unforced)
     {
         unforced = 0;
@@ -69,16 +69,10 @@ public static class TinBuilder
                 AddEdge(real, edges, segment.A, segment.B);
         }
 
-        if (boundary is { Count: >= 3 })
+        if (boundaries is not null)
         {
-            var count = boundary.Count;
-            if (Near(boundary[0], boundary[count - 1]))
-                count--;
-            if (count >= 3)
-            {
-                for (var i = 0; i < count; i++)
-                    AddEdge(real, edges, boundary[i], boundary[(i + 1) % count]);
-            }
+            foreach (var ring in boundaries)
+                AddRing(real, edges, ring);
         }
 
         if (real.Count < 3)
@@ -120,7 +114,7 @@ public static class TinBuilder
             var c = vertices[tri.C];
             if (Math.Abs(Orient(a, b, c)) < 1e-8)
                 continue;
-            if (boundary is { Count: >= 3 } && !Inside(boundary, (a.X + b.X + c.X) / 3, (a.Y + b.Y + c.Y) / 3))
+            if (boundaries is { Count: > 0 } && !InsideAny(boundaries, (a.X + b.X + c.X) / 3, (a.Y + b.Y + c.Y) / 3))
                 continue;
             result.Add(new TinTriangle(a, b, c));
         }
@@ -184,12 +178,15 @@ public static class TinBuilder
                 new TinVertex(10, 10, 0)
             },
             null,
-            new[]
+            new IReadOnlyList<TinVertex>[]
             {
-                new TinVertex(0, 0, 0),
-                new TinVertex(4, 0, 0),
-                new TinVertex(4, 4, 0),
-                new TinVertex(0, 4, 0)
+                new[]
+                {
+                    new TinVertex(0, 0, 0),
+                    new TinVertex(4, 0, 0),
+                    new TinVertex(4, 4, 0),
+                    new TinVertex(0, 4, 0)
+                }
             },
             out _);
         if (!TryElevation(clipped, 2, 2, out _))
@@ -197,6 +194,30 @@ public static class TinBuilder
         if (TryElevation(clipped, 8, 8, out _))
             return "Còn tam giác ngoài đường bao";
         return null;
+    }
+
+    private static void AddRing(List<TinVertex> vertices, List<(int A, int B)> edges, IReadOnlyList<TinVertex> ring)
+    {
+        if (ring.Count < 3)
+            return;
+        var count = ring.Count;
+        if (Near(ring[0], ring[count - 1]))
+            count--;
+        if (count < 3)
+            return;
+        for (var i = 0; i < count; i++)
+            AddEdge(vertices, edges, ring[i], ring[(i + 1) % count]);
+    }
+
+    private static bool InsideAny(IReadOnlyList<IReadOnlyList<TinVertex>> rings, double x, double y)
+    {
+        foreach (var ring in rings)
+        {
+            if (ring.Count >= 3 && Inside(ring, x, y))
+                return true;
+        }
+
+        return false;
     }
 
     private static void AddEdge(List<TinVertex> vertices, List<(int A, int B)> edges, TinVertex a, TinVertex b)
