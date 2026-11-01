@@ -29,13 +29,14 @@
 
 - [ ] Đặt `client_secret.json` theo `docs/video/YOUTUBE.md`, rồi đăng video D2C ở chế độ không công khai.
 - [ ] Chưa phát hành 1.8.16. Gói UPD trên máy chủ vẫn là 1.8.14.
-- [ ] Nhìn lại cây BANGIS trên Civil: bốn mục con và nét đứt.
-- [ ] Pha 2: tuyến và cọc. `VEMCD` chưa có lệnh.
+- [ ] Civil đang mở từ trước còn DLL cũ. Đóng và mở lại trước khi thử THEMMOHINH hoặc RAIMCD.
+- [ ] Nhìn đỉnh RAIMCD trên layout sau khi nạp DLL mới. Nhìn lại cây BANGIS trên Civil.
+- [ ] Pha 2: tuyến và cọc. `VEMCD` chưa có lệnh. Khi vẽ, đoạn vượt khung thì đặt lại mức so sánh và gợi ý mức mới. RAIMCD không đổi mức so sánh.
 
 ### Câu mở phiên sau
 
 ```text
-git pull, đọc handoff đầu. iSurvey 1.8.16, chưa phát hành, không bump. Video Nhập file DGN phiên bản 1.8.15 đã ghép, chưa đăng YouTube (thiếu client_secret.json). Quay trên AutoCAD 2023. RAIMCD lề và nhiều đường bao vẫn như phiên sáng. VEMCD chưa có lệnh. Tiếp: đăng video khi đã có khóa Google, hoặc nhìn cây BANGIS, hoặc pha 2 tuyến và cọc, hoặc phát hành 1.8.16 khi được yêu cầu.
+git pull, đọc handoff đầu. iSurvey 1.8.16, chưa phát hành, không bump. Video Nhập file DGN phiên bản 1.8.15 đã ghép, chưa đăng YouTube (thiếu client_secret.json), quay trên AutoCAD 2023. THEMMOHINH thêm điểm mở hộp: điểm, block, chữ số bật sẵn; đường nối điểm tắt sẵn. RAIMCD thêm tờ phía trên khi đoạn cao hơn khung, cùng tỷ lệ; lề trong 10 mm, số liệu dừng trước khung tên 3 mm. VEMCD chưa có lệnh. Civil đang mở từ trước cần đóng và mở lại để nạp DLL mới. Tiếp: đăng video khi đã có khóa Google, hoặc nhìn đỉnh RAIMCD và cây BANGIS sau khi mở lại Civil, hoặc pha 2 tuyến và cọc, hoặc phát hành 1.8.16 khi được yêu cầu.
 ```
 
 **Lưu trữ ngày:** [2026-11-01-video-d2c.md](./2026-11-01-video-d2c.md)
