@@ -118,6 +118,84 @@ internal static class RasterClipService
         return true;
     }
 
+    /// <summary>Biên cắt đang gắn, hệ pixel ảnh. Bỏ điểm đóng trùng điểm đầu.</summary>
+    public static List<Point2d> ReadClipPixels(RasterImage raster)
+    {
+        var ring = new List<Point2d>();
+        if (!raster.IsClipped)
+            return ring;
+
+        try
+        {
+            foreach (Point2d p in raster.GetClipBoundary())
+                ring.Add(p);
+        }
+        catch (Autodesk.AutoCAD.Runtime.Exception)
+        {
+            return [];
+        }
+
+        if (ring.Count >= 2 && ring[0].GetDistanceTo(ring[^1]) < 1e-4)
+            ring.RemoveAt(ring.Count - 1);
+        return ring;
+    }
+
+    /// <summary>
+    /// Giữ phần biên cắt của ảnh đích nằm trong biên cắt pixel của ảnh gốc.
+    /// Dùng cho sơ họa đã duỗi: cùng file ảnh, nhưng biên cắt là một ảnh khác.
+    /// </summary>
+    public static bool TryMaskClipWith(RasterImage target, IReadOnlyList<Point2d> sourcePixels)
+    {
+        if (sourcePixels.Count < 3 || !target.IsClipped)
+            return false;
+
+        var own = ReadClipPixels(target);
+        if (own.Count < 3 || !IsConvex(own))
+            return false;
+        if (SignedArea(own) < 0)
+            own.Reverse();
+
+        var hit = PolygonClipHelper.IntersectWithConvexClip(sourcePixels, own);
+        if (hit.Count < 3)
+            return false;
+
+        return TryApplyClipPolygonPixels(target, hit);
+    }
+
+    private static double SignedArea(List<Point2d> ring)
+    {
+        double sum = 0;
+        for (var i = 0; i < ring.Count; i++)
+        {
+            var a = ring[i];
+            var b = ring[(i + 1) % ring.Count];
+            sum += a.X * b.Y - b.X * a.Y;
+        }
+
+        return sum;
+    }
+
+    private static bool IsConvex(List<Point2d> ring)
+    {
+        var sign = 0;
+        for (var i = 0; i < ring.Count; i++)
+        {
+            var a = ring[i];
+            var b = ring[(i + 1) % ring.Count];
+            var c = ring[(i + 2) % ring.Count];
+            var cross = (b.X - a.X) * (c.Y - b.Y) - (b.Y - a.Y) * (c.X - b.X);
+            if (Math.Abs(cross) < 1e-8)
+                continue;
+            var s = cross > 0 ? 1 : -1;
+            if (sign == 0)
+                sign = s;
+            else if (s != sign)
+                return false;
+        }
+
+        return sign != 0;
+    }
+
     private static Point2dCollection ToPixelRing(RasterImage raster, IReadOnlyList<Point2d> wcsRing)
     {
         var toPixel = raster.PixelToModelTransform.Inverse();

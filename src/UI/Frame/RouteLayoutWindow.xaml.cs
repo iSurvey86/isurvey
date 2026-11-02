@@ -643,21 +643,7 @@ public partial class RouteLayoutWindow : Window
 
     private void Sample_Click(object sender, RoutedEventArgs e)
     {
-        var folder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        try
-        {
-            var drawing = AcadApp.DocumentManager.MdiActiveDocument?.Name;
-            if (!string.IsNullOrEmpty(drawing) && System.IO.File.Exists(drawing))
-            {
-                var dir = System.IO.Path.GetDirectoryName(drawing);
-                if (!string.IsNullOrEmpty(dir))
-                    folder = dir;
-            }
-        }
-        catch
-        {
-            // bản vẽ chưa lưu: giữ Documents
-        }
+        var folder = SuggestFolder();
 
         using var dlg = new System.Windows.Forms.SaveFileDialog
         {
@@ -681,6 +667,62 @@ public partial class RouteLayoutWindow : Window
         }
 
         System.Windows.MessageBox.Show(this, "Đã lưu file mẫu:\n" + dlg.FileName, "iSurvey", MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
+    private void Export_Click(object sender, RoutedEventArgs e)
+    {
+        LeftGrid.CommitEdit(DataGridEditingUnit.Row, true);
+        RightGrid.CommitEdit(DataGridEditingUnit.Row, true);
+        var folder = SuggestFolder();
+        using var dlg = new System.Windows.Forms.SaveFileDialog
+        {
+            Title = "Xuất thông tin khung tên",
+            Filter = "Excel (*.xlsx)|*.xlsx",
+            FileName = "KhungTen.xlsx",
+            InitialDirectory = folder,
+            OverwritePrompt = true
+        };
+        if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+            return;
+
+        var rows = _rows
+            .Select(row => (
+                row.Stt.ToString(CultureInfo.InvariantCulture),
+                row.Label,
+                row.Field.Auto ? row.Value : FrameFields.Clean(row.Value)))
+            .ToList();
+        try
+        {
+            FrameSheetImport.Write(dlg.FileName, rows);
+        }
+        catch (System.Exception ex)
+        {
+            System.Windows.MessageBox.Show(this, "Không xuất được file: " + ex.Message, "iSurvey", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        System.Windows.MessageBox.Show(this, "Đã xuất thông tin khung tên:\n" + dlg.FileName, "iSurvey", MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
+    private static string SuggestFolder()
+    {
+        var folder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        try
+        {
+            var drawing = AcadApp.DocumentManager.MdiActiveDocument?.Name;
+            if (!string.IsNullOrEmpty(drawing) && System.IO.File.Exists(drawing))
+            {
+                var dir = System.IO.Path.GetDirectoryName(drawing);
+                if (!string.IsNullOrEmpty(dir))
+                    folder = dir;
+            }
+        }
+        catch
+        {
+            // bản vẽ chưa lưu: giữ Documents
+        }
+
+        return folder;
     }
 
     private void Import_Click(object sender, RoutedEventArgs e)

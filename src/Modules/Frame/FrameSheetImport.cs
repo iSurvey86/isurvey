@@ -54,6 +54,20 @@ public static class FrameSheetImport
     /// <summary>Ghi file .xlsx mẫu: hàng đầu STT, Tiêu đề, Nội dung, rồi đủ 25 ô khung tên.</summary>
     public static void WriteSample(string path)
     {
+        var rows = new List<(string Stt, string Title, string Content)>(FrameFields.All.Length);
+        for (var i = 0; i < FrameFields.All.Length; i++)
+        {
+            var field = FrameFields.All[i];
+            var content = i < SampleContent.Length ? SampleContent[i] : "";
+            rows.Add((field.Stt.ToString(CultureInfo.InvariantCulture), field.Label, content));
+        }
+
+        Write(path, rows);
+    }
+
+    /// <summary>Ghi đúng các ô đang có trên hộp thoại. Hàng đầu vẫn là STT, Tiêu đề, Nội dung.</summary>
+    public static void Write(string path, IReadOnlyList<(string Stt, string Title, string Content)> rows)
+    {
         var sheet = new StringBuilder();
         sheet.Append("""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>""");
         sheet.Append("""<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">""");
@@ -61,12 +75,8 @@ public static class FrameSheetImport
         sheet.Append("""<col min="2" max="2" width="22" customWidth="1"/>""");
         sheet.Append("""<col min="3" max="3" width="56" customWidth="1"/></cols><sheetData>""");
         sheet.Append(SampleRow(1, "STT", "Tiêu đề", "Nội dung"));
-        for (var i = 0; i < FrameFields.All.Length; i++)
-        {
-            var field = FrameFields.All[i];
-            var content = i < SampleContent.Length ? SampleContent[i] : "";
-            sheet.Append(SampleRow(i + 2, field.Stt.ToString(CultureInfo.InvariantCulture), field.Label, content));
-        }
+        for (var i = 0; i < rows.Count; i++)
+            sheet.Append(SampleRow(i + 2, rows[i].Stt, rows[i].Title, rows[i].Content));
 
         sheet.Append("</sheetData></worksheet>");
 

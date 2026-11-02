@@ -93,13 +93,16 @@ internal static class UavImageService
 
     private static int? PromptClipMode(Editor ed)
     {
-        var opts = new PromptKeywordOptions("\niSurvey: Chọn phương pháp cắt")
+        // Tên trên menu không được có dấu cách. «Tự cắt nền» bị AutoCAD tách thành ba từ,
+        // bấm mục đó thì lệnh không nhận và đứng yên ở câu hỏi.
+        var opts = new PromptKeywordOptions(
+            "\niSurvey: Cách cắt — 1 chọn biên theo polyline, 2 tự cắt nền trắng hoặc đen")
         {
             AllowNone = true,
             AppendKeywordsToMessage = true
         };
-        opts.Keywords.Add("1", "1", "Chọn biên");
-        opts.Keywords.Add("2", "2", "Tự cắt nền");
+        opts.Keywords.Add("1", "1", "1");
+        opts.Keywords.Add("2", "2", "2");
         opts.Keywords.Default = "1";
 
         var res = ed.GetKeywords(opts);
@@ -236,7 +239,10 @@ internal static class UavImageService
             SendImageToBack(tr, db, imageId);
             usedPolys.Add(bestPoly.Value);
             ok++;
+            var copies = PropagateClipToCopies(tr, db, raster);
             ed.WriteMessage($"\n[iSurvey] Đã cắt 1 ảnh ({ring.Count} đỉnh, {(bestContained ? "biên trong ảnh" : "overlap")}).");
+            if (copies > 0)
+                ed.WriteMessage($"\n[iSurvey] Đã cập nhật {copies} ảnh sơ họa cùng file.");
         }
 
         tr.Commit();
@@ -301,8 +307,11 @@ internal static class UavImageService
             DrawBorderPolyline(tr, db, wcsRing);
             SendImageToBack(tr, db, imageId);
             ok++;
+            var copies = PropagateClipToCopies(tr, db, raster);
             ed.WriteMessage(
                 $"\n[iSurvey] Auto-Clip 1 ảnh OK ({detail}, Y{(yUp ? "↑" : "↓")}-CAD).");
+            if (copies > 0)
+                ed.WriteMessage($"\n[iSurvey] Đã cập nhật {copies} ảnh sơ họa cùng file.");
         }
 
         tr.Commit();
@@ -333,6 +342,47 @@ internal static class UavImageService
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Ảnh sơ họa (DUOITUYEN) trỏ cùng file nhưng giữ biên cắt riêng.
+    /// Reload ảnh không chép biên. Cắt xong thì siết biên của các bản sao theo biên mới.
+    /// </summary>
+    private static int PropagateClipToCopies(Transaction tr, Database db, RasterImage source)
+    {
+        var pixels = RasterClipService.ReadClipPixels(source);
+        if (pixels.Count < 3 || source.ImageDefId.IsNull)
+            return 0;
+
+        var updated = 0;
+        var bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
+        foreach (ObjectId btrId in bt)
+        {
+            var btr = (BlockTableRecord)tr.GetObject(btrId, OpenMode.ForRead);
+            if (!btr.IsLayout)
+                continue;
+            foreach (ObjectId id in btr)
+            {
+                if (id == source.ObjectId)
+                    continue;
+                try
+                {
+                    if (tr.GetObject(id, OpenMode.ForRead, false, true) is not RasterImage other || other is Wipeout)
+                        continue;
+                    if (other.ImageDefId != source.ImageDefId || !other.IsClipped)
+                        continue;
+                    other.UpgradeOpen();
+                    if (RasterClipService.TryMaskClipWith(other, pixels))
+                        updated++;
+                }
+                catch (Autodesk.AutoCAD.Runtime.Exception)
+                {
+                    // Thực thể khóa hoặc không đọc được: giữ nguyên, không hủy lần cắt ảnh gốc.
+                }
+            }
+        }
+
+        return updated;
     }
 
     private static void EnsureLayer(Database db, Transaction tr, string name)

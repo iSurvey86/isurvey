@@ -1,0 +1,45 @@
+{
+  "id": "raimcd-1.8.16",
+  "command": "RAIMCD",
+  "commandFull": "ISURVEY_PROFILE_SHEETS",
+  "feature": "Rải khung mặt cắt dọc",
+  "version": "1.8.16",
+  "title": "Rải khung mặt cắt dọc phiên bản 1.8.16",
+  "privacy": "unlisted",
+  "voice": "vi-VN-HoaiMyNeural",
+  "rate": "-8%",
+  "tags": ["iSurvey", "Civil 3D", "mặt cắt dọc", "RAIMCD"],
+  "description": "Cách rải khung in cho mặt cắt dọc đã vẽ bằng iSurvey.\n\nHành vi trong video có từ iSurvey 1.8.16 (lệnh RAIMCD, lệnh đủ ISURVEY_PROFILE_SHEETS).\nCửa sổ là ô bản đồ của khối khung. A3 là 340 × 277 mm. Mép phải dừng đúng vạch khung tên. Tờ dưới ghim dòng đã chọn.",
+  "shots": [
+    {
+      "id": "01-mo-dau",
+      "type": "card",
+      "lines": ["Rải khung mặt cắt dọc", "phiên bản 1.8.16"],
+      "narration": "Rải khung mặt cắt dọc, phiên bản một chấm tám chấm mười sáu. Lệnh này chỉ dựng tờ in cho mặt cắt đã vẽ, không sửa hình trên Model."
+    },
+    {
+      "id": "02-chon",
+      "type": "screen",
+      "action": "Gõ RAIMCD. Bấm góc dưới-trái của hàng cuối trên mặt cắt.",
+      "narration": "Gõ R A I M C D. Bấm đúng giao điểm của nét ngang và nét dọc ở góc dưới-trái hàng cuối cần in."
+    },
+    {
+      "id": "03-hop",
+      "type": "screen",
+      "action": "Hộp rải khung. Giữ khổ A3 và tỷ lệ 1/5000. Bấm Tạo Layout.",
+      "narration": "Chọn khổ giấy và tỷ lệ. Một phần năm nghìn hoặc một phần hai nghìn. Bấm Tạo Layout. In sau bằng lệnh in tuyến, không in ngay trong bước này."
+    },
+    {
+      "id": "04-to",
+      "type": "screen",
+      "action": "Layout MatCat_Doc. Mặt cắt nằm trong ô 340 nhân 277 mm của khổ A3.",
+      "narration": "Tờ in hiện ra. Mặt cắt chỉ nằm trong ô bản đồ của khung. Với khổ A3, ô đó rộng ba trăm bốn mươi milimét và cao hai trăm bảy mươi bảy milimét. Không vẽ tràn sang khung tên."
+    },
+    {
+      "id": "05-ket",
+      "type": "card",
+      "lines": ["Lệnh RAIMCD", "ISURVEY_PROFILE_SHEETS", "Có từ iSurvey 1.8.16"],
+      "narration": "Lệnh tắt là R A I M C D. Lệnh đủ là ISURVEY PROFILE SHEETS. Cách chia khung này có từ iSurvey một chấm tám chấm mười sáu."
+    }
+  ]
+}

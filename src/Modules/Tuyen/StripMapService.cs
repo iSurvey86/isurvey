@@ -433,7 +433,19 @@ public sealed class StripMapService
         RasterImage.EnableReactors(true);
         clone.AssociateRasterDef(def);
 
-        if (!RasterClipService.TryApplyClipPolygon(clone, clip))
+        var clipUse = clip;
+        var srcClip = SourceClipWcs(src);
+        if (srcClip is { Count: >= 3 })
+        {
+            var corridor = clip.ToArray();
+            if (Shoelace(corridor) < 0)
+                Array.Reverse(corridor);
+            var hit = PolygonClipHelper.IntersectWithConvexClip(srcClip, corridor);
+            if (hit.Count >= 3)
+                clipUse = hit;
+        }
+
+        if (!RasterClipService.TryApplyClipPolygon(clone, clipUse))
         {
             clone.Erase();
             return null;
@@ -441,6 +453,24 @@ public sealed class StripMapService
 
         ApplyStraighten(clone, pivot, angle, dest);
         return id;
+    }
+
+    /// <summary>Biên cắt của ảnh gốc, đổi sang tọa độ bản vẽ. Không có biên thì null.</summary>
+    private static List<Point2d>? SourceClipWcs(RasterImage src)
+    {
+        var pixels = RasterClipService.ReadClipPixels(src);
+        if (pixels.Count < 3)
+            return null;
+
+        var toModel = src.PixelToModelTransform;
+        var ring = new List<Point2d>(pixels.Count);
+        foreach (var px in pixels)
+        {
+            var w = new Point3d(px.X, px.Y, 0).TransformBy(toModel);
+            ring.Add(new Point2d(w.X, w.Y));
+        }
+
+        return ring;
     }
 
     private static ObjectId? PlaceBlockClip(

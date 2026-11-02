@@ -199,16 +199,8 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <DockPanel Grid.Row="0" LastChildFill="True" Margin="0,0,0,8">
-                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                        <Button Content="Tải file mẫu" Style="{StaticResource CtaSoft}" Margin="0,0,8,0" Click="Sample_Click"
-                                ToolTip="Lưu file Excel mẫu. Ba cột: STT, Tiêu đề, Nội dung." />
-                        <Button Content="Nhập Excel" Style="{StaticResource CtaPrimary}" Click="Import_Click"
-                                ToolTip="Đọc cột STT và cột Nội dung từ Excel. Ô Tờ vẫn tự điền." />
-                    </StackPanel>
-                    <TextBlock x:Name="FieldsTitle" Style="{StaticResource SectionTitle}" Margin="0" VerticalAlignment="Center"
-                               Text="2. THÔNG TIN KHUNG TÊN" />
-                </DockPanel>
+                <TextBlock x:Name="FieldsTitle" Grid.Row="0" Style="{StaticResource SectionTitle}" Margin="0,0,0,8"
+                           Text="2. THÔNG TIN KHUNG TÊN" />
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -264,11 +256,11 @@
         </Border>
 
         <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,12,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <StackPanel x:Name="FooterLeft" Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center" Margin="0,0,12,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel x:Name="FooterLeft" Grid.Row="0" Orientation="Vertical" VerticalAlignment="Center" Margin="0,0,0,8">
                 <CheckBox x:Name="ApplyAllCheck" Content="Áp dụng cho toàn bộ khung" IsChecked="True" Visibility="Collapsed"
                           Foreground="#1D4ED8" VerticalAlignment="Center"
                           ToolTip="Bỏ chọn để chỉ sửa khung vừa nhắp. Ô Tờ và tỷ lệ giữ nguyên." />
@@ -286,10 +278,24 @@
                 </StackPanel>
                 <TextBlock x:Name="LogoNote" Foreground="#555" FontSize="12" TextWrapping="Wrap" />
             </StackPanel>
-            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                <Button Content="Hủy bỏ" Style="{StaticResource CtaSoft}" Margin="0,0,10,0" Click="Cancel_Click" />
-                <Button x:Name="OkButton" Content="▷  Tạo Layout" Style="{StaticResource CtaPrimary}" IsDefault="False" Click="Ok_Click" />
-            </StackPanel>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="Tải file mẫu" Style="{StaticResource CtaSoft}" Margin="0,0,8,0" Click="Sample_Click"
+                            ToolTip="Lưu file Excel mẫu. Ba cột: STT, Tiêu đề, Nội dung." />
+                    <Button Content="Xuất file" Style="{StaticResource CtaSoft}" Margin="0,0,8,0" Click="Export_Click"
+                            ToolTip="Ghi các ô khung tên đang hiện ra file Excel. Ba cột: STT, Tiêu đề, Nội dung." />
+                    <Button Content="Nhập file" Style="{StaticResource CtaSoft}" Click="Import_Click"
+                            ToolTip="Đọc cột STT và cột Nội dung từ Excel. Ô Tờ vẫn tự điền." />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="Hủy bỏ" Style="{StaticResource CtaSoft}" Margin="0,0,10,0" Click="Cancel_Click" />
+                    <Button x:Name="OkButton" Content="▷  Tạo Layout" Style="{StaticResource CtaPrimary}" IsDefault="False" Click="Ok_Click" />
+                </StackPanel>
+            </Grid>
         </Grid>
     </Grid>
 </Window>

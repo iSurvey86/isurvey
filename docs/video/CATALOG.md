@@ -5,6 +5,8 @@ Một dòng là một video. Video cũ giữ lại khi có bản mới của cù
 | Lệnh | Chức năng | Phiên bản | Trạng thái | YouTube |
 |---|---|---|---|---|
 | D2C | Nhập file DGN | 1.8.15 | Đã ghép, chưa đăng | |
+| RAIMCD | Rải khung mặt cắt dọc | 1.8.16 | Chưa quay | |
+| UAVCLIP | Cắt ảnh UAV | 1.8.16 | Chưa quay | |
 
 Kịch bản: `docs/video/kich-ban/d2c-1.8.15.md`.
 

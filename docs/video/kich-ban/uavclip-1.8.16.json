@@ -1,0 +1,39 @@
+{
+  "id": "uavclip-1.8.16",
+  "command": "UAVCLIP",
+  "commandFull": "ISURVEY_UAV_CLIP",
+  "feature": "Cắt ảnh UAV",
+  "version": "1.8.16",
+  "title": "Cắt ảnh UAV phiên bản 1.8.16",
+  "privacy": "unlisted",
+  "voice": "vi-VN-HoaiMyNeural",
+  "rate": "-8%",
+  "tags": ["iSurvey", "Civil 3D", "UAV", "UAVCLIP"],
+  "description": "Cách cắt nền ảnh UAV và cập nhật ảnh sơ họa cùng file.\n\nHành vi trong video có từ iSurvey 1.8.16 (lệnh UAVCLIP, lệnh đủ ISURVEY_UAV_CLIP).\nReload ảnh không chép biên cắt. Cắt lại thì ảnh sơ họa cùng file được siết theo biên mới.",
+  "shots": [
+    {
+      "id": "01-mo-dau",
+      "type": "card",
+      "lines": ["Cắt ảnh UAV", "phiên bản 1.8.16"],
+      "narration": "Cắt ảnh UAV, phiên bản một chấm tám chấm mười sáu. Reload ảnh không đưa biên cắt sang sơ họa. Phải cắt lại."
+    },
+    {
+      "id": "02-cat",
+      "type": "screen",
+      "action": "Gõ UAVCLIP. Chọn ảnh mặt bằng. Gõ 2.",
+      "narration": "Gõ U A V C L I P. Chọn ảnh trên mặt bằng. Gõ hai để tự cắt nền trắng hoặc đen. Gõ một nếu muốn chọn biên theo polyline."
+    },
+    {
+      "id": "03-so-hoa",
+      "type": "screen",
+      "action": "Zoom ảnh sơ họa. Nền trắng trong dải đã biến mất.",
+      "narration": "Ảnh sơ họa dùng cùng file nên được siết theo biên mới. Phần nền nằm trong dải tuyến không còn hiện. Ảnh đã duỗi từ trước chỉ đổi khi cắt lại, không đổi khi reload."
+    },
+    {
+      "id": "04-ket",
+      "type": "card",
+      "lines": ["Sơ họa cập nhật theo biên cắt"],
+      "narration": "Duỗi tuyến sau khi đã cắt thì dải mới cũng nằm trong biên ảnh gốc."
+    }
+  ]
+}

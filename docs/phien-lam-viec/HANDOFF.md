@@ -5,6 +5,45 @@
 
 ---
 
+## 2026-11-02 — Ô khung RAIMCD và sơ họa UAV (1.8.16, chưa phát hành, không bump)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ. **Không bump.** Vẫn **1.8.16**, chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14.
+
+### Đã chốt / đã làm
+
+- **RAIMCD**: cửa sổ là ô bản đồ của khối khung, gốc là điểm chèn. A3 là 340 × 277 mm, mép phải dừng đúng vạch khung tên. Tờ dưới ghim dòng đã chọn ở đáy ô. Đo trên bản vẽ trắng: mép phải 340 mm, chữ khung tên bắt đầu khoảng 341 mm. Layout cũ không tự dịch.
+- **RAIKHUNG** và **RAIMCD**: cuối hộp thoại một hàng. Trái: Tải file mẫu, Xuất file, Nhập file. Phải: Hủy bỏ, Tạo Layout.
+- **UAVCLIP**: gõ `1` hoặc `2`. Reload ảnh không chép biên cắt. Cắt xong thì ảnh sơ họa cùng file, nếu biên còn là hình chữ nhật, được siết theo biên mới. **DUOITUYEN** sau khi ảnh đã cắt thì dải mới cũng nằm trong biên đó.
+- Đã nhìn trên Civil 3D 2026, bản vẽ trắng Drawing1: cắt ảnh gốc thì ảnh thứ hai cùng file mất nền trắng. Hai bản vẽ thử đã đóng, không lưu. Civil để mở, không còn bản vẽ.
+- Kịch bản video **RAIMCD** và **UAVCLIP** phiên bản 1.8.16, trạng thái Chưa quay. Không quay, không đăng.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Rải mặt cắt | `src/Modules/Frame/FrameService.ProfileLayout.cs` |
+| Cắt ảnh | `src/Modules/Uav/UavImageService.cs`, `src/Modules/Map/RasterClipService.cs` |
+| Sơ họa | `src/Modules/Tuyen/StripMapService.cs` |
+| Kịch bản | `docs/video/kich-ban/raimcd-1.8.16.md`, `docs/video/kich-ban/uavclip-1.8.16.md` |
+
+### Việc tiếp
+
+- [ ] Chưa phát hành 1.8.16. Gói UPD trên máy chủ vẫn là 1.8.14.
+- [ ] Trên bản vẽ công trình: chạy lại **UAVCLIP**, gõ `2`, để sơ họa nhận biên. Reload không làm việc này.
+- [ ] Layout `MatCat_Doc` cũ vẫn lệch cho đến khi chạy lại **RAIMCD**.
+- [ ] `VEMCD` chưa có lệnh. RAIMCD không đổi mức so sánh.
+- [ ] Video RAIMCD và UAVCLIP chưa quay. YouTube vẫn thiếu `client_secret.json`.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff đầu. iSurvey 1.8.16, chưa phát hành, không bump. RAIMCD vẽ trong ô bản đồ của khối khung: A3 là 340 × 277 mm, mép phải đúng vạch khung tên. UAVCLIP gõ 1 hoặc 2; cắt xong thì ảnh sơ họa cùng file được siết theo biên mới. Reload ảnh không chép biên. Đã nhìn trên bản vẽ trắng. Bản vẽ công trình cần chạy lại UAVCLIP (gõ 2) và RAIMCD nếu layout cũ còn lệch. VEMCD chưa có lệnh. Tiếp: phát hành 1.8.16 khi được yêu cầu, hoặc pha 2 tuyến và cọc.
+```
+
+**Lưu trữ ngày:** [2026-11-02-raimcd-uavclip.md](./2026-11-02-raimcd-uavclip.md)
+
+---
+
 ## 2026-11-01 — Video Nhập DGN (1.8.16, chưa phát hành, không bump)
 
 **Máy / ngữ cảnh:** Cursor — máy chỉ có AutoCAD 2023, không có Civil 3D. Cuối phiên đầy đủ. **Không bump.** Vẫn **1.8.16**, chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14.

@@ -11,7 +11,11 @@ Chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14. Ngày 2026-11-01 
 
 ### Khung mặt cắt
 
-- **RAIMCD**: dòng ngang vừa chọn cách lề trong dưới 10 mm. Số liệu dừng trước khung tên 3 mm. Đoạn mặt cắt cao hơn khung được thêm tờ phía trên, cùng tỷ lệ, không ép sang khổ lớn. PDF in lại đúng tờ vì lớp viewport được in và cửa sổ in khớp góc khung.
+- **RAIMCD**: cửa sổ là ô bản đồ của khối khung, gốc là điểm chèn. A3 là 340 × 277 mm, mép phải dừng đúng vạch khung tên. Đoạn cao hơn ô được thêm tờ phía trên, cùng tỷ lệ. Tờ dưới ghim dòng đã chọn ở đáy ô. Layout cũ không tự dịch; phải chạy lại lệnh. Đã đo trên bản vẽ trắng: mép phải 340 mm, chữ khung tên bắt đầu khoảng 341 mm.
+- **RAIKHUNG** và **RAIMCD**: cuối hộp thoại một hàng. Trái: Tải file mẫu, Xuất file, Nhập file. Phải: Hủy bỏ, Tạo Layout. Xuất file ghi 25 ô khung tên ra Excel.
+
+### Ảnh UAV
+- **UAVCLIP**: gõ `1` chọn biên theo polyline, gõ `2` tự cắt nền trắng hoặc đen. Reload ảnh chỉ đọc lại điểm ảnh, không chép biên cắt. Sau khi cắt, ảnh sơ họa cùng file (dải chữ nhật của DUOITUYEN) được siết theo biên mới. Duỗi tuyến sau khi đã cắt thì dải mới cũng nằm trong biên ảnh gốc. Đã nhìn trên Civil 3D 2026, bản vẽ trắng: cắt ảnh gốc thì ảnh cùng file mất nền trắng.
 
 ### Điểm đo
 - **NHAPDIEM**: bảng sửa được, thêm và xóa dòng. Cao chữ, kiểu điểm (chấm / trống / tròn gạch chéo) và cỡ điểm theo phần trăm màn hình. Cột X, Y trên bảng vẫn là trắc địa. Khi vẽ, CAD nhận Đông trên trục X và Bắc trên trục Y.

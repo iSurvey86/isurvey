@@ -21,20 +21,6 @@ public sealed partial class FrameService
 {
     private const string ProfileLayoutName = "MatCat_Doc";
 
-    /// <summary>Mép trái vùng vẽ, trùng cột đóng tập 20 mm của khung mẫu. Gốc block là góc tờ giấy.</summary>
-    private const double ProfileLeftInsetMm = 20;
-
-    /// <summary>Lề trong dưới của khung mẫu, tính từ mép tờ giấy.</summary>
-    private const double ProfileInnerBottomMm = 10;
-
-    /// <summary>Dòng ngang vừa chọn nằm cao hơn lề trong dưới chừng này, trùng vạch đáy khung tên.</summary>
-    private const double ProfileCutAboveInnerMm = 10;
-
-    /// <summary>Cửa sổ dừng trước vạch đứng của khung tên, để số liệu không tràn vào ô tên.</summary>
-    private const double ProfileRightGapMm = 3;
-
-    /// <summary>Trục đứng nằm trong cửa sổ, cách điểm chọn về bên trái chừng này (mét) để không bị cắt mép.</summary>
-    private const double ProfileAxisMarginM = 2.5;
     private static readonly int[] ProfileScales = [5000, 2000];
     private static readonly string[] ProfileScaleLabels = ["1/500; 1/5000", "1/200; 1/2000"];
     private static readonly string[] ProfileSizes = ["A3", "A2", "A1", "A0"];
@@ -513,8 +499,16 @@ public sealed partial class FrameService
     private static string ProfileScaleText(int scaleN) =>
         scaleN == 2000 ? "1/200; 1/2000" : "1/500; 1/5000";
 
-    private static double ProfileMapWidth(Spec spec) =>
-        Math.Max(80, spec.Mx1 - spec.Mx0 - ProfileRightGapMm);
+    /// <summary>
+    /// Vùng được vẽ, mm, gốc là điểm chèn khối KB_A*.
+    /// Khối không có gốc ở góc tờ giấy: A3 chèn tại (0,0) thì khung tên bắt đầu ở x = 340.
+    /// Đo trên bản rải: viewport tới x = chèn + 360 thì đè chữ khung tên (chữ nằm ở chèn + 341).
+    /// A3 là (0, 0, 340, 277). Khổ khác lấy đúng ô Mx, My của khung.
+    /// </summary>
+    private static (double Left, double Bottom, double Width, double Height) ProfileDrawRect(Spec spec) =>
+        (spec.Mx0, spec.My0, spec.Mx1 - spec.Mx0, spec.My1 - spec.My0);
+
+    private static double ProfileMapWidth(Spec spec) => ProfileDrawRect(spec).Width;
 
     private static string FirstFittingSize(ProfileBand band, double unitM, int scale)
     {
@@ -617,8 +611,8 @@ public sealed partial class FrameService
     {
         var spec = Specs.First(s => s.Name.Equals(size, StringComparison.OrdinalIgnoreCase));
         var custom = 1000.0 * unitM / scale;
-        var paperH = PaperSizeMm(spec).h;
-        var overlap = 20.0 / custom;
+        var room = ProfileDrawRect(spec).Height / custom;
+        var overlap = Math.Min(room * 0.08, 20.0 / custom);
         var localTop = LocalTop(segs, x0, x1, yCut);
         var frames = new List<ProfileFrame>();
         var anchor = yCut;
@@ -627,7 +621,7 @@ public sealed partial class FrameService
         while (guard++ < 16)
         {
             frames.Add(new ProfileFrame(x0, x1, anchor, pin));
-            var top = VisibleTop(anchor, pin, paperH, custom);
+            var top = anchor + room;
             if (localTop <= top + 0.5)
                 break;
             var next = top - overlap;
@@ -640,28 +634,12 @@ public sealed partial class FrameService
         if (frames.Count > 1)
         {
             var last = frames[^1];
-            var top = VisibleTop(last.YAnchor, last.PinTable, paperH, custom);
+            var top = last.YAnchor + room;
             if (localTop > top + 0.5)
-            {
-                var room = (paperH - ProfileInnerBottomMm - ProfileInnerBottomMm) / custom;
                 frames[^1] = new ProfileFrame(last.X0, last.X1, Math.Max(frames[^2].YAnchor + 1, localTop - room), false);
-            }
         }
 
         return frames;
-    }
-
-    /// <summary>Mức model tại mép trên vùng vẽ, chừa 10 mm lề trong trên.</summary>
-    private static double VisibleTop(double anchor, bool pinTable, double paperH, double custom)
-    {
-        var bottomMm = pinTable ? ProfileInnerBottomMm + ProfileCutAboveInnerMm : ProfileInnerBottomMm;
-        return anchor + (paperH - bottomMm - ProfileInnerBottomMm) / custom;
-    }
-
-    private static double FrameCenterY(double anchor, bool pinTable, double paperH, double custom)
-    {
-        var bottomMm = pinTable ? ProfileInnerBottomMm + ProfileCutAboveInnerMm : ProfileInnerBottomMm;
-        return anchor - (bottomMm - paperH / 2.0) / custom;
     }
 
     /// <summary>
@@ -704,13 +682,8 @@ public sealed partial class FrameService
         }
 
         var (paperW, paperH) = PaperSizeMm(spec);
-        var mapW = ProfileMapWidth(spec);
         var custom = 1000.0 * unitM / opts.Scale;
         var labelMm = (band.XSplit - band.XLeft) * custom;
-        var stationMm = mapW - labelMm;
-        var margin = ProfileAxisMarginM / unitM;
-        var marginMm = margin * custom;
-        var viewH = paperH / custom;
         var sheetTotal = groups.Sum(g => g.Count);
         var sheetNo = 0;
 
@@ -736,8 +709,9 @@ public sealed partial class FrameService
         lm.CurrentLayout = "Model";
 
         var viewportIds = new List<ObjectId>();
+        var viewportFit = new List<ProfileVp>();
         var frameIds = new List<ObjectId>();
-        var coverIds = new List<ObjectId>();
+        var signIds = new List<ObjectId>();
         using (var tr = db.TransactionManager.StartTransaction())
         {
             var bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
@@ -793,40 +767,35 @@ public sealed partial class FrameService
                             TitleBlockFit.Fit(tr, ar, br);
                         }
 
-                        PlaceSignatures(tr, ps, br, signBlocks);
+                        PlaceSignatures(tr, ps, br, signBlocks, signIds);
 
-                        var centerY = FrameCenterY(frame.YAnchor, frame.PinTable, paperH, custom);
-                        var leftPaper = cx + ProfileLeftInsetMm;
-                        var leftWidth = labelMm + marginMm;
-                        var leftModel = (band.XLeft - margin + band.XSplit) / 2.0;
-                        var paperY = cy + paperH / 2.0;
-                        viewportIds.Add(AddProfileViewport(tr, ps,
-                            leftPaper + leftWidth / 2.0, paperY,
-                            leftWidth, paperH,
-                            leftModel, centerY, viewH, custom));
+                        // Chỉ vẽ trong ô bản đồ của khung. A3: 340 × 277 mm. Không tràn khung tên, không thấp hơn ô này.
+                        var draw = ProfileDrawRect(spec);
+                        var mapLeft = cx + draw.Left;
+                        var mapBottom = cy + draw.Bottom;
+                        var mapW = draw.Width;
+                        var mapH = draw.Height;
+                        var labelPaper = Math.Min(Math.Max(8, labelMm), mapW * 0.42);
+                        var labelModelW = labelPaper / custom;
+                        var rightPaperW = mapW - labelPaper;
+                        var paperY = mapBottom + mapH / 2.0;
+                        var shownH = mapH / custom;
+                        var centerY = frame.YAnchor + shownH / 2.0;
 
-                        var rightPaper = leftPaper + leftWidth - marginMm;
-                        var rightModel = frame.X0 - margin + (stationMm / custom) / 2.0;
-                        viewportIds.Add(AddProfileViewport(tr, ps,
-                            rightPaper + stationMm / 2.0, paperY,
-                            stationMm, paperH,
-                            rightModel, centerY, viewH, custom));
+                        var leftFit = new ProfileVp(ObjectId.Null,
+                            mapLeft + labelPaper / 2.0, paperY, labelPaper, mapH,
+                            band.XLeft + labelModelW / 2.0, centerY, shownH, custom);
+                        var leftId = AddProfileViewport(tr, ps, leftFit);
+                        viewportIds.Add(leftId);
+                        viewportFit.Add(leftFit with { Id = leftId });
 
-                        var mapRight = rightPaper + stationMm;
-                        var sheetTop = cy + paperH;
-                        if (frame.PinTable)
-                        {
-                            var xLeftPaper = leftPaper + leftWidth / 2.0 + (band.XLeft - leftModel) * custom;
-                            var yCutPaper = paperY + (band.YCut - centerY) * custom;
-                            foreach (var id in AddProfileCover(tr, ps, frameLayer,
-                                leftPaper, cy, mapRight, sheetTop,
-                                xLeftPaper, yCutPaper))
-                                coverIds.Add(id);
-                        }
-
-                        var innerTop = sheetTop - ProfileInnerBottomMm;
-                        if (innerTop < sheetTop && mapRight - leftPaper > 0.2)
-                            coverIds.Add(AddCover(tr, ps, frameLayer, leftPaper, innerTop, mapRight, sheetTop));
+                        var rightLeft = mapLeft + labelPaper;
+                        var rightFit = new ProfileVp(ObjectId.Null,
+                            rightLeft + rightPaperW / 2.0, paperY, rightPaperW, mapH,
+                            frame.X0 + (rightPaperW / custom) / 2.0, centerY, shownH, custom);
+                        var rightId = AddProfileViewport(tr, ps, rightFit);
+                        viewportIds.Add(rightId);
+                        viewportFit.Add(rightFit with { Id = rightId });
                     }
                 }
 
@@ -837,35 +806,55 @@ public sealed partial class FrameService
         }
 
         lm.CurrentLayout = layoutName;
-        try
+
+        var mismatched = 0;
+        foreach (var fit in viewportFit)
         {
-            AcadApp.SetSystemVariable("WIPEOUTFRAME", 2);
-        }
-        catch
-        {
-            // khung wipeout không chặn lệnh
+            using (var tr = db.TransactionManager.StartTransaction())
+            {
+                var vp = (Viewport)tr.GetObject(fit.Id, OpenMode.ForWrite);
+                vp.On = true;
+                tr.Commit();
+            }
+
+            try
+            {
+                ed.Regen();
+            }
+            catch
+            {
+                // regen không chặn lệnh
+            }
+
+            using (var tr = db.TransactionManager.StartTransaction())
+            {
+                var vp = (Viewport)tr.GetObject(fit.Id, OpenMode.ForWrite);
+                if (vp.Locked)
+                    vp.Locked = false;
+                ApplyProfileView(vp, fit);
+                if (!ProfilePaperMatches(vp, fit))
+                    ApplyProfileView(vp, fit);
+                var lay = (Layout)tr.GetObject(layoutId, OpenMode.ForRead);
+                var space = (BlockTableRecord)tr.GetObject(lay.BlockTableRecordId, OpenMode.ForWrite);
+                ClipProfileViewport(tr, space, vp, fit);
+                ApplyProfileView(vp, fit);
+                tr.Commit();
+            }
         }
 
         using (var tr = db.TransactionManager.StartTransaction())
         {
-            foreach (var vid in viewportIds)
-            {
-                var vp = (Viewport)tr.GetObject(vid, OpenMode.ForWrite);
-                vp.On = true;
-                vp.Locked = true;
-            }
-
-            if (frameIds.Count > 0 || coverIds.Count > 0)
+            if (frameIds.Count > 0 || viewportIds.Count > 0)
             {
                 var lay = (Layout)tr.GetObject(layoutId, OpenMode.ForRead);
                 var space = (BlockTableRecord)tr.GetObject(lay.BlockTableRecordId, OpenMode.ForRead);
                 var order = (DrawOrderTable)tr.GetObject(space.DrawOrderTableId, OpenMode.ForWrite);
-                if (coverIds.Count > 0)
+                if (viewportIds.Count > 0)
                 {
-                    var ids = new ObjectIdCollection();
-                    foreach (var id in coverIds)
-                        ids.Add(id);
-                    order.MoveToTop(ids);
+                    var under = new ObjectIdCollection();
+                    foreach (var id in viewportIds)
+                        under.Add(id);
+                    order.MoveToBottom(under);
                 }
 
                 if (frameIds.Count > 0)
@@ -875,9 +864,44 @@ public sealed partial class FrameService
                         frames.Add(id);
                     order.MoveToTop(frames);
                 }
+
+                if (signIds.Count > 0)
+                {
+                    var signs = new ObjectIdCollection();
+                    foreach (var id in signIds)
+                        signs.Add(id);
+                    order.MoveToTop(signs);
+                }
+            }
+
+            foreach (var fit in viewportFit)
+            {
+                var vp = (Viewport)tr.GetObject(fit.Id, OpenMode.ForWrite);
+                if (!ProfilePaperMatches(vp, fit))
+                {
+                    if (vp.Locked)
+                        vp.Locked = false;
+                    ApplyProfileView(vp, fit);
+                }
+
+                if (!ProfilePaperMatches(vp, fit))
+                    mismatched++;
+                vp.Locked = true;
             }
 
             tr.Commit();
+        }
+
+        if (mismatched > 0)
+            ed.WriteMessage($"\n[iSurvey] {mismatched} cửa sổ chưa khớp vùng vẽ của khung.");
+
+        try
+        {
+            ed.Command("_.PSPACE");
+        }
+        catch
+        {
+            // đã ở paper space
         }
 
         try
@@ -892,62 +916,69 @@ public sealed partial class FrameService
         return sheetNo;
     }
 
-    private static ObjectId AddProfileViewport(
-        Transaction tr, BlockTableRecord ps, double paperX, double paperY, double width, double height,
-        double modelX, double modelY, double viewH, double custom)
+    private static ObjectId AddProfileViewport(Transaction tr, BlockTableRecord ps, ProfileVp fit)
     {
         var vp = new Viewport
         {
-            CenterPoint = new Point3d(paperX, paperY, 0),
-            Width = width,
-            Height = height,
+            CenterPoint = new Point3d(fit.X, fit.Y, 0),
+            Width = fit.W,
+            Height = fit.H,
             Layer = LayerViewport
         };
         ps.AppendEntity(vp);
         tr.AddNewlyCreatedDBObject(vp, true);
         vp.ViewDirection = Vector3d.ZAxis;
-        vp.ViewTarget = new Point3d(modelX, modelY, 0);
+        vp.ViewTarget = new Point3d(fit.ModelX, fit.ModelY, 0);
         vp.ViewCenter = Point2d.Origin;
         vp.TwistAngle = 0;
-        vp.ViewHeight = viewH;
-        vp.CustomScale = custom;
+        vp.ViewHeight = fit.ViewH;
+        vp.CustomScale = fit.Scale;
         return vp.ObjectId;
     }
 
+    private readonly record struct ProfileVp(
+        ObjectId Id, double X, double Y, double W, double H, double ModelX, double ModelY, double ViewH, double Scale);
+
     /// <summary>
-    /// Che phần model lọt vào lề trái và bên dưới điểm chọn. Không xóa hình trên Model.
+    /// Gán khung nhìn rồi gán lại hình chữ nhật giấy. Bật viewport và gán tỷ lệ hay nới cửa sổ ra ngoài tờ.
     /// </summary>
-    private static List<ObjectId> AddProfileCover(
-        Transaction tr, BlockTableRecord ps, string layer,
-        double left, double bottom, double right, double top, double xLeftPaper, double yCutPaper)
+    private static void ApplyProfileView(Viewport vp, ProfileVp fit)
     {
-        var made = new List<ObjectId>();
-        const double gap = 0.08;
-        var xMask = xLeftPaper - gap;
-        var yMask = yCutPaper - gap;
-        if (xMask - left > 0.12)
-            made.Add(AddCover(tr, ps, layer, left, bottom, xMask, top));
-        if (yMask - bottom > 0.2 && right - Math.Max(left, xMask) > 0.2)
-            made.Add(AddCover(tr, ps, layer, Math.Max(left, xMask), bottom, right, yMask));
-        return made;
+        vp.ViewDirection = Vector3d.ZAxis;
+        vp.TwistAngle = 0;
+        vp.ViewTarget = new Point3d(fit.ModelX, fit.ModelY, 0);
+        vp.ViewCenter = Point2d.Origin;
+        vp.ViewHeight = fit.ViewH;
+        vp.CustomScale = fit.Scale;
+        vp.CenterPoint = new Point3d(fit.X, fit.Y, 0);
+        vp.Width = fit.W;
+        vp.Height = fit.H;
     }
 
-    private static ObjectId AddCover(
-        Transaction tr, BlockTableRecord ps, string layer, double x0, double y0, double x1, double y1)
+    private static bool ProfilePaperMatches(Viewport vp, ProfileVp fit) =>
+        Math.Abs(vp.Width - fit.W) < 0.8
+        && Math.Abs(vp.Height - fit.H) < 0.8
+        && Math.Abs(vp.CenterPoint.X - fit.X) < 0.8
+        && Math.Abs(vp.CenterPoint.Y - fit.Y) < 0.8
+        && vp.CustomScale > 1e-9
+        && Math.Abs(vp.CustomScale - fit.Scale) / fit.Scale < 0.02;
+
+    /// <summary>Cắt cửa sổ đúng hình chữ nhật vùng vẽ, để hình không tràn ra ngoài khung dù AutoCAD nới viewport.</summary>
+    private static void ClipProfileViewport(Transaction tr, BlockTableRecord ps, Viewport vp, ProfileVp fit)
     {
-        var cover = new Wipeout { Layer = layer };
-        ps.AppendEntity(cover);
-        tr.AddNewlyCreatedDBObject(cover, true);
-        var pts = new Point2dCollection
-        {
-            new(x0, y0),
-            new(x1, y0),
-            new(x1, y1),
-            new(x0, y1),
-            new(x0, y0)
-        };
-        cover.SetFrom(pts, Vector3d.ZAxis);
-        return cover.ObjectId;
+        var x0 = fit.X - fit.W / 2.0;
+        var y0 = fit.Y - fit.H / 2.0;
+        var x1 = fit.X + fit.W / 2.0;
+        var y1 = fit.Y + fit.H / 2.0;
+        var pl = new Polyline { Layer = LayerViewport, Closed = true };
+        pl.AddVertexAt(0, new Point2d(x0, y0), 0, 0, 0);
+        pl.AddVertexAt(1, new Point2d(x1, y0), 0, 0, 0);
+        pl.AddVertexAt(2, new Point2d(x1, y1), 0, 0, 0);
+        pl.AddVertexAt(3, new Point2d(x0, y1), 0, 0, 0);
+        ps.AppendEntity(pl);
+        tr.AddNewlyCreatedDBObject(pl, true);
+        vp.NonRectClipEntityId = pl.ObjectId;
+        vp.NonRectClipOn = true;
     }
 
     /// <summary>Lớp viewport phải in được, nếu không PDF chỉ còn nền trắng.</summary>
