@@ -11,6 +11,12 @@ public sealed class TerrainRecord
 
     public List<string> Points { get; set; } = new();
 
+    /// <summary>
+    /// Khi dựng lưới: điểm/block lấy XY, Z từ chữ số gần nhất trong bản vẽ.
+    /// Không sửa entity CAD.
+    /// </summary>
+    public bool BlockElevFromLabels { get; set; }
+
     public List<string> Breaklines { get; set; } = new();
 
     public List<string> Contours { get; set; } = new();

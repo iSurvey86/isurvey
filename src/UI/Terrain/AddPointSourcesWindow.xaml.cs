@@ -10,6 +10,9 @@ public sealed class PointSourceChoice
 
     public bool Blocks { get; init; } = true;
 
+    /// <summary>XY từ block, Z từ chữ số gần nhất. Không ghi Z vào entity CAD.</summary>
+    public bool BlockElevFromLabels { get; init; }
+
     public bool Labels { get; init; } = true;
 
     public bool Chains { get; init; }
@@ -35,9 +38,10 @@ public partial class AddPointSourcesWindow : Window
     {
         var points = PointBox.IsChecked == true;
         var blocks = BlockBox.IsChecked == true;
+        var blockElev = BlockElevBox.IsChecked == true;
         var labels = LabelBox.IsChecked == true;
         var chains = ChainBox.IsChecked == true;
-        if (!points && !blocks && !labels && !chains)
+        if (!points && !blocks && !blockElev && !labels && !chains)
         {
             System.Windows.MessageBox.Show(this, "Hãy chọn ít nhất một loại đối tượng.", "iSurvey");
             return;
@@ -47,6 +51,7 @@ public partial class AddPointSourcesWindow : Window
         {
             Points = points,
             Blocks = blocks,
+            BlockElevFromLabels = blockElev,
             Labels = labels,
             Chains = chains
         };

@@ -3,6 +3,7 @@ using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
 using iSurvey.Core;
+using iSurvey.UI;
 using iSurvey.UI.Account;
 
 namespace iSurvey.Auth;
@@ -44,6 +45,22 @@ public sealed class AuthModule : ISurveyModule
         catch (System.Exception ex)
         {
             AuthManager.Print("\n[iSurvey] Khong mo duoc huong dan: " + ex.Message);
+        }
+    }
+
+    /// <summary>Dựng lại tab Ribbon iSurvey và kích hoạt. Không cần đăng nhập.</summary>
+    [CommandMethod("ISURVEY_RIBBON")]
+    public void RibbonCommand()
+    {
+        try
+        {
+            RibbonBuilder.ReloadRibbon();
+            AuthManager.Print("\n[iSurvey] Da nap lai menu Ribbon iSurvey.");
+            ActivityLogger.Enqueue("ribbon_reload", "ISURVEY_RIBBON");
+        }
+        catch (System.Exception ex)
+        {
+            AuthManager.Print("\n[iSurvey] Khong nap duoc menu Ribbon: " + ex.Message);
         }
     }
 

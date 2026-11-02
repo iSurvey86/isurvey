@@ -2,7 +2,7 @@
 
 ## 1.8.16 — 2026-10-31
 
-Chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14. Ngày 2026-11-01 không tăng số phiên bản.
+Chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14. Ngày 2026-11-01 và 2026-11-02 không tăng số phiên bản.
 
 ### Video hướng dẫn
 
@@ -20,9 +20,17 @@ Chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14. Ngày 2026-11-01 
 ### Điểm đo
 - **NHAPDIEM**: bảng sửa được, thêm và xóa dòng. Cao chữ, kiểu điểm (chấm / trống / tròn gạch chéo) và cỡ điểm theo phần trăm màn hình. Cột X, Y trên bảng vẫn là trắc địa. Khi vẽ, CAD nhận Đông trên trục X và Bắc trên trục Y.
 
+### Tuyến
+- **TAOTUYEN** tạo tuyến: tên, lý trình gốc, mô hình bám; chọn polyline rồi chọn điểm đầu gần một đầu mút (có thể đảo so với chiều vẽ).
+- **PHATSINHCOC** phát sinh cọc vuông góc với tuyến, Z từ TIN. Chữ cọc cũng vuông góc với tuyến (dọc gạch cọc). Ngoài bước lý trình, luôn có cọc tại đầu, cuối và mọi đỉnh polyline trong khoảng. Gạch cọc và chữ nằm trên layer `isurvey_Coctuyen`. **THIETLAPCOC** chỉnh chiều dài cọc, cao chữ, khoảng cách chữ, tùy chọn theo độ rộng polyline. **THEMCOC** thêm một cọc tại điểm pick. **XOACOC1** xóa một cọc đã chọn. **BANGCOC** bảng danh sách cọc (zoom / xóa / thêm). **DAODAUTUYEN** đảo đầu (xóa cọc, phát sinh lại; dùng cả sau MCD). **XOACOC** xóa hết cọc. Trên BANGIS: chuột phải tên tuyến hoặc mục Cọc.
+
+### Ribbon
+- **MENUISURVEY** (`ISURVEY_RIBBON`): dựng lại tab Ribbon iSurvey và kích hoạt. Dùng khi tab biến mất (đổi workspace, nạp plugin muộn). Không cần đăng nhập. Đổi workspace (`WSCURRENT`) tự dựng lại tab. Khi mở bản vẽ, Idle cũng gọi lại `EnsureRibbon` nếu tab chưa có.
+- Tránh đổi `ModuleName` sang tên DLL phụ (vd. `iSurvey-menu.dll`) khi Civil đang khóa file: .NET 8 cần `iSurvey.deps.json` / `runtimeconfig` cùng tên — đổi tên làm plugin không nạp, mất cả tab lẫn lệnh.
+
 ### Mô hình địa hình
-- **TAOMOHINH** tạo mô hình đặt tên trong bản vẽ. Không có cạnh dài nhất. **THEMMOHINH** gắn điểm, đứt gãy, đường đồng mức hoặc nhiều đường bao. Khi thêm điểm, hộp thoại chọn loại: điểm, block và chữ số bật sẵn; đường nối điểm tắt sẵn và chỉ lấy đỉnh, không thành đứt gãy. Chữ không đọc được thành số thì bỏ. **XAYMOHINH** dựng lưới tam giác: đứt gãy và đồng mức là cạnh bắt buộc. Có đường bao thì chỉ giữ tam giác có tâm nằm trong một đường bao. Không có bao thì lưới là bao lồi. **ANTIN** ẩn hoặc hiện lưới của mô hình. **TRACAOD** lấy cao độ tại một điểm trên lưới.
-- **BANGIS** hiện từng mô hình đã lưu, kèm số điểm, đứt gãy, đồng mức và đường bao. Chuột phải trên tên mô hình để thêm, xây dựng, ẩn/hiện và tra cao độ. Đã nhìn hộp tạo mô hình trên Civil 3D 2026, bản vẽ trắng. Cây mục con chưa nhìn lại trong phiên 2026-11-01.
+- **TAOMOHINH** tạo mô hình đặt tên trong bản vẽ. Không có cạnh dài nhất. **THEMMOHINH** gắn điểm, đứt gãy, đường đồng mức hoặc nhiều đường bao. Khi thêm điểm, hộp thoại chọn loại: điểm, block và chữ số bật sẵn; thêm mục «Điểm/Block + chữ cao độ cạnh» (XY từ điểm hoặc block, Z từ chữ số gần nhất, không sửa CAD); đường nối điểm tắt sẵn và chỉ lấy đỉnh, không thành đứt gãy. Chữ không đọc được thành số thì bỏ. **XAYMOHINH** dựng lưới tam giác: đứt gãy và đồng mức là cạnh bắt buộc. Có đường bao thì chỉ giữ điểm trong bao; mỗi tam giác phải có ba đỉnh, tâm và giữa ba cạnh nằm trong bao (không bắc cầu chỗ lõm). Không có bao thì lưới là bao lồi. Lúc dựng có thanh tiến trình và nút Hủy bỏ. **TRACAOD** chọn nhiều điểm, hiện Z trên dòng lệnh và chữ đỏ tạm trên bản vẽ. **GOMOHINH** gỡ đối tượng đã chọn khỏi mô hình. **XOATHANHPHAN** xóa toàn bộ một loại (điểm, đứt gãy, đồng mức hoặc đường bao). Cả hai không xóa đối tượng CAD; lưới cũ bị xóa và cần xây dựng lại. Khi xây dựng, handle đối tượng đã mất trên bản vẽ cũng bị bỏ khỏi mô hình. **ANTIN** ẩn hoặc hiện lưới của mô hình. **TRACAOD** lấy cao độ tại một điểm trên lưới.
+- **BANGIS** hiện từng mô hình đã lưu, kèm số điểm, đứt gãy, đồng mức và đường bao. Chỉ dòng đang chọn được in đậm. Chuột phải trên tên mô hình để Xây dựng TIN, ẩn/hiện và tra cao độ. Chuột phải trên Điểm, Đứt gãy, Đường đồng mức hoặc Đường bao: thêm, gỡ đã chọn, hoặc xóa toàn bộ đúng loại đó.
 
 ## 1.8.15 — 2026-10-30
 

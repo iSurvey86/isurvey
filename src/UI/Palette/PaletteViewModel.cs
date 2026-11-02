@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using Autodesk.AutoCAD.ApplicationServices;
 using iSurvey.Modules.Terrain;
+using iSurvey.Modules.Tuyen;
 
 namespace iSurvey.UI.Palette;
 
@@ -92,7 +93,7 @@ internal sealed class PaletteViewModel : ObservableObject
         TreeNodes.Clear();
         TreeNodes.Add(Points());
         TreeNodes.Add(Terrain(document));
-        TreeNodes.Add(Route());
+        TreeNodes.Add(Route(document));
         TreeNodes.Add(Profile());
         LinkGuides(TreeNodes, connectUp: false);
     }
@@ -142,49 +143,114 @@ internal sealed class PaletteViewModel : ObservableObject
             {
                 Tag = model.Id
             };
-            child.Actions.Add(new NodeAction("Thêm điểm", PaletteCommands.ForModel("THEMMOHINH", model.Id, "point")));
-            child.Actions.Add(new NodeAction("Thêm đứt gãy", PaletteCommands.ForModel("THEMMOHINH", model.Id, "break")));
-            child.Actions.Add(new NodeAction("Thêm đường đồng mức", PaletteCommands.ForModel("THEMMOHINH", model.Id, "contour")));
-            child.Actions.Add(new NodeAction("Thêm đường bao", PaletteCommands.ForModel("THEMMOHINH", model.Id, "boundary")));
-            child.Actions.Add(new NodeAction("Xây dựng", PaletteCommands.ForModel("XAYMOHINH", model.Id, null)));
+            child.Actions.Add(new NodeAction("Xây dựng TIN", PaletteCommands.ForModel("XAYMOHINH", model.Id, null)));
             child.Actions.Add(new NodeAction("Ẩn / hiện lưới", PaletteCommands.ForModel("ANTIN", model.Id, null)));
             child.Actions.Add(new NodeAction("Tra cao độ", PaletteCommands.ForModel("TRACAOD", model.Id, null)));
-            child.Children.Add(new TreeNodeViewModel(
+            var spots = new TreeNodeViewModel(
                 "Điểm (" + model.Points.Count + ")",
                 "",
                 model.Points.Count + " đối tượng điểm khống chế cao độ.",
-                "Spot"));
-            child.Children.Add(new TreeNodeViewModel(
+                "Spot");
+            spots.Actions.Add(new NodeAction("Thêm điểm", PaletteCommands.ForModel("THEMMOHINH", model.Id, "point")));
+            spots.Actions.Add(new NodeAction("Gỡ đã chọn...", PaletteCommands.ForModel("GOMOHINH", model.Id, "point")));
+            spots.Actions.Add(new NodeAction("Xóa toàn bộ điểm", PaletteCommands.ForModel("XOATHANHPHAN", model.Id, "point")));
+            var breaks = new TreeNodeViewModel(
                 "Đứt gãy (" + model.Breaklines.Count + ")",
                 "",
                 model.Breaklines.Count + " đường đứt gãy. Cạnh bắt buộc, ví dụ mép ta luy.",
-                "Break"));
-            child.Children.Add(new TreeNodeViewModel(
+                "Break");
+            breaks.Actions.Add(new NodeAction("Thêm đứt gãy", PaletteCommands.ForModel("THEMMOHINH", model.Id, "break")));
+            breaks.Actions.Add(new NodeAction("Gỡ đã chọn...", PaletteCommands.ForModel("GOMOHINH", model.Id, "break")));
+            breaks.Actions.Add(new NodeAction("Xóa toàn bộ đứt gãy", PaletteCommands.ForModel("XOATHANHPHAN", model.Id, "break")));
+            var contours = new TreeNodeViewModel(
                 "Đường đồng mức (" + model.Contours.Count + ")",
                 "",
                 model.Contours.Count + " đường đồng mức. Cạnh bắt buộc, cao độ không đổi dọc cạnh.",
-                "Contour"));
+                "Contour");
+            contours.Actions.Add(new NodeAction("Thêm đường đồng mức", PaletteCommands.ForModel("THEMMOHINH", model.Id, "contour")));
+            contours.Actions.Add(new NodeAction("Gỡ đã chọn...", PaletteCommands.ForModel("GOMOHINH", model.Id, "contour")));
+            contours.Actions.Add(new NodeAction("Xóa toàn bộ đường đồng mức", PaletteCommands.ForModel("XOATHANHPHAN", model.Id, "contour")));
             var bao = model.BoundaryCount;
-            child.Children.Add(new TreeNodeViewModel(
+            var boundary = new TreeNodeViewModel(
                 "Đường bao (" + bao + ")",
                 "",
                 bao + " đường bao kín. Chỉ giữ tam giác nằm trong các đường bao.",
-                "Boundary"));
+                "Boundary");
+            boundary.Actions.Add(new NodeAction("Thêm đường bao", PaletteCommands.ForModel("THEMMOHINH", model.Id, "boundary")));
+            boundary.Actions.Add(new NodeAction("Gỡ đã chọn...", PaletteCommands.ForModel("GOMOHINH", model.Id, "boundary")));
+            boundary.Actions.Add(new NodeAction("Xóa toàn bộ đường bao", PaletteCommands.ForModel("XOATHANHPHAN", model.Id, "boundary")));
+            child.Children.Add(spots);
+            child.Children.Add(breaks);
+            child.Children.Add(contours);
+            child.Children.Add(boundary);
             node.Children.Add(child);
         }
 
         return node;
     }
 
-    private static TreeNodeViewModel Route()
+    private static TreeNodeViewModel Route(Document? document)
     {
+        List<RouteRecord> routes;
+        try
+        {
+            routes = document is null ? new List<RouteRecord>() : RouteStore.Load(document.Database);
+        }
+        catch (System.Exception)
+        {
+            routes = new List<RouteRecord>();
+        }
+
         var node = new TreeNodeViewModel(
             "Tuyến",
             "Phải chuột để tạo...",
-            "Chưa có tuyến. Làm sau khi đã có mô hình.",
+            routes.Count == 0 ? "Chưa có tuyến trong bản vẽ này." : routes.Count + " tuyến.",
             "Route");
-        node.Actions.Add(new NodeAction("Tạo tuyến...", PaletteCommands.Later(
-            "Tạo tuyến chưa có. Cần mô hình địa hình trước.")));
+        node.Actions.Add(new NodeAction("Tạo tuyến...", PaletteCommands.Run("TAOTUYEN")));
+        node.Actions.Add(new NodeAction("Thiết lập kiểu cọc...", PaletteCommands.Run("THIETLAPCOC")));
+        foreach (var route in routes)
+        {
+            var child = new TreeNodeViewModel(route.Name, "", route.Summary(), "Route")
+            {
+                Tag = route.Id
+            };
+            child.Actions.Add(new NodeAction("Phát sinh cọc...", PaletteCommands.ForRoute("PHATSINHCOC", route.Id)));
+            child.Actions.Add(new NodeAction("Danh sách cọc...", PaletteCommands.ForRoute("BANGCOC", route.Id)));
+            child.Actions.Add(new NodeAction("Thêm một cọc...", PaletteCommands.ForRoute("THEMCOC", route.Id)));
+            child.Actions.Add(new NodeAction("Xóa một cọc...", PaletteCommands.ForRoute("XOACOC1", route.Id)));
+            child.Actions.Add(new NodeAction("Thiết lập kiểu cọc...", PaletteCommands.Run("THIETLAPCOC")));
+            child.Actions.Add(new NodeAction("Đảo đầu tuyến", PaletteCommands.ForRoute("DAODAUTUYEN", route.Id)));
+            child.Actions.Add(new NodeAction("Xóa hết cọc", PaletteCommands.ForRoute("XOACOC", route.Id)));
+            var stations = route.Stations?.Count ?? 0;
+            var withZ = 0;
+            if (route.Stations is not null)
+            {
+                foreach (var station in route.Stations)
+                {
+                    if (station.HasZ)
+                        withZ++;
+                }
+            }
+
+            var coc = new TreeNodeViewModel(
+                "Cọc (" + stations + ")",
+                "",
+                stations == 0
+                    ? "Chưa có cọc. Chuột phải để phát sinh, thêm hoặc xem danh sách."
+                    : stations + " cọc, " + withZ + " có cao độ Z từ mô hình.",
+                "Spot")
+            {
+                Tag = route.Id
+            };
+            coc.Actions.Add(new NodeAction("Danh sách cọc...", PaletteCommands.ForRoute("BANGCOC", route.Id)));
+            coc.Actions.Add(new NodeAction("Thêm một cọc...", PaletteCommands.ForRoute("THEMCOC", route.Id)));
+            coc.Actions.Add(new NodeAction("Xóa một cọc...", PaletteCommands.ForRoute("XOACOC1", route.Id)));
+            coc.Actions.Add(new NodeAction("Phát sinh cọc...", PaletteCommands.ForRoute("PHATSINHCOC", route.Id)));
+            coc.Actions.Add(new NodeAction("Xóa hết cọc", PaletteCommands.ForRoute("XOACOC", route.Id)));
+            child.Children.Add(coc);
+            node.Children.Add(child);
+        }
+
         return node;
     }
 

@@ -1,0 +1,72 @@
+<Window x:Class="iSurvey.UI.Tuyen.StationStyleWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="iSurvey — Thiết lập kiểu cọc"
+        Width="460" SizeToContent="Height"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ResizeMode="NoResize" ShowInTaskbar="False" FontFamily="Segoe UI"
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/iSurvey;component/src/UI/CtaStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Border Background="White" CornerRadius="12" Margin="12">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="18" ShadowDepth="2" Opacity="0.28"/>
+        </Border.Effect>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" Background="#1D4ED8" CornerRadius="12,12,0,0" MouseLeftButtonDown="Header_Drag">
+                <DockPanel Margin="14,10">
+                    <Button DockPanel.Dock="Right" Content="&#xE8BB;" FontFamily="Segoe MDL2 Assets" FontSize="12"
+                            Style="{StaticResource CtaClose}" Click="Cancel_Click" ToolTip="Đóng"/>
+                    <TextBlock Text="iSurvey — Thiết lập kiểu cọc" Foreground="White" FontWeight="SemiBold"
+                               VerticalAlignment="Center"/>
+                </DockPanel>
+            </Border>
+            <StackPanel Grid.Row="1" Margin="16,14,16,8">
+                <TextBlock Text="Chiều dài cọc (m)" Foreground="#374151" Margin="0,0,0,4"/>
+                <TextBox x:Name="TickBox" Padding="8,6" Margin="0,0,0,4"/>
+                <TextBlock Text="Để trống hoặc 0: tự động theo khung nhìn (cao chữ × 2,5)."
+                           Foreground="#64748B" FontSize="12" Margin="0,0,0,10" TextWrapping="Wrap"/>
+
+                <TextBlock Text="Cao chữ (m)" Foreground="#374151" Margin="0,0,0,4"/>
+                <TextBox x:Name="HeightBox" Padding="8,6" Margin="0,0,0,4"/>
+                <TextBlock Text="Để trống hoặc 0: tự động theo khung nhìn."
+                           Foreground="#64748B" FontSize="12" Margin="0,0,0,10" TextWrapping="Wrap"/>
+
+                <TextBlock Text="Khoảng cách chữ đến tâm cọc (m)" Foreground="#374151" Margin="0,0,0,4"/>
+                <TextBox x:Name="OffsetBox" Padding="8,6" Margin="0,0,0,4"/>
+                <TextBlock Text="Để trống hoặc 0: tự động (khoảng nửa cọc + một phần cao chữ)."
+                           Foreground="#64748B" FontSize="12" Margin="0,0,0,10" TextWrapping="Wrap"/>
+
+                <CheckBox x:Name="WidthBox" Content="Lấy chiều dài cọc theo độ rộng polyline tim (nếu có)"
+                          Margin="0,0,0,8"/>
+                <TextBlock Text="Hệ số nhân độ rộng" Foreground="#374151" Margin="0,0,0,4"/>
+                <TextBox x:Name="FactorBox" Padding="8,6" Text="1" Margin="0,0,0,4"/>
+                <TextBlock Text="Chỉ dùng khi bật ô trên. Mặc định 1 = đúng bằng độ rộng tim."
+                           Foreground="#64748B" FontSize="12" Margin="0,0,0,4" TextWrapping="Wrap"/>
+                <TextBlock Text="Lưu trên máy. Lần phát sinh cọc sau (PHATSINHCOC) dùng thông số mới."
+                           Foreground="#64748B" FontSize="12" TextWrapping="Wrap" Margin="0,8,0,0"/>
+            </StackPanel>
+            <Border Grid.Row="2" Background="#F8FAFC" CornerRadius="0,0,12,12" Padding="16,12">
+                <DockPanel LastChildFill="False">
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                        <Button Content="Hủy bỏ" MinWidth="88" Margin="0,0,8,0" Click="Cancel_Click"
+                                Style="{StaticResource CtaSoft}"/>
+                        <Button Content="Lưu" MinWidth="100" Click="Save_Click"
+                                Style="{StaticResource CtaPrimary}"/>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

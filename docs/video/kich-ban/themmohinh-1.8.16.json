@@ -1,0 +1,12 @@
+{
+  "command": "THEMMOHINH",
+  "title": "Thêm điểm vào mô hình phiên bản 1.8.16",
+  "version": "1.8.16",
+  "status": "Chưa quay",
+  "steps": [
+    "Mở hộp Thêm điểm từ BANGIS hoặc THEMMOHINH",
+    "Bật Block + chữ cao độ cạnh",
+    "Chọn block và chữ cạnh",
+    "Xây dựng TIN và tra cao độ"
+  ]
+}

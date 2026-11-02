@@ -34,6 +34,7 @@ using iSurvey.UI;
 [assembly: CommandClass(typeof(AuthModule))]
 [assembly: CommandClass(typeof(iSurvey.UI.Palette.PaletteModule))]
 [assembly: CommandClass(typeof(iSurvey.Modules.Terrain.TerrainModule))]
+[assembly: CommandClass(typeof(iSurvey.Modules.Tuyen.RouteModule))]
 [assembly: CommandClass(typeof(iSurvey.CommandAliases))]
 #endif
 
@@ -88,6 +89,9 @@ public sealed class Main : IExtensionApplication
                 acad.MdiActiveDocument.Editor.WriteMessage(
                     $"\n[iSurvey] {string.Join(", ", fixedVars)} đang = 0 (làm hộp thoại không hiện) — đã đặt lại 1.");
             }
+
+            // Ribbon đôi khi chưa sẵn lúc Initialize — dựng lại khi đã có bản vẽ.
+            RibbonBuilder.EnsureRibbon();
 
             iSurvey.Auth.UpdateApplyService.FlushPendingResult();
         }

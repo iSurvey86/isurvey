@@ -1,0 +1,7 @@
+{
+  "command": "THIETLAPCOC",
+  "title": "Thiết lập kiểu cọc phiên bản 1.8.16",
+  "version": "1.8.16",
+  "status": "Chưa quay",
+  "steps": ["Mở hộp THIETLAPCOC", "Nhập thông số", "Lưu và phát sinh lại cọc"]
+}

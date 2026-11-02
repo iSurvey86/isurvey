@@ -1,0 +1,45 @@
+{
+  "id": "xaymohinh-1.8.16",
+  "command": "XAYMOHINH",
+  "commandFull": "ISURVEY_TERRAIN_BUILD",
+  "feature": "Xây dựng lưới",
+  "version": "1.8.16",
+  "title": "Xây dựng lưới phiên bản 1.8.16",
+  "privacy": "unlisted",
+  "voice": "vi-VN-HoaiMyNeural",
+  "rate": "-8%",
+  "tags": ["iSurvey", "Civil 3D", "TIN", "XAYMOHINH"],
+  "description": "Cách chọn đúng mục trên bảng iSurvey và theo dõi tiến trình khi xây dựng lưới.\n\nHành vi trong video có từ iSurvey 1.8.16 (lệnh XAYMOHINH, lệnh đủ ISURVEY_TERRAIN_BUILD).\nChuột phải trên đường bao chỉ thêm đường bao. Xây dựng lưới nằm ở chuột phải tên mô hình, có thanh tiến trình.",
+  "shots": [
+    {
+      "id": "01-mo-dau",
+      "type": "card",
+      "lines": ["Xây dựng lưới", "phiên bản 1.8.16"],
+      "narration": "Xây dựng lưới, phiên bản một chấm tám chấm mười sáu. Trên bảng, chỉ dòng đang chọn được in đậm."
+    },
+    {
+      "id": "02-chon",
+      "type": "screen",
+      "action": "Bấm lần lượt Điểm, Đường bao và tên mô hình. Chỉ dòng đang chọn in đậm.",
+      "narration": "Bấm một dòng. Dòng đó đậm và nền xanh. Các dòng khác giữ chữ thường."
+    },
+    {
+      "id": "03-menu",
+      "type": "screen",
+      "action": "Chuột phải Đường bao, chỉ thấy Thêm đường bao. Chuột phải tên mô hình, thấy Xây dựng TIN.",
+      "narration": "Chuột phải đường bao thì chỉ thêm đường bao. Muốn dựng lưới, chuột phải đúng tên mô hình."
+    },
+    {
+      "id": "04-tien-trinh",
+      "type": "screen",
+      "action": "Bấm Xây dựng TIN. Giữ thanh tiến trình đến khi lưới hiện.",
+      "narration": "Thanh tiến trình cho biết đang dựng bao nhiêu điểm, rồi đang vẽ bao nhiêu tam giác. Bấm Hủy bỏ nếu muốn dừng trước khi ghi lưới."
+    },
+    {
+      "id": "05-ket",
+      "type": "card",
+      "lines": ["Lưới đã dựng xong"],
+      "narration": "Lưới nằm trên lớp của mô hình. Có thể ẩn hoặc tra cao độ từ chính tên mô hình."
+    }
+  ]
+}

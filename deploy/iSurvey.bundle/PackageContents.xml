@@ -65,6 +65,8 @@
         <Command Local="ISURVEY_LOGIN" Global="ISURVEY_LOGIN" />
         <Command Local="ISURVEY_UPDATE" Global="ISURVEY_UPDATE" />
         <Command Local="ISURVEY_ABOUT" Global="ISURVEY_ABOUT" />
+        <Command Local="ISURVEY_RIBBON" Global="ISURVEY_RIBBON" />
+        <Command Local="MENUISURVEY" Global="MENUISURVEY" />
         <Command Local="ISURVEY_PALETTE" Global="ISURVEY_PALETTE" />
         <Command Local="BANGIS" Global="BANGIS" />
         <Command Local="ISURVEY_TERRAIN_NEW" Global="ISURVEY_TERRAIN_NEW" />
@@ -77,6 +79,26 @@
         <Command Local="ANTIN" Global="ANTIN" />
         <Command Local="ISURVEY_TERRAIN_Z" Global="ISURVEY_TERRAIN_Z" />
         <Command Local="TRACAOD" Global="TRACAOD" />
+        <Command Local="ISURVEY_TERRAIN_DETACH" Global="ISURVEY_TERRAIN_DETACH" />
+        <Command Local="GOMOHINH" Global="GOMOHINH" />
+        <Command Local="ISURVEY_TERRAIN_CLEAR" Global="ISURVEY_TERRAIN_CLEAR" />
+        <Command Local="XOATHANHPHAN" Global="XOATHANHPHAN" />
+        <Command Local="ISURVEY_ROUTE_NEW" Global="ISURVEY_ROUTE_NEW" />
+        <Command Local="TAOTUYEN" Global="TAOTUYEN" />
+        <Command Local="ISURVEY_ROUTE_STATIONS" Global="ISURVEY_ROUTE_STATIONS" />
+        <Command Local="PHATSINHCOC" Global="PHATSINHCOC" />
+        <Command Local="ISURVEY_ROUTE_CLEAR_STATIONS" Global="ISURVEY_ROUTE_CLEAR_STATIONS" />
+        <Command Local="XOACOC" Global="XOACOC" />
+        <Command Local="ISURVEY_ROUTE_REVERSE" Global="ISURVEY_ROUTE_REVERSE" />
+        <Command Local="DAODAUTUYEN" Global="DAODAUTUYEN" />
+        <Command Local="ISURVEY_STATION_STYLE" Global="ISURVEY_STATION_STYLE" />
+        <Command Local="THIETLAPCOC" Global="THIETLAPCOC" />
+        <Command Local="ISURVEY_STATION_REMOVE_ONE" Global="ISURVEY_STATION_REMOVE_ONE" />
+        <Command Local="XOACOC1" Global="XOACOC1" />
+        <Command Local="ISURVEY_STATION_ADD_ONE" Global="ISURVEY_STATION_ADD_ONE" />
+        <Command Local="THEMCOC" Global="THEMCOC" />
+        <Command Local="ISURVEY_STATION_LIST" Global="ISURVEY_STATION_LIST" />
+        <Command Local="BANGCOC" Global="BANGCOC" />
         <Command Local="ISURVEY_LOGOUT" Global="ISURVEY_LOGOUT" />
         <Command Local="ISURVEY_GENOTP" Global="ISURVEY_GENOTP" />
         <Command Local="LGI" Global="LGI" />
@@ -143,6 +165,8 @@
         <Command Local="ISURVEY_LOGIN" Global="ISURVEY_LOGIN" />
         <Command Local="ISURVEY_UPDATE" Global="ISURVEY_UPDATE" />
         <Command Local="ISURVEY_ABOUT" Global="ISURVEY_ABOUT" />
+        <Command Local="ISURVEY_RIBBON" Global="ISURVEY_RIBBON" />
+        <Command Local="MENUISURVEY" Global="MENUISURVEY" />
         <Command Local="ISURVEY_PALETTE" Global="ISURVEY_PALETTE" />
         <Command Local="BANGIS" Global="BANGIS" />
         <Command Local="ISURVEY_TERRAIN_NEW" Global="ISURVEY_TERRAIN_NEW" />
@@ -155,6 +179,26 @@
         <Command Local="ANTIN" Global="ANTIN" />
         <Command Local="ISURVEY_TERRAIN_Z" Global="ISURVEY_TERRAIN_Z" />
         <Command Local="TRACAOD" Global="TRACAOD" />
+        <Command Local="ISURVEY_TERRAIN_DETACH" Global="ISURVEY_TERRAIN_DETACH" />
+        <Command Local="GOMOHINH" Global="GOMOHINH" />
+        <Command Local="ISURVEY_TERRAIN_CLEAR" Global="ISURVEY_TERRAIN_CLEAR" />
+        <Command Local="XOATHANHPHAN" Global="XOATHANHPHAN" />
+        <Command Local="ISURVEY_ROUTE_NEW" Global="ISURVEY_ROUTE_NEW" />
+        <Command Local="TAOTUYEN" Global="TAOTUYEN" />
+        <Command Local="ISURVEY_ROUTE_STATIONS" Global="ISURVEY_ROUTE_STATIONS" />
+        <Command Local="PHATSINHCOC" Global="PHATSINHCOC" />
+        <Command Local="ISURVEY_ROUTE_CLEAR_STATIONS" Global="ISURVEY_ROUTE_CLEAR_STATIONS" />
+        <Command Local="XOACOC" Global="XOACOC" />
+        <Command Local="ISURVEY_ROUTE_REVERSE" Global="ISURVEY_ROUTE_REVERSE" />
+        <Command Local="DAODAUTUYEN" Global="DAODAUTUYEN" />
+        <Command Local="ISURVEY_STATION_STYLE" Global="ISURVEY_STATION_STYLE" />
+        <Command Local="THIETLAPCOC" Global="THIETLAPCOC" />
+        <Command Local="ISURVEY_STATION_REMOVE_ONE" Global="ISURVEY_STATION_REMOVE_ONE" />
+        <Command Local="XOACOC1" Global="XOACOC1" />
+        <Command Local="ISURVEY_STATION_ADD_ONE" Global="ISURVEY_STATION_ADD_ONE" />
+        <Command Local="THEMCOC" Global="THEMCOC" />
+        <Command Local="ISURVEY_STATION_LIST" Global="ISURVEY_STATION_LIST" />
+        <Command Local="BANGCOC" Global="BANGCOC" />
         <Command Local="ISURVEY_LOGOUT" Global="ISURVEY_LOGOUT" />
         <Command Local="ISURVEY_GENOTP" Global="ISURVEY_GENOTP" />
         <Command Local="LGI" Global="LGI" />
@@ -221,6 +265,8 @@
         <Command Local="ISURVEY_LOGIN" Global="ISURVEY_LOGIN" />
         <Command Local="ISURVEY_UPDATE" Global="ISURVEY_UPDATE" />
         <Command Local="ISURVEY_ABOUT" Global="ISURVEY_ABOUT" />
+        <Command Local="ISURVEY_RIBBON" Global="ISURVEY_RIBBON" />
+        <Command Local="MENUISURVEY" Global="MENUISURVEY" />
         <Command Local="ISURVEY_PALETTE" Global="ISURVEY_PALETTE" />
         <Command Local="BANGIS" Global="BANGIS" />
         <Command Local="ISURVEY_TERRAIN_NEW" Global="ISURVEY_TERRAIN_NEW" />
@@ -233,6 +279,26 @@
         <Command Local="ANTIN" Global="ANTIN" />
         <Command Local="ISURVEY_TERRAIN_Z" Global="ISURVEY_TERRAIN_Z" />
         <Command Local="TRACAOD" Global="TRACAOD" />
+        <Command Local="ISURVEY_TERRAIN_DETACH" Global="ISURVEY_TERRAIN_DETACH" />
+        <Command Local="GOMOHINH" Global="GOMOHINH" />
+        <Command Local="ISURVEY_TERRAIN_CLEAR" Global="ISURVEY_TERRAIN_CLEAR" />
+        <Command Local="XOATHANHPHAN" Global="XOATHANHPHAN" />
+        <Command Local="ISURVEY_ROUTE_NEW" Global="ISURVEY_ROUTE_NEW" />
+        <Command Local="TAOTUYEN" Global="TAOTUYEN" />
+        <Command Local="ISURVEY_ROUTE_STATIONS" Global="ISURVEY_ROUTE_STATIONS" />
+        <Command Local="PHATSINHCOC" Global="PHATSINHCOC" />
+        <Command Local="ISURVEY_ROUTE_CLEAR_STATIONS" Global="ISURVEY_ROUTE_CLEAR_STATIONS" />
+        <Command Local="XOACOC" Global="XOACOC" />
+        <Command Local="ISURVEY_ROUTE_REVERSE" Global="ISURVEY_ROUTE_REVERSE" />
+        <Command Local="DAODAUTUYEN" Global="DAODAUTUYEN" />
+        <Command Local="ISURVEY_STATION_STYLE" Global="ISURVEY_STATION_STYLE" />
+        <Command Local="THIETLAPCOC" Global="THIETLAPCOC" />
+        <Command Local="ISURVEY_STATION_REMOVE_ONE" Global="ISURVEY_STATION_REMOVE_ONE" />
+        <Command Local="XOACOC1" Global="XOACOC1" />
+        <Command Local="ISURVEY_STATION_ADD_ONE" Global="ISURVEY_STATION_ADD_ONE" />
+        <Command Local="THEMCOC" Global="THEMCOC" />
+        <Command Local="ISURVEY_STATION_LIST" Global="ISURVEY_STATION_LIST" />
+        <Command Local="BANGCOC" Global="BANGCOC" />
         <Command Local="ISURVEY_LOGOUT" Global="ISURVEY_LOGOUT" />
         <Command Local="ISURVEY_GENOTP" Global="ISURVEY_GENOTP" />
         <Command Local="LGI" Global="LGI" />
@@ -243,3 +309,4 @@
     </ComponentEntry>
   </Components>
 </ApplicationPackage>
+

@@ -1,0 +1,7 @@
+{
+  "command": "XOACOC1",
+  "title": "Xóa một cọc phiên bản 1.8.16",
+  "version": "1.8.16",
+  "status": "Chưa quay",
+  "steps": ["XOACOC1", "Chọn gạch hoặc chữ cọc", "Một cọc bị xóa"]
+}

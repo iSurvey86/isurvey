@@ -61,7 +61,7 @@ Tham số mặc định trong `ads-config.xml` (`DTMSETTING`): cạnh dài nhấ
 - **Vào mô hình:** polyline 3D (hoặc đường có Z) làm cạnh bắt buộc khi tam giác hóa.
 - **Ra khỏi mô hình:** vẽ lại đồng mức sau khi đã có TIN (và tùy chọn tự cập nhật khi rebuild).
 
-iSurvey 1.8.16: nhập điểm, `GHISODM` ghi số đồng mức, mô hình đặt tên (`TAOMOHINH`), thêm điểm / đứt gãy / đồng mức / đường bao (`THEMMOHINH`), xây dựng lưới (`XAYMOHINH`). Không lọc cạnh dài. Đứt gãy và đồng mức là cạnh bắt buộc. Đường bao là chỗ cắt duy nhất. Thêm điểm mở hộp chọn loại: điểm, block, chữ số (bật sẵn) và đường nối điểm (tắt sẵn, chỉ lấy đỉnh). Không có mục «đối tượng khác», mặt 3D hay đám mây điểm. `ANTIN` ẩn hoặc hiện lưới của mô hình. `TRACAOD` lấy cao độ trên lưới. Chưa có tuyến, cọc, `VEMCD`.
+iSurvey 1.8.16: nhập điểm, `GHISODM` ghi số đồng mức, mô hình đặt tên (`TAOMOHINH`), thêm điểm / đứt gãy / đồng mức / đường bao (`THEMMOHINH`), xây dựng lưới (`XAYMOHINH`). Không lọc cạnh dài. Đứt gãy và đồng mức là cạnh bắt buộc. Đường bao là chỗ cắt duy nhất. Thêm điểm mở hộp chọn loại: điểm, block, chữ số (bật sẵn), «Block + chữ cao độ cạnh» (XY block, Z chữ gần nhất, không sửa CAD), và đường nối điểm (tắt sẵn, chỉ lấy đỉnh). Không có mục «đối tượng khác», mặt 3D hay đám mây điểm. `ANTIN` ẩn hoặc hiện lưới của mô hình. `TRACAOD` lấy cao độ trên lưới. Có tuyến và cọc; `VEMCD` chưa có.
 
 ### 2.2 Road — tuyến bám bề mặt, rồi mới cọc và TD
 
@@ -153,15 +153,15 @@ Cùng tuyến + cọc + **cùng TIN**. Mỗi cọc một lát vuông góc tim. Z
 | Đã có | Chưa có |
 |--------|---------|
 | Nhập/xuất điểm, ghi số đồng mức, mô hình đặt tên, thêm điểm/đứt gãy/đồng mức/bao, xây dựng TIN, ẩn/hiện lưới, tra cao độ | Lỗ địa hình và đám mây điểm trong lưới |
-| `DUOITUYEN` — dải 100 m trên bình đồ | Tuyến nội bộ + lý trình (chưa phải Alignment Civil) |
-| | Phát sinh cọc, lấy Z từ TIN dọc tuyến |
+| `DUOITUYEN` — dải 100 m trên bình đồ | |
+| `TAOTUYEN` / `PHATSINHCOC` / `XOACOC` — tuyến nội bộ, cọc, Z từ TIN | Alignment Civil (không dùng) |
 | `RAIMCD` — rải layout lên mặt cắt **đã vẽ** | **Vẽ** đường đất + đầu bảng |
 | `INTUYEN` in layout `MatCat_Doc` | Mẫu đầu bảng iSurvey (JSON) |
 
 Pha đề xuất khi được lệnh code (độc lập, không copy ADS):
 
 1. **Pha 1 — mô hình địa hình:** đã có trong 1.8.16. Tạo mô hình, thêm điểm / đứt gãy / đồng mức / đường bao, xây dựng lưới, hiện/ẩn, tra cao độ. Không lọc cạnh dài.
-2. **Pha 2 — tuyến + cọc:** polyline → tuyến + lý trình gốc; phát sinh cọc; Z từ mô hình.
+2. **Pha 2 — tuyến + cọc:** `TAOTUYEN` tạo tuyến (chọn tim + điểm đầu). `PHATSINHCOC` cọc vuông góc, Z từ TIN. `DAODAUTUYEN` đảo đầu (kể cả sau khi đã vẽ MCD — phải phát sinh cọc / vẽ lại TD). `XOACOC` xóa cọc. Một mô hình có thể gắn nhiều tuyến.
 3. **Pha 3 — vẽ TD tự nhiên + hiệu chỉnh;** rồi `RAIMCD`.
 4. Sau: TN tự nhiên, đường đỏ, địa chất.
 

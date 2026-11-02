@@ -1,0 +1,39 @@
+{
+  "id": "taotuyen-1.8.16",
+  "command": "TAOTUYEN",
+  "commandFull": "ISURVEY_ROUTE_NEW",
+  "feature": "Tạo tuyến",
+  "version": "1.8.16",
+  "title": "Tạo tuyến phiên bản 1.8.16",
+  "privacy": "unlisted",
+  "voice": "vi-VN-HoaiMyNeural",
+  "rate": "-8%",
+  "tags": ["iSurvey", "Civil 3D", "tuyến", "TAOTUYEN"],
+  "description": "Cách tạo tuyến từ một polyline bằng iSurvey.\n\nHành vi trong video có từ iSurvey 1.8.16 (lệnh TAOTUYEN, lệnh đủ ISURVEY_ROUTE_NEW).\nTuyến có tên và lý trình gốc. Chiều theo nét vẽ. Cọc chưa phát sinh.",
+  "shots": [
+    {
+      "id": "01-mo-dau",
+      "type": "card",
+      "lines": ["Tạo tuyến", "phiên bản 1.8.16"],
+      "narration": "Tạo tuyến, phiên bản một chấm tám chấm mười sáu. Tuyến bám một polyline, có lý trình gốc. Cọc làm ở bước sau."
+    },
+    {
+      "id": "02-hop",
+      "type": "screen",
+      "action": "Gõ TAOTUYEN. Giữ tên Tuyến 1, lý trình gốc 0, mô hình Chưa gắn. Bấm Tạo tuyến.",
+      "narration": "Gõ T A O T U Y E N. Nhập tên và lý trình gốc, tính bằng mét. Mô hình bám có thể để trống. Bấm Tạo tuyến."
+    },
+    {
+      "id": "03-chon",
+      "type": "screen",
+      "action": "Chọn polyline tim tuyến.",
+      "narration": "Chọn polyline làm tim. Chiều tuyến đi theo chiều đã vẽ nét đó."
+    },
+    {
+      "id": "04-ket",
+      "type": "card",
+      "lines": ["Tuyến đã có tên và lý trình gốc"],
+      "narration": "Tuyến nằm trong bản vẽ. Cọc và cao độ từ mô hình là bước tiếp theo."
+    }
+  ]
+}

@@ -182,6 +182,9 @@ public sealed class CommandAliases
     [CommandMethod("LGO")]
     public void AliasLogout() => _auth.LogoutCommand();
 
+    [CommandMethod("MENUISURVEY")]
+    public void AliasRibbon() => _auth.RibbonCommand();
+
     [CommandMethod("BANGIS")]
     public void AliasPalette() => _palette.ShowCommand();
 }

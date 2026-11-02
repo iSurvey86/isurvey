@@ -41,18 +41,29 @@ Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georefere
 | `STT` | **STT** | Đánh số thứ tự tại từng điểm click (nút «Đánh Số Thứ Tự»). Tiền tố + số + hậu tố, vòng tròn và wipeout trên layer `iSurvey_STT`. Esc hoặc chuột phải để dừng |
 | `NHAPDIEM` | **ND** | Nhập điểm đo từ CSV/TXT. Bảng giữ X Bắc (7 chữ số) và Y Đông (6 chữ số). Khi vẽ, CAD nhận Đông trên trục X và Bắc trên trục Y. Dấu điểm trên `iSurvey_DiemDo`, tên trên `iSurvey_DiemDo_Ten`, cao độ trên `iSurvey_DiemDo_CaoDo`. Kiểu điểm và cỡ điểm (%) lấy từ hộp thoại. Tạo xong thì phóng vừa vùng điểm |
 | `XUATDIEM` | **XD** | Xuất điểm, block hoặc chữ. CSV dùng dấu phân cách danh sách của Windows. TXT dùng tab. Thập phân luôn là dấu chấm. Chữ đọc được thành số thì thành cao độ và để trống tên. Tên xếp từ số nhỏ đến lớn, rồi A–Z |
+| `ISURVEY_ROUTE_NEW` | **TAOTUYEN** | Tạo tuyến: tên, lý trình gốc, mô hình bám; chọn polyline rồi chọn điểm đầu gần một đầu mút |
+| `ISURVEY_ROUTE_STATIONS` | **PHATSINHCOC** | Phát sinh cọc vuông góc tuyến; Z từ TIN; chữ vuông góc; luôn có cọc tại đỉnh; layer `isurvey_Coctuyen` |
+| `ISURVEY_STATION_STYLE` | **THIETLAPCOC** | Thiết lập chiều dài cọc, cao chữ, khoảng cách chữ; tùy chọn theo độ rộng polyline |
+| `ISURVEY_STATION_ADD_ONE` | **THEMCOC** | Thêm một cọc tại điểm pick gần tim |
+| `ISURVEY_STATION_REMOVE_ONE` | **XOACOC1** | Xóa một cọc (chọn gạch hoặc chữ) |
+| `ISURVEY_STATION_LIST` | **BANGCOC** | Bảng danh sách cọc: zoom, xóa, thêm |
+| `ISURVEY_ROUTE_REVERSE` | **DAODAUTUYEN** | Đảo đầu tuyến (xóa cọc cũ; phát sinh lại). Dùng được cả sau khi đã vẽ MCD |
+| `ISURVEY_ROUTE_CLEAR_STATIONS` | **XOACOC** | Xóa toàn bộ cọc của một tuyến |
+| `ISURVEY_RIBBON` | **MENUISURVEY** | Dựng lại tab Ribbon iSurvey |
 | `ISURVEY_STRIP_MAP` | **DUOITUYEN** | Duỗi thẳng dải bản đồ dọc tuyến: chọn tim tuyến (click chỗ nào cũng được) + bắt buộc chọn điểm đầu (DD, G1…Gn, DC); cắt dải chữ nhật liền mạch. Ảnh gốc đã cắt thì dải chỉ giữ phần nằm trong biên đó. Xuất bảng góc `.txt` (`Tên Điểm,X,Y,Khoảng Cách Cạnh Trước,Góc Rẽ` với `P/T độ phút giây`, X/Y 2 số lẻ) |
 | `ISURVEY_KHUNG` | **KHUNG** | Chèn **khung bản đồ** chuẩn TCVN 7285:2003 (ISO 5457) khổ A0–A4, tỷ lệ 1/200…1/5000: khung tên (ô DỰ ÁN mặc định «Đường dây và TBA 110KV KCN Minh Châu», logo EVN NPC vector), lưới tọa độ theo tọa độ CAD, mũi tên Bắc, thước tỷ lệ. Xoay: không / góc / theo tuyến |
 | `ISURVEY_KHUNG_BV` | **KHUNGBV** | Chèn **khung bản vẽ kỹ thuật** (cùng khung tên, không lưới tọa độ). Mẫu: `Contents\Templates\KhungBanDo_Chuan.dwg`; ghi đè bằng `%AppData%\iSurvey\KhungBanDo.dwg` |
 | `ISURVEY_LOGO` | **ANLOGO** | Ẩn hoặc hiện một logo trên khung tên. Gõ `1` logo chủ đầu tư, `2` logo đơn vị thiết kế. `ANLOGO1` và `ANLOGO2` chọn thẳng, không hỏi |
 | `ISURVEY_LOGO_REPLACE` | **THAYLOGO** | Thay logo EVN bằng ảnh (chủ đầu tư hoặc đơn vị thiết kế); gõ `K` để khôi phục |
 | `ISURVEY_ROUTE_SHEETS` | **RAIKHUNG** | Rải khung in dọc tuyến (nút Ribbon «Rải Khung Theo Tuyến»): một layout lưới khung + viewport xoay. Chữ trong vùng tờ đọc ngang trên layout, góc và cao chữ bên Model không đổi. Hộp thoại hai cột: bố cục in bên trái, 25 ô khung tên bên phải. Cuối hộp thoại: Tải file mẫu, Xuất file, Nhập file. Excel ba cột STT, Tiêu đề, Nội dung. Không in PDF ở bước này. Logo đã chèn được nhớ trong file. Nhấp đúp khung để sửa thông tin |
-| `ISURVEY_PALETTE` | **BANGIS** | Mở hoặc đóng bảng dữ liệu neo bên trái. Bốn tab: Khảo sát, Khung in, UAV, Bản đồ. Cây Khảo sát hiện mô hình của bản vẽ, mỗi mô hình có điểm, đứt gãy, đồng mức và đường bao |
+| `ISURVEY_PALETTE` | **BANGIS** | Mở hoặc đóng bảng dữ liệu neo bên trái. Bốn tab: Khảo sát, Khung in, UAV, Bản đồ. Chỉ dòng đang chọn in đậm. Chuột phải trên từng mục chỉ hiện lệnh của mục đó |
 | `ISURVEY_TERRAIN_NEW` | **TAOMOHINH** | Tạo mô hình địa hình: tên và lớp lưới. Chưa có tam giác |
-| `ISURVEY_TERRAIN_ADD` | **THEMMOHINH** | Gắn điểm (Point, block, chữ số; đường nối điểm nếu bật), đứt gãy, đường đồng mức hoặc đường bao vào mô hình |
-| `ISURVEY_TERRAIN_BUILD` | **XAYMOHINH** | Dựng lưới tam giác. Đứt gãy và đồng mức là cạnh bắt buộc. Có một hoặc nhiều đường bao thì chỉ giữ tam giác có tâm nằm trong một đường bao. Không có bao thì lưới là bao lồi |
+| `ISURVEY_TERRAIN_ADD` | **THEMMOHINH** | Gắn điểm (Point, block, chữ số; Điểm/Block + chữ cao độ cạnh; đường nối điểm nếu bật), đứt gãy, đường đồng mức hoặc đường bao vào mô hình |
+| `ISURVEY_TERRAIN_BUILD` | **XAYMOHINH** | Dựng lưới tam giác, có thanh tiến trình và nút Hủy bỏ. Có đường bao: điểm trong bao; tam giác phải có ba đỉnh, tâm và giữa ba cạnh trong bao (không bắc cầu chỗ lõm) |
+| `ISURVEY_TERRAIN_DETACH` | **GOMOHINH** | Gỡ đối tượng đã chọn khỏi mô hình. Đối tượng trên bản vẽ vẫn giữ. Lưới bị xóa, cần xây dựng lại |
+| `ISURVEY_TERRAIN_CLEAR` | **XOATHANHPHAN** | Xóa toàn bộ điểm, đứt gãy, đồng mức hoặc đường bao khỏi mô hình. Có hộp xác nhận. Đối tượng CAD vẫn giữ |
 | `ISURVEY_TERRAIN_TOGGLE` | **ANTIN** | Ẩn hoặc hiện lưới của mô hình |
-| `ISURVEY_TERRAIN_Z` | **TRACAOD** | Tra cao độ một điểm trên lưới |
+| `ISURVEY_TERRAIN_Z` | **TRACAOD** | Tra cao độ trên lưới: chọn nhiều vị trí, hiện Z trên dòng lệnh và chữ đỏ tạm trên bản vẽ; Enter để xong |
 | `ISURVEY_PROFILE_SHEETS` | **RAIMCD** | Rải khung mặt cắt dọc đã vẽ: chọn góc dưới-trái hàng cuối. Tỷ lệ `1/500; 1/5000` (hoặc `1/200; 1/2000`), không tăng khổ chỉ vì mặt cắt cao. Cửa sổ là ô bản đồ của khối khung: A3 là 340 × 277 mm, mép phải dừng đúng vạch khung tên. Đoạn cao hơn khung được thêm tờ phía trên, cùng tỷ lệ; tờ dưới ghim dòng đã chọn ở đáy ô. Layout `MatCat_Doc`. Cuối hộp thoại: Tải file mẫu, Xuất file, Nhập file. Model không bị xóa |
 | `ISURVEY_ROUTE_PLOT` | **INTUYEN** | In layout `BanDo_Tuyen` hoặc `MatCat_Doc` đã rải. Hộp thoại: In màu (`acad.ctb`) hoặc In đen trắng (`monochrome.ctb`), chèn chữ ký DWG theo chức danh đã ghi trên khung, đóng mộc đỏ PNG. Chữ ký và mộc chỉ trên PDF. Rồi hỏi `1` khung đang chọn, `2` tất cả. Không dựng trang mới. In xong có nút Mở thư mục |
 | `ISURVEY_FIT_TITLE` | **CODAN** | Co ô chủ đầu tư và đại diện chủ đầu tư về một dòng. Ô tên bản vẽ vẫn xuống dòng trong khung |

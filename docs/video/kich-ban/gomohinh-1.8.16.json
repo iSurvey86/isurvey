@@ -1,0 +1,39 @@
+{
+  "id": "gomohinh-1.8.16",
+  "command": "GOMOHINH",
+  "commandFull": "ISURVEY_TERRAIN_DETACH",
+  "feature": "Gỡ điểm khỏi mô hình",
+  "version": "1.8.16",
+  "title": "Gỡ điểm khỏi mô hình phiên bản 1.8.16",
+  "privacy": "unlisted",
+  "voice": "vi-VN-HoaiMyNeural",
+  "rate": "-8%",
+  "tags": ["iSurvey", "Civil 3D", "TIN", "GOMOHINH", "XOATHANHPHAN"],
+  "description": "Cách gỡ điểm đã chọn hoặc xóa toàn bộ điểm khỏi mô hình địa hình iSurvey.\n\nHành vi trong video có từ iSurvey 1.8.16 (GOMOHINH / XOATHANHPHAN).\nĐối tượng trên bản vẽ vẫn giữ. Lưới bị xóa và cần xây dựng lại.",
+  "shots": [
+    {
+      "id": "01-mo-dau",
+      "type": "card",
+      "lines": ["Gỡ điểm khỏi mô hình", "phiên bản 1.8.16"],
+      "narration": "Gỡ điểm khỏi mô hình, phiên bản một chấm tám chấm mười sáu. Có thể gỡ vài điểm đã chọn, hoặc xóa toàn bộ."
+    },
+    {
+      "id": "02-go",
+      "type": "screen",
+      "action": "Chuột phải Điểm → Gỡ đã chọn... → chọn vài điểm trên bản vẽ.",
+      "narration": "Chuột phải mục Điểm, chọn Gỡ đã chọn. Chọn các điểm cần bỏ khỏi mô hình. Điểm trên bản vẽ vẫn còn. Lưới cũ bị xóa."
+    },
+    {
+      "id": "03-xoa",
+      "type": "screen",
+      "action": "Chuột phải Điểm → Xóa toàn bộ điểm → Xóa toàn bộ.",
+      "narration": "Muốn bỏ hết điểm khỏi mô hình, chọn Xóa toàn bộ điểm rồi xác nhận. Đứt gãy, đồng mức và đường bao cũng có lệnh tương tự."
+    },
+    {
+      "id": "04-ket",
+      "type": "card",
+      "lines": ["Thêm hoặc gỡ xong thì xây dựng lại"],
+      "narration": "Sau khi thêm hoặc gỡ, chuột phải tên mô hình và chọn Xây dựng để có lưới mới."
+    }
+  ]
+}

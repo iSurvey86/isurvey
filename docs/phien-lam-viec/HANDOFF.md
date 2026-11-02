@@ -5,6 +5,47 @@
 
 ---
 
+## 2026-11-02 — Tuyến/cọc, TIN lõm, THEMMOHINH chọn 2, MENUISURVEY (1.8.16, chưa phát hành, không bump)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ. **Không bump.** Vẫn **1.8.16**, chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14.
+
+### Đã chốt / đã làm
+
+- **THEMMOHINH**: thêm mục «Điểm/Block + chữ cao độ cạnh» (XY từ Point/Block, Z từ chữ số gần).
+- **XAYMOHINH**: có đường bao thì tam giác phải có ba đỉnh, tâm và giữa ba cạnh trong bao (không bắc cầu chỗ lõm).
+- **PHATSINHCOC**: chữ vuông góc tuyến; luôn cọc tại đỉnh; layer `isurvey_Coctuyen`.
+- **THIETLAPCOC** / **THEMCOC** / **XOACOC1** / **BANGCOC**: kiểu cọc, thêm/xóa một cọc, bảng danh sách.
+- **BANGIS**: căn icon/chữ; icon tuyến `/\/`.
+- **MENUISURVEY**: nạp lại Ribbon. Không đổi `ModuleName` khi Civil khóa DLL (cần deps/runtimeconfig cùng tên).
+- Catalog Excel, README, changelog 1.8.16, kịch bản video (Chưa quay). Không quay, không đăng.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| Điểm + Z chữ | `src/Modules/Terrain/TerrainService.cs`, `AddPointSourcesWindow` |
+| TIN bao lõm | `src/Modules/Terrain/TinBuilder.cs` |
+| Cọc / kiểu | `src/Modules/Route/RouteService.cs`, `StationStyle*` , `StationListWindow` |
+| Ribbon | `src/Modules/Ui/RibbonBuilder.cs`, `RouteModule` |
+| Video | `docs/video/CATALOG.md`, `docs/video/kich-ban/*coc*-1.8.16.*` |
+
+### Việc tiếp
+
+- [ ] Chưa phát hành 1.8.16. Gói UPD trên máy chủ vẫn là 1.8.14.
+- [ ] `VEMCD` chưa có lệnh. RAIMCD không đổi mức so sánh.
+- [ ] Video các lệnh tuyến/cọc/TIN 1.8.16 chưa quay. YouTube vẫn thiếu `client_secret.json`.
+- [ ] Bản vẽ công trình: chạy lại UAVCLIP/RAIMCD nếu layout cũ còn lệch (phiên trước).
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff đầu. iSurvey 1.8.16, chưa phát hành, không bump. THEMMOHINH có chọn 2 Point/Block + chữ cao độ cạnh. XAYMOHINH clip TIN theo đỉnh+tâm+giữa cạnh trong bao. PHATSINHCOC chữ vuông góc, cọc tại đỉnh, layer isurvey_Coctuyen. THIETLAPCOC / THEMCOC / XOACOC1 / BANGCOC đã có. MENUISURVEY nạp lại Ribbon; không đổi ModuleName khi Civil khóa DLL. VEMCD chưa có. Tiếp: phát hành 1.8.16 khi được yêu cầu, hoặc VEMCD / quay video.
+```
+
+**Lưu trữ ngày:** [2026-11-02-tuyen-coc-tin-menu.md](./2026-11-02-tuyen-coc-tin-menu.md)
+
+---
+
 ## 2026-11-02 — Ô khung RAIMCD và sơ họa UAV (1.8.16, chưa phát hành, không bump)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ. **Không bump.** Vẫn **1.8.16**, chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14.

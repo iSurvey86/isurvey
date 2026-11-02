@@ -28,6 +28,7 @@
                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                 <Setter Property="Padding" Value="0"/>
                 <Setter Property="ContextMenu" Value="{StaticResource NodeMenu}"/>
+                <EventSetter Event="PreviewMouseRightButtonDown" Handler="Node_RightClick"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="TreeViewItem">
@@ -84,7 +85,7 @@
                                     <Setter TargetName="Row" Property="Background" Value="#DDE3EA"/>
                                 </Trigger>
                                 <Trigger Property="IsSelected" Value="True">
-                                    <Setter TargetName="Row" Property="Background" Value="#D5DEE8"/>
+                                    <Setter TargetName="Row" Property="Background" Value="#BFDBFE"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -125,7 +126,7 @@
                         <ColumnDefinition Width="18"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Grid Width="16" Height="16" VerticalAlignment="Center" Margin="0,1,0,0">
+                    <Grid Width="16" Height="16" VerticalAlignment="Center">
                         <Grid>
                             <Grid.Style>
                                 <Style TargetType="Grid">
@@ -221,8 +222,9 @@
                                 </Style>
                             </Rectangle.Style>
                         </Rectangle>
-                        <Path Data="M2,12 L8,4 L14,9" Stroke="#EA580C" StrokeThickness="1.5"
-                              StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stretch="Uniform">
+                        <Path Data="M1,12 L5.5,3.5 L10,12 L15,3.5" Stroke="#EA580C" StrokeThickness="1.5"
+                              StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                              Stretch="Uniform">
                             <Path.Style>
                                 <Style TargetType="Path">
                                     <Setter Property="Visibility" Value="Collapsed"/>
@@ -234,10 +236,9 @@
                                 </Style>
                             </Path.Style>
                         </Path>
-                        <Path Data="M3,2 H10 L13,5 V14 H3 Z M10,2 V5 H13" Stroke="#7C3AED" StrokeThickness="1.3"
-                              StrokeLineJoin="Round" Fill="Transparent" Stretch="Uniform">
-                            <Path.Style>
-                                <Style TargetType="Path">
+                        <Grid Width="16" Height="16">
+                            <Grid.Style>
+                                <Style TargetType="Grid">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IconKind}" Value="Profile">
@@ -245,13 +246,32 @@
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </Path.Style>
-                        </Path>
+                            </Grid.Style>
+                            <Path Data="M2,1.5 V13.5 H14.5" Stroke="#65A30D" StrokeThickness="1.2"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                            <Path Data="M2,11.5 L4,7.5 L5.5,9 L8,4 L10,6.5 L12,3 L14.5,5.5"
+                                  Stroke="#84CC16" StrokeThickness="1.4"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                                  Fill="Transparent"/>
+                        </Grid>
                     </Grid>
-                    <StackPanel Grid.Column="1" Margin="8,0,0,0">
-                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="#1E293B"/>
+                    <StackPanel Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Name}" Foreground="#1E293B"
+                                   VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="FontWeight" Value="Normal"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=TreeViewItem}}" Value="True">
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                            <Setter Property="Foreground" Value="#1D4ED8"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
                         <TextBlock Text="{Binding EmptyHint}" Foreground="#4B5563" FontSize="11" Margin="0,1,0,0"
-                                   TextWrapping="Wrap">
+                                   TextWrapping="Wrap" VerticalAlignment="Center">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Visibility" Value="Collapsed"/>

@@ -1,0 +1,7 @@
+{
+  "command": "THEMCOC",
+  "title": "Thêm một cọc phiên bản 1.8.16",
+  "version": "1.8.16",
+  "status": "Chưa quay",
+  "steps": ["THEMCOC", "Pick gần tim", "Cọc mới trên layer isurvey_Coctuyen"]
+}

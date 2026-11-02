@@ -34,10 +34,33 @@ public static class RibbonBuilder
         {
             ComponentManager.ItemInitialized += OnItemInitialized!;
             AuthManager.StateChanged += UpdateAuthState;
+            AcadApp.SystemVariableChanged += OnSystemVariableChanged;
             _subscribed = true;
         }
 
         TryBuild();
+    }
+
+    /// <summary>
+    /// Gỡ tab iSurvey (nếu còn) rồi dựng lại và kích hoạt.
+    /// Dùng khi tab biến mất sau đổi workspace hoặc nạp plugin muộn.
+    /// </summary>
+    public static void ReloadRibbon()
+    {
+        EnsureRibbon();
+        RebuildRibbonTab();
+        try
+        {
+            var tab = ComponentManager.Ribbon?.FindTab(TabId);
+            if (tab is null)
+                return;
+            tab.IsVisible = true;
+            tab.IsActive = true;
+        }
+        catch
+        {
+            // Ribbon chưa sẵn sàng
+        }
     }
 
     /// <summary>Gỡ Ribbon và handler — gọi từ Terminate() khi reload qua DevReload.</summary>
@@ -47,6 +70,7 @@ public static class RibbonBuilder
         {
             ComponentManager.ItemInitialized -= OnItemInitialized!;
             AuthManager.StateChanged -= UpdateAuthState;
+            AcadApp.SystemVariableChanged -= OnSystemVariableChanged;
             _subscribed = false;
         }
 
@@ -71,6 +95,24 @@ public static class RibbonBuilder
     private static void OnItemInitialized(object? sender, RibbonItemEventArgs e)
     {
         TryBuild();
+    }
+
+    /// <summary>Đổi workspace (WSCURRENT) đôi khi làm mất tab custom — dựng lại.</summary>
+    private static void OnSystemVariableChanged(object sender, Autodesk.AutoCAD.ApplicationServices.SystemVariableChangedEventArgs e)
+    {
+        if (!string.Equals(e.Name, "WSCURRENT", StringComparison.OrdinalIgnoreCase))
+            return;
+        try
+        {
+            RebuildRibbonTab();
+            var tab = ComponentManager.Ribbon?.FindTab(TabId);
+            if (tab is not null)
+                tab.IsVisible = true;
+        }
+        catch
+        {
+            // Ribbon chưa sẵn
+        }
     }
 
     private static void TryBuild()
@@ -183,6 +225,8 @@ public static class RibbonBuilder
                     new Btn("Kiểm Tra Cập Nhật", "ISURVEY_UPDATE", AuthIcons.Refresh, true),
                     new Btn("Thông Tin & Giấy Phép", "ISURVEY_ABOUT", AuthIcons.Info, true),
                     new Btn("Hướng dẫn", "ISURVEY_HDSD", AuthIcons.Help, true, "Mở hướng dẫn iSurvey trên web"),
+                    new Btn("Nạp lại\nMenu", "ISURVEY_RIBBON", AuthIcons.Refresh, true,
+                        "Dựng lại tab Ribbon iSurvey (MENUISURVEY)"),
                     new Btn("Đăng Xuất / Đổi Máy", LogoutCommand, AuthIcons.Power, true)
                 ],
                 gated: false);

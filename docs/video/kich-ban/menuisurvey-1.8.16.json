@@ -1,0 +1,10 @@
+{
+  "command": "MENUISURVEY",
+  "title": "Nạp lại menu iSurvey phiên bản 1.8.16",
+  "version": "1.8.16",
+  "status": "Chưa quay",
+  "steps": [
+    "Gõ MENUISURVEY",
+    "Tab iSurvey hiện trên Ribbon"
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": "phatsinhcoc-1.8.16",
+  "command": "PHATSINHCOC",
+  "commandFull": "ISURVEY_ROUTE_STATIONS",
+  "feature": "Phát sinh cọc",
+  "version": "1.8.16",
+  "title": "Phát sinh cọc phiên bản 1.8.16",
+  "privacy": "unlisted",
+  "voice": "vi-VN-HoaiMyNeural",
+  "rate": "-8%",
+  "tags": ["iSurvey", "Civil 3D", "cọc", "PHATSINHCOC"],
+  "description": "Cách phát sinh cọc trên tuyến và lấy cao độ từ mô hình địa hình.\n\nHành vi có từ iSurvey 1.8.16 (PHATSINHCOC).",
+  "shots": [
+    {
+      "id": "01-mo-dau",
+      "type": "card",
+      "lines": ["Phát sinh cọc", "phiên bản 1.8.16"],
+      "narration": "Phát sinh cọc, phiên bản một chấm tám chấm mười sáu. Cọc lấy lý trình trên tuyến và cao độ từ mô hình."
+    },
+    {
+      "id": "02-hop",
+      "type": "screen",
+      "action": "Chuột phải tên tuyến → Phát sinh cọc... Giữ từ, đến, bước 20. Bấm Phát sinh cọc.",
+      "narration": "Chuột phải tên tuyến, chọn Phát sinh cọc. Nhập khoảng lý trình và bước. Bấm Phát sinh cọc."
+    },
+    {
+      "id": "03-ket",
+      "type": "card",
+      "lines": ["Cọc đã có lý trình và Z"],
+      "narration": "Cọc hiện trên bản vẽ. Bước tiếp theo là vẽ mặt cắt dọc."
+    }
+  ]
+}
