@@ -2,7 +2,7 @@
 
 Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), nhập và xuất **KML/KMZ**, cắt bình đồ theo biên (`CATBD`), quét cấu trúc bản vẽ (`AUTOSCAN`). Các lệnh nghiệp vụ khóa cho tới khi kích hoạt bằng Gmail + mã OTP.
 
-**Phiên bản bundle:** `1.8.16` (`deploy/iSurvey.bundle/PackageContents.xml`)
+**Phiên bản bundle:** `1.8.17` (`deploy/iSurvey.bundle/PackageContents.xml`)
 
 **Đồng bộ phiên làm việc (Cursor / đa máy):** đọc [docs/phien-lam-viec/HANDOFF.md](docs/phien-lam-viec/HANDOFF.md). Quy tắc cuối phiên: [docs/phien-lam-viec/README.md](docs/phien-lam-viec/README.md). Changelog: [docs/changelog/CHANGELOG.md](docs/changelog/CHANGELOG.md).
 
@@ -25,7 +25,7 @@ Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georefere
 | `ISURVEY_DELETE_GE` | **XG** | Xóa toàn bộ tile GE (xác nhận) |
 | `ISURVEY_IMPORT_KML` | **INK** | Nhập KML/KMZ vào layer `KML_IMPORT` (VN-2000), rồi phóng vừa vùng vừa nhập |
 | `ISURVEY_EXPORT_KML` | **EXK**, **EG** | Xuất CAD → KML/KMZ. Thiết lập → chọn đối tượng → lưu file → mở Google Earth nếu đã chọn |
-| `ISURVEY_DGN_TO_CAD` | **D2C** | Nhập nhiều file MicroStation `.dgn` (V7/V8). **Ghép thành một file .dwg:** chèn tất cả vào Model Space bản vẽ đang mở. **Rời từng file .dwg:** mỗi file một `.dwg` cùng thư mục. Layer giữ Level gốc hoặc thêm tiền tố (mặc định `iSurvey_`); TCVN3 ➔ Unicode và Explode Cell theo tùy chọn. Dọn linetype/layer rác luôn chạy; Zoom Extents một lần khi ghép xong. `UNDO` hai lần để hoàn tác (hậu xử lý + DGNIMPORT) |
+| `ISURVEY_DGN_TO_CAD` | **D2C** | Nhập nhiều file MicroStation `.dgn` (V7/V8). **Ghép thành một file .dwg:** chèn tất cả vào Model Space bản vẽ đang mở. **Rời từng file .dwg:** mỗi file một `.dwg` cùng thư mục. Layer giữ Level gốc hoặc thêm tiền tố (mặc định `iSurvey_`); TCVN3 ➔ Unicode và Explode Cell theo tùy chọn. Dọn linetype/layer rác luôn chạy; Zoom Extents một lần khi ghép xong. Có hộp thoại tiến trình. `UNDO` hai lần để hoàn tác (hậu xử lý + DGNIMPORT) |
 | `ISURVEY_CAD_TO_DGN` | **C2D** | Xuất CAD ➔ MicroStation DGN V8/V7: toàn bộ Model Space hoặc đối tượng đang chọn; Purge trên bản sao tạm (bản vẽ gốc không đổi); tự chọn seed 2D/3D đi kèm bộ cài (V7 và V8), tự điền hộp thoại seed |
 | `ISURVEY_TAB_TO_CAD` | **T2C** | Nhập MapInfo TAB: tô đặc đúng màu MapInfo, layer theo MDSD, nhãn tại điểm trong thửa |
 | `CATBD` | **CBD** | Cắt bình đồ theo đường biên (giữ Z, không dùng TRIM) |
@@ -64,12 +64,13 @@ Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georefere
 | `ISURVEY_TERRAIN_CLEAR` | **XOATHANHPHAN** | Xóa toàn bộ điểm, đứt gãy, đồng mức hoặc đường bao khỏi mô hình. Có hộp xác nhận. Đối tượng CAD vẫn giữ |
 | `ISURVEY_TERRAIN_TOGGLE` | **ANTIN** | Ẩn hoặc hiện lưới của mô hình |
 | `ISURVEY_TERRAIN_Z` | **TRACAOD** | Tra cao độ trên lưới: chọn nhiều vị trí, hiện Z trên dòng lệnh và chữ đỏ tạm trên bản vẽ; Enter để xong |
+| `ISURVEY_PROFILE_DRAW` | **VEMCD** | Vẽ mặt cắt dọc trên Model: đầu bảng năm hàng (hàng dưới là khoảng cách cộng dồn), đường đất, thước cao độ. Tỷ lệ `1/500; 1/5000` hoặc `1/200; 1/2000`. Đoạn cao hơn tờ A3 thì tách và gợi ý mức so sánh. `RAIMCD` chỉ rải khung in lên hình đã vẽ. Có từ 1.8.17 |
 | `ISURVEY_PROFILE_SHEETS` | **RAIMCD** | Rải khung mặt cắt dọc đã vẽ: chọn góc dưới-trái hàng cuối. Tỷ lệ `1/500; 1/5000` (hoặc `1/200; 1/2000`), không tăng khổ chỉ vì mặt cắt cao. Cửa sổ là ô bản đồ của khối khung: A3 là 340 × 277 mm, mép phải dừng đúng vạch khung tên. Đoạn cao hơn khung được thêm tờ phía trên, cùng tỷ lệ; tờ dưới ghim dòng đã chọn ở đáy ô. Layout `MatCat_Doc`. Cuối hộp thoại: Tải file mẫu, Xuất file, Nhập file. Model không bị xóa |
 | `ISURVEY_ROUTE_PLOT` | **INTUYEN** | In layout `BanDo_Tuyen` hoặc `MatCat_Doc` đã rải. Hộp thoại: In màu (`acad.ctb`) hoặc In đen trắng (`monochrome.ctb`), chèn chữ ký DWG theo chức danh đã ghi trên khung, đóng mộc đỏ PNG. Chữ ký và mộc chỉ trên PDF. Rồi hỏi `1` khung đang chọn, `2` tất cả. Không dựng trang mới. In xong có nút Mở thư mục |
 | `ISURVEY_FIT_TITLE` | **CODAN** | Co ô chủ đầu tư và đại diện chủ đầu tư về một dòng. Ô tên bản vẽ vẫn xuống dòng trong khung |
 | `ISURVEY_AI_ASSIST` | **AIA** | Trợ lý AI điều khiển Civil/CAD bằng Command Line (**chỉ Admin**, thử nghiệm). Xem [docs/Huong_dan_Tro_ly_AI.md](docs/Huong_dan_Tro_ly_AI.md) |
 
-**Đang nghiên cứu, chưa có lệnh vẽ:** mặt cắt dọc đi theo chuỗi mô hình địa hình → tuyến → cọc → vẽ. `RAIMCD` chỉ rải khung in. Tên dự kiến lệnh vẽ là `VEMCD` (chưa chạy). Báo cáo: [docs/Bao_cao_phan_tich_module_ve_mat_cat_doc_iSurvey.docx](docs/Bao_cao_phan_tich_module_ve_mat_cat_doc_iSurvey.docx).
+Chuỗi khảo sát: mô hình → tuyến → cọc → **VEMCD** → RAIMCD. Báo cáo: [docs/Bao_cao_phan_tich_module_ve_mat_cat_doc_iSurvey.docx](docs/Bao_cao_phan_tich_module_ve_mat_cat_doc_iSurvey.docx).
 
 Catalog đầy đủ: [docs/Danh_sach_lenh_iSurvey.xlsx](docs/Danh_sach_lenh_iSurvey.xlsx). Video hướng dẫn theo phiên bản: [docs/video/QUY_TRINH.md](docs/video/QUY_TRINH.md), sổ [docs/video/CATALOG.md](docs/video/CATALOG.md). Supabase: [docs/Huong_dan_Supabase.md](docs/Huong_dan_Supabase.md). Phát hành Setup/update: [docs/Huong_dan_Phat_hanh.md](docs/Huong_dan_Phat_hanh.md). Admin nhật ký (ksnpsc): [docs/Huong_dan_Admin_ksnpsc.md](docs/Huong_dan_Admin_ksnpsc.md).
 

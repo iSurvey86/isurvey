@@ -1,8 +1,20 @@
 # Changelog — iSurvey
 
+## 1.8.17 — 2026-11-03
+
+Chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14. Gộp các thay đổi đã làm dưới số 1.8.16 (chưa đóng gói) và bump lên 1.8.17.
+
+### Tiến trình
+
+- Hộp thoại tiến trình dùng chung (`TaskProgressWindow`): **Nhập DGN** / batch / **Xuất DGN**, cắt ảnh UAV tự động, phát sinh cọc, duỗi tuyến, nhập TAB, cắt bình đồ, rải khung tuyến, tải/ghép tile bản đồ, nhập KML (nhiều đối tượng). TIN và xuất PDF vẫn dùng hộp riêng sẵn có. Nút Hủy bỏ dừng được ở các bước chờ / vòng lặp.
+
+### Mặt cắt dọc
+
+- **VEMCD** (`ISURVEY_PROFILE_DRAW`): vẽ trên Model đầu bảng năm hàng (hàng dưới là khoảng cách cộng dồn), đường đất, thước cao độ. Tỷ lệ `1/500; 1/5000` hoặc `1/200; 1/2000`. Đoạn cao hơn tờ A3 thì tách và gợi ý mức so sánh. **RAIMCD** vẫn chỉ rải khung in, không đổi mức. Đã nhìn trên Civil 3D 2026, bản vẽ trắng.
+
 ## 1.8.16 — 2026-10-31
 
-Chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14. Ngày 2026-11-01 và 2026-11-02 không tăng số phiên bản.
+Chưa phát hành riêng. Nội dung đã gộp vào 1.8.17. Gói UPD trên máy chủ vẫn là 1.8.14.
 
 ### Video hướng dẫn
 

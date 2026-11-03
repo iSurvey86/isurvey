@@ -1,0 +1,45 @@
+{
+  "id": "d2c-1.8.17",
+  "command": "D2C",
+  "commandFull": "ISURVEY_DGN_TO_CAD",
+  "feature": "Nhập file DGN",
+  "version": "1.8.17",
+  "title": "Nhập file DGN phiên bản 1.8.17",
+  "privacy": "unlisted",
+  "voice": "vi-VN-HoaiMyNeural",
+  "rate": "-8%",
+  "tags": ["iSurvey", "Civil 3D", "DGN", "D2C"],
+  "description": "Cách nhập file MicroStation DGN vào CAD bằng iSurvey.\n\nHành vi trong video có từ iSurvey 1.8.17: sau Nhập DGN có hộp thoại tiến trình.",
+  "shots": [
+    {
+      "id": "01-mo-dau",
+      "type": "card",
+      "lines": ["Nhập file DGN", "phiên bản 1.8.17"],
+      "narration": "Nhập file D G N, phiên bản một chấm tám chấm mười bảy. Sau khi bấm Nhập D G N sẽ có hộp tiến trình."
+    },
+    {
+      "id": "02-lenh",
+      "type": "screen",
+      "action": "Gõ D2C. Hộp Nhập DGN mở.",
+      "narration": "Gõ D hai C. Hộp nhập D G N mở."
+    },
+    {
+      "id": "03-them-tep",
+      "type": "screen",
+      "action": "Thêm tệp. Chọn một file DGN.",
+      "narration": "Bấm Thêm tệp. Chọn một file D G N. Bảng hiện một dòng."
+    },
+    {
+      "id": "04-nhap",
+      "type": "screen",
+      "action": "Bấm Nhập DGN. Hiện hộp tiến trình đến khi xong.",
+      "narration": "Bấm Nhập D G N. Hộp tiến trình hiện trạng thái đang nhập và hậu xử lý. Đợi đến khi hộp đóng."
+    },
+    {
+      "id": "05-ket",
+      "type": "card",
+      "lines": ["Đã nhập DGN vào Model"],
+      "narration": "Xong. Đối tượng đã nằm trên Model. Có thể Undo hai lần nếu cần hoàn tác."
+    }
+  ]
+}

@@ -5,6 +5,7 @@ using Autodesk.AutoCAD.Runtime;
 using iSurvey.Auth;
 using iSurvey.Core;
 using iSurvey.Modules.Map;
+using iSurvey.UI;
 
 namespace iSurvey.Dgn;
 
@@ -34,16 +35,19 @@ public sealed class DgnModule : ISurveyModule
             return;
         }
 
-        DgnImportOptions? options;
-        try
+        DgnImportOptions? options = TryLoadProgressSeed();
+        if (options is null)
         {
-            var drawingPath = string.IsNullOrWhiteSpace(doc.Database.Filename) ? null : doc.Database.Filename;
-            options = DgnImportDialog.ShowImport(drawingPath);
-        }
-        catch (System.Exception ex)
-        {
-            ed.WriteMessage($"\n[iSurvey] Không mở được hộp thoại DGN: {ex.Message}");
-            return;
+            try
+            {
+                var drawingPath = string.IsNullOrWhiteSpace(doc.Database.Filename) ? null : doc.Database.Filename;
+                options = DgnImportDialog.ShowImport(drawingPath);
+            }
+            catch (System.Exception ex)
+            {
+                ed.WriteMessage($"\n[iSurvey] Không mở được hộp thoại DGN: {ex.Message}");
+                return;
+            }
         }
 
         if (options is null)
@@ -55,14 +59,28 @@ public sealed class DgnModule : ISurveyModule
 
         if (options.IsBatch)
         {
+            var batchProgress = TaskProgressWindow.ShowNew(
+                "iSurvey — Nhập DGN",
+                options.BatchCombine ? "Đang ghép nhiều file DGN" : "Đang nhập DGN (rời từng file)",
+                $"Chuẩn bị {options.BatchFiles.Count} tệp…");
             DgnBatchService.Start(doc, options, (results, combined) =>
-                WriteBatchSummary(AcadApp.DocumentManager.MdiActiveDocument?.Editor ?? ed, results, combined));
+            {
+                batchProgress.ForceClose();
+                WriteBatchSummary(AcadApp.DocumentManager.MdiActiveDocument?.Editor ?? ed, results, combined);
+            }, batchProgress);
             return;
         }
 
         // DGNIMPORT hoàn tất bất đồng bộ: Start trả về ngay, báo cáo in ra khi hậu xử lý xong.
+        var progress = TaskProgressWindow.ShowNew(
+            "iSurvey — Nhập DGN",
+            "Đang nhập DGN",
+            "Chuẩn bị — " + Path.GetFileName(options.FilePath));
         DgnImportService.Start(doc, options, report =>
-            WriteSummary(AcadApp.DocumentManager.MdiActiveDocument?.Editor ?? ed, report, options.FilePath));
+        {
+            progress.ForceClose();
+            WriteSummary(AcadApp.DocumentManager.MdiActiveDocument?.Editor ?? ed, report, options.FilePath);
+        }, progress);
     }
 
     /// <summary>CAD ➔ DGN (C2D). UsePickSet: giữ các đối tượng người dùng đã chọn trước khi gõ lệnh.</summary>
@@ -116,8 +134,15 @@ public sealed class DgnModule : ISurveyModule
         }
 
         options.SelectedIds = selected;
+        var exportProgress = TaskProgressWindow.ShowNew(
+            "iSurvey — Xuất DGN",
+            "Đang xuất CAD ➔ DGN",
+            "Chuẩn bị — " + Path.GetFileName(options.OutputPath));
         DgnExportService.Start(doc, options, report =>
-            WriteExportSummary(AcadApp.DocumentManager.MdiActiveDocument?.Editor ?? ed, report));
+        {
+            exportProgress.ForceClose();
+            WriteExportSummary(AcadApp.DocumentManager.MdiActiveDocument?.Editor ?? ed, report);
+        }, exportProgress);
     }
 
     private static void WriteExportSummary(Autodesk.AutoCAD.EditorInput.Editor ed, DgnExportReport r)
@@ -262,5 +287,39 @@ public sealed class DgnModule : ISurveyModule
         ed.WriteMessage("\n[iSurvey][DGN] Gõ UNDO 2 lần để hoàn tác (lần 1: hậu xử lý, lần 2: DGNIMPORT).");
         if (r.LogPath is not null)
             ed.WriteMessage($"\n[iSurvey][DGN] Log chi tiết: {r.LogPath}");
+    }
+
+    /// <summary>
+    /// Thử nhanh: nếu có %TEMP%\isurvey-dgn-progress-seed.flag (dòng 1 = đường dẫn .dgn) thì bỏ hộp thoại chọn file.
+    /// File cờ bị xóa ngay khi đọc.
+    /// </summary>
+    private static DgnImportOptions? TryLoadProgressSeed()
+    {
+        var flag = Path.Combine(Path.GetTempPath(), "isurvey-dgn-progress-seed.flag");
+        if (!File.Exists(flag))
+            return null;
+        try
+        {
+            var lines = File.ReadAllLines(flag);
+            File.Delete(flag);
+            var path = lines.FirstOrDefault(l => !string.IsNullOrWhiteSpace(l))?.Trim();
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+                return null;
+
+            var options = DgnImportOptions.FromSettings(UserSettingsStore.Load(null), path);
+            options.FilePath = path;
+            options.BatchFiles = [path];
+            options.BatchCombine = true;
+            options.PurgeJunk = true;
+            options.ZoomToImport = true;
+            options.UseSubUnits = false;
+            options.ImportMode = 2;
+            return options;
+        }
+        catch
+        {
+            try { File.Delete(flag); } catch { /* bỏ qua */ }
+            return null;
+        }
     }
 }

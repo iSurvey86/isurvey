@@ -5,6 +5,41 @@
 
 ---
 
+## 2026-11-03 — VEMCD + hộp tiến trình, bump 1.8.17 (chưa phát hành)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ. **Bump 1.8.16 → 1.8.17.** Chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14.
+
+### Đã chốt / đã làm
+
+- **VEMCD** (`ISURVEY_PROFILE_DRAW`): vẽ trên Model đầu bảng năm hàng (hàng dưới Khoảng cách cộng dồn), đường đất theo Z cọc, thước cao độ; gợi ý/tách mức so sánh theo A3. Ribbon, BANGIS. Đã nhìn bản vẽ trắng Civil 2026.
+- **TaskProgressWindow**: Nhập/Xuất DGN (và batch), UAV tự cắt, phát sinh cọc, duỗi tuyến, TAB, CATBD, rải khung tuyến, tile bản đồ, KML (≥20). TIN / PDF giữ hộp riêng.
+- Bump version `1.8.17` (csproj + PackageContents). Catalog, README, CHANGELOG, kịch bản `vemcd-1.8.17` và `d2c-1.8.17` (Chưa quay).
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| VEMCD | `src/Modules/Profile/*`, `src/UI/Profile/*` |
+| Tiến trình | `src/UI/TaskProgressWindow.cs`, `src/Dgn/*`, UAV/Tuyến/Import/Map/Plan/Frame |
+| Version | `iSurvey.csproj`, `deploy/iSurvey.bundle/PackageContents.xml` |
+| Video | `docs/video/CATALOG.md`, `kich-ban/vemcd-1.8.17.*`, `kich-ban/d2c-1.8.17.*` |
+
+### Việc tiếp
+
+- [ ] Chưa phát hành 1.8.17. Gói UPD trên máy chủ vẫn là 1.8.14.
+- [ ] Video VEMCD / D2C 1.8.17 và các lệnh tuyến-cọc chưa quay. YouTube vẫn thiếu `client_secret.json`.
+- [ ] Bản vẽ công trình: chạy lại UAVCLIP/RAIMCD nếu layout cũ còn lệch (phiên trước).
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff đầu. iSurvey 1.8.17, chưa phát hành. VEMCD vẽ mặt cắt trên Model; RAIMCD chỉ rải khung. Nhiều lệnh dài có hộp tiến trình (DGN, UAV, cọc, TAB…). Tiếp: phát hành 1.8.17 khi được yêu cầu, hoặc quay video khi được yêu cầu.
+```
+
+**Lưu trữ ngày:** [2026-11-03-vemcd-tien-trinh.md](./2026-11-03-vemcd-tien-trinh.md)
+
+---
+
 ## 2026-11-02 — Tuyến/cọc, TIN lõm, THEMMOHINH chọn 2, MENUISURVEY (1.8.16, chưa phát hành, không bump)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ. **Không bump.** Vẫn **1.8.16**, chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14.

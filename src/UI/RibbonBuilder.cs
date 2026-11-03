@@ -181,6 +181,8 @@ public static class RibbonBuilder
                 [
                     new Btn("Rải Khung Theo Tuyến", "RAIKHUNG", RibbonIcons.RaiKhung, true,
                         "Rải khung in dọc tuyến: một layout, nhiều tờ, viewport xoay (RAIKHUNG)"),
+                    new Btn("Vẽ Mặt Cắt Dọc", "VEMCD", RibbonIcons.RaiMcd, true,
+                        "Vẽ đường đất và đầu bảng trên Model (VEMCD). RAIMCD chỉ rải khung in."),
                     new Btn("Rải Khung Mặt Cắt", "RAIMCD", RibbonIcons.RaiMcd, true,
                         "Rải khung in mặt cắt dọc: chọn góc dưới-trái hàng cuối, tỷ lệ 1/500; 1/5000 (RAIMCD)"),
                     new Btn("Thiết Lập Tỉ Lệ Khung", "TILEKHUNG", RibbonIcons.TileKhung, false),

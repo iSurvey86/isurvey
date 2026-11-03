@@ -1,0 +1,39 @@
+{
+  "id": "vemcd-1.8.17",
+  "command": "VEMCD",
+  "commandFull": "ISURVEY_PROFILE_DRAW",
+  "feature": "Vẽ mặt cắt dọc",
+  "version": "1.8.17",
+  "title": "Vẽ mặt cắt dọc phiên bản 1.8.17",
+  "privacy": "unlisted",
+  "voice": "vi-VN-HoaiMyNeural",
+  "rate": "-8%",
+  "tags": ["iSurvey", "Civil 3D", "mặt cắt dọc", "VEMCD"],
+  "description": "Cách vẽ mặt cắt dọc tự nhiên trên Model bằng iSurvey.\n\nHành vi trong video có từ iSurvey 1.8.17 (lệnh VEMCD, lệnh đủ ISURVEY_PROFILE_DRAW).\nĐầu bảng năm hàng, hàng dưới là khoảng cách cộng dồn. RAIMCD chỉ rải khung in sau khi đã vẽ.",
+  "shots": [
+    {
+      "id": "01-mo-dau",
+      "type": "card",
+      "lines": ["Vẽ mặt cắt dọc", "phiên bản 1.8.17"],
+      "narration": "Vẽ mặt cắt dọc, phiên bản một chấm tám chấm mười bảy. Lệnh này vẽ đường đất và đầu bảng trên Model. Rải khung in là lệnh R A I M C D riêng."
+    },
+    {
+      "id": "02-hop",
+      "type": "screen",
+      "action": "Gõ VEMCD. Chọn tuyến, tỷ lệ, mức so sánh. Bấm Vẽ.",
+      "narration": "Gõ V E M C D. Chọn tuyến đã có cọc. Giữ tỷ lệ một phần năm trăm chấm một phần năm nghìn. Mức so sánh đã gợi ý. Bấm Vẽ."
+    },
+    {
+      "id": "03-chen",
+      "type": "screen",
+      "action": "Chỉ góc chèn. Hiện bảng và đường đất.",
+      "narration": "Chỉ góc dưới trái cột tên trên Model. Đầu bảng năm hàng hiện ra. Hàng dưới cùng là khoảng cách cộng dồn. Đường đất nằm phía trên bảng."
+    },
+    {
+      "id": "04-ket",
+      "type": "card",
+      "lines": ["Tiếp theo: RAIMCD rải khung in"],
+      "narration": "Sau khi đã có hình, gõ R A I M C D và bấm góc dưới trái hàng cộng dồn để rải khung in."
+    }
+  ]
+}

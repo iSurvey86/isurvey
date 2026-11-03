@@ -35,6 +35,7 @@ using iSurvey.UI;
 [assembly: CommandClass(typeof(iSurvey.UI.Palette.PaletteModule))]
 [assembly: CommandClass(typeof(iSurvey.Modules.Terrain.TerrainModule))]
 [assembly: CommandClass(typeof(iSurvey.Modules.Tuyen.RouteModule))]
+[assembly: CommandClass(typeof(iSurvey.Modules.Profile.ProfileModule))]
 [assembly: CommandClass(typeof(iSurvey.CommandAliases))]
 #endif
 

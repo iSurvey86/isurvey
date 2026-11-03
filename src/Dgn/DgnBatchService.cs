@@ -3,6 +3,7 @@ using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
+using iSurvey.UI;
 
 namespace iSurvey.Dgn;
 
@@ -66,6 +67,8 @@ internal static class DgnBatchService
         /// <summary>Bản vẽ đang nhận file hiện tại (ghép: dùng chung; không ghép: mỗi file một bản).</summary>
         public Document? Target { get; set; }
 
+        public TaskProgressWindow? Progress { get; init; }
+
         public bool Combine => Options.BatchCombine;
     }
 
@@ -74,7 +77,10 @@ internal static class DgnBatchService
     /// <summary>Bắt đầu Batch (gọi từ lệnh). Tạo bản vẽ và nhập đều chạy ở các sự kiện Idle kế tiếp.</summary>
     /// <param name="done">(kết quả, đường dẫn bản vẽ ghép chưa lưu / null).</param>
     public static void Start(
-        Document orig, DgnImportOptions options, Action<IReadOnlyList<DgnBatchFileResult>, string?> done)
+        Document orig,
+        DgnImportOptions options,
+        Action<IReadOnlyList<DgnBatchFileResult>, string?> done,
+        TaskProgressWindow? progress = null)
     {
         if (IsRunning)
         {
@@ -100,12 +106,17 @@ internal static class DgnBatchService
             Options = options,
             Files = new Queue<string>(files),
             Total = files.Count,
-            Done = done
+            Done = done,
+            Progress = progress
         };
 
         orig.Editor.WriteMessage(options.BatchCombine
             ? $"\n[iSurvey][DGN] GHÉP: {files.Count} file vào Model Space bản vẽ hiện hành (tuần tự, đừng thao tác trong lúc chạy)."
             : $"\n[iSurvey][DGN] RỜI: {files.Count} file ➔ mỗi file một .dwg cùng thư mục (tuần tự, đừng thao tác trong lúc chạy).");
+
+        progress?.Report(0, files.Count, options.BatchCombine
+            ? $"Ghép 0 / {files.Count} file vào bản vẽ hiện hành…"
+            : $"Xuất rời 0 / {files.Count} file…");
 
         RunLater(batch, () => Step(batch));
     }
@@ -115,6 +126,13 @@ internal static class DgnBatchService
     {
         while (true)
         {
+            if (b.Progress?.Cancelled == true)
+            {
+                WriteLine("\n[iSurvey][DGN] Batch đã hủy theo yêu cầu người dùng.", b);
+                Finish(b);
+                return;
+            }
+
             if (b.Files.Count == 0)
             {
                 Finish(b);
@@ -124,6 +142,14 @@ internal static class DgnBatchService
             var file = b.Files.Dequeue();
             b.Index++;
             var prefix = $"[{b.Index}/{b.Total}] {Path.GetFileName(file)}";
+            try
+            {
+                b.Progress?.Report(b.Index - 1, b.Total, $"{prefix} — đang nhập…");
+            }
+            catch
+            {
+                // bỏ qua
+            }
 
             if (!File.Exists(file))
             {
@@ -195,7 +221,8 @@ internal static class DgnBatchService
                             // Ghép: Zoom Extents một lần ở file cuối. Rời: mỗi .dwg được zoom trước khi lưu.
                             options.ZoomToImport = !b.Combine || b.Files.Count == 0;
                             DgnImportService.Start(target, options,
-                                report => OnFileDone(b, file, output, prefix, watch, report));
+                                report => OnFileDone(b, file, output, prefix, watch, report),
+                                b.Progress);
                         }
                         catch (System.Exception ex)
                         {
@@ -322,6 +349,14 @@ internal static class DgnBatchService
             _ => "LỖI — " + result.Message
         };
         WriteLine($"\n[iSurvey][DGN] {prefix}: {text}", b);
+        try
+        {
+            b.Progress?.Report(b.Index, b.Total, $"{prefix}: {text}");
+        }
+        catch
+        {
+            // bỏ qua
+        }
     }
 
     private static void WriteLine(string text, Batch b)

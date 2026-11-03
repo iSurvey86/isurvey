@@ -3,6 +3,7 @@ using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
+using iSurvey.UI;
 
 namespace iSurvey.Dgn;
 
@@ -58,12 +59,17 @@ internal static class DgnExportService
         public EventHandler? IdleHandler { get; set; }
 
         public bool Finishing { get; set; }
+
+        public TaskProgressWindow? Progress { get; init; }
+
+        public DateTime LastProgressUi { get; set; }
     }
 
     public static bool IsRunning { get; private set; }
 
     /// <summary>Bắt đầu xuất. Gọi từ lệnh (ngữ cảnh lệnh của <paramref name="orig"/>); báo cáo trả về qua <paramref name="done"/>.</summary>
-    public static void Start(Document orig, DgnExportOptions options, Action<DgnExportReport> done)
+    public static void Start(
+        Document orig, DgnExportOptions options, Action<DgnExportReport> done, TaskProgressWindow? progress = null)
     {
         var report = new DgnExportReport { OutputPath = options.OutputPath };
         var log = new DgnLog(orig.Editor, "C2D", "c2d");
@@ -126,12 +132,13 @@ internal static class DgnExportService
 
         var job = new Job
         {
-            Orig = orig, Options = options, Log = log, Report = report, Seed = seed, Done = done
+            Orig = orig, Options = options, Log = log, Report = report, Seed = seed, Done = done, Progress = progress
         };
 
         // Xuất trực tiếp bản vẽ hiện hành chỉ khi: toàn bộ + không dọn rác. Còn lại dùng bản sao tạm.
         var direct = options.Scope == DgnExportScope.All && !options.Purge;
         IsRunning = true;
+        progress?.Report(0, 0, "Đang chuẩn bị xuất — " + Path.GetFileName(options.OutputPath));
 
         if (direct)
         {
@@ -143,6 +150,7 @@ internal static class DgnExportService
 
         try
         {
+            progress?.Report(0, 0, "Đang tạo bản sao tạm để xuất…");
             job.ScratchPath = BuildScratchCopy(job);
             report.UsedScratchCopy = true;
         }
@@ -360,6 +368,7 @@ internal static class DgnExportService
             };
 
             log.Info("Gọi: " + string.Join(" | ", args.Select(a => a is string { Length: 0 } ? "<Enter>" : a.ToString())));
+            job.Progress?.Report(0, 0, "Đang gọi -DGNEXPORT…");
             doc.Editor.Command(args.ToArray());
             log.Info($"CMDACTIVE sau lệnh = {SafeSysVar("CMDACTIVE")}; hộp thoại seed đã điền {job.Driver.Driven} lần.");
         }
@@ -372,6 +381,7 @@ internal static class DgnExportService
 
         job.PollStarted = DateTime.UtcNow;
         job.LastChange = DateTime.UtcNow;
+        job.Progress?.Report(0, 0, "Đang chờ Civil 3D xuất file DGN…");
         job.IdleHandler = (_, _) => OnIdle(job, doc);
         AcadApp.Idle += job.IdleHandler;
     }
@@ -384,6 +394,21 @@ internal static class DgnExportService
         try
         {
             var now = DateTime.UtcNow;
+            if (job.Progress?.Cancelled == true)
+            {
+                try
+                {
+                    doc.SendStringToExecute("\u001b\u001b", true, false, false);
+                }
+                catch
+                {
+                    // bỏ qua
+                }
+
+                Complete(job, "đã hủy");
+                return;
+            }
+
             var path = job.Options.OutputPath;
             var exists = File.Exists(path);
             var size = exists ? new FileInfo(path).Length : -1;
@@ -391,6 +416,16 @@ internal static class DgnExportService
             {
                 job.LastSize = size;
                 job.LastChange = now;
+            }
+
+            if ((now - job.LastProgressUi).TotalSeconds >= 0.5)
+            {
+                job.LastProgressUi = now;
+                var elapsed = (now - job.PollStarted).TotalSeconds;
+                job.Progress?.Report(0, 0,
+                    exists && size > 0
+                        ? $"Đang ghi DGN… {size / 1024.0:0.#} KB ({elapsed:0}s)"
+                        : $"Đang chờ xuất DGN… ({elapsed:0}s)");
             }
 
             var active = (Convert.ToInt32(AcadApp.GetSystemVariable("CMDACTIVE")) & 1) != 0;

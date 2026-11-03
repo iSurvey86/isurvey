@@ -3,6 +3,7 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using iSurvey.Auth;
 using iSurvey.Modules.Map;
+using iSurvey.UI;
 using AcadRegion = Autodesk.AutoCAD.DatabaseServices.Region;
 
 namespace iSurvey.Modules.Uav;
@@ -255,66 +256,87 @@ internal static class UavImageService
         ed.WriteMessage("\n[iSurvey] Auto-Clip: đọc file trên đĩa, downsample, dò nền trắng/đen...");
         var ok = 0;
         var total = listImages.Count;
+        var progress = TaskProgressWindow.ShowNew(
+            "iSurvey — Cắt ảnh UAV",
+            "Đang tự cắt nền ảnh",
+            $"0 / {total} ảnh…");
 
-        using var tr = db.TransactionManager.StartTransaction();
-        EnsureLayer(db, tr, AutoBorderLayer);
-
-        foreach (var imageId in listImages)
+        try
         {
-            var raster = (RasterImage)tr.GetObject(imageId, OpenMode.ForRead);
-            if (raster.ImageDefId.IsNull)
+            using var tr = db.TransactionManager.StartTransaction();
+            EnsureLayer(db, tr, AutoBorderLayer);
+
+            for (var index = 0; index < listImages.Count; index++)
             {
-                ed.WriteMessage("\n[iSurvey] Bỏ qua ảnh — không có ImageDef.");
-                continue;
+                if (progress.Cancelled)
+                {
+                    ed.WriteMessage("\n[iSurvey] Auto-Clip đã hủy.");
+                    break;
+                }
+
+                var imageId = listImages[index];
+                progress.Report(index, total, $"Đang phân tích ảnh {index + 1} / {total}…");
+                var raster = (RasterImage)tr.GetObject(imageId, OpenMode.ForRead);
+                if (raster.ImageDefId.IsNull)
+                {
+                    ed.WriteMessage("\n[iSurvey] Bỏ qua ảnh — không có ImageDef.");
+                    continue;
+                }
+
+                var def = (RasterImageDef)tr.GetObject(raster.ImageDefId, OpenMode.ForRead);
+                var path = ResolveImagePath(def);
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    ed.WriteMessage("\n[iSurvey] Bỏ qua ảnh — không có ActiveFileName (kiểm tra đường dẫn External Reference).");
+                    continue;
+                }
+
+                ed.WriteMessage($"\n[iSurvey] Đang phân tích: {Path.GetFileName(path!)} ...");
+                progress.Report(index, total, $"Đang phân tích — {Path.GetFileName(path!)} ({index + 1}/{total})");
+                var drawingRing = UavAutoClipService.TryBuildClipRingInFullPixels(
+                    path!, out var detail, out _, out var fullH);
+                if (drawingRing is null)
+                {
+                    ed.WriteMessage($"\n[iSurvey] Bỏ qua ảnh — {detail}");
+                    continue;
+                }
+
+                var toModel = raster.PixelToModelTransform;
+                var yUp = UavAutoClipService.DetectCadPixelYIncreasesUp(toModel, raster.Orientation.Yaxis, fullH);
+                var cadPixels = UavAutoClipService.DrawingPixelsToCadPixels(drawingRing, fullH, yUp);
+
+                // Clip trực tiếp bằng pixel CAD — không round-trip WCS.
+                raster = (RasterImage)tr.GetObject(imageId, OpenMode.ForWrite, false, true);
+                if (!RasterClipService.TryApplyClipPolygonPixels(raster, cadPixels))
+                {
+                    ed.WriteMessage("\n[iSurvey] Bỏ qua ảnh — SetClipBoundary thất bại.");
+                    continue;
+                }
+
+                var wcsRing = new List<Point2d>(cadPixels.Count);
+                foreach (var px in cadPixels)
+                {
+                    var w = new Point3d(px.X, px.Y, 0).TransformBy(toModel);
+                    wcsRing.Add(new Point2d(w.X, w.Y));
+                }
+
+                DrawBorderPolyline(tr, db, wcsRing);
+                SendImageToBack(tr, db, imageId);
+                ok++;
+                var copies = PropagateClipToCopies(tr, db, raster);
+                ed.WriteMessage(
+                    $"\n[iSurvey] Auto-Clip 1 ảnh OK ({detail}, Y{(yUp ? "↑" : "↓")}-CAD).");
+                if (copies > 0)
+                    ed.WriteMessage($"\n[iSurvey] Đã cập nhật {copies} ảnh sơ họa cùng file.");
             }
 
-            var def = (RasterImageDef)tr.GetObject(raster.ImageDefId, OpenMode.ForRead);
-            var path = ResolveImagePath(def);
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                ed.WriteMessage("\n[iSurvey] Bỏ qua ảnh — không có ActiveFileName (kiểm tra đường dẫn External Reference).");
-                continue;
-            }
-
-            ed.WriteMessage($"\n[iSurvey] Đang phân tích: {Path.GetFileName(path!)} ...");
-            var drawingRing = UavAutoClipService.TryBuildClipRingInFullPixels(
-                path!, out var detail, out _, out var fullH);
-            if (drawingRing is null)
-            {
-                ed.WriteMessage($"\n[iSurvey] Bỏ qua ảnh — {detail}");
-                continue;
-            }
-
-            var toModel = raster.PixelToModelTransform;
-            var yUp = UavAutoClipService.DetectCadPixelYIncreasesUp(toModel, raster.Orientation.Yaxis, fullH);
-            var cadPixels = UavAutoClipService.DrawingPixelsToCadPixels(drawingRing, fullH, yUp);
-
-            // Clip trực tiếp bằng pixel CAD — không round-trip WCS.
-            raster = (RasterImage)tr.GetObject(imageId, OpenMode.ForWrite, false, true);
-            if (!RasterClipService.TryApplyClipPolygonPixels(raster, cadPixels))
-            {
-                ed.WriteMessage("\n[iSurvey] Bỏ qua ảnh — SetClipBoundary thất bại.");
-                continue;
-            }
-
-            var wcsRing = new List<Point2d>(cadPixels.Count);
-            foreach (var px in cadPixels)
-            {
-                var w = new Point3d(px.X, px.Y, 0).TransformBy(toModel);
-                wcsRing.Add(new Point2d(w.X, w.Y));
-            }
-
-            DrawBorderPolyline(tr, db, wcsRing);
-            SendImageToBack(tr, db, imageId);
-            ok++;
-            var copies = PropagateClipToCopies(tr, db, raster);
-            ed.WriteMessage(
-                $"\n[iSurvey] Auto-Clip 1 ảnh OK ({detail}, Y{(yUp ? "↑" : "↓")}-CAD).");
-            if (copies > 0)
-                ed.WriteMessage($"\n[iSurvey] Đã cập nhật {copies} ảnh sơ họa cùng file.");
+            tr.Commit();
+        }
+        finally
+        {
+            progress.ForceClose();
         }
 
-        tr.Commit();
         ed.WriteMessage($"\n[iSurvey] Auto-Clip hoàn tất cho {ok}/{total} tấm ảnh.");
         ActivityLogger.Result("ISURVEY_UAV_CLIP", $"tự cắt nền, {ok}/{total} ảnh, bản vẽ {ActivityLogger.FileName(db.Filename)}");
     }

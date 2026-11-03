@@ -8,6 +8,7 @@ using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using iSurvey.Auth;
 using iSurvey.Modules.Map;
+using iSurvey.UI;
 using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using AcadColor = Autodesk.AutoCAD.Colors.Color;
 using ColorMethod = Autodesk.AutoCAD.Colors.ColorMethod;
@@ -261,39 +262,57 @@ public sealed class StripMapService
                 }
 
                 var imageOut = new ObjectIdCollection();
-                for (var i = 0; i < segCount; i++)
+                var progress = TaskProgressWindow.ShowNew(
+                    "iSurvey — Duỗi tuyến",
+                    "Đang duỗi tuyến thành sơ họa",
+                    $"0 / {segCount} đoạn…");
+                try
                 {
-                    var clip = BuildClip(vertices, i, halfWidth);
-                    if (clip is null)
+                    for (var i = 0; i < segCount; i++)
                     {
-                        ed.WriteMessage($"\n[iSurvey] Bỏ đoạn {i + 1}: đa giác cắt suy biến.");
-                        continue;
-                    }
+                        if (progress.Cancelled)
+                        {
+                            ed.WriteMessage("\n[iSurvey] Duỗi tuyến đã hủy.");
+                            break;
+                        }
 
-                    var angle = Angle(vertices[i], vertices[i + 1]);
-                    var origin = vertices[i];
-                    var dest = inserts[i];
+                        progress.Report(i, segCount, $"Đang xử lý đoạn {i + 1} / {segCount}…");
+                        var clip = BuildClip(vertices, i, halfWidth);
+                        if (clip is null)
+                        {
+                            ed.WriteMessage($"\n[iSurvey] Bỏ đoạn {i + 1}: đa giác cắt suy biến.");
+                            continue;
+                        }
 
-                    foreach (var rid in rasterIds)
-                    {
-                        var src = tr.GetObject(rid, OpenMode.ForRead) as RasterImage;
-                        if (src is null || src is Wipeout)
-                            continue;
-                        if (!ExtentsOverlap(src, clip))
-                            continue;
-                        var placed = PlaceImage(tr, space, layerId, src, clip, origin, angle, dest);
-                        if (placed is null)
-                            continue;
-                        imageOut.Add(placed.Value);
-                        imageCount++;
-                    }
+                        var angle = Angle(vertices[i], vertices[i + 1]);
+                        var origin = vertices[i];
+                        var dest = inserts[i];
 
-                    if (blockId is not null)
-                    {
-                        var brId = PlaceBlockClip(tr, space, layerId, blockId.Value, clip, origin, angle, dest);
-                        if (brId is not null)
-                            blockCount++;
+                        foreach (var rid in rasterIds)
+                        {
+                            var src = tr.GetObject(rid, OpenMode.ForRead) as RasterImage;
+                            if (src is null || src is Wipeout)
+                                continue;
+                            if (!ExtentsOverlap(src, clip))
+                                continue;
+                            var placed = PlaceImage(tr, space, layerId, src, clip, origin, angle, dest);
+                            if (placed is null)
+                                continue;
+                            imageOut.Add(placed.Value);
+                            imageCount++;
+                        }
+
+                        if (blockId is not null)
+                        {
+                            var brId = PlaceBlockClip(tr, space, layerId, blockId.Value, clip, origin, angle, dest);
+                            if (brId is not null)
+                                blockCount++;
+                        }
                     }
+                }
+                finally
+                {
+                    progress.ForceClose();
                 }
 
                 for (var i = 0; i < vertices.Count; i++)

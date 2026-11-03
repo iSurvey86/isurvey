@@ -6,6 +6,7 @@ using Autodesk.AutoCAD.Runtime;
 using iSurvey.Auth;
 using iSurvey.Core;
 using iSurvey.Modules.Map;
+using iSurvey.UI;
 
 namespace iSurvey.Modules.Plan;
 
@@ -121,13 +122,20 @@ public sealed class PlanModule : ISurveyModule
 
         var relock = UnlockLockedLayers(db, tr);
 
-        var pm = new ProgressMeter();
-        pm.Start("iSurvey CATBD");
-        pm.SetLimit(Math.Max(1, ids.Length));
+        var progress = TaskProgressWindow.ShowNew(
+            "iSurvey — Cắt bình đồ",
+            "Đang cắt bình đồ theo biên",
+            $"0 / {ids.Length:N0} đối tượng…");
         try
         {
             for (var i = 0; i < ids.Length; i++)
             {
+                if (progress.Cancelled)
+                {
+                    stats.FirstError ??= "đã hủy";
+                    break;
+                }
+
                 var id = ids[i];
                 if (id != boundaryId)
                 {
@@ -142,13 +150,13 @@ public sealed class PlanModule : ISurveyModule
                     }
                 }
 
-                if (i % 200 == 0)
-                    pm.MeterProgress();
+                if (i == 0 || i % 50 == 0 || i + 1 == ids.Length)
+                    progress.Report(i + 1, ids.Length, $"Đã xử lý {i + 1:N0} / {ids.Length:N0} đối tượng…");
             }
         }
         finally
         {
-            pm.Stop();
+            progress.ForceClose();
         }
 
         foreach (var lid in relock)

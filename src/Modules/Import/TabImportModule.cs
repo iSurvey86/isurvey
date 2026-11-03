@@ -8,6 +8,7 @@ using iSurvey.Auth;
 using iSurvey.Core;
 using iSurvey.Models;
 using iSurvey.Modules.Map;
+using iSurvey.UI;
 using iSurvey.UI.Import;
 using OSGeo.OGR;
 using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
@@ -89,26 +90,40 @@ public sealed class TabImportModule : ISurveyModule
         var layers = (LayerTable)tr.GetObject(db.LayerTableId, OpenMode.ForRead);
         var made = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        var pm = new ProgressMeter();
-        pm.Start("iSurvey nhập TAB");
-        pm.SetLimit(Math.Max(1, options.FeatureCount));
+        var limit = Math.Max(1, options.FeatureCount);
+        var progress = TaskProgressWindow.ShowNew(
+            "iSurvey — Nhập TAB",
+            "Đang nhập MapInfo TAB",
+            $"0 / {limit:N0} đối tượng…");
+        var done = 0;
         try
         {
-            TabReader.Read(options.Path, settings, transform: true, feature =>
+            try
             {
-                pm.MeterProgress();
-                try
+                TabReader.Read(options.Path, settings, transform: true, feature =>
                 {
-                    DrawFeature(tr, space, layers, made, hatches, feature, options, stats);
-                }
-                catch (System.Exception ex)
-                {
-                    stats.Errors++;
-                    stats.FirstError ??= ex.Message;
-                }
-            });
+                    if (progress.Cancelled)
+                        throw new OperationCanceledException();
+                    done++;
+                    if (done == 1 || done % 50 == 0 || done >= limit)
+                        progress.Report(done, limit, $"Đã nhập {done:N0} / {limit:N0} đối tượng…");
+                    try
+                    {
+                        DrawFeature(tr, space, layers, made, hatches, feature, options, stats);
+                    }
+                    catch (System.Exception ex) when (ex is not OperationCanceledException)
+                    {
+                        stats.Errors++;
+                        stats.FirstError ??= ex.Message;
+                    }
+                });
+            }
+            catch (OperationCanceledException)
+            {
+                stats.FirstError ??= "đã hủy";
+            }
 
-            if (hatches.Count > 0)
+            if (hatches.Count > 0 && stats.FirstError != "đã hủy")
             {
                 var order = (DrawOrderTable)tr.GetObject(space.DrawOrderTableId, OpenMode.ForWrite);
                 order.MoveToBottom(hatches);
@@ -118,7 +133,7 @@ public sealed class TabImportModule : ISurveyModule
         }
         finally
         {
-            pm.Stop();
+            progress.ForceClose();
         }
 
         return stats;

@@ -9,6 +9,7 @@ using Autodesk.AutoCAD.Geometry;
 using iSurvey.Auth;
 using iSurvey.Core;
 using iSurvey.Models;
+using iSurvey.UI;
 using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 
 namespace iSurvey.Modules.Map;
@@ -106,18 +107,35 @@ internal static class HdMosaicWorkflow
             $"\n[iSurvey] HD zoom {picked.Zoom}, {tiles.Count} o, moi o {TilePixels}px. Dang tai...");
 
         IReadOnlyList<(int X, int Y, int Z, string Path)> ready;
+        var ui = TaskProgressWindow.ShowNew(
+            "iSurvey — Ghép ảnh HD",
+            "Đang tải tile bản đồ",
+            $"0 / {tiles.Count} ô…");
         try
         {
             using var downloader = new TileDownloader(SourceId);
             var progress = new Progress<(int Done, int Total)>(p =>
             {
-                if (p.Done % 24 == 0 || p.Done == p.Total)
+                if (ui.Cancelled)
+                    throw new OperationCanceledException();
+                if (p.Done % 8 == 0 || p.Done == p.Total)
+                {
+                    ui.Report(p.Done, p.Total, $"Đã tải {p.Done} / {p.Total} ô…");
                     ed.WriteMessage($"\n[iSurvey] ... {p.Done}/{p.Total}");
+                }
             });
             ready = downloader.EnsureTilesAsync(tiles, picked.Zoom, Scale, progress).GetAwaiter().GetResult();
         }
+        catch (OperationCanceledException)
+        {
+            ui.ForceClose();
+            ed.WriteMessage("\n[iSurvey] Da huy tai tile.");
+            Log("ghép HD, đã hủy");
+            return;
+        }
         catch (System.Exception ex)
         {
+            ui.ForceClose();
             ed.WriteMessage($"\n[iSurvey] Loi tai tile: {ex.Message}");
             Log("ghép HD, lỗi tải tile: " + ex.Message);
             return;
@@ -125,6 +143,7 @@ internal static class HdMosaicWorkflow
 
         if (ready.Count == 0)
         {
+            ui.ForceClose();
             ed.WriteMessage("\n[iSurvey] Khong tai duoc tile nao — kiem tra mang.");
             Log("ghép HD, không tải được tile");
             return;
@@ -133,17 +152,20 @@ internal static class HdMosaicWorkflow
         string mosaicPath;
         try
         {
+            ui.Report(ready.Count, ready.Count, "Đang ghép ảnh…");
             ed.WriteMessage("\n[iSurvey] Dang ghep anh...");
             mosaicPath = Stitch(ready, picked);
         }
         catch (OutOfMemoryException)
         {
+            ui.ForceClose();
             ed.WriteMessage("\n[iSurvey] Khong du bo nho de ghep anh. Chon zoom thap hon hoac duong bao nho hon.");
             Log($"ghép HD, hết bộ nhớ, zoom {picked.Zoom}, {tiles.Count} ô");
             return;
         }
         catch (System.Exception ex)
         {
+            ui.ForceClose();
             ed.WriteMessage($"\n[iSurvey] Loi ghep anh: {ex.Message}");
             Log("ghép HD, lỗi ghép: " + ex.Message);
             return;
@@ -151,14 +173,20 @@ internal static class HdMosaicWorkflow
 
         try
         {
+            ui.Report(ready.Count, ready.Count, "Đang chèn ảnh vào bản vẽ…");
             Insert(db, coordinates, mosaicPath, picked, cm, zone, boundary.ClipPolygonWcs);
             ed.Regen();
         }
         catch (System.Exception ex)
         {
+            ui.ForceClose();
             ed.WriteMessage($"\n[iSurvey] Loi chen anh: {ex.Message}");
             Log($"ghép HD, lỗi chèn file {ActivityLogger.FileName(mosaicPath)}: {ex.Message}");
             return;
+        }
+        finally
+        {
+            ui.ForceClose();
         }
 
         var missing = tiles.Count - ready.Count;

@@ -5,6 +5,7 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using iSurvey.Auth;
+using iSurvey.UI;
 using iSurvey.UI.Frame;
 using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 
@@ -555,8 +556,18 @@ public sealed partial class FrameService
                     attDefs.Add(ad);
             }
 
+            var layoutProgress = TaskProgressWindow.ShowNew(
+                "iSurvey — Rải khung tuyến",
+                "Đang dựng layout khung in",
+                $"0 / {pieces.Count} tờ…");
+            try
+            {
             for (var i = 0; i < pieces.Count; i++)
             {
+                if (layoutProgress.Cancelled)
+                    throw new InvalidOperationException("đã hủy");
+
+                layoutProgress.Report(i, pieces.Count, $"Đang đặt tờ {i + 1} / {pieces.Count}…");
                 var pc = pieces[i];
                 var row = i / opts.Cols;
                 var col = i % opts.Cols;
@@ -602,6 +613,11 @@ public sealed partial class FrameService
                 viewportIds.Add(vp.ObjectId);
 
                 DrawPieceOutline(tr, db, model, style, pc, mapW * s0, mapH * s0, s0, pieces.Count, spec.Name);
+            }
+            }
+            finally
+            {
+                layoutProgress.ForceClose();
             }
 
             tr.Commit();

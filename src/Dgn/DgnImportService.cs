@@ -3,6 +3,7 @@ using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
+using iSurvey.UI;
 
 namespace iSurvey.Dgn;
 
@@ -97,6 +98,10 @@ internal static class DgnImportService
         public bool Finishing { get; set; }
 
         public EventHandler? IdleHandler { get; set; }
+
+        public TaskProgressWindow? Progress { get; init; }
+
+        public DateTime LastProgressUi { get; set; }
     }
 
     /// <summary>
@@ -104,7 +109,8 @@ internal static class DgnImportService
     /// (log thực tế: CMDACTIVE=1 và 0 đối tượng ngay sau Editor.Command), nên hậu xử lý được hoãn tới
     /// khi Handseed ngừng thay đổi và không còn lệnh đang chạy (xem <see cref="OnIdle"/>).
     /// </summary>
-    public static void Start(Document doc, DgnImportOptions options, Action<DgnImportReport> done)
+    public static void Start(
+        Document doc, DgnImportOptions options, Action<DgnImportReport> done, TaskProgressWindow? progress = null)
     {
         var report = new DgnImportReport();
         var db = doc.Database;
@@ -138,7 +144,8 @@ internal static class DgnImportService
             Vars = new SysVarScope(log),
             Done = done,
             Seed = seed,
-            LastSeed = seed
+            LastSeed = seed,
+            Progress = progress
         };
 
         try
@@ -153,6 +160,7 @@ internal static class DgnImportService
             foreach (Document d in AcadApp.DocumentManager)
                 job.KnownDocs.Add(d);
 
+            ReportProgress(job, 0, 0, "Đang gửi lệnh DGNIMPORT — " + Path.GetFileName(options.FilePath));
             RunImportCommand(ed, options, log);
         }
         catch (System.Exception ex)
@@ -164,11 +172,26 @@ internal static class DgnImportService
         }
 
         log.Info("Đang chờ Civil 3D nhập xong DGN (hậu xử lý tự chạy khi hoàn tất)...");
+        ReportProgress(job, 0, 0, "Đang chờ Civil 3D nhập xong — " + Path.GetFileName(options.FilePath));
         job.LastSeed = db.Handseed.Value;
         job.LastChange = DateTime.UtcNow;
         job.IdleHandler = (_, _) => OnIdle(job);
         AcadApp.Idle += job.IdleHandler;
     }
+
+    private static void ReportProgress(Job job, int done, int total, string text)
+    {
+        try
+        {
+            job.Progress?.Report(done, total, text);
+        }
+        catch
+        {
+            // hộp thoại không được làm hỏng nhập
+        }
+    }
+
+    private static bool IsCancelled(Job job) => job.Progress?.Cancelled == true;
 
     private static bool IsCommandActive()
     {
@@ -190,6 +213,16 @@ internal static class DgnImportService
         try
         {
             var now = DateTime.UtcNow;
+
+            if (IsCancelled(job))
+            {
+                job.Finishing = true;
+                AcadApp.Idle -= job.IdleHandler;
+                job.Report.Error = "đã hủy";
+                job.Log.Info("Người dùng hủy trong lúc chờ DGNIMPORT.");
+                FinishJob(job);
+                return;
+            }
 
             // DGNIMPORT có thể tạo bản vẽ mới (Drawing2...) thay vì nhập vào bản vẽ hiện hành.
             if (!job.TargetIsNewDoc)
@@ -217,6 +250,17 @@ internal static class DgnImportService
             {
                 job.LastSeed = seedNow;
                 job.LastChange = now;
+            }
+
+            if ((now - job.LastProgressUi).TotalSeconds >= 0.4)
+            {
+                job.LastProgressUi = now;
+                var grown = Math.Max(0, seedNow - (job.TargetIsNewDoc ? job.BaselineSeed : job.Seed));
+                var elapsed = (now - job.Started).TotalSeconds;
+                ReportProgress(job, 0, 0,
+                    grown > 0
+                        ? $"Đang nhập… ~{grown:N0} đối tượng mới ({elapsed:0}s) — {Path.GetFileName(job.Options.FilePath)}"
+                        : $"Đang chờ Civil 3D… ({elapsed:0}s) — {Path.GetFileName(job.Options.FilePath)}");
             }
 
             var active = IsCommandActive();
@@ -282,6 +326,10 @@ internal static class DgnImportService
                     report.Error = "DGNIMPORT không tạo đối tượng nào. Xem prompt trên Command Line " +
                                    "(trình tự prompt có thể khác) và gửi lại log.";
                 }
+                else if (IsCancelled(job))
+                {
+                    report.Error = "đã hủy";
+                }
                 else
                 {
                     // Một nhóm UNDO cho toàn bộ hậu xử lý (bản thân DGNIMPORT là một bước UNDO riêng).
@@ -295,12 +343,16 @@ internal static class DgnImportService
                         log.Info("Không mở được nhóm UNDO: " + ex.Message);
                     }
 
-                    PostProcess(db, job.Seed, job.TargetIsNewDoc, options, report, log);
+                    ReportProgress(job, 0, 0, $"Đang hậu xử lý {imported.Count:N0} đối tượng…");
+                    PostProcess(db, job.Seed, job.TargetIsNewDoc, options, report, log, job);
                 }
             }
 
-            if (report.Error is null && options.ZoomToImport)
+            if (report.Error is null && options.ZoomToImport && !IsCancelled(job))
+            {
+                ReportProgress(job, 0, 0, "Đang zoom vùng vừa nhập…");
                 ZoomExtents(ed, log);
+            }
         }
         catch (System.Exception ex)
         {
@@ -375,11 +427,24 @@ internal static class DgnImportService
     /// layer/block), nên chỉ xử lý layer đang được đối tượng dùng, và không purge block/linetype/layer của template.
     /// </summary>
     private static void PostProcess(
-        Database db, long seed, bool newDoc, DgnImportOptions options, DgnImportReport report, DgnLog log)
+        Database db, long seed, bool newDoc, DgnImportOptions options, DgnImportReport report, DgnLog log, Job job)
     {
+        if (IsCancelled(job))
+        {
+            report.Error = "đã hủy";
+            return;
+        }
+
         if (options.ExplodeCells)
         {
-            ExplodeCells(db, seed, report, log);
+            ReportProgress(job, 0, 0, "Đang phá khối DGN Cell (Explode)…");
+            ExplodeCells(db, seed, report, log, job);
+            if (IsCancelled(job))
+            {
+                report.Error = "đã hủy";
+                return;
+            }
+
             if (!newDoc)
             {
                 report.BlocksPurged = PurgeNewBlocks(db, seed);
@@ -388,6 +453,7 @@ internal static class DgnImportService
             }
         }
 
+        ReportProgress(job, 0, 0, "Đang xử lý layer và chữ…");
         using (var tr = db.TransactionManager.StartTransaction())
         {
             var msIds = CollectNewModelSpace(db, seed);
@@ -406,7 +472,10 @@ internal static class DgnImportService
                 MergeLayers(all, merge, tr);
 
             if (options.FixFonts)
+            {
+                ReportProgress(job, 0, 0, "Đang chuyển TCVN3 sang Unicode…");
                 report.TextsConverted = FixTexts(db, all, tr, log);
+            }
 
             report.Extents = ComputeExtents(msIds, tr);
             tr.Commit();
@@ -414,6 +483,7 @@ internal static class DgnImportService
 
         if (options.PurgeJunk && !newDoc)
         {
+            ReportProgress(job, 0, 0, "Đang dọn layer / linetype thừa…");
             report.LinetypesPurged = PurgeNewSymbols(db, seed, db.LinetypeTableId);
             report.LayersPurged = PurgeNewSymbols(db, seed, db.LayerTableId);
             log.Info($"Dọn rác: {report.LinetypesPurged} linetype, {report.LayersPurged} layer không dùng.");
@@ -424,25 +494,35 @@ internal static class DgnImportService
 
     // ---- Explode
 
-    private static void ExplodeCells(Database db, long seed, DgnImportReport report, DgnLog log)
+    private static void ExplodeCells(Database db, long seed, DgnImportReport report, DgnLog log, Job job)
     {
         var failed = new HashSet<ObjectId>();
         var total = 0;
 
         for (var pass = 1; pass <= MaxExplodePasses; pass++)
         {
+            if (IsCancelled(job))
+                return;
+
             var refs = CollectNewModelSpace(db, seed)
                 .Where(id => id.ObjectClass.DxfName == "INSERT" && !failed.Contains(id))
                 .ToList();
             if (refs.Count == 0)
                 break;
 
+            ReportProgress(job, 0, refs.Count, $"Explode lượt {pass}: 0 / {refs.Count:N0} cell…");
             var done = 0;
             using var tr = db.TransactionManager.StartTransaction();
             var ms = (BlockTableRecord)tr.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForWrite);
 
             foreach (var id in refs)
             {
+                if (IsCancelled(job))
+                {
+                    tr.Commit();
+                    return;
+                }
+
                 if (total >= MaxExplodeEntities)
                 {
                     report.Warnings.Add($"Dừng Explode ở mức {MaxExplodeEntities} đối tượng (giới hạn an toàn).");
@@ -470,6 +550,8 @@ internal static class DgnImportService
 
                     br.Erase();
                     done++;
+                    if (done == refs.Count || done % 25 == 0)
+                        ReportProgress(job, done, refs.Count, $"Explode lượt {pass}: {done:N0} / {refs.Count:N0} cell…");
                 }
                 catch (System.Exception ex)
                 {

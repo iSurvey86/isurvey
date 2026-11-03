@@ -87,6 +87,10 @@ internal static class ActivityPhrases
         ["ISURVEY_PROFILE_SHEETS"] = "RAIMCD (rải khung mặt cắt dọc)",
         ["RAIMCD"] = "RAIMCD (rải khung mặt cắt dọc)",
         ["AliasProfileLayout"] = "RAIMCD (rải khung mặt cắt dọc)",
+        ["DrawCommand"] = "VEMCD (vẽ mặt cắt dọc trên Model)",
+        ["DrawAlias"] = "VEMCD (vẽ mặt cắt dọc trên Model)",
+        ["ISURVEY_PROFILE_DRAW"] = "VEMCD (vẽ mặt cắt dọc trên Model)",
+        ["VEMCD"] = "VEMCD (vẽ mặt cắt dọc trên Model)",
 
         ["RoutePlotCommand"] = "INTUYEN (in khung đang chọn hoặc tất cả)",
         ["ISURVEY_ROUTE_PLOT"] = "INTUYEN (in khung đang chọn hoặc tất cả)",

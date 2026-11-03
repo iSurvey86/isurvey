@@ -3,6 +3,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using iSurvey.Models;
+using iSurvey.UI;
 using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 
 namespace iSurvey.Modules.Map;
@@ -59,22 +60,35 @@ public sealed class BasemapRefreshService
 
         ed.WriteMessage("\n[iSurvey] Đang tải tile...");
         IReadOnlyList<(int X, int Y, int Z, string Path)> ready;
+        var ui = TaskProgressWindow.ShowNew(
+            "iSurvey — Làm mới bản đồ",
+            "Đang tải tile ảnh nền",
+            $"0 / {total} ô…");
 
         try
         {
             using var downloader = new TileDownloader(basemapId);
             var progress = new Progress<(int Done, int Total)>(p =>
             {
-                if (p.Done % 24 == 0 || p.Done == p.Total)
+                if (ui.Cancelled)
+                    throw new OperationCanceledException();
+                if (p.Done % 8 == 0 || p.Done == p.Total)
                 {
+                    ui.Report(p.Done, p.Total, $"Đã tải {p.Done} / {p.Total} ô…");
                     ed.WriteMessage($"\n[iSurvey] ... {p.Done}/{p.Total}");
                     try { ed.UpdateScreen(); } catch { /* bỏ qua */ }
                 }
             });
             ready = downloader.EnsureTilesAsync(tileList, zoom, progress).GetAwaiter().GetResult();
         }
+        catch (OperationCanceledException)
+        {
+            ui.ForceClose();
+            throw new InvalidOperationException("Đã hủy tải tile.");
+        }
         catch (Exception ex)
         {
+            ui.ForceClose();
             throw new InvalidOperationException($"Lỗi tải tile: {ex.Message}", ex);
         }
 
@@ -82,24 +96,34 @@ public sealed class BasemapRefreshService
         ed.WriteMessage($"\n[iSurvey] Tile: {ready.Count}/{total} OK, {failed} lỗi.");
 
         if (ready.Count == 0)
-            throw new InvalidOperationException("Không tải được tile nào — kiểm tra mạng.");
-
-        ed.WriteMessage("\n[iSurvey] Gắn tile...");
-        RasterClearService.ClearAll(db);
-        var attach = TileAttachService.AttachTiles(
-            db, basemapId, ready, _coordinates, centralMeridian, BasemapSession.ClipPolygonWcs, zone);
-        ed.Regen();
-
-        var clipNote = BasemapSession.HasBoundaryClip ? " (clip đường bao)" : string.Empty;
-        ed.WriteMessage($"\n[iSurvey] Đã gắn {attach.Attached} tile{clipNote} (lỗi {attach.Failed}). Zoom in sẽ tự nét hơn (AutoRefresh).");
-
-        return new RefreshResult
         {
-            Zoom = zoom,
-            TileCount = attach.Attached,
-            FailedTileCount = failed + attach.Failed,
-            Bounds = wgsBounds
-        };
+            ui.ForceClose();
+            throw new InvalidOperationException("Không tải được tile nào — kiểm tra mạng.");
+        }
+
+        try
+        {
+            ui.Report(ready.Count, ready.Count, "Đang gắn tile vào bản vẽ…");
+            ed.WriteMessage("\n[iSurvey] Gắn tile...");
+            RasterClearService.ClearAll(db);
+            var attach = TileAttachService.AttachTiles(
+                db, basemapId, ready, _coordinates, centralMeridian, BasemapSession.ClipPolygonWcs, zone);
+            ed.Regen();
+
+            var clipNote = BasemapSession.HasBoundaryClip ? " (clip đường bao)" : string.Empty;
+            ed.WriteMessage($"\n[iSurvey] Đã gắn {attach.Attached} tile{clipNote} (lỗi {attach.Failed}). Zoom in sẽ tự nét hơn (AutoRefresh).");
+            return new RefreshResult
+            {
+                Zoom = zoom,
+                TileCount = attach.Attached,
+                FailedTileCount = failed + attach.Failed,
+                Bounds = wgsBounds
+            };
+        }
+        finally
+        {
+            ui.ForceClose();
+        }
     }
 
     public void Clear(Document doc)

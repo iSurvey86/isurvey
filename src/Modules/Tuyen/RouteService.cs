@@ -5,6 +5,7 @@ using Autodesk.AutoCAD.Geometry;
 using AcadColor = Autodesk.AutoCAD.Colors.Color;
 using ColorMethod = Autodesk.AutoCAD.Colors.ColorMethod;
 using iSurvey.Modules.Terrain;
+using iSurvey.UI;
 
 namespace iSurvey.Modules.Tuyen;
 
@@ -169,29 +170,53 @@ public static class RouteService
             var space = (BlockTableRecord)tr.GetObject(doc.Database.CurrentSpaceId, OpenMode.ForWrite);
             ResolveStationStyle(doc, curve, out var height, out var tick, out var textOffset);
 
-            for (var chain = from; chain <= to + 1e-6; chain += step)
+            var estimate = Math.Max(1, (int)Math.Ceiling((to - from) / step) + 2);
+            var progress = TaskProgressWindow.ShowNew(
+                "iSurvey — Phát sinh cọc",
+                "Đang phát sinh cọc trên tuyến",
+                $"0 / ~{estimate:N0} cọc…");
+            try
             {
-                var use = Math.Min(chain, to);
-                AddStation(tr, doc, space, curve, route, terrain, stations, use, start, length, height, tick, textOffset, ref missingZ, false);
-                if (Math.Abs(use - to) <= 1e-6)
-                    break;
+                for (var chain = from; chain <= to + 1e-6; chain += step)
+                {
+                    if (progress.Cancelled)
+                        break;
+                    var use = Math.Min(chain, to);
+                    AddStation(tr, doc, space, curve, route, terrain, stations, use, start, length, height, tick, textOffset, ref missingZ, false);
+                    if (stations.Count == 1 || stations.Count % 20 == 0)
+                        progress.Report(stations.Count, estimate, $"Đã tạo {stations.Count:N0} cọc…");
+                    if (Math.Abs(use - to) <= 1e-6)
+                        break;
+                }
+
+                if (!progress.Cancelled
+                    && (stations.Count == 0 || Math.Abs(stations[stations.Count - 1].Chainage - to) > 1e-4))
+                    AddStation(tr, doc, space, curve, route, terrain, stations, to, start, length, height, tick, textOffset, ref missingZ, false);
+
+                // Bắt buộc có cọc tại mọi đỉnh polyline nằm trong khoảng lý trình.
+                if (!progress.Cancelled)
+                {
+                    progress.Report(stations.Count, estimate, "Đang thêm cọc tại đỉnh polyline…");
+                    foreach (var alongCurve in VertexDistancesAlong(tr, curve))
+                    {
+                        if (progress.Cancelled)
+                            break;
+                        var distance = route.Reversed ? length - alongCurve : alongCurve;
+                        var chainage = start + distance;
+                        if (chainage < from - 1e-6 || chainage > to + 1e-6)
+                            continue;
+                        AddStation(tr, doc, space, curve, route, terrain, stations, chainage, start, length, height, tick, textOffset, ref missingZ, false);
+                    }
+                }
+
+                stations.Sort((a, b) => a.Chainage.CompareTo(b.Chainage));
+                progress.Report(stations.Count, Math.Max(stations.Count, 1), $"Hoàn tất {stations.Count:N0} cọc.");
+                tr.Commit();
             }
-
-            if (stations.Count == 0 || Math.Abs(stations[stations.Count - 1].Chainage - to) > 1e-4)
-                AddStation(tr, doc, space, curve, route, terrain, stations, to, start, length, height, tick, textOffset, ref missingZ, false);
-
-            // Bắt buộc có cọc tại mọi đỉnh polyline nằm trong khoảng lý trình.
-            foreach (var alongCurve in VertexDistancesAlong(tr, curve))
+            finally
             {
-                var distance = route.Reversed ? length - alongCurve : alongCurve;
-                var chainage = start + distance;
-                if (chainage < from - 1e-6 || chainage > to + 1e-6)
-                    continue;
-                AddStation(tr, doc, space, curve, route, terrain, stations, chainage, start, length, height, tick, textOffset, ref missingZ, false);
+                progress.ForceClose();
             }
-
-            stations.Sort((a, b) => a.Chainage.CompareTo(b.Chainage));
-            tr.Commit();
         }
 
         route.Stations = stations;

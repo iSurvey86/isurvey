@@ -61,7 +61,7 @@ Tham số mặc định trong `ads-config.xml` (`DTMSETTING`): cạnh dài nhấ
 - **Vào mô hình:** polyline 3D (hoặc đường có Z) làm cạnh bắt buộc khi tam giác hóa.
 - **Ra khỏi mô hình:** vẽ lại đồng mức sau khi đã có TIN (và tùy chọn tự cập nhật khi rebuild).
 
-iSurvey 1.8.16: nhập điểm, `GHISODM` ghi số đồng mức, mô hình đặt tên (`TAOMOHINH`), thêm điểm / đứt gãy / đồng mức / đường bao (`THEMMOHINH`), xây dựng lưới (`XAYMOHINH`). Không lọc cạnh dài. Đứt gãy và đồng mức là cạnh bắt buộc. Đường bao là chỗ cắt duy nhất. Thêm điểm mở hộp chọn loại: điểm, block, chữ số (bật sẵn), «Block + chữ cao độ cạnh» (XY block, Z chữ gần nhất, không sửa CAD), và đường nối điểm (tắt sẵn, chỉ lấy đỉnh). Không có mục «đối tượng khác», mặt 3D hay đám mây điểm. `ANTIN` ẩn hoặc hiện lưới của mô hình. `TRACAOD` lấy cao độ trên lưới. Có tuyến và cọc; `VEMCD` chưa có.
+iSurvey 1.8.16: nhập điểm, `GHISODM` ghi số đồng mức, mô hình đặt tên (`TAOMOHINH`), thêm điểm / đứt gãy / đồng mức / đường bao (`THEMMOHINH`), xây dựng lưới (`XAYMOHINH`). Không lọc cạnh dài. Đứt gãy và đồng mức là cạnh bắt buộc. Đường bao là chỗ cắt duy nhất. Thêm điểm mở hộp chọn loại: điểm, block, chữ số (bật sẵn), «Block + chữ cao độ cạnh» (XY block, Z chữ gần nhất, không sửa CAD), và đường nối điểm (tắt sẵn, chỉ lấy đỉnh). Không có mục «đối tượng khác», mặt 3D hay đám mây điểm. `ANTIN` ẩn hoặc hiện lưới của mô hình. `TRACAOD` lấy cao độ trên lưới. Có tuyến và cọc; `VEMCD` vẽ mặt cắt trên Model (đầu bảng + đường đất); `RAIMCD` chỉ rải khung.
 
 ### 2.2 Road — tuyến bám bề mặt, rồi mới cọc và TD
 
@@ -116,7 +116,7 @@ Hai lệnh, không gộp:
 
 | Lệnh | Việc | Trạng thái |
 |------|------|------------|
-| **VEMCD** | **Vẽ** mặt cắt dọc trên Model (đường đất + đầu bảng) | Chưa có. Lệnh mới |
+| **VEMCD** | **Vẽ** mặt cắt dọc trên Model (đường đất + đầu bảng) | Có từ 1.8.16 |
 | **RAIMCD** | **Rải khung in** lên mặt cắt **đã vẽ** | Giữ nguyên, không đổi vai trò |
 
 `RAIMCD` không vẽ mặt cắt. Hình `VEMCD` phải vừa cách `RAIMCD` đang đo (góc hàng cuối, cột tên, tỷ lệ), để không phải sửa lệnh rải khung.

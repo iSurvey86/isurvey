@@ -5,6 +5,7 @@ using Autodesk.AutoCAD.Geometry;
 using iSurvey.Core;
 using iSurvey.Models;
 using iSurvey.Modules.Map;
+using iSurvey.UI;
 using AcadColor = Autodesk.AutoCAD.Colors.Color;
 
 namespace iSurvey.Modules.Import;
@@ -51,19 +52,38 @@ internal static class KmlDrawService
 
         var space = (BlockTableRecord)tr.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForWrite);
         var zone = CoordinateService.NormalizeZoneWidth(zoneWidthDegrees);
-
-        foreach (var shape in shapes)
+        var progress = shapes.Count >= 20
+            ? TaskProgressWindow.ShowNew(
+                "iSurvey — Nhập KML",
+                "Đang vẽ đối tượng KML",
+                $"0 / {shapes.Count:N0}…")
+            : null;
+        try
         {
-            if (shape.IsPoint)
+            for (var i = 0; i < shapes.Count; i++)
             {
-                DrawPoint(tr, space, shape, coordinates, centralMeridian, zone, insertPoints, labelNames, textHeight, report);
-                continue;
+                if (progress?.Cancelled == true)
+                    break;
+                if (progress is not null && (i == 0 || i % 25 == 0 || i + 1 == shapes.Count))
+                    progress.Report(i + 1, shapes.Count, $"Đã vẽ {i + 1:N0} / {shapes.Count:N0} đối tượng…");
+
+                var shape = shapes[i];
+                if (shape.IsPoint)
+                {
+                    DrawPoint(tr, space, shape, coordinates, centralMeridian, zone, insertPoints, labelNames, textHeight, report);
+                    continue;
+                }
+
+                DrawCurve(tr, space, shape, coordinates, centralMeridian, zone, simplifyVertices, simplifyTolerance, report);
             }
 
-            DrawCurve(tr, space, shape, coordinates, centralMeridian, zone, simplifyVertices, simplifyTolerance, report);
+            tr.Commit();
+        }
+        finally
+        {
+            progress?.ForceClose();
         }
 
-        tr.Commit();
         return report;
     }
 

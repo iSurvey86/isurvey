@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using Autodesk.AutoCAD.ApplicationServices;
 using iSurvey.Modules.Terrain;
 using iSurvey.Modules.Tuyen;
+using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 
 namespace iSurvey.UI.Palette;
 
@@ -256,13 +257,37 @@ internal sealed class PaletteViewModel : ObservableObject
 
     private static TreeNodeViewModel Profile()
     {
+        List<iSurvey.Modules.Profile.ProfileRecord> profiles;
+        try
+        {
+            var doc = AcadApp.DocumentManager.MdiActiveDocument;
+            profiles = doc is null
+                ? new List<iSurvey.Modules.Profile.ProfileRecord>()
+                : iSurvey.Modules.Profile.ProfileStore.Load(doc.Database);
+        }
+        catch
+        {
+            profiles = new List<iSurvey.Modules.Profile.ProfileRecord>();
+        }
+
         var node = new TreeNodeViewModel(
             "Trắc dọc",
             "Phải chuột để tạo...",
-            "Chưa có mặt cắt. Vẽ bằng VEMCD, chưa làm. RAIMCD chỉ rải khung in.",
+            profiles.Count == 0
+                ? "Chưa có mặt cắt. Vẽ bằng VEMCD. RAIMCD chỉ rải khung in."
+                : profiles.Count + " mặt cắt.",
             "Profile");
-        node.Actions.Add(new NodeAction("Vẽ mặt cắt (chưa làm)", PaletteCommands.Later(
-            "Vẽ mặt cắt là lệnh VEMCD, chưa làm. RAIMCD chỉ rải khung in.")));
+        node.Actions.Add(new NodeAction("Vẽ mặt cắt dọc...", PaletteCommands.Run("VEMCD")));
+        foreach (var profile in profiles)
+        {
+            var child = new TreeNodeViewModel(profile.Name, "", profile.Summary(), "Profile")
+            {
+                Tag = profile.Id
+            };
+            child.Actions.Add(new NodeAction("Vẽ mặt cắt dọc...", PaletteCommands.Run("VEMCD")));
+            node.Children.Add(child);
+        }
+
         return node;
     }
 
