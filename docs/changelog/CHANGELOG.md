@@ -2,7 +2,7 @@
 
 ## 1.8.17 — 2026-11-03
 
-Chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14. Gộp các thay đổi đã làm dưới số 1.8.16 (chưa đóng gói) và bump lên 1.8.17.
+Đã phát hành. Gộp các thay đổi đã làm dưới số 1.8.16 (chưa đóng gói) và bump lên 1.8.17.
 
 ### Tiến trình
 

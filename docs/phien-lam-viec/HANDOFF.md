@@ -5,9 +5,34 @@
 
 ---
 
-## 2026-11-03 — VEMCD + hộp tiến trình, bump 1.8.17 (chưa phát hành)
+## 2026-11-03 — Phát hành 1.8.17
 
-**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ. **Bump 1.8.16 → 1.8.17.** Chưa phát hành. Gói UPD trên máy chủ vẫn là 1.8.14.
+**Máy / ngữ cảnh:** Cursor — máy văn phòng. Đã chạy `publish-release.ps1`. **Đã phát hành 1.8.17.**
+
+### Đã chốt / đã làm
+
+- Upload `iSurvey-Setup-1.8.17.zip` + `version.json` lên Storage `isurvey-releases` (trước đó server là 1.8.14).
+- Nội dung chính: **VEMCD**, hộp tiến trình các lệnh dài, tuyến/cọc/TIN đã gộp từ 1.8.16 chưa phát hành.
+
+### Việc tiếp
+
+- [ ] Video VEMCD / D2C 1.8.17 và tuyến-cọc chưa quay. YouTube vẫn thiếu `client_secret.json`.
+- [ ] Bản vẽ công trình: chạy lại UAVCLIP/RAIMCD nếu layout cũ còn lệch (phiên trước).
+- [ ] Máy đang dùng bản cũ: `UPD` hoặc cài zip Setup mới.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff đầu. iSurvey 1.8.17 đã phát hành. VEMCD vẽ mặt cắt trên Model; RAIMCD chỉ rải khung. Nhiều lệnh dài có hộp tiến trình. Tiếp: quay video khi được yêu cầu, hoặc việc mới.
+```
+
+**Lưu trữ ngày:** [2026-11-03-vemcd-tien-trinh.md](./2026-11-03-vemcd-tien-trinh.md)
+
+---
+
+## 2026-11-03 — VEMCD + hộp tiến trình, bump 1.8.17 (trước phát hành)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ. **Bump 1.8.16 → 1.8.17.** Sau đó đã phát hành (xem block trên).
 
 ### Đã chốt / đã làm
 
@@ -26,14 +51,14 @@
 
 ### Việc tiếp
 
-- [ ] Chưa phát hành 1.8.17. Gói UPD trên máy chủ vẫn là 1.8.14.
+- [x] Đã phát hành 1.8.17 (block trên).
 - [ ] Video VEMCD / D2C 1.8.17 và các lệnh tuyến-cọc chưa quay. YouTube vẫn thiếu `client_secret.json`.
 - [ ] Bản vẽ công trình: chạy lại UAVCLIP/RAIMCD nếu layout cũ còn lệch (phiên trước).
 
 ### Câu mở phiên sau
 
 ```text
-git pull, đọc handoff đầu. iSurvey 1.8.17, chưa phát hành. VEMCD vẽ mặt cắt trên Model; RAIMCD chỉ rải khung. Nhiều lệnh dài có hộp tiến trình (DGN, UAV, cọc, TAB…). Tiếp: phát hành 1.8.17 khi được yêu cầu, hoặc quay video khi được yêu cầu.
+git pull, đọc handoff đầu. iSurvey 1.8.17 đã phát hành. VEMCD vẽ mặt cắt trên Model; RAIMCD chỉ rải khung. Nhiều lệnh dài có hộp tiến trình. Tiếp: quay video khi được yêu cầu, hoặc việc mới.
 ```
 
 **Lưu trữ ngày:** [2026-11-03-vemcd-tien-trinh.md](./2026-11-03-vemcd-tien-trinh.md)

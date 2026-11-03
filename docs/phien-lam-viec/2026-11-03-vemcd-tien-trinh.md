@@ -1,6 +1,6 @@
 # 2026-11-03 — VEMCD + hộp tiến trình, bump 1.8.17
 
-**Phiên bản:** 1.8.17 (chưa phát hành). Gói UPD máy chủ vẫn 1.8.14.
+**Phiên bản:** 1.8.17 — **đã phát hành** 2026-11-03 (`iSurvey-Setup-1.8.17.zip` + `version.json`).
 
 ## Đã làm
 
@@ -19,5 +19,5 @@
 
 ## Việc còn lại
 
-- Phát hành 1.8.17 khi được yêu cầu (`phát hành`).
 - Quay video khi được yêu cầu («làm video»).
+- Máy bản cũ: `UPD` hoặc cài zip Setup mới.
