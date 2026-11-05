@@ -214,8 +214,8 @@ public static class AiToolRegistry
     {
         var items = new[]
         {
-            new { cmd = "GOC", desc = "Danh so goc tuyen" },
-            new { cmd = "DUOITUYEN", desc = "Duoi thang tuyen + bang goc txt" },
+            new { cmd = "GOC", desc = "Danh so goc tuyen + xuat MoTaTuyen.txt" },
+            new { cmd = "DUOITUYEN", desc = "Duoi thang tuyen, tim net dut" },
             new { cmd = "KHUNG", desc = "Chen khung ban do chuan A0-A4, ty le 1/200..1/5000 + luoi toa do" },
             new { cmd = "KHUNGBV", desc = "Chen khung ban ve ky thuat A0-A4, ty le 1/200..1/5000 (khong luoi toa do)" },
             new { cmd = "UAVCLIP", desc = "Cat anh UAV theo bien / Auto-Clip" },

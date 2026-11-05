@@ -1,0 +1,39 @@
+{
+  "id": "duoituyen-1.8.17",
+  "command": "DUOITUYEN",
+  "commandFull": "ISURVEY_STRIP_MAP",
+  "feature": "Duỗi thẳng tuyến",
+  "version": "1.8.17",
+  "title": "Duỗi thẳng tuyến phiên bản 1.8.17",
+  "privacy": "unlisted",
+  "voice": "vi-VN-HoaiMyNeural",
+  "rate": "-8%",
+  "tags": ["iSurvey", "Civil 3D", "duỗi tuyến", "DUOITUYEN"],
+  "description": "Cách duỗi thẳng tuyến bằng iSurvey.\n\nHành vi trong video có từ iSurvey 1.8.17 (lệnh DUOITUYEN, lệnh đủ ISURVEY_STRIP_MAP).\nSau duỗi có polyline nét đứt tim. Bảng góc text dùng lệnh GOC.",
+  "shots": [
+    {
+      "id": "01-mo-dau",
+      "type": "card",
+      "lines": ["Duỗi thẳng tuyến", "phiên bản 1.8.17"],
+      "narration": "Duỗi thẳng tuyến, phiên bản một chấm tám chấm mười bảy. Xếp các đoạn theo một đường ngang, có tim nét đứt."
+    },
+    {
+      "id": "02-lenh",
+      "type": "screen",
+      "action": "Gõ DUOITUYEN. Chọn đối tượng, chọn tim, điểm đầu, hành lang, điểm chèn.",
+      "narration": "Gõ D U O I T U Y E N. Chọn ảnh và nét cần duỗi, rồi chọn polyline tim và điểm đầu."
+    },
+    {
+      "id": "03-ket-qua",
+      "type": "screen",
+      "action": "Zoom dải đã duỗi — polyline nét đứt ở giữa.",
+      "narration": "Dải đã thẳng. Tim là đường nét đứt, độ rộng vừa để in vẫn nhìn rõ."
+    },
+    {
+      "id": "04-ket",
+      "type": "card",
+      "lines": ["Tim nét đứt trên sơ họa", "Bảng góc: lệnh GOC"],
+      "narration": "Xong. Muốn bảng góc text thì chạy lệnh G O C trên tim gốc."
+    }
+  ]
+}

@@ -108,20 +108,23 @@ public sealed class RouteModule
         }
 
         var models = new List<RouteModelChoice>();
+        string? preferredTerrainId = null;
         try
         {
             foreach (var model in TerrainStore.Load(doc.Database))
                 models.Add(new RouteModelChoice { Id = model.Id, Name = model.Name });
+            preferredTerrainId = TerrainStore.LastCreated(doc.Database)?.Id;
         }
         catch (System.Exception)
         {
             models.Clear();
+            preferredTerrainId = null;
         }
 
         CreateRouteRequest? request;
         try
         {
-            request = CreateRouteWindow.Prompt("Tuyến " + count, models);
+            request = CreateRouteWindow.Prompt("Tuyến " + count, models, preferredTerrainId);
         }
         catch (System.Exception ex)
         {
@@ -209,11 +212,7 @@ public sealed class RouteModule
         CreateStationsRequest? request;
         try
         {
-            request = CreateStationsWindow.Prompt(
-                route.Name,
-                from,
-                to,
-                !string.IsNullOrWhiteSpace(route.TerrainId));
+            request = CreateStationsWindow.Prompt(route.Name, from, to);
         }
         catch (System.Exception ex)
         {

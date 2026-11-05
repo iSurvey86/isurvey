@@ -196,9 +196,9 @@ public static class RibbonBuilder
                 [
                     new Btn("Rải Móng &\nBiên Đất", "RAIMONG", RibbonIcons.RaiMong, false),
                     new Btn("Đánh Số\nGóc Tuyến", "ISURVEY_NUMBER_VERTICES", RibbonIcons.DanhSoGoc, true,
-                        "Đánh số góc tim tuyến — chấm đỏ + chữ né đường (GOC)"),
+                        "Đánh số góc tim tuyến — chấm đỏ + chữ né đường, xuất mô tả tuyến .txt (GOC)"),
                     new Btn("Duỗi Thẳng\nTuyến", "ISURVEY_STRIP_MAP", RibbonIcons.DuoiTuyen, true,
-                        "Duỗi ảnh UAV và đối tượng CAD theo tim tuyến, xuất bảng góc (DUOITUYEN)")
+                        "Duỗi ảnh UAV và đối tượng CAD theo tim tuyến, vẽ tim nét đứt (DUOITUYEN)")
                 ],
                 [
                     new Btn("Tạo Biên Đường Tạm", "BIENDUONGTAM", RibbonIcons.BienDuongTam, false),

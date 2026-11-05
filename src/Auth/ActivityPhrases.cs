@@ -57,9 +57,9 @@ internal static class ActivityPhrases
         ["CATBD"] = "CBD (cắt bình đồ theo đường biên)",
         ["CBD"] = "CBD (cắt bình đồ theo đường biên)",
 
-        ["StripMapCommand"] = "DUOITUYEN (duỗi thẳng tuyến, xuất bảng góc)",
-        ["ISURVEY_STRIP_MAP"] = "DUOITUYEN (duỗi thẳng tuyến, xuất bảng góc)",
-        ["DUOITUYEN"] = "DUOITUYEN (duỗi thẳng tuyến, xuất bảng góc)",
+        ["StripMapCommand"] = "DUOITUYEN (duỗi thẳng tuyến, tim nét đứt)",
+        ["ISURVEY_STRIP_MAP"] = "DUOITUYEN (duỗi thẳng tuyến, tim nét đứt)",
+        ["DUOITUYEN"] = "DUOITUYEN (duỗi thẳng tuyến, tim nét đứt)",
 
         ["FrameCommand"] = "KHUNG (chèn khung bản đồ)",
         ["ISURVEY_KHUNG"] = "KHUNG (chèn khung bản đồ)",
@@ -106,9 +106,9 @@ internal static class ActivityPhrases
         ["ISURVEY_FIT_TITLE"] = "CODAN (co chữ chủ đầu tư về một dòng)",
         ["CODAN"] = "CODAN (co chữ chủ đầu tư về một dòng)",
 
-        ["NumberVerticesCommand"] = "GOC (đánh số góc tuyến)",
-        ["ISURVEY_NUMBER_VERTICES"] = "GOC (đánh số góc tuyến)",
-        ["GOC"] = "GOC (đánh số góc tuyến)",
+        ["NumberVerticesCommand"] = "GOC (đánh số góc tuyến, xuất mô tả txt)",
+        ["ISURVEY_NUMBER_VERTICES"] = "GOC (đánh số góc tuyến, xuất mô tả txt)",
+        ["GOC"] = "GOC (đánh số góc tuyến, xuất mô tả txt)",
         ["STT"] = "STT (đánh số thứ tự tại điểm click)",
         ["SequenceCommand"] = "STT (đánh số thứ tự tại điểm click)",
         ["NHAPDIEM"] = "NHAPDIEM (nhập điểm đo từ tệp tọa độ)",

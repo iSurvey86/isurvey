@@ -435,6 +435,21 @@ public static class TerrainService
             doc.Editor.WriteMessage("\n[iSurvey] Chưa có đường bao. Lưới giữ bao lồi, kể cả tam giác dài giữa các cụm điểm.");
         if (unforced > 0)
             doc.Editor.WriteMessage("\n[iSurvey] " + unforced + " cạnh đứt gãy hoặc đồng mức chưa ép được vào lưới.");
+
+        // Thang màu theo cao độ (chỉ để nhìn QC): xanh thấp → đỏ cao.
+        var zMin = double.PositiveInfinity;
+        var zMax = double.NegativeInfinity;
+        foreach (var tri in triangles)
+        {
+            var z = (tri.A.Z + tri.B.Z + tri.C.Z) / 3.0;
+            if (z < zMin) zMin = z;
+            if (z > zMax) zMax = z;
+        }
+
+        var zSpan = zMax - zMin;
+        if (zSpan < 1e-9)
+            zSpan = 1.0;
+
         using (doc.LockDocument())
         using (var tr = doc.Database.TransactionManager.StartTransaction())
         {
@@ -464,7 +479,9 @@ public static class TerrainService
                     true, true, true, true);
                 face.SetDatabaseDefaults();
                 face.Layer = model.Layer;
-                face.Color = AcadColor.FromColorIndex(ColorMethod.ByLayer, 256);
+                var zAvg = (tri.A.Z + tri.B.Z + tri.C.Z) / 3.0;
+                var t = (zAvg - zMin) / zSpan;
+                face.Color = ElevationRampColor(t);
                 face.Visible = model.MeshVisible;
                 space.AppendEntity(face);
                 tr.AddNewlyCreatedDBObject(face, true);
@@ -478,8 +495,76 @@ public static class TerrainService
 
         model.SetTriangles(triangles);
         TerrainStore.Save(doc.Database, model);
+        TrySetShadedVisualStyle(doc);
         doc.Editor.Regen();
+        doc.Editor.WriteMessage(
+            $"\n[iSurvey] Đã tô màu theo cao độ Z {zMin:0.###} … {zMax:0.###} m (xanh→đỏ). " +
+            "Chỉ để nhìn; ANTIN để ẩn. Visual Style Conceptual/Realistic nếu chưa thấy mặt tô.");
         return triangles.Count;
+    }
+
+    /// <summary>Thang màu QC: t=0 xanh dương, t=1 đỏ (HSV hue 240→0).</summary>
+    private static AcadColor ElevationRampColor(double t)
+    {
+        if (t < 0) t = 0;
+        else if (t > 1) t = 1;
+        var hue = (1.0 - t) * 240.0;
+        HsvToRgb(hue, 0.88, 0.92, out var r, out var g, out var b);
+        return AcadColor.FromRgb(r, g, b);
+    }
+
+    private static void HsvToRgb(double h, double s, double v, out byte r, out byte g, out byte b)
+    {
+        h %= 360.0;
+        if (h < 0) h += 360.0;
+        var c = v * s;
+        var x = c * (1.0 - Math.Abs(h / 60.0 % 2.0 - 1.0));
+        var m = v - c;
+        double rp, gp, bp;
+        if (h < 60) { rp = c; gp = x; bp = 0; }
+        else if (h < 120) { rp = x; gp = c; bp = 0; }
+        else if (h < 180) { rp = 0; gp = c; bp = x; }
+        else if (h < 240) { rp = 0; gp = x; bp = c; }
+        else if (h < 300) { rp = x; gp = 0; bp = c; }
+        else { rp = c; gp = 0; bp = x; }
+
+        r = ToByte((rp + m) * 255.0);
+        g = ToByte((gp + m) * 255.0);
+        b = ToByte((bp + m) * 255.0);
+    }
+
+    private static byte ToByte(double value)
+    {
+        var n = (int)Math.Round(value);
+        if (n < 0) return 0;
+        if (n > 255) return 255;
+        return (byte)n;
+    }
+
+    /// <summary>Chuyển viewport hiện tại sang Conceptual để thấy mặt Face tô màu (không bắt buộc in).</summary>
+    private static void TrySetShadedVisualStyle(Autodesk.AutoCAD.ApplicationServices.Document doc)
+    {
+        try
+        {
+            using var tr = doc.Database.TransactionManager.StartTransaction();
+            var dictId = doc.Database.VisualStyleDictionaryId;
+            if (dictId.IsNull)
+                return;
+            var dict = (DBDictionary)tr.GetObject(dictId, OpenMode.ForRead);
+            if (!dict.Contains("Conceptual"))
+                return;
+            var styleId = dict.GetAt("Conceptual");
+            var vpTable = (ViewportTable)tr.GetObject(doc.Database.ViewportTableId, OpenMode.ForRead);
+            if (!vpTable.Has("*Active"))
+                return;
+            var vp = (ViewportTableRecord)tr.GetObject(vpTable["*Active"], OpenMode.ForWrite);
+            vp.VisualStyleId = styleId;
+            tr.Commit();
+        }
+        catch
+        {
+            // Một số cấu hình CAD không đổi được Visual Style — bỏ qua.
+        }
     }
 
     public static bool Toggle(Autodesk.AutoCAD.ApplicationServices.Document doc, TerrainRecord model)

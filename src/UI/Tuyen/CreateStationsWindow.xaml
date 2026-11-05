@@ -39,8 +39,7 @@
                 <TextBlock Text="Đến lý trình (m)" Foreground="#374151" Margin="0,0,0,4"/>
                 <TextBox x:Name="ToBox" Padding="8,6" Margin="0,0,0,10"/>
                 <TextBlock Text="Bước cọc (m)" Foreground="#374151" Margin="0,0,0,4"/>
-                <TextBox x:Name="StepBox" Padding="8,6" Text="20" Margin="0,0,0,10"/>
-                <TextBlock x:Name="HintText" Foreground="#64748B" TextWrapping="Wrap" FontSize="12"/>
+                <TextBox x:Name="StepBox" Padding="8,6" Text="20"/>
             </StackPanel>
             <Border Grid.Row="2" Background="#F8FAFC" CornerRadius="0,0,12,12" Padding="16,12">
                 <DockPanel LastChildFill="False">

@@ -17,6 +17,14 @@ public static class TerrainStore
 
     public static List<TerrainRecord> Load(Database db)
     {
+        var list = LoadInStoreOrder(db);
+        list.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCultureIgnoreCase));
+        return list;
+    }
+
+    /// <summary>Thứ tự ghi vào dictionary (mô hình tạo sau đứng sau).</summary>
+    public static List<TerrainRecord> LoadInStoreOrder(Database db)
+    {
         var list = new List<TerrainRecord>();
         using var tr = db.TransactionManager.StartTransaction();
         var nod = (DBDictionary)tr.GetObject(db.NamedObjectsDictionaryId, OpenMode.ForRead);
@@ -53,8 +61,13 @@ public static class TerrainStore
         }
 
         tr.Commit();
-        list.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCultureIgnoreCase));
         return list;
+    }
+
+    public static TerrainRecord? LastCreated(Database db)
+    {
+        var list = LoadInStoreOrder(db);
+        return list.Count == 0 ? null : list[list.Count - 1];
     }
 
     public static void Save(Database db, TerrainRecord model)

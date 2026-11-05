@@ -27,7 +27,7 @@ public partial class CreateRouteWindow : Window
 {
     public CreateRouteRequest? Request { get; private set; }
 
-    public CreateRouteWindow(string suggestedName, IReadOnlyList<RouteModelChoice> models)
+    public CreateRouteWindow(string suggestedName, IReadOnlyList<RouteModelChoice> models, string? preferredTerrainId = null)
     {
         InitializeComponent();
         NameBox.Text = suggestedName;
@@ -35,12 +35,32 @@ public partial class CreateRouteWindow : Window
         ModelBox.Items.Add(new RouteModelChoice { Id = "", Name = "Chưa gắn" });
         foreach (var model in models)
             ModelBox.Items.Add(model);
-        ModelBox.SelectedIndex = 0;
+
+        var index = 0;
+        if (!string.IsNullOrWhiteSpace(preferredTerrainId))
+        {
+            for (var i = 1; i < ModelBox.Items.Count; i++)
+            {
+                if (ModelBox.Items[i] is RouteModelChoice choice
+                    && string.Equals(choice.Id, preferredTerrainId, StringComparison.OrdinalIgnoreCase))
+                {
+                    index = i;
+                    break;
+                }
+            }
+        }
+        else if (models.Count > 0)
+            index = 1;
+
+        ModelBox.SelectedIndex = index;
     }
 
-    public static CreateRouteRequest? Prompt(string suggestedName, IReadOnlyList<RouteModelChoice> models)
+    public static CreateRouteRequest? Prompt(
+        string suggestedName,
+        IReadOnlyList<RouteModelChoice> models,
+        string? preferredTerrainId = null)
     {
-        var window = new CreateRouteWindow(suggestedName, models);
+        var window = new CreateRouteWindow(suggestedName, models, preferredTerrainId);
         AcadApp.ShowModalWindow(window);
         return window.Request;
     }

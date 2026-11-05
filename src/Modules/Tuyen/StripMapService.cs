@@ -1,5 +1,3 @@
-using System.Globalization;
-using System.Text;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.DatabaseServices.Filters;
@@ -17,13 +15,14 @@ namespace iSurvey.Modules.Tuyen;
 
 /// <summary>
 /// Duỗi thẳng tuyến: RasterImage (clip pixel) + CAD (anonymous block + SpatialFilter).
-/// Mỗi đoạn xoay cho song song trục X rồi xếp nối tiếp. Tọa độ trong file .txt là tọa độ gốc.
-/// Một transaction + undo mark = một lần UNDO.
+/// Mỗi đoạn xoay cho song song trục X rồi xếp nối tiếp. Sau duỗi vẽ polyline nét đứt tim.
+/// Bảng góc .txt xuất bằng lệnh GOC. Một transaction + undo mark = một lần UNDO.
 /// </summary>
 public sealed class StripMapService
 {
     private const string OutLayer = "ISURVEY_STRIP";
     private const string GocLayer = "ISURVEY_GOC_TUYEN";
+    private const string DashLinetype = "DASHED";
     private const double BulgeTol = 1e-8;
     [CommandMethod("ISURVEY_STRIP_MAP")]
     public void StripMapCommand()
@@ -194,23 +193,6 @@ public sealed class StripMapService
 
         var insert0 = ppr.Value.TransformBy(ed.CurrentUserCoordinateSystem);
 
-        var dlg = new Microsoft.Win32.SaveFileDialog
-        {
-            Title = "Lưu bảng góc tuyến",
-            Filter = "Text (*.txt)|*.txt",
-            DefaultExt = "txt",
-            FileName = "BangGocTuyen.txt",
-            AddExtension = true,
-            OverwritePrompt = true
-        };
-        if (dlg.ShowDialog() != true || string.IsNullOrWhiteSpace(dlg.FileName))
-        {
-            ed.WriteMessage("\n[iSurvey] Đã hủy lưu file.");
-            return;
-        }
-
-        var txtPath = dlg.FileName;
-        var report = new StringBuilder();
         var imageCount = 0;
         var blockCount = 0;
         var labelCount = 0;
@@ -341,7 +323,9 @@ public sealed class StripMapService
                     order.MoveToBottom(imageOut);
                 }
 
-                report.Append(BuildReport(vertices, names.Labels));
+                // Tim duỗi: polyline nét đứt nối các đỉnh đã thẳng hàng theo trục X.
+                AddStraightenedCenterline(tr, db, space, layerId, vertices, insert0, halfWidth);
+
                 tr.Commit();
             }
         }
@@ -359,32 +343,82 @@ public sealed class StripMapService
             catch { /* ignore */ }
         }
 
-        File.WriteAllText(txtPath, report.ToString(), new UTF8Encoding(encoderShouldEmitUTF8Identifier: true));
-        try
-        {
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(txtPath)
-            {
-                UseShellExecute = true
-            });
-        }
-        catch (System.Exception ex)
-        {
-            ed.WriteMessage($"\n[iSurvey] Không mở được file: {ex.Message}");
-        }
-
         ActivityLogger.Enqueue("strip_map", "ISURVEY_STRIP_MAP", new
         {
             segments = vertices.Count - 1,
             images = imageCount,
             blocks = blockCount,
             labels = labelCount,
-            file = ActivityLogger.FileName(txtPath),
             drawing = ActivityLogger.FileName(doc.Database.Filename)
         });
 
         ed.WriteMessage(
             $"\n[iSurvey] Duỗi tuyến xong: {vertices.Count - 1} đoạn, {imageCount} ảnh, {blockCount} block cắt, {labelCount} nhãn. " +
-            $"Layer {OutLayer}. File: {txtPath}. Một lần UNDO để hoàn tác.");
+            $"Layer {OutLayer} (tim nét đứt). Bảng góc: lệnh GOC. Một lần UNDO để hoàn tác.");
+    }
+
+    /// <summary>
+    /// Polyline nét đứt qua các đỉnh đã duỗi. ConstantWidth 0.2–0.5 theo hành lang; LTSCALE để dash rõ khi in.
+    /// </summary>
+    private static void AddStraightenedCenterline(
+        Transaction tr, Database db, BlockTableRecord space, ObjectId layerId,
+        IReadOnlyList<Point3d> vertices, Point3d insert0, double halfWidth)
+    {
+        if (vertices.Count < 2)
+            return;
+
+        var width = halfWidth / 280.0;
+        if (width < 0.2) width = 0.2;
+        if (width > 0.5) width = 0.5;
+        // DASHED chuẩn ~0.5/-0.25: LTSCALE sao cho đoạn nét ~2.5–4 mm giấy khi sơ họa cùng cỡ hành lang.
+        var ltScale = halfWidth / 25.0;
+        if (ltScale < 4.0) ltScale = 4.0;
+        if (ltScale > 12.0) ltScale = 12.0;
+        var ltId = EnsureDashedLinetype(tr, db);
+
+        var pl = new Polyline
+        {
+            LayerId = layerId,
+            Color = AcadColor.FromColorIndex(ColorMethod.ByLayer, 256),
+            ConstantWidth = width,
+            LinetypeScale = ltScale
+        };
+        if (!ltId.IsNull)
+            pl.LinetypeId = ltId;
+
+        var x = insert0.X;
+        pl.AddVertexAt(0, new Point2d(x, insert0.Y), 0, width, width);
+        for (var i = 0; i < vertices.Count - 1; i++)
+        {
+            x += Dist2d(vertices[i], vertices[i + 1]);
+            pl.AddVertexAt(i + 1, new Point2d(x, insert0.Y), 0, width, width);
+        }
+
+        space.AppendEntity(pl);
+        tr.AddNewlyCreatedDBObject(pl, true);
+    }
+
+    private static ObjectId EnsureDashedLinetype(Transaction tr, Database db)
+    {
+        var table = (LinetypeTable)tr.GetObject(db.LinetypeTableId, OpenMode.ForRead);
+        if (table.Has(DashLinetype))
+            return table[DashLinetype];
+
+        try
+        {
+            var lin = HostApplicationServices.Current.FindFile("acad.lin", db, FindFileHint.Default);
+            if (!string.IsNullOrEmpty(lin))
+                db.LoadLineTypeFile(DashLinetype, lin);
+        }
+        catch
+        {
+            // thử tên file tương đối
+            try { db.LoadLineTypeFile(DashLinetype, "acad.lin"); }
+            catch { /* Continuous */ }
+        }
+
+        table = (LinetypeTable)tr.GetObject(db.LinetypeTableId, OpenMode.ForRead);
+        return table.Has(DashLinetype) ? table[DashLinetype] : db.ContinuousLinetype;
     }
 
     private static void Partition(
@@ -697,16 +731,7 @@ public sealed class StripMapService
         string prefix, int start, double radius)
     {
         var ids = AssignNearest(vertices, texts, radius);
-        var labels = new string[vertices.Count];
-        var last = vertices.Count - 1;
-        for (var i = 0; i < vertices.Count; i++)
-        {
-            // DD = điểm đầu, DC = điểm cuối, giữa là {prefix}{start}, {prefix}{start+1}, …
-            labels[i] = i == 0 ? "DD"
-                : i == last ? "DC"
-                : $"{prefix}{start + i - 1}";
-        }
-
+        var labels = AngleTableExport.BuildLabels(vertices.Count, prefix, start);
         return (labels, ids);
     }
 
@@ -740,64 +765,6 @@ public sealed class StripMapService
         }
 
         return result;
-    }
-
-    private static string BuildReport(IReadOnlyList<Point3d> v, string[] names)
-    {
-        var sb = new StringBuilder();
-        sb.AppendLine("Tên Điểm,X,Y,Khoảng Cách Cạnh Trước,Góc Rẽ (T/P Độ Phút Giây)");
-        var inv = CultureInfo.InvariantCulture;
-        for (var i = 0; i < v.Count; i++)
-        {
-            var dist = i == 0 ? "" : Dist2d(v[i - 1], v[i]).ToString("0.00", inv);
-            var turn = "";
-            var dms = "";
-            if (i > 0 && i < v.Count - 1)
-            {
-                var vin = Unit(v[i - 1], v[i]);
-                var vout = Unit(v[i], v[i + 1]);
-                var cross = vin.X * vout.Y - vin.Y * vout.X;
-                var dot = vin.X * vout.X + vin.Y * vout.Y;
-                var deg = Math.Atan2(Math.Abs(cross), dot) * 180.0 / Math.PI;
-                if (deg >= 1.0 / 60.0)
-                {
-                    turn = cross > 0 ? "T" : "P";
-                    dms = ToDms(deg);
-                }
-            }
-
-            sb.Append(names[i]).Append(',')
-                .Append(v[i].X.ToString("0.00", inv)).Append(',')
-                .Append(v[i].Y.ToString("0.00", inv)).Append(',')
-                .Append(dist).Append(',')
-                .Append(turn.Length > 0 ? turn + " " + dms : "")
-                .AppendLine();
-        }
-
-        return sb.ToString();
-    }
-
-    private static string ToDms(double degrees)
-    {
-        if (degrees < 0)
-            degrees = 0;
-        var d = (int)Math.Floor(degrees);
-        var minFull = (degrees - d) * 60.0;
-        var m = (int)Math.Floor(minFull + 1e-9);
-        var s = (int)Math.Round((minFull - m) * 60.0, MidpointRounding.AwayFromZero);
-        if (s >= 60)
-        {
-            s = 0;
-            m++;
-        }
-
-        if (m >= 60)
-        {
-            m = 0;
-            d++;
-        }
-
-        return $"{d:00} {m:00} {s:00}";
     }
 
     private static ObjectId EnsureLayer(Transaction tr, Database db)

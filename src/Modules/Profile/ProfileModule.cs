@@ -50,29 +50,42 @@ public sealed class ProfileModule
             return;
         }
 
-        DrawProfileRequest? request;
+        ProfileDrawOptions options;
+        ProfileDialogAction action;
         Point3d insert;
+
         if (seeded)
         {
             var route = routes[0];
-            var datum = ProfileDrawService.SuggestDatum(
-                route.Stations ?? new List<StationRecord>(), 5000, 500, ProfileDrawService.DefaultRowHeight);
-            request = new DrawProfileRequest
-            {
-                Route = route,
-                Name = "MCD " + route.Name,
-                HorizontalScale = 5000,
-                VerticalScale = 500,
-                Datum = datum
-            };
+            options = ProfileSettingsStore.Load();
+            options.RouteId = route.Id;
+            options.ProfileName = "MCD " + route.Name;
+            var samples = route.Stations!
+                .Where(s => s.HasZ)
+                .Select(s => new ProfileSampleService.SamplePoint
+                {
+                    Chainage = s.Chainage,
+                    X = s.X,
+                    Y = s.Y,
+                    Z = s.Z,
+                    HasZ = true,
+                    IsStation = true,
+                    Name = s.Name
+                })
+                .ToList();
+            var bandH = ProfileBandRow.TotalHeight(options.Rows);
+            options.Datum = ProfileDrawService.SuggestDatum(
+                samples, options.HorizontalScale, options.VerticalScale, bandH);
+            action = ProfileDialogAction.Draw;
             insert = Point3d.Origin;
-            ed.WriteMessage("\n[iSurvey] Thử nhanh: vẽ tại gốc (0,0), mức " + datum.ToString("0.###") + ".");
+            ed.WriteMessage("\n[iSurvey] Thử nhanh: vẽ tại gốc (0,0), mức " + options.Datum.ToString("0.###") + ".");
         }
         else
         {
+            DrawProfileDialogResult? dialog;
             try
             {
-                request = DrawProfileWindow.Prompt(routes, RouteContext.TakeRoute());
+                dialog = DrawProfileWindow.Prompt(routes, RouteContext.TakeRoute());
             }
             catch (System.Exception ex)
             {
@@ -80,68 +93,181 @@ public sealed class ProfileModule
                 return;
             }
 
-            if (request is null)
+            if (dialog is null || dialog.Action == ProfileDialogAction.Cancel || dialog.Options is null)
             {
                 ed.WriteMessage("\n[iSurvey] Đã hủy vẽ mặt cắt.");
                 return;
             }
 
-            var pOpts = new PromptPointOptions("\niSurvey: Chỉ góc dưới-trái cột tên (hàng cộng dồn) trên Model: ")
+            options = dialog.Options;
+            action = dialog.Action;
+            ProfileSettingsStore.Save(options);
+
+            if (action == ProfileDialogAction.Draw)
             {
-                AllowNone = false
-            };
-            var pRes = ed.GetPoint(pOpts);
-            if (pRes.Status != PromptStatus.OK)
-            {
-                ed.WriteMessage("\n[iSurvey] Đã hủy — chưa chọn điểm chèn.");
-                return;
+                // Luôn pick vị trí; nếu đã có MCD thì xóa bản cũ rồi vẽ tại điểm mới.
+                var pOpts = new PromptPointOptions("\niSurvey: Chỉ góc dưới-trái cột tên (đáy bảng) trên Model: ")
+                {
+                    AllowNone = false
+                };
+                var pRes = ed.GetPoint(pOpts);
+                if (pRes.Status != PromptStatus.OK)
+                {
+                    ed.WriteMessage("\n[iSurvey] Đã hủy — chưa chọn điểm chèn.");
+                    return;
+                }
+
+                insert = pRes.Value;
             }
-
-            insert = pRes.Value;
+            else
+            {
+                insert = Point3d.Origin;
+            }
         }
-
-        var withZ = request.Route.Stations?.Count(s => s.HasZ) ?? 0;
-        if (withZ < 2)
-        {
-            ed.WriteMessage("\n[iSurvey] Tuyến chưa đủ cọc có Z. Gắn mô hình và chạy PHATSINHCOC.");
-            return;
-        }
-
-        var segs = ProfileDrawService.PlanSegments(
-            request.Route.Stations!,
-            request.Datum,
-            request.HorizontalScale,
-            request.VerticalScale,
-            ProfileDrawService.DefaultRowHeight);
-        var tip = ProfileDrawService.FormatSuggestion(segs);
-        if (!string.IsNullOrEmpty(tip))
-            ed.WriteMessage("\n[iSurvey] " + tip);
 
         try
         {
-            var profile = ProfileDrawService.Draw(
-                doc,
-                request.Route,
-                request.Name,
-                request.HorizontalScale,
-                request.VerticalScale,
-                request.Datum,
-                insert,
-                ProfileDrawService.DefaultLabelWidth,
-                ProfileDrawService.DefaultRowHeight,
-                ProfileDrawService.DefaultTextHeight);
-            ProfileStore.Save(doc.Database, profile);
-            ed.WriteMessage(
-                "\n[iSurvey] Đã vẽ «" + profile.Name + "». "
-                + profile.Summary()
-                + " Rải khung bằng RAIMCD tại góc dưới-trái hàng cộng dồn.");
-            ActivityLogger.Result("ISURVEY_PROFILE_DRAW", profile.Name + " " + profile.Summary());
+            switch (action)
+            {
+                case ProfileDialogAction.Draw:
+                    RunDraw(doc, ed, routes, options, insert);
+                    break;
+                case ProfileDialogAction.UpdateFromProfile:
+                case ProfileDialogAction.UpdateProperties:
+                case ProfileDialogAction.UpdateFromTin:
+                    RunUpdate(doc, ed, routes, options, action);
+                    break;
+            }
         }
         catch (System.Exception ex)
         {
-            ed.WriteMessage("\n[iSurvey] Lỗi vẽ mặt cắt: " + ex.Message);
+            ed.WriteMessage("\n[iSurvey] Lỗi mặt cắt dọc: " + ex.Message);
             ActivityLogger.TrackError(ex, "ISURVEY_PROFILE_DRAW");
         }
+    }
+
+    private static void RunDraw(
+        Autodesk.AutoCAD.ApplicationServices.Document doc,
+        Editor ed,
+        List<RouteRecord> routes,
+        ProfileDrawOptions options,
+        Point3d insert)
+    {
+        var targets = SelectRoutes(routes, options);
+        if (targets.Count == 0)
+        {
+            ed.WriteMessage("\n[iSurvey] Không có tuyến phù hợp để vẽ.");
+            return;
+        }
+
+        var existingProfiles = ProfileStore.Load(doc.Database);
+        var origin = insert;
+        var drawn = 0;
+        foreach (var route in targets)
+        {
+            ProfileRecord? existing = null;
+            foreach (var p in existingProfiles)
+            {
+                if (string.Equals(p.RouteId, route.Id, StringComparison.OrdinalIgnoreCase))
+                {
+                    existing = p;
+                    break;
+                }
+            }
+
+            // Đã có bản → xóa rồi vẽ lại tại điểm vừa pick (không chồng bản).
+            var profile = ProfileDrawService.Draw(
+                doc, route, options, origin,
+                existingId: existing?.Id,
+                eraseHandles: existing?.EntityHandles);
+            ProfileStore.Save(doc.Database, profile);
+            if (existing is not null)
+            {
+                ed.WriteMessage("\n[iSurvey] Đã cập nhật «" + profile.Name + "». " + profile.Summary());
+                ActivityLogger.Result("ISURVEY_PROFILE_DRAW", "redraw " + profile.Name + " " + profile.Summary());
+            }
+            else
+            {
+                ed.WriteMessage(
+                    "\n[iSurvey] Đã vẽ «" + profile.Name + "». "
+                    + profile.Summary()
+                    + " Rải khung bằng RAIMCD tại góc dưới-trái bảng.");
+                ActivityLogger.Result("ISURVEY_PROFILE_DRAW", profile.Name + " " + profile.Summary());
+            }
+
+            drawn++;
+            var bandH = ProfileBandRow.TotalHeight(options.Rows);
+            origin = new Point3d(insert.X, origin.Y + bandH + 200 + ProfileDrawService.SegmentGap, 0);
+        }
+
+        if (drawn == 0)
+            ed.WriteMessage("\n[iSurvey] Không vẽ được mặt cắt nào.");
+    }
+
+    private static void RunUpdate(
+        Autodesk.AutoCAD.ApplicationServices.Document doc,
+        Editor ed,
+        List<RouteRecord> routes,
+        ProfileDrawOptions options,
+        ProfileDialogAction action)
+    {
+        var profiles = ProfileStore.Load(doc.Database);
+        if (profiles.Count == 0)
+        {
+            ed.WriteMessage("\n[iSurvey] Chưa có mặt cắt để cập nhật. Hãy Vẽ trắc dọc trước.");
+            return;
+        }
+
+        ProfileRecord? target = null;
+        foreach (var p in profiles)
+        {
+            if (string.Equals(p.RouteId, options.RouteId, StringComparison.OrdinalIgnoreCase))
+            {
+                target = p;
+                break;
+            }
+        }
+
+        target ??= profiles[profiles.Count - 1];
+
+        var route = routes.FirstOrDefault(r => string.Equals(r.Id, target.RouteId, StringComparison.OrdinalIgnoreCase))
+            ?? routes.FirstOrDefault(r => string.Equals(r.Id, options.RouteId, StringComparison.OrdinalIgnoreCase));
+        if (route is null)
+        {
+            ed.WriteMessage("\n[iSurvey] Không tìm thấy tuyến của mặt cắt «" + target.Name + "».");
+            return;
+        }
+
+        // UpdateProperties: giữ tham số cũ về tỷ lệ/datum nếu form chỉ đổi mẫu bảng — vẫn dùng options từ form.
+        // UpdateFromTin: ép lấy mẫu lại (Draw luôn Collect từ TIN).
+        // UpdateFromProfile: vẽ lại cùng điểm chèn, xóa handle cũ.
+        if (action == ProfileDialogAction.UpdateProperties)
+        {
+            // Giữ điểm chèn + id; áp options mới từ form.
+        }
+        else if (action == ProfileDialogAction.UpdateFromProfile)
+        {
+            // Đồng bộ options từ profile cũ rồi ghi đè các tùy chọn form (đã có trong options).
+            options.Datum = target.Datum;
+        }
+
+        var insert = new Point3d(target.InsertX, target.InsertY, 0);
+        var profile = ProfileDrawService.Draw(
+            doc, route, options, insert,
+            existingId: target.Id,
+            eraseHandles: target.EntityHandles);
+        ProfileStore.Save(doc.Database, profile);
+        ed.WriteMessage("\n[iSurvey] Đã cập nhật «" + profile.Name + "». " + profile.Summary());
+        ActivityLogger.Result("ISURVEY_PROFILE_DRAW", "update " + profile.Name + " " + profile.Summary());
+    }
+
+    private static List<RouteRecord> SelectRoutes(List<RouteRecord> routes, ProfileDrawOptions options)
+    {
+        if (options.DrawMultipleRoutes)
+            return routes.Where(r => r.Stations is { Count: > 0 }).ToList();
+
+        var one = routes.FirstOrDefault(r => string.Equals(r.Id, options.RouteId, StringComparison.OrdinalIgnoreCase));
+        return one is null ? new List<RouteRecord>() : new List<RouteRecord> { one };
     }
 
     /// <summary>

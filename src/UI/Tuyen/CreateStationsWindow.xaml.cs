@@ -18,20 +18,17 @@ public partial class CreateStationsWindow : Window
 {
     public CreateStationsRequest? Request { get; private set; }
 
-    public CreateStationsWindow(string routeName, double from, double to, bool hasTerrain)
+    public CreateStationsWindow(string routeName, double from, double to)
     {
         InitializeComponent();
         RouteText.Text = "Tuyến: " + routeName;
         FromBox.Text = from.ToString("0.###", CultureInfo.InvariantCulture);
         ToBox.Text = to.ToString("0.###", CultureInfo.InvariantCulture);
-        HintText.Text = hasTerrain
-            ? "Cọc đầu, cuối và mọi đỉnh tuyến luôn được phát sinh. Chữ vuông góc với tuyến. Cao độ Z lấy từ mô hình đã gắn."
-            : "Cọc đầu, cuối và mọi đỉnh tuyến luôn được phát sinh. Chữ vuông góc với tuyến. Tuyến chưa gắn mô hình nên chưa có Z; gắn mô hình rồi phát sinh lại.";
     }
 
-    public static CreateStationsRequest? Prompt(string routeName, double from, double to, bool hasTerrain)
+    public static CreateStationsRequest? Prompt(string routeName, double from, double to)
     {
-        var window = new CreateStationsWindow(routeName, from, to, hasTerrain);
+        var window = new CreateStationsWindow(routeName, from, to);
         AcadApp.ShowModalWindow(window);
         return window.Request;
     }

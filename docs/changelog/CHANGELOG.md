@@ -2,7 +2,13 @@
 
 ## 1.8.17 — 2026-11-03
 
-Đã phát hành. Gộp các thay đổi đã làm dưới số 1.8.16 (chưa đóng gói) và bump lên 1.8.17.
+Đã phát hành 2026-11-03. Gộp các thay đổi đã làm dưới số 1.8.16 (chưa đóng gói) và bump lên 1.8.17.
+
+### Sau phát hành (2026-11-05, chưa bump)
+
+- **VEMCD** Pha 3: hộp thoại 2 cột + footer; mẫu 8 hàng; chữ dọc cao độ/KC; hướng ADS `/\` `\/` với `A=` căn giữa V (baseline tách khỏi chân V); chỉ hàng khoảng cách lẻ có dóng dọc; không ghi Z trên đường đất; mỗi lần vẽ chỉ điểm chèn, vẽ lại = xóa bản cũ; mức so sánh tự do (bỏ cắt A3). Chữ đầu bảng mặc định 12, lệch mép 40; mục **Cách đầu bảng** + đường dóng nét đứt trên/dưới vùng đất. Đã nhìn trên Civil 3D 2026 Metric (Drawing1 thử, không lưu).
+- **GOC**: chữ G né tim; xuất `MoTaTuyen-….txt` (góc °′″, placeholder điền tay). **DUOITUYEN**: polyline tim nét đứt sau duỗi; bảng góc chuyển sang GOC.
+- **TAOTUYEN**: mặc định mô hình vừa tạo. **THEMMOHINH**: Bỏ chọn tất cả; mặc định Điểm/Block+chữ cao độ cạnh. **PHATSINHCOC**: bỏ gợi ý thừa trên hộp.
 
 ### Tiến trình
 
@@ -10,7 +16,7 @@
 
 ### Mặt cắt dọc
 
-- **VEMCD** (`ISURVEY_PROFILE_DRAW`): vẽ trên Model đầu bảng năm hàng (hàng dưới là khoảng cách cộng dồn), đường đất, thước cao độ. Tỷ lệ `1/500; 1/5000` hoặc `1/200; 1/2000`. Đoạn cao hơn tờ A3 thì tách và gợi ý mức so sánh. **RAIMCD** vẫn chỉ rải khung in, không đổi mức. Đã nhìn trên Civil 3D 2026, bản vẽ trắng.
+- **VEMCD** (`ISURVEY_PROFILE_DRAW`): vẽ trên Model đầu bảng + đường đất, thước cao độ (ban đầu năm hàng; sau phát hành mở rộng Pha 3 — xem mục trên). **RAIMCD** vẫn chỉ rải khung in, không đổi mức. Đã nhìn trên Civil 3D 2026, bản vẽ trắng.
 
 ## 1.8.16 — 2026-10-31
 

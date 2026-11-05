@@ -8,7 +8,7 @@ Một dòng là một video. Video cũ giữ lại khi có bản mới của cù
 | D2C | Nhập file DGN (có hộp tiến trình) | 1.8.17 | Chưa quay | |
 | RAIMCD | Rải khung mặt cắt dọc | 1.8.16 | Chưa quay | |
 | UAVCLIP | Cắt ảnh UAV | 1.8.16 | Chưa quay | |
-| VEMCD | Vẽ mặt cắt dọc | 1.8.17 | Chưa quay | |
+| VEMCD | Vẽ mặt cắt dọc tự nhiên (Pha 3; Cách đầu bảng; chữ 12/lệch 40; hướng ADS căn giữa V) | 1.8.17 | Chưa quay | |
 | TAOTUYEN | Tạo tuyến | 1.8.16 | Chưa quay | |
 | THEMMOHINH | Thêm điểm vào mô hình | 1.8.16 | Chưa quay | |
 | XAYMOHINH | Xây dựng lưới | 1.8.16 | Chưa quay | |
@@ -20,6 +20,8 @@ Một dòng là một video. Video cũ giữ lại khi có bản mới của cù
 | THEMCOC | Thêm một cọc | 1.8.16 | Chưa quay | |
 | XOACOC1 | Xóa một cọc | 1.8.16 | Chưa quay | |
 | BANGCOC | Danh sách cọc | 1.8.16 | Chưa quay | |
+| GOC | Đánh góc tuyến (né tim + xuất mô tả txt) | 1.8.17 | Chưa quay | |
+| DUOITUYEN | Duỗi thẳng tuyến (tim nét đứt) | 1.8.17 | Chưa quay | |
 
 Kịch bản: `docs/video/kich-ban/`.
 

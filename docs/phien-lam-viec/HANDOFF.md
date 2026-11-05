@@ -5,6 +5,42 @@
 
 ---
 
+## 2026-11-05 — VEMCD Pha 3 + GOC/DUOITUYEN (1.8.17, không bump)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026 Metric. Cuối phiên đầy đủ. **Không bump.** Vẫn **1.8.17** (đã phát hành 2026-11-03).
+
+### Đã chốt / đã làm
+
+- **VEMCD** Pha 3: hộp 2 cột + footer; mẫu 8 hàng; chữ dọc cao độ/KC; hướng ADS `/\` `\/` (`A=` căn giữa V); dóng dọc chỉ hàng khoảng cách lẻ; không Z trên đường đất; luôn chỉ điểm chèn; vẽ lại = xóa bản cũ; mức so sánh tự do (bỏ cắt A3). Chữ đầu bảng mặc định 12, lệch mép 40; **Cách đầu bảng** + đường dóng nét đứt trên/dưới vùng đất. Đã nhìn hộp thoại và bản vẽ thử Drawing1 (không lưu).
+- **GOC**: chữ G né tim; xuất `MoTaTuyen-….txt`. **DUOITUYEN**: polyline tim nét đứt; bảng góc chuyển sang GOC.
+- **TAOTUYEN**: mặc định mô hình vừa tạo. **THEMMOHINH**: Bỏ chọn tất cả + mặc định Điểm/Block+chữ. **PHATSINHCOC**: bỏ gợi ý thừa.
+- Catalog, README, CHANGELOG (mục sau phát hành), kịch bản video VEMCD/GOC/DUOITUYEN (Chưa quay). Không quay, không đăng. Không phát hành lại.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| VEMCD | `src/Modules/Profile/*`, `src/UI/Profile/*` |
+| GOC / DUOITUYEN | `VertexNumberingService`, `AngleTableExport`, `StripMapService` |
+| Tuyến / điểm | `CreateRouteWindow`, `CreateStationsWindow`, `AddPointSourcesWindow` |
+| Docs / video | `README.md`, `CHANGELOG.md`, `CATALOG.md`, `kich-ban/vemcd|goc|duoituyen-1.8.17.*`, catalog Excel |
+
+### Việc tiếp
+
+- [ ] Video VEMCD / GOC / DUOITUYEN / D2C 1.8.17 chưa quay. YouTube vẫn thiếu `client_secret.json`.
+- [ ] Bản vẽ công trình: chạy lại UAVCLIP/RAIMCD nếu layout cũ còn lệch (phiên trước).
+- [ ] Bump / phát hành bản sau 1.8.17 khi được yêu cầu.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff đầu. iSurvey 1.8.17 đã phát hành; phiên 05/11 không bump. VEMCD Pha 3: Cách đầu bảng, chữ 12/lệch 40, hướng ADS, không cắt A3. GOC xuất MoTaTuyen.txt; DUOITUYEN tim nét đứt. Tiếp: quay video khi được yêu cầu, bump/phát hành khi được bảo, hoặc việc mới.
+```
+
+**Lưu trữ ngày:** [2026-11-05-vemcd-pha3-goc-duoituyen.md](./2026-11-05-vemcd-pha3-goc-duoituyen.md)
+
+---
+
 ## 2026-11-03 — Phát hành 1.8.17
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng. Đã chạy `publish-release.ps1`. **Đã phát hành 1.8.17.**

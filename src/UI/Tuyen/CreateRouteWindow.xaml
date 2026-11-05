@@ -39,8 +39,6 @@
                 <TextBox x:Name="ChainBox" Padding="8,6" Text="0" Margin="0,0,0,10"/>
                 <TextBlock Text="Mô hình bám" Foreground="#374151" Margin="0,0,0,4"/>
                 <ComboBox x:Name="ModelBox" Padding="8,6"/>
-                <TextBlock Text="Sau khi bấm Tạo tuyến: chọn polyline, rồi chọn điểm đầu gần một đầu mút. Gắn mô hình để phát sinh cọc lấy Z. Có thể đảo đầu sau bằng Đảo đầu tuyến."
-                           Foreground="#64748B" TextWrapping="Wrap" Margin="0,10,0,0" FontSize="12"/>
             </StackPanel>
             <Border Grid.Row="2" Background="#F8FAFC" CornerRadius="0,0,12,12" Padding="16,12">
                 <DockPanel LastChildFill="False">

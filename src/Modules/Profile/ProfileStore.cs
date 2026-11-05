@@ -42,6 +42,20 @@ public static class ProfileStore
                 profile.Name ??= "";
                 profile.RouteId ??= "";
                 profile.EntityHandles ??= new List<string>();
+                if (profile.Rows is null || profile.Rows.Count == 0)
+                    profile.Rows = ProfileBandRow.CreateDefaultList();
+                if (profile.VerticalScale <= 0)
+                    profile.VerticalScale = 100;
+                if (profile.HorizontalScale <= 0)
+                    profile.HorizontalScale = 1000;
+                if (profile.LabelWidth <= 0)
+                    profile.LabelWidth = 250;
+                if (profile.LabelInset <= 0)
+                    profile.LabelInset = 40;
+                if (profile.HeaderClearance < 0)
+                    profile.HeaderClearance = 40;
+                if (profile.ProfileTextHeight <= 0)
+                    profile.ProfileTextHeight = 12;
                 list.Add(profile);
             }
             catch (JsonException)

@@ -1,0 +1,45 @@
+{
+  "id": "goc-1.8.17",
+  "command": "GOC",
+  "commandFull": "ISURVEY_NUMBER_VERTICES",
+  "feature": "Đánh góc tuyến",
+  "version": "1.8.17",
+  "title": "Đánh góc tuyến phiên bản 1.8.17",
+  "privacy": "unlisted",
+  "voice": "vi-VN-HoaiMyNeural",
+  "rate": "-8%",
+  "tags": ["iSurvey", "Civil 3D", "góc tuyến", "GOC"],
+  "description": "Cách đánh số góc tuyến và xuất mô tả tuyến text bằng iSurvey.\n\nHành vi trong video có từ iSurvey 1.8.17 (lệnh GOC, lệnh đủ ISURVEY_NUMBER_VERTICES).\nChấm đỏ tại đỉnh. Chữ G né tim. Sau đó lưu MoTaTuyen.txt UTF-8 (mô tả đoạn, góc °′″, placeholder điền tay).",
+  "shots": [
+    {
+      "id": "01-mo-dau",
+      "type": "card",
+      "lines": ["Đánh góc tuyến", "phiên bản 1.8.17"],
+      "narration": "Đánh góc tuyến, phiên bản một chấm tám chấm mười bảy. Đánh số đỉnh tim, xuất bảng góc text."
+    },
+    {
+      "id": "02-lenh",
+      "type": "screen",
+      "action": "Gõ GOC. Chọn polyline tim. Tiền tố G, chỉ số 0, tỷ lệ 1000.",
+      "narration": "Gõ G O C. Chọn polyline làm tim. Giữ tiền tố G, bắt đầu từ không, tỷ lệ một trên một nghìn."
+    },
+    {
+      "id": "03-ket-qua",
+      "type": "screen",
+      "action": "Zoom gần vài góc — chữ G cách khỏi nét tim.",
+      "narration": "Chấm đỏ tại mỗi đỉnh. Chữ G không đè lên nét tim."
+    },
+    {
+      "id": "04-xuat",
+      "type": "screen",
+      "action": "Lưu MoTaTuyen-….txt; xem câu mô tả và góc °′″.",
+      "narration": "Lưu file text. Mỗi đoạn từ góc này đến góc kế có hướng rẽ, góc độ phút giây, và chỗ trong ngoặc để kỹ sư mô tả thực địa."
+    },
+    {
+      "id": "05-ket",
+      "type": "card",
+      "lines": ["Chữ G không đè tim", "Đã có MoTaTuyen.txt"],
+      "narration": "Xong. Số góc trên layer riêng, mô tả tuyến đã lưu dạng text."
+    }
+  ]
+}

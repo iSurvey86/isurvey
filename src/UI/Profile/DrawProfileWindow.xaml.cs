@@ -1,178 +1,181 @@
-using System.Globalization;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using iSurvey.Modules.Profile;
 using iSurvey.Modules.Tuyen;
 using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
+using AcadColor = Autodesk.AutoCAD.Colors.Color;
+using AcadColorDialog = Autodesk.AutoCAD.Windows.ColorDialog;
+using AcadColorMethod = Autodesk.AutoCAD.Colors.ColorMethod;
+using Win32OpenFileDialog = Microsoft.Win32.OpenFileDialog;
+using Win32SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
 namespace iSurvey.UI.Profile;
 
-public sealed class DrawProfileRequest
+public enum ProfileDialogAction
 {
-    public RouteRecord Route { get; init; } = null!;
+    Cancel,
+    Draw,
+    UpdateFromProfile,
+    UpdateProperties,
+    UpdateFromTin,
+    SaveSettingsOnly
+}
 
-    public string Name { get; init; } = "";
+public sealed class DrawProfileDialogResult
+{
+    public ProfileDialogAction Action { get; init; }
 
-    public int HorizontalScale { get; init; }
-
-    public int VerticalScale { get; init; }
-
-    public double Datum { get; init; }
+    public ProfileDrawOptions? Options { get; init; }
 }
 
 public partial class DrawProfileWindow : Window
 {
-    private readonly List<RouteRecord> _routes;
-    private bool _busy;
+    private readonly DrawProfileViewModel _vm;
 
-    public DrawProfileRequest? Request { get; private set; }
+    public DrawProfileDialogResult? Result { get; private set; }
 
     public DrawProfileWindow(IReadOnlyList<RouteRecord> routes, string? preferredRouteId)
     {
         InitializeComponent();
-        _routes = routes.Where(r => r.Stations is { Count: > 0 }).ToList();
-        foreach (var route in _routes)
-            RouteBox.Items.Add(route.Name);
-
-        ScaleBox.Items.Add("1/500; 1/5000");
-        ScaleBox.Items.Add("1/200; 1/2000");
-        ScaleBox.SelectedIndex = 0;
-
-        if (_routes.Count == 0)
-        {
-            HintText.Text = "Chưa có tuyến có cọc. Tạo tuyến và phát sinh cọc (có Z) trước.";
-            return;
-        }
-
-        var index = 0;
-        if (!string.IsNullOrWhiteSpace(preferredRouteId))
-        {
-            for (var i = 0; i < _routes.Count; i++)
-            {
-                if (_routes[i].Id == preferredRouteId)
-                {
-                    index = i;
-                    break;
-                }
-            }
-        }
-
-        RouteBox.SelectedIndex = index;
-        RefreshForRoute();
+        _vm = new DrawProfileViewModel(routes, preferredRouteId, ProfileSettingsStore.Load());
+        DataContext = _vm;
     }
 
-    public static DrawProfileRequest? Prompt(IReadOnlyList<RouteRecord> routes, string? preferredRouteId)
+    public static DrawProfileDialogResult? Prompt(IReadOnlyList<RouteRecord> routes, string? preferredRouteId)
     {
         var window = new DrawProfileWindow(routes, preferredRouteId);
         AcadApp.ShowModalWindow(window);
-        return window.Request;
+        return window.Result;
     }
 
-    private void RouteBox_SelectionChanged(object sender, SelectionChangedEventArgs e) => RefreshForRoute();
+    private void Draw_Click(object sender, RoutedEventArgs e) => Finish(ProfileDialogAction.Draw);
 
-    private void ScaleBox_SelectionChanged(object sender, SelectionChangedEventArgs e) => RefreshForRoute();
+    private void UpdateFromProfile_Click(object sender, RoutedEventArgs e) =>
+        Finish(ProfileDialogAction.UpdateFromProfile);
 
-    private void RefreshForRoute()
+    private void UpdateProps_Click(object sender, RoutedEventArgs e) =>
+        Finish(ProfileDialogAction.UpdateProperties);
+
+    private void UpdateFromTin_Click(object sender, RoutedEventArgs e) =>
+        Finish(ProfileDialogAction.UpdateFromTin);
+
+    private void SaveSettings_Click(object sender, RoutedEventArgs e)
     {
-        if (_busy || RouteBox.SelectedIndex < 0 || RouteBox.SelectedIndex >= _routes.Count)
+        if (!_vm.TryBuildOptions(out var opts, out var error))
+        {
+            System.Windows.MessageBox.Show(this, error, "iSurvey");
             return;
-        _busy = true;
-        try
-        {
-            var route = _routes[RouteBox.SelectedIndex];
-            if (string.IsNullOrWhiteSpace(NameBox.Text) || NameBox.Text.StartsWith("MCD ", StringComparison.Ordinal))
-                NameBox.Text = "MCD " + route.Name;
-
-            GetScales(out var h, out var v);
-            var withZ = 0;
-            if (route.Stations is not null)
-            {
-                foreach (var s in route.Stations)
-                {
-                    if (s.HasZ)
-                        withZ++;
-                }
-            }
-
-            var datum = ProfileDrawService.SuggestDatum(
-                route.Stations ?? new List<StationRecord>(), h, v, ProfileDrawService.DefaultRowHeight);
-            DatumBox.Text = datum.ToString("0.###", CultureInfo.InvariantCulture);
-
-            var segs = ProfileDrawService.PlanSegments(
-                route.Stations ?? new List<StationRecord>(), datum, h, v, ProfileDrawService.DefaultRowHeight);
-            var tip = ProfileDrawService.FormatSuggestion(segs);
-            HintText.Text = withZ < 2
-                ? "Tuyến này chưa đủ cọc có Z. Phát sinh cọc sau khi gắn mô hình."
-                : (string.IsNullOrEmpty(tip)
-                    ? "Hàng dưới cùng là Khoảng cách cộng dồn. Sau khi bấm Vẽ, chỉ điểm chèn trên Model."
-                    : tip + " Hàng dưới cùng là Khoảng cách cộng dồn.");
         }
-        finally
-        {
-            _busy = false;
-        }
+
+        ProfileSettingsStore.Save(opts);
+        System.Windows.MessageBox.Show(this, "Đã lưu thiết lập VEMCD.", "iSurvey");
     }
 
-    private void Ok_Click(object sender, RoutedEventArgs e)
+    private void Finish(ProfileDialogAction action)
     {
-        if (RouteBox.SelectedIndex < 0 || RouteBox.SelectedIndex >= _routes.Count)
+        if (!_vm.TryBuildOptions(out var opts, out var error))
         {
-            System.Windows.MessageBox.Show(this, "Chọn một tuyến có cọc.", "iSurvey");
+            System.Windows.MessageBox.Show(this, error, "iSurvey");
             return;
         }
 
-        var route = _routes[RouteBox.SelectedIndex];
-        var withZ = route.Stations?.Count(s => s.HasZ) ?? 0;
-        if (withZ < 2)
-        {
-            System.Windows.MessageBox.Show(this, "Cần ít nhất hai cọc có cao độ Z.", "iSurvey");
-            return;
-        }
-
-        if (!TryNumber(DatumBox.Text, out var datum))
-        {
-            System.Windows.MessageBox.Show(this, "Mức so sánh phải là số.", "iSurvey");
-            return;
-        }
-
-        GetScales(out var h, out var v);
-        var name = string.IsNullOrWhiteSpace(NameBox.Text) ? "MCD " + route.Name : NameBox.Text.Trim();
-        Request = new DrawProfileRequest
-        {
-            Route = route,
-            Name = name,
-            HorizontalScale = h,
-            VerticalScale = v,
-            Datum = datum
-        };
+        Result = new DrawProfileDialogResult { Action = action, Options = opts };
         Close();
-    }
-
-    private void GetScales(out int h, out int v)
-    {
-        if (ScaleBox.SelectedIndex == 1)
-        {
-            v = 200;
-            h = 2000;
-        }
-        else
-        {
-            v = 500;
-            h = 5000;
-        }
-    }
-
-    private static bool TryNumber(string text, out double value)
-    {
-        var raw = text.Trim().Replace(',', '.');
-        return double.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out value);
     }
 
     private void Cancel_Click(object sender, RoutedEventArgs e)
     {
-        Request = null;
+        Result = new DrawProfileDialogResult { Action = ProfileDialogAction.Cancel };
         Close();
+    }
+
+    private void AddRow_Click(object sender, RoutedEventArgs e) => _vm.AddRow();
+
+    private void RemoveRow_Click(object sender, RoutedEventArgs e) => _vm.RemoveSelectedRow();
+
+    private void ColorCell_Click(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is not FrameworkElement { DataContext: ProfileBandRowVm row })
+            return;
+        e.Handled = true;
+        try
+        {
+            var dlg = new AcadColorDialog();
+            var aci = row.ColorAci is >= 1 and <= 255 ? (short)row.ColorAci : (short)7;
+            dlg.Color = AcadColor.FromColorIndex(AcadColorMethod.ByAci, aci);
+            if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                return;
+            var picked = dlg.Color;
+            if (picked.ColorMethod == AcadColorMethod.ByAci || picked.ColorMethod == AcadColorMethod.ByLayer)
+                row.ColorAci = picked.ColorIndex;
+            else
+                row.ColorAci = picked.ColorIndex is >= 1 and <= 255 ? picked.ColorIndex : 7;
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show(this, "Không mở được bảng màu CAD: " + ex.Message, "iSurvey");
+        }
+    }
+
+    private void Import_Click(object sender, RoutedEventArgs e)
+    {
+        var dlg = new Win32OpenFileDialog
+        {
+            Title = "Nhập mẫu bảng trắc dọc",
+            Filter = "JSON (*.json)|*.json|CSV (*.csv)|*.csv|Tất cả|*.*"
+        };
+        if (dlg.ShowDialog(this) != true)
+            return;
+        try
+        {
+            var path = dlg.FileName;
+            if (path.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
+            {
+                var rows = ProfileTemplateIO.ImportCsv(path);
+                _vm.LoadTemplate(new ProfileTemplateIO.TemplateFile
+                {
+                    Name = System.IO.Path.GetFileNameWithoutExtension(path),
+                    Rows = rows
+                });
+            }
+            else
+            {
+                _vm.LoadTemplate(ProfileTemplateIO.ImportJson(path));
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show(this, "Không nhập được: " + ex.Message, "iSurvey");
+        }
+    }
+
+    private void Export_Click(object sender, RoutedEventArgs e)
+    {
+        if (!_vm.TryBuildOptions(out var opts, out var error))
+        {
+            System.Windows.MessageBox.Show(this, error, "iSurvey");
+            return;
+        }
+
+        var dlg = new Win32SaveFileDialog
+        {
+            Title = "Xuất mẫu bảng trắc dọc",
+            Filter = "JSON (*.json)|*.json|CSV (*.csv)|*.csv",
+            FileName = opts.TemplateName
+        };
+        if (dlg.ShowDialog(this) != true)
+            return;
+        try
+        {
+            if (dlg.FilterIndex == 2 || dlg.FileName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
+                ProfileTemplateIO.ExportCsv(dlg.FileName, opts.Rows);
+            else
+                ProfileTemplateIO.ExportJson(dlg.FileName, opts.TemplateName, opts.LabelWidth, opts.Rows);
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show(this, "Không xuất được: " + ex.Message, "iSurvey");
+        }
     }
 
     private void Header_Drag(object sender, MouseButtonEventArgs e)
@@ -185,7 +188,7 @@ public partial class DrawProfileWindow : Window
     {
         if (e.Key != Key.Escape)
             return;
-        Request = null;
+        Result = new DrawProfileDialogResult { Action = ProfileDialogAction.Cancel };
         Close();
     }
 }
