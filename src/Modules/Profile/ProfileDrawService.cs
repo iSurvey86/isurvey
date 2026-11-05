@@ -152,9 +152,8 @@ internal static class ProfileDrawService
 
                 var phong = Exaggerate(options.HorizontalScale, options.VerticalScale);
                 var zTop = slice.Max(s => s.Z);
-                var clear = Math.Max(0, options.HeaderClearance);
-                // band + khoảng dưới đất + đất + khoảng trên bề mặt (đường dóng trên).
-                var groundTop = bandH + clear + Math.Max(0, (zTop - seg.Datum) * phong) + clear;
+                // Khoảng đứng = 0: band + đất (không cộng Cách đầu bảng — đó là khoảng ngang).
+                var groundTop = bandH + Math.Max(0, (zTop - seg.Datum) * phong);
                 origin = new Point3d(insert.X, origin.Y + groundTop + SegmentGap + options.RowGap, 0);
             }
 
@@ -209,13 +208,14 @@ internal static class ProfileDrawService
         var length = Math.Max(1, l1 - l0);
         var labelWidth = Math.Max(40, options.LabelWidth);
         var labelInset = options.LabelInset > 0 ? options.LabelInset : DefaultLabelInset;
-        var headerClearance = Math.Max(0, options.HeaderClearance);
+        // Cách đầu bảng = khoảng ngang thước → đầu đất. Khoảng đứng luôn 0.
+        var gap = Math.Max(0, options.HeaderClearance);
         var xSplit = origin.X + labelWidth;
-        var xRight = xSplit + length;
+        var xProfile0 = xSplit + gap;
+        var xRight = xProfile0 + length;
         var yCut = origin.Y;
         var yBandTop = yCut + bandH;
-        // Đường dóng nét đứt = mốc Y mức so sánh; đường đất không dính mép trên bảng.
-        var yDatum = yBandTop + headerClearance;
+        var yDatum = yBandTop;
         var textProfile = Math.Max(0.5, options.ProfileTextHeight);
 
         if (options.DrawBandHeader)
@@ -242,13 +242,6 @@ internal static class ProfileDrawService
             }
         }
 
-        if (headerClearance > 1e-6)
-        {
-            // Đường dóng ngang nét đứt phía trên đầu bảng (mốc Z = mức so sánh).
-            AddDashedLine(tr, space, iSurveyLayers.TdLuoi, 3,
-                xSplit, yDatum, xRight, yDatum, textProfile, handles);
-        }
-
         // Vạch đứng tại cọc + số liệu hàng.
         var stations = samples.Where(s => s.IsStation).ToList();
         if (stations.Count == 0)
@@ -271,10 +264,22 @@ internal static class ProfileDrawService
         var leBand = rowBands.FirstOrDefault(b => ContentKey(b.Row.Content) == "le");
         var hasLeBand = leBand.Row is not null;
 
+        // Chữ thập đỏ: X = đầu mặt cắt (cách đầu bảng), Y = trung điểm hàng Sơ họa mặt bằng.
+        var soHoaBand = rowBands.FirstOrDefault(b => ContentKey(b.Row.Content) == "so_hoa");
+        if (options.DrawCrossMark && options.DrawBandHeader && soHoaBand.Row is not null)
+        {
+            var yCross = soHoaBand.YBottom + soHoaBand.Height * 0.5;
+            var arm = Math.Max(textProfile * 0.55, 5.0);
+            AddLine(tr, space, iSurveyLayers.TdBang, 1,
+                xProfile0 - arm, yCross, xProfile0 + arm, yCross, handles);
+            AddLine(tr, space, iSurveyLayers.TdBang, 1,
+                xProfile0, yCross - arm, xProfile0, yCross + arm, handles);
+        }
+
         for (var i = 0; i < stations.Count; i++)
         {
             var st = stations[i];
-            var x = xSplit + (st.Chainage - l0);
+            var x = xProfile0 + (st.Chainage - l0);
             if (options.DrawBandHeader && hasLeBand)
                 AddLine(tr, space, iSurveyLayers.TdBang, 7,
                     x, leBand.YBottom, x, leBand.YBottom + leBand.Height, handles);
@@ -282,12 +287,13 @@ internal static class ProfileDrawService
             var prev = i == 0 ? route.StartChainage : stations[i - 1].Chainage;
             var le = st.Chainage - prev;
             var cong = st.Chainage - route.StartChainage;
+            var xPrev = xProfile0 + (prev - l0);
 
             foreach (var band in rowBands)
             {
                 var key = ContentKey(band.Row.Content);
-                if (key is "huong" or "bearing")
-                    continue; // zigzag riêng
+                if (key is "huong" or "bearing" or "kc_100")
+                    continue; // zigzag / thước 100 vẽ riêng
 
                 var cell = ResolveCell(key, st, le, cong, 0, options);
                 if (string.IsNullOrEmpty(cell))
@@ -295,15 +301,19 @@ internal static class ProfileDrawService
 
                 var rowStyle = ResolveTextStyle(tr, space.Database, band.Row.TextStyle, styleId);
                 var th = Math.Max(0.5, band.Row.TextHeight);
+                // Khoảng lẻ: chữ giữa hai vạch đứng.
+                var xText = key == "le"
+                    ? CellMidX(i, stations, l0, xProfile0, xPrev, x, th)
+                    : x;
                 if (IsVerticalCell(key))
                 {
                     WriteVerticalCell(tr, space, rowStyle, band.Row.Layer, band.Row.ColorAci,
-                        x, band.YBottom, band.Height, th, cell, handles);
+                        xText, band.YBottom, band.Height, th, cell, handles);
                 }
                 else
                 {
                     WriteCell(tr, space, rowStyle, band.Row.Layer, band.Row.ColorAci,
-                        x, band.YBottom, band.Height, th, cell, handles);
+                        xText, band.YBottom, band.Height, th, cell, handles);
                 }
             }
         }
@@ -316,18 +326,40 @@ internal static class ProfileDrawService
             var rowStyle = ResolveTextStyle(tr, space.Database, band.Row.TextStyle, styleId);
             DrawHuongZigzag(
                 tr, space, rowStyle, band.Row,
-                stations, l0, xSplit, xRight,
+                stations, l0, xProfile0, xRight,
+                band.YBottom, band.Height, handles);
+        }
+
+        foreach (var band in rowBands)
+        {
+            if (ContentKey(band.Row.Content) != "neo")
+                continue;
+            var rowStyle = ResolveTextStyle(tr, space.Database, band.Row.TextStyle, styleId);
+            DrawNeoSpans(
+                tr, space, rowStyle, band.Row,
+                stations, l0, xProfile0,
+                band.YBottom, band.Height, handles);
+        }
+
+        foreach (var band in rowBands)
+        {
+            if (ContentKey(band.Row.Content) != "kc_100")
+                continue;
+            var rowStyle = ResolveTextStyle(tr, space.Database, band.Row.TextStyle, styleId);
+            DrawKc100Pickets(
+                tr, space, rowStyle, band.Row,
+                route, l0, l1, xProfile0,
                 band.YBottom, band.Height, handles);
         }
 
         // Đường đất: chỉ polyline bề mặt (+ vạch đứng tại cọc). Không ghi số Z trên đường đất.
-        // Y tính từ đường dóng (yDatum), không từ mép trên bảng.
+        // Y sát mép trên bảng (khoảng đứng = 0). X lệch thước theo Cách đầu bảng.
         _ = textProfile;
         var ground = new Point2dCollection();
         double yGroundMax = yDatum;
         foreach (var st in samples)
         {
-            var x = xSplit + (st.Chainage - l0);
+            var x = xProfile0 + (st.Chainage - l0);
             var y = yDatum + (st.Z - datum) * phong;
             if (y > yGroundMax)
                 yGroundMax = y;
@@ -342,17 +374,9 @@ internal static class ProfileDrawService
             var step = Math.Max(10, NiceStep(length / 10.0));
             for (var c = Math.Ceiling(l0 / step) * step; c < l1 - 1e-6; c += step)
             {
-                var x = xSplit + (c - l0);
+                var x = xProfile0 + (c - l0);
                 AddLine(tr, space, iSurveyLayers.TdLuoi, 8, x, yDatum, x, yGroundMax, handles);
             }
-        }
-
-        // Đường dóng nét đứt phía trên bề mặt tự nhiên (cùng khoảng cách Cách đầu bảng).
-        if (headerClearance > 1e-6 && ground.Count >= 2)
-        {
-            AddDashedLine(tr, space, iSurveyLayers.TdLuoi, 3,
-                xSplit, yGroundMax + headerClearance, xRight, yGroundMax + headerClearance,
-                textProfile, handles);
         }
 
         if (ground.Count >= 2)
@@ -369,6 +393,29 @@ internal static class ProfileDrawService
 
         if (options.InsertLeftScaleBar || options.InsertRightScaleBar || options.FillDatumLabels)
             DrawScaleBars(tr, space, styleId, options, origin.X, xSplit, xRight, labelWidth, yDatum, yGroundMax, datum, phong, textProfile, handles);
+    }
+
+    /// <summary>Tọa độ X giữa ô khoảng lẻ — không cắt vào vạch đứng.</summary>
+    private static double CellMidX(
+        int index,
+        List<ProfileSampleService.SamplePoint> stations,
+        double l0,
+        double xProfile0,
+        double xPrev,
+        double x,
+        double textHeight)
+    {
+        // le: giữa hai vạch đứng của đoạn [prev, hiện tại].
+        if (Math.Abs(x - xPrev) > 1e-3)
+            return (xPrev + x) * 0.5;
+
+        if (index + 1 < stations.Count)
+        {
+            var xNext = xProfile0 + (stations[index + 1].Chainage - l0);
+            return x + (xNext - x) * 0.35;
+        }
+
+        return x + Math.Max(textHeight, 1.0);
     }
 
     /// <summary>
@@ -465,7 +512,7 @@ internal static class ProfileDrawService
 
     /// <summary>Cao độ / khoảng cách lẻ / cộng dồn / lý trình / tên cọc — chữ xoay dọc.</summary>
     private static bool IsVerticalCell(string key) =>
-        key is "cao_do" or "z" or "le" or "cong_don" or "ly_trinh" or "chainage" or "ten" or "name" or "kc_100";
+        key is "cao_do" or "z" or "le" or "cong_don" or "ly_trinh" or "chainage" or "ten" or "name";
 
     private static string ResolveCell(
         string key,
@@ -479,21 +526,19 @@ internal static class ProfileDrawService
         return key switch
         {
             "cao_do" or "z" => st.Z.ToString("0.##", CultureInfo.InvariantCulture),
-            "le" => le.ToString("0.##", CultureInfo.InvariantCulture),
+            // Không ghi 0 tại đầu tuyến (tránh dính số khoảng sau).
+            "le" => Math.Abs(le) < 0.05 ? "" : le.ToString("0.##", CultureInfo.InvariantCulture),
             "cong_don" => cong.ToString("0.##", CultureInfo.InvariantCulture),
             "ly_trinh" or "chainage" => options.FillChainage ? FormatChainage(st.Chainage) : "",
             "ten" or "name" => st.Name,
-            "huong" or "bearing" => "",
-            "kc_100" => Math.Abs(cong % 100) < 0.05 || Math.Abs(cong % 100 - 100) < 0.05
-                ? "100"
-                : "",
+            "huong" or "bearing" or "kc_100" => "",
             "so_hoa" or "neo" or "cot" or "empty" => "",
             _ => ""
         };
     }
 
     /// <summary>
-    /// Hàng hướng tuyến kiểu ADS: đường ngang --/\-- (rẽ trái) hoặc --\/-- (rẽ phải) tại đỉnh có góc.
+    /// Hàng hướng tuyến kiểu ADS: --/\-- = rẽ trái (RTr), --\/-- = rẽ phải (RPh); chữ góc đối diện mũi.
     /// </summary>
     private static void DrawHuongZigzag(
         Transaction tr, BlockTableRecord space, ObjectId styleId, ProfileBandRow row,
@@ -504,14 +549,15 @@ internal static class ProfileDrawService
         if (stations.Count < 2)
             return;
 
-        var ym = yBottom + rowHeight * 0.5;
-        var peakH = rowHeight * 0.38;
-        var halfWWish = Math.Max(rowHeight * 0.22, Math.Max(0.5, row.TextHeight) * 0.9);
+        // Đường hướng tuyến giữa khuông; mũi rộng–thấp; DMS giữa đường hướng tuyến và mép hàng (đối diện mũi).
+        var yTop = yBottom + rowHeight;
+        var yBase = yBottom + rowHeight * 0.5;
+        var peakH = rowHeight * 0.16;
+        var halfWWish = Math.Max(rowHeight * 0.42, Math.Max(0.5, row.TextHeight) * 1.35);
         var th = Math.Max(0.5, row.TextHeight * 0.85);
         var layer = string.IsNullOrWhiteSpace(row.Layer) ? iSurveyLayers.TdBang : row.Layer;
         var color = row.ColorAci is >= 1 and <= 255 ? (short)row.ColorAci : (short)7;
 
-        // Baseline ngang có khoảng hở tại mỗi góc + polyline V riêng → không còn nét thừa đáy V.
         var gaps = new List<(double Left, double Right, bool LeftTurn, double X, string Label)>();
         for (var i = 0; i < stations.Count; i++)
         {
@@ -524,10 +570,11 @@ internal static class ProfileDrawService
             var xNext = i < stations.Count - 1
                 ? xSplit + (stations[i + 1].Chainage - l0)
                 : xRight;
-            var halfW = Math.Min(halfWWish, Math.Min((x - xPrev) * 0.45, (xNext - x) * 0.45));
+            var halfW = Math.Min(halfWWish, Math.Min((x - xPrev) * 0.48, (xNext - x) * 0.48));
             if (halfW < 0.5)
-                halfW = Math.Min(halfWWish, Math.Max(0.5, (xNext - xPrev) * 0.2));
-            gaps.Add((x - halfW, x + halfW, left, x, "A = " + (left ? "" : "-") + dms));
+                halfW = Math.Min(halfWWish, Math.Max(0.5, (xNext - xPrev) * 0.28));
+            var label = (left ? "RTr = " : "RPh = ") + dms;
+            gaps.Add((x - halfW, x + halfW, left, x, label));
         }
 
         gaps.Sort((a, b) => a.Left.CompareTo(b.Left));
@@ -535,21 +582,23 @@ internal static class ProfileDrawService
         foreach (var g in gaps)
         {
             if (g.Left > cursor + 1e-9)
-                AddLine(tr, space, layer, color, cursor, ym, g.Left, ym, handles);
+                AddLine(tr, space, layer, color, cursor, yBase, g.Left, yBase, handles);
 
-            var yPeak = g.LeftTurn ? ym + peakH : ym - peakH;
+            var yPeak = g.LeftTurn ? yBase + peakH : yBase - peakH;
             var v = new Polyline();
-            v.AddVertexAt(0, new Point2d(g.Left, ym), 0, 0, 0);
+            v.AddVertexAt(0, new Point2d(g.Left, yBase), 0, 0, 0);
             v.AddVertexAt(1, new Point2d(g.X, yPeak), 0, 0, 0);
-            v.AddVertexAt(2, new Point2d(g.Right, ym), 0, 0, 0);
+            v.AddVertexAt(2, new Point2d(g.Right, yBase), 0, 0, 0);
             v.Layer = layer;
             v.Color = AcadColor.FromColorIndex(ColorMethod.ByAci, color);
             space.AppendEntity(v);
             tr.AddNewlyCreatedDBObject(v, true);
             handles.Add(v.Handle.ToString());
 
-            // Căn giữa vào lòng chữ V (giữa baseline và đỉnh).
-            var yText = g.LeftTurn ? ym + peakH * 0.45 : ym - peakH * 0.45;
+            // Mũi lên → chữ giữa đường hướng tuyến và đáy hàng; mũi xuống → giữa đường và đỉnh hàng.
+            var yText = g.LeftTurn
+                ? (yBase + yBottom) * 0.5
+                : (yBase + yTop) * 0.5;
             AddCenteredText(tr, space, styleId, layer, color,
                 new Point3d(g.X, yText, 0), g.Label, th, handles);
 
@@ -557,7 +606,102 @@ internal static class ProfileDrawService
         }
 
         if (xRight > cursor + 1e-9)
-            AddLine(tr, space, layer, color, cursor, ym, xRight, ym, handles);
+            AddLine(tr, space, layer, color, cursor, yBase, xRight, yBase, handles);
+    }
+
+    /// <summary>
+    /// Thước 100 m: vạch đứng tại cộng dồn 0, 100, 200…; chữ ngang giữa vạch;
+    /// vạch cắt rỗng đúng chiều cao chữ (không đè số).
+    /// </summary>
+    private static void DrawKc100Pickets(
+        Transaction tr, BlockTableRecord space, ObjectId styleId, ProfileBandRow row,
+        RouteRecord route, double l0, double l1, double xProfile0,
+        double yBottom, double rowHeight, List<string> handles)
+    {
+        var layer = string.IsNullOrWhiteSpace(row.Layer) ? iSurveyLayers.TdBang : row.Layer;
+        var color = row.ColorAci is >= 1 and <= 255 ? (short)row.ColorAci : (short)7;
+        var th = Math.Max(0.5, row.TextHeight);
+        var yMid = yBottom + rowHeight * 0.5;
+        // Rỗng qua chiều cao chữ (± nửa H + chút đệm).
+        var gapHalf = th * 0.55;
+        var yGapLo = yMid - gapHalf;
+        var yGapHi = yMid + gapHalf;
+        var yHi = yBottom + rowHeight;
+
+        var cong0 = l0 - route.StartChainage;
+        var cong1 = l1 - route.StartChainage;
+        var first = Math.Ceiling(cong0 / 100.0 - 1e-9) * 100.0;
+        if (first < cong0 - 1e-6)
+            first += 100.0;
+        if (cong0 <= 1e-6)
+            first = 0.0;
+
+        for (var cong = first; cong <= cong1 + 1e-6; cong += 100.0)
+        {
+            var chainage = route.StartChainage + cong;
+            if (chainage < l0 - 1e-6 || chainage > l1 + 1e-6)
+                continue;
+
+            var x = xProfile0 + (chainage - l0);
+            if (yGapLo > yBottom + 1e-6)
+                AddLine(tr, space, layer, color, x, yBottom, x, yGapLo, handles);
+            if (yHi > yGapHi + 1e-6)
+                AddLine(tr, space, layer, color, x, yGapHi, x, yHi, handles);
+
+            var label = cong.ToString("0", CultureInfo.InvariantCulture);
+            AddCenteredText(tr, space, styleId, layer, color,
+                new Point3d(x, yMid, 0), label, th, handles);
+        }
+    }
+
+    /// <summary>
+    /// Khoảng néo = khoảng cách giữa hai điểm Góc liên tiếp (đầu/cuối tuyến + đỉnh có góc).
+    /// Vạch đứng tại mỗi G; số khoảng giữa hai vạch, chữ ngang.
+    /// </summary>
+    private static void DrawNeoSpans(
+        Transaction tr, BlockTableRecord space, ObjectId styleId, ProfileBandRow row,
+        List<ProfileSampleService.SamplePoint> stations,
+        double l0, double xProfile0,
+        double yBottom, double rowHeight, List<string> handles)
+    {
+        if (stations.Count < 2)
+            return;
+
+        var gIdx = new List<int>();
+        for (var i = 0; i < stations.Count; i++)
+        {
+            if (i == 0 || i == stations.Count - 1 || TryDeflection(stations, i, out _, out _, out _))
+                gIdx.Add(i);
+        }
+
+        if (gIdx.Count < 2)
+            return;
+
+        var layer = string.IsNullOrWhiteSpace(row.Layer) ? iSurveyLayers.TdBang : row.Layer;
+        var color = row.ColorAci is >= 1 and <= 255 ? (short)row.ColorAci : (short)1;
+        var th = Math.Max(0.5, row.TextHeight);
+        var yMid = yBottom + rowHeight * 0.5;
+
+        for (var k = 0; k < gIdx.Count; k++)
+        {
+            var i = gIdx[k];
+            var x = xProfile0 + (stations[i].Chainage - l0);
+            AddLine(tr, space, layer, color, x, yBottom, x, yBottom + rowHeight, handles);
+
+            if (k == 0)
+                continue;
+
+            var i0 = gIdx[k - 1];
+            var dist = stations[i].Chainage - stations[i0].Chainage;
+            if (dist < 1e-3)
+                continue;
+
+            var x0 = xProfile0 + (stations[i0].Chainage - l0);
+            var xMid = (x0 + x) * 0.5;
+            var text = dist.ToString("0.##", CultureInfo.InvariantCulture);
+            AddCenteredText(tr, space, styleId, layer, color,
+                new Point3d(xMid, yMid, 0), text, th, handles);
+        }
     }
 
     private static bool TryDeflection(
@@ -601,25 +745,17 @@ internal static class ProfileDrawService
     {
         if (degrees < 0)
             degrees = 0;
-        var d = (int)Math.Floor(degrees);
-        var minFull = (degrees - d) * 60.0;
-        var m = (int)Math.Floor(minFull + 1e-9);
-        var s = (minFull - m) * 60.0;
-        if (s >= 59.995)
-        {
-            s = 0;
-            m++;
-        }
-
-        if (m >= 60)
-        {
-            m = 0;
-            d++;
-        }
+        var totalSec = (int)Math.Round(degrees * 3600.0);
+        if (totalSec < 0)
+            totalSec = 0;
+        var d = totalSec / 3600;
+        var rem = totalSec % 3600;
+        var m = rem / 60;
+        var s = rem % 60;
 
         return d.ToString("0", CultureInfo.InvariantCulture) + "°"
             + m.ToString("00", CultureInfo.InvariantCulture) + "'"
-            + s.ToString("00.00", CultureInfo.InvariantCulture) + "\"";
+            + s.ToString("00", CultureInfo.InvariantCulture) + "\"";
     }
 
     private static void WriteCell(

@@ -148,7 +148,7 @@ public sealed class DrawProfileViewModel : INotifyPropertyChanged
     private string _labelWidthText = "250";
     private string _scaleBarWidthText = "1";
     private string _rowGapText = "5";
-    private string _headerClearanceText = "40";
+    private string _headerClearanceText = "10";
     private bool _drawMultipleRoutes;
     private bool _fillChainage = true;
     private bool _fillDatumLabels = true;
@@ -157,6 +157,7 @@ public sealed class DrawProfileViewModel : INotifyPropertyChanged
     private bool _drawBandHeader = true;
     private bool _elevationsAtStationsOnly = true;
     private bool _showGrid;
+    private bool _drawCrossMark = true;
     private string _templateName = "Tiêu chuẩn";
     private int _selectedRouteIndex;
     private ProfileBandRowVm? _selectedRow;
@@ -377,6 +378,12 @@ public sealed class DrawProfileViewModel : INotifyPropertyChanged
         set => Set(ref _showGrid, value);
     }
 
+    public bool DrawCrossMark
+    {
+        get => _drawCrossMark;
+        set => Set(ref _drawCrossMark, value);
+    }
+
     public string TemplateName
     {
         get => _templateName;
@@ -556,6 +563,7 @@ public sealed class DrawProfileViewModel : INotifyPropertyChanged
             DrawBandHeader = DrawBandHeader,
             ElevationsAtStationsOnly = ElevationsAtStationsOnly,
             ShowGrid = ShowGrid,
+            DrawCrossMark = DrawCrossMark,
             TemplateName = TemplateName,
             Rows = new List<ProfileBandRow>()
         };
@@ -591,6 +599,7 @@ public sealed class DrawProfileViewModel : INotifyPropertyChanged
         DrawBandHeader = opts.DrawBandHeader;
         ElevationsAtStationsOnly = opts.ElevationsAtStationsOnly;
         ShowGrid = opts.ShowGrid;
+        DrawCrossMark = opts.DrawCrossMark;
         TemplateName = string.IsNullOrWhiteSpace(opts.TemplateName) ? "Tiêu chuẩn" : opts.TemplateName;
         if (!TemplateNames.Contains(TemplateName))
             TemplateNames.Add(TemplateName);

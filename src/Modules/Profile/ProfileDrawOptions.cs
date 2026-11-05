@@ -26,10 +26,10 @@ public sealed class ProfileDrawOptions
     public double LabelInset { get; set; } = 40;
 
     /// <summary>
-    /// Cách đầu bảng tới đường dóng nét đứt (mốc Y = mức so sánh).
-    /// Đường đất / thước tỷ lệ tính từ đường này, không dính mép trên bảng.
+    /// Cách đầu bảng (ngang): khoảng từ thước tỷ lệ (mép phải cột nhãn) tới đầu đường đất /
+    /// đường tím nét đứt đứng. Khoảng đứng đầu bảng luôn 0 (đất sát mép trên bảng).
     /// </summary>
-    public double HeaderClearance { get; set; } = 40;
+    public double HeaderClearance { get; set; } = 10;
 
     public double ScaleBarWidth { get; set; } = 1;
 
@@ -48,6 +48,9 @@ public sealed class ProfileDrawOptions
     public bool ElevationsAtStationsOnly { get; set; } = true;
 
     public bool ShowGrid { get; set; }
+
+    /// <summary>Vẽ chữ thập đỏ tại đầu mặt cắt × trung điểm hàng Sơ họa mặt bằng.</summary>
+    public bool DrawCrossMark { get; set; } = true;
 
     public string TemplateName { get; set; } = "Tiêu chuẩn";
 
@@ -77,6 +80,7 @@ public sealed class ProfileDrawOptions
             DrawBandHeader = DrawBandHeader,
             ElevationsAtStationsOnly = ElevationsAtStationsOnly,
             ShowGrid = ShowGrid,
+            DrawCrossMark = DrawCrossMark,
             TemplateName = TemplateName,
             Rows = new List<ProfileBandRow>(Rows.Count)
         };

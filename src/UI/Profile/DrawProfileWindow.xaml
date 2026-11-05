@@ -159,6 +159,7 @@
                         <CheckBox Content="Chèn thước tỷ lệ phải" IsChecked="{Binding InsertRightScaleBar}"/>
                         <CheckBox Content="Vẽ đầu bảng TD" IsChecked="{Binding DrawBandHeader}"/>
                         <CheckBox Content="Hiển thị dạng lưới" IsChecked="{Binding ShowGrid}"/>
+                        <CheckBox Content="Chữ thập" IsChecked="{Binding DrawCrossMark}"/>
                     </StackPanel>
 
                     <Grid Margin="0,6,0,0">

@@ -233,12 +233,12 @@ public sealed class AuthModule : ISurveyModule
                 ("Trạng thái", "Đã kích hoạt"),
                 ("Mã thiết bị (HWID)", lic.HardwareId),
                 ("Ngày kích hoạt", lic.ActivatedAt.LocalDateTime.ToString("dd/MM/yyyy HH:mm")),
-                ("Hình thức", lic.Mode == LicenseMode.Online ? "Trực tuyến (Supabase)" : "Ngoại tuyến (mã Admin)"),
+                ("Hình thức", lic.Mode == LicenseMode.Online ? "Trực tuyến (Network)" : "Ngoại tuyến (mã Admin)"),
                 ("Xác minh gần nhất", lic.VerifiedAt.LocalDateTime.ToString("dd/MM/yyyy HH:mm")),
                 ("Hạn dùng khi không có mạng", lic.ExpiresAt.LocalDateTime.ToString("dd/MM/yyyy HH:mm"))
             ],
             note: lic.Mode == LicenseMode.Online
-                ? "iSurvey tự xác minh lại ngầm mỗi 24 giờ khi mở Civil 3D. Mất mạng vẫn dùng được tới hạn trên."
+                ? null
                 : "Giấy phép ngoại tuyến chỉ có hiệu lực 7 ngày; hãy kích hoạt trực tuyến khi có mạng.");
     }
 }

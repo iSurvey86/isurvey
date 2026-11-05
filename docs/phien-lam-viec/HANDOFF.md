@@ -5,6 +5,42 @@
 
 ---
 
+## 2026-11-06 — VEMCD KC 100m / néo / chữ thập + kiểu cọc (1.8.17, không bump)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026 Metric. Cuối phiên đầy đủ. **Không bump.** Vẫn **1.8.17** (đã phát hành 2026-11-03).
+
+### Đã chốt / đã làm
+
+- **VEMCD**: **Cách đầu bảng** = khoảng ngang thước→đất (đứng luôn 0). Hàng **Khoảng cách 100m**: picket 0/100/200… chữ ngang, vạch đứng cắt rỗng qua chiều cao chữ. **Khoảng néo**: theo điểm G (đầu/cuối + đỉnh có góc), số khoảng chữ ngang giữa hai vạch. Checkbox **Chữ thập** (đỏ tại đầu mặt cắt × giữa hàng sơ họa). Đã nhìn trên Civil (bản sao `_test_vemcd_kc100`, không ghi đè bản vẽ công trình).
+- **THIETLAPCOC** / phát sinh cọc: cao chữ mặc định 2,5 mm giấy @ 1:1000 (không theo zoom); bỏ giá trị cao chữ/offset lệch quá lớn đã lưu nhầm.
+- **ABT**: hình thức trực tuyến ghi Network; bỏ ghi chú tự xác minh 24 giờ.
+- Catalog Excel, README, CHANGELOG (mục sau phát hành), cập nhật kịch bản `vemcd-1.8.17` (Chưa quay). Không quay, không đăng. Không phát hành lại.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| VEMCD | `ProfileDrawService`, `ProfileDrawOptions`, `DrawProfileWindow/ViewModel`, `ProfileRecord` / Store |
+| Kiểu cọc | `RouteService`, `StationStyleWindow.xaml` |
+| About | `AuthModule.cs` |
+| Docs / video | `README.md`, `CHANGELOG.md`, `CATALOG.md`, `kich-ban/vemcd-1.8.17.*`, catalog Excel |
+
+### Việc tiếp
+
+- [ ] Video VEMCD / GOC / DUOITUYEN / D2C 1.8.17 chưa quay. YouTube vẫn thiếu `client_secret.json`.
+- [ ] Bản vẽ công trình: chạy lại VEMCD (và UAVCLIP/RAIMCD nếu layout cũ còn lệch) khi cần hình mới.
+- [ ] Bump / phát hành bản sau 1.8.17 khi được yêu cầu.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff đầu. iSurvey 1.8.17 đã phát hành; phiên 06/11 không bump. VEMCD: Cách đầu bảng ngang; KC 100m chữ ngang + vạch cắt rỗng; khoảng néo chữ ngang; chữ thập tùy chọn. THIETLAPCOC cao chữ theo tỷ lệ giấy, không theo zoom. Tiếp: quay video khi được yêu cầu, bump/phát hành khi được bảo, hoặc việc mới.
+```
+
+**Lưu trữ ngày:** [2026-11-06-vemcd-kc100-neo.md](./2026-11-06-vemcd-kc100-neo.md)
+
+---
+
 ## 2026-11-05 — VEMCD Pha 3 + GOC/DUOITUYEN (1.8.17, không bump)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026 Metric. Cuối phiên đầy đủ. **Không bump.** Vẫn **1.8.17** (đã phát hành 2026-11-03).

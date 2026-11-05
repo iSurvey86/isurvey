@@ -31,7 +31,7 @@ Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georefere
 | `CATBD` | **CBD** | Cắt bình đồ theo đường biên (giữ Z, không dùng TRIM) |
 | `AUTOSCAN` | **SCN** | Quét cấu trúc bản vẽ, xuất `CAD_AutoScan_Report.txt` |
 | `ISURVEY_LOGIN` | **LGI** | Đăng nhập / kích hoạt (Gmail + OTP 6 số) |
-| `ISURVEY_ABOUT` | **ABT** | Thông tin tài khoản và giấy phép trên máy |
+| `ISURVEY_ABOUT` | **ABT** | Thông tin tài khoản và giấy phép trên máy (hình thức trực tuyến ghi Network; không ghi chú tự xác minh 24 giờ) |
 | `ISURVEY_HDSD` | **HD** | Mở hướng dẫn iSurvey trên web. Không cần đăng nhập |
 | `ISURVEY_LOGOUT` | **LGO** | Đăng xuất / đổi máy (trả suất thiết bị nếu đang trực tuyến) |
 | `ISURVEY_UPDATE` | **UPD** | Kiểm tra cập nhật: tải gói và giải nén, rồi đóng Civil như bấm nút đóng. Bản vẽ chưa lưu thì hỏi lưu. Đóng xong thì cài ngay và mở lại |
@@ -43,7 +43,7 @@ Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georefere
 | `XUATDIEM` | **XD** | Xuất điểm, block hoặc chữ. CSV dùng dấu phân cách danh sách của Windows. TXT dùng tab. Thập phân luôn là dấu chấm. Chữ đọc được thành số thì thành cao độ và để trống tên. Tên xếp từ số nhỏ đến lớn, rồi A–Z |
 | `ISURVEY_ROUTE_NEW` | **TAOTUYEN** | Tạo tuyến: tên, lý trình gốc, mô hình bám (mặc định mô hình vừa tạo); chọn polyline rồi chọn điểm đầu gần một đầu mút |
 | `ISURVEY_ROUTE_STATIONS` | **PHATSINHCOC** | Phát sinh cọc vuông góc tuyến; Z từ TIN; chữ vuông góc; luôn có cọc tại đỉnh; layer `isurvey_Coctuyen` |
-| `ISURVEY_STATION_STYLE` | **THIETLAPCOC** | Thiết lập chiều dài cọc, cao chữ, khoảng cách chữ; tùy chọn theo độ rộng polyline |
+| `ISURVEY_STATION_STYLE` | **THIETLAPCOC** | Thiết lập chiều dài cọc, cao chữ, khoảng cách chữ; để trống/0: cao chữ 2,5 mm giấy @ 1:1000 (không theo zoom); offset > 50 m bị bỏ; tùy chọn theo độ rộng polyline |
 | `ISURVEY_STATION_ADD_ONE` | **THEMCOC** | Thêm một cọc tại điểm pick gần tim |
 | `ISURVEY_STATION_REMOVE_ONE` | **XOACOC1** | Xóa một cọc (chọn gạch hoặc chữ) |
 | `ISURVEY_STATION_LIST` | **BANGCOC** | Bảng danh sách cọc: zoom, xóa, thêm |
@@ -64,7 +64,7 @@ Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georefere
 | `ISURVEY_TERRAIN_CLEAR` | **XOATHANHPHAN** | Xóa toàn bộ điểm, đứt gãy, đồng mức hoặc đường bao khỏi mô hình. Có hộp xác nhận. Đối tượng CAD vẫn giữ |
 | `ISURVEY_TERRAIN_TOGGLE` | **ANTIN** | Ẩn hoặc hiện lưới của mô hình |
 | `ISURVEY_TERRAIN_Z` | **TRACAOD** | Tra cao độ trên lưới: chọn nhiều vị trí, hiện Z trên dòng lệnh và chữ đỏ tạm trên bản vẽ; Enter để xong |
-| `ISURVEY_PROFILE_DRAW` | **VEMCD** | Vẽ mặt cắt dọc trên Model: hộp thoại 2 cột + footer, mẫu bảng 8 hàng (sơ họa 200, còn lại 50). Chữ đầu bảng cao 12, lệch mép 40; **Cách đầu bảng** = đường dóng nét đứt làm mốc Z (đường đất không dính mép bảng). Chữ dọc cao độ/khoảng cách; hướng tuyến kiểu ADS `/\` `\/` với `A=` căn giữa V. Chỉ hàng khoảng cách lẻ có dóng dọc. Mức so sánh tự do (không cắt A3). Mỗi lần vẽ chỉ điểm chèn; vẽ lại xóa bản cũ. Layer `iSurvey_TD_*`. `RAIMCD` chỉ rải khung in. Có từ 1.8.17 |
+| `ISURVEY_PROFILE_DRAW` | **VEMCD** | Vẽ mặt cắt dọc trên Model: hộp thoại 2 cột + footer, mẫu bảng 8 hàng (sơ họa 200, còn lại 50). Chữ đầu bảng cao 12, lệch mép 40; **Cách đầu bảng** = khoảng ngang thước→đất (đứng = 0). Chữ dọc cao độ/KC lẻ; hàng **Khoảng cách 100m** picket 0/100/200… chữ ngang, vạch đứng cắt rỗng qua chiều cao chữ; **Khoảng néo** theo G, số khoảng chữ ngang; hướng ADS `/\` `\/` với `A=` căn giữa V; chữ thập đỏ tùy chọn. Chỉ hàng khoảng cách lẻ có dóng dọc. Mức so sánh tự do (không cắt A3). Mỗi lần vẽ chỉ điểm chèn; vẽ lại xóa bản cũ. Layer `iSurvey_TD_*`. `RAIMCD` chỉ rải khung in. Có từ 1.8.17 |
 | `ISURVEY_PROFILE_SHEETS` | **RAIMCD** | Rải khung mặt cắt dọc đã vẽ: chọn góc dưới-trái hàng cuối. Tỷ lệ `1/500; 1/5000` (hoặc `1/200; 1/2000`), không tăng khổ chỉ vì mặt cắt cao. Cửa sổ là ô bản đồ của khối khung: A3 là 340 × 277 mm, mép phải dừng đúng vạch khung tên. Đoạn cao hơn khung được thêm tờ phía trên, cùng tỷ lệ; tờ dưới ghim dòng đã chọn ở đáy ô. Layout `MatCat_Doc`. Cuối hộp thoại: Tải file mẫu, Xuất file, Nhập file. Model không bị xóa |
 | `ISURVEY_ROUTE_PLOT` | **INTUYEN** | In layout `BanDo_Tuyen` hoặc `MatCat_Doc` đã rải. Hộp thoại: In màu (`acad.ctb`) hoặc In đen trắng (`monochrome.ctb`), chèn chữ ký DWG theo chức danh đã ghi trên khung, đóng mộc đỏ PNG. Chữ ký và mộc chỉ trên PDF. Rồi hỏi `1` khung đang chọn, `2` tất cả. Không dựng trang mới. In xong có nút Mở thư mục |
 | `ISURVEY_FIT_TITLE` | **CODAN** | Co ô chủ đầu tư và đại diện chủ đầu tư về một dòng. Ô tên bản vẽ vẫn xuống dòng trong khung |

@@ -53,7 +53,7 @@ public static class ProfileStore
                 if (profile.LabelInset <= 0)
                     profile.LabelInset = 40;
                 if (profile.HeaderClearance < 0)
-                    profile.HeaderClearance = 40;
+                    profile.HeaderClearance = 10;
                 if (profile.ProfileTextHeight <= 0)
                     profile.ProfileTextHeight = 12;
                 list.Add(profile);

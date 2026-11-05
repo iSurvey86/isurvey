@@ -39,7 +39,7 @@ public static class ProfileSettingsStore
             if (opts.LabelInset <= 0)
                 opts.LabelInset = 40;
             if (opts.HeaderClearance < 0)
-                opts.HeaderClearance = 40;
+                opts.HeaderClearance = 10;
             if (opts.ProfileTextHeight <= 0)
                 opts.ProfileTextHeight = 12;
             // Mẫu cũ lưu TextHeight 7.5 — nâng lên 12 nếu còn mặc định cũ.

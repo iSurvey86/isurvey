@@ -4,9 +4,15 @@
 
 Đã phát hành 2026-11-03. Gộp các thay đổi đã làm dưới số 1.8.16 (chưa đóng gói) và bump lên 1.8.17.
 
+### Sau phát hành (2026-11-06, chưa bump)
+
+- **VEMCD**: **Cách đầu bảng** = khoảng ngang thước→đất (đứng luôn 0); hàng **Khoảng cách 100m** picket 0/100/200… chữ ngang, vạch đứng cắt rỗng qua chiều cao chữ; **Khoảng néo** theo điểm G, số khoảng chữ ngang; checkbox **Chữ thập** (đỏ tại đầu mặt cắt × giữa hàng sơ họa). Đã nhìn trên Civil 3D 2026 Metric (bản sao `_test_vemcd_kc100`, không ghi đè bản vẽ công trình).
+- **THIETLAPCOC** / phát sinh cọc: cao chữ mặc định 2,5 mm giấy @ 1:1000 (không theo zoom); bỏ giá trị cao chữ/offset lệch quá lớn đã lưu nhầm.
+- **ABT**: hình thức trực tuyến ghi Network; bỏ ghi chú tự xác minh 24 giờ.
+
 ### Sau phát hành (2026-11-05, chưa bump)
 
-- **VEMCD** Pha 3: hộp thoại 2 cột + footer; mẫu 8 hàng; chữ dọc cao độ/KC; hướng ADS `/\` `\/` với `A=` căn giữa V (baseline tách khỏi chân V); chỉ hàng khoảng cách lẻ có dóng dọc; không ghi Z trên đường đất; mỗi lần vẽ chỉ điểm chèn, vẽ lại = xóa bản cũ; mức so sánh tự do (bỏ cắt A3). Chữ đầu bảng mặc định 12, lệch mép 40; mục **Cách đầu bảng** + đường dóng nét đứt trên/dưới vùng đất. Đã nhìn trên Civil 3D 2026 Metric (Drawing1 thử, không lưu).
+- **VEMCD** Pha 3: hộp thoại 2 cột + footer; mẫu 8 hàng; chữ dọc cao độ/KC; hướng ADS `/\` `\/` với `A=` căn giữa V (baseline tách khỏi chân V); chỉ hàng khoảng cách lẻ có dóng dọc; không ghi Z trên đường đất; mỗi lần vẽ chỉ điểm chèn, vẽ lại = xóa bản cũ; mức so sánh tự do (bỏ cắt A3). Chữ đầu bảng mặc định 12, lệch mép 40; mục **Cách đầu bảng** (lúc đó còn đường dóng nét đứt đứng). Đã nhìn trên Civil 3D 2026 Metric (Drawing1 thử, không lưu).
 - **GOC**: chữ G né tim; xuất `MoTaTuyen-….txt` (góc °′″, placeholder điền tay). **DUOITUYEN**: polyline tim nét đứt sau duỗi; bảng góc chuyển sang GOC.
 - **TAOTUYEN**: mặc định mô hình vừa tạo. **THEMMOHINH**: Bỏ chọn tất cả; mặc định Điểm/Block+chữ cao độ cạnh. **PHATSINHCOC**: bỏ gợi ý thừa trên hộp.
 

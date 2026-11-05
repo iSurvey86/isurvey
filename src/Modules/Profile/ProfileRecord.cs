@@ -24,7 +24,7 @@ public sealed class ProfileRecord
 
     public double LabelInset { get; set; } = 40;
 
-    public double HeaderClearance { get; set; } = 40;
+    public double HeaderClearance { get; set; } = 10;
 
     public double ProfileTextHeight { get; set; } = 12;
 
@@ -43,6 +43,8 @@ public sealed class ProfileRecord
     public bool ElevationsAtStationsOnly { get; set; } = true;
 
     public bool ShowGrid { get; set; }
+
+    public bool DrawCrossMark { get; set; } = true;
 
     public string TemplateName { get; set; } = "Tiêu chuẩn";
 
@@ -77,6 +79,7 @@ public sealed class ProfileRecord
             DrawBandHeader = DrawBandHeader,
             ElevationsAtStationsOnly = ElevationsAtStationsOnly,
             ShowGrid = ShowGrid,
+            DrawCrossMark = DrawCrossMark,
             TemplateName = TemplateName,
             Rows = new List<ProfileBandRow>()
         };
@@ -125,6 +128,7 @@ public sealed class ProfileRecord
             DrawBandHeader = options.DrawBandHeader,
             ElevationsAtStationsOnly = options.ElevationsAtStationsOnly,
             ShowGrid = options.ShowGrid,
+            DrawCrossMark = options.DrawCrossMark,
             TemplateName = options.TemplateName,
             Rows = rows,
             EntityHandles = handles

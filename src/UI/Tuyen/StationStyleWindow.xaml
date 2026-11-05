@@ -35,17 +35,17 @@
             <StackPanel Grid.Row="1" Margin="16,14,16,8">
                 <TextBlock Text="Chiều dài cọc (m)" Foreground="#374151" Margin="0,0,0,4"/>
                 <TextBox x:Name="TickBox" Padding="8,6" Margin="0,0,0,4"/>
-                <TextBlock Text="Để trống hoặc 0: tự động theo khung nhìn (cao chữ × 2,5)."
+                <TextBlock Text="Để trống hoặc 0: tự động (cao chữ × 2,5). Không theo zoom."
                            Foreground="#64748B" FontSize="12" Margin="0,0,0,10" TextWrapping="Wrap"/>
 
                 <TextBlock Text="Cao chữ (m)" Foreground="#374151" Margin="0,0,0,4"/>
                 <TextBox x:Name="HeightBox" Padding="8,6" Margin="0,0,0,4"/>
-                <TextBlock Text="Để trống hoặc 0: tự động theo khung nhìn."
+                <TextBlock Text="Để trống hoặc 0: 2,5 mm giấy ở tỷ lệ 1:1000 (= 2,5 m). Không theo zoom."
                            Foreground="#64748B" FontSize="12" Margin="0,0,0,10" TextWrapping="Wrap"/>
 
                 <TextBlock Text="Khoảng cách chữ đến tâm cọc (m)" Foreground="#374151" Margin="0,0,0,4"/>
                 <TextBox x:Name="OffsetBox" Padding="8,6" Margin="0,0,0,4"/>
-                <TextBlock Text="Để trống hoặc 0: tự động (khoảng nửa cọc + một phần cao chữ)."
+                <TextBlock Text="Để trống hoặc 0: tự động (khoảng nửa cọc + một phần cao chữ). Giá trị &gt; 50 m bị bỏ."
                            Foreground="#64748B" FontSize="12" Margin="0,0,0,10" TextWrapping="Wrap"/>
 
                 <CheckBox x:Name="WidthBox" Content="Lấy chiều dài cọc theo độ rộng polyline tim (nếu có)"

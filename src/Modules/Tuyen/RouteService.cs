@@ -729,8 +729,13 @@ public static class RouteService
         out double textOffset)
     {
         var style = StationStyleStore.Load();
-        height = style.TextHeight > 1e-9 ? style.TextHeight : EstimateTextHeight(doc);
-        tick = style.TickLength > 1e-9 ? style.TickLength : Math.Max(height * 2.5, 1.0);
+        // Cao chữ quá lớn (vd. từng lưu theo zoom toàn tuyến) → bỏ, dùng ước lượng theo tỷ lệ.
+        height = style.TextHeight > 1e-9 && style.TextHeight <= MaxReasonableTextHeight
+            ? style.TextHeight
+            : EstimateTextHeight();
+        tick = style.TickLength > 1e-9 && style.TickLength <= MaxReasonableTickLength
+            ? style.TickLength
+            : Math.Max(height * 2.5, height);
         if (style.UsePolylineWidth)
         {
             var width = TryPolylineWidth(curve);
@@ -739,10 +744,21 @@ public static class RouteService
                 tick = width * factor;
         }
 
-        textOffset = style.TextOffset > 1e-9
+        // Offset hàng trăm mét (lưu nhầm) làm chữ lệch xa tim — bỏ qua, dùng tự động.
+        textOffset = style.TextOffset > 1e-9 && style.TextOffset <= MaxReasonableTextOffset
             ? style.TextOffset
             : tick * 0.55 + height * 0.35;
     }
+
+    /// <summary>Cỡ chữ trên giấy (mm) — cùng quy ước GOC.</summary>
+    private const double StationTextHeightMm = 2.5;
+
+    /// <summary>Tỷ lệ bản đồ mặc định khi không nhập tay (1:M).</summary>
+    private const int DefaultMapScale = 1000;
+
+    private const double MaxReasonableTextHeight = 20.0;
+    private const double MaxReasonableTickLength = 50.0;
+    private const double MaxReasonableTextOffset = 50.0;
 
     /// <summary>Độ rộng polyline tim (ConstantWidth hoặc trung bình Start/EndWidth).</summary>
     private static double TryPolylineWidth(Curve curve)
@@ -777,18 +793,12 @@ public static class RouteService
         return count == 0 ? 0 : sum / count;
     }
 
-    private static double EstimateTextHeight(Autodesk.AutoCAD.ApplicationServices.Document doc)
-    {
-        try
-        {
-            var view = doc.Editor.GetCurrentView();
-            return Math.Max(view.Height / 50.0, 0.2);
-        }
-        catch (System.Exception)
-        {
-            return 1.0;
-        }
-    }
+    /// <summary>
+    /// Cao chữ theo tỷ lệ bản đồ (không theo zoom khung nhìn).
+    /// 2,5 mm giấy @ 1:1000 → 2,5 m trên model.
+    /// </summary>
+    private static double EstimateTextHeight() =>
+        StationTextHeightMm * DefaultMapScale / 1000.0;
 
     private static string Clip(string text) =>
         text.Length <= 255 ? text : text.Substring(0, 255);
