@@ -196,12 +196,21 @@ public sealed class ProfileModule
             }
 
             drawn++;
-            var bandH = ProfileBandRow.TotalHeight(options.Rows);
-            origin = new Point3d(insert.X, origin.Y + bandH + 200 + ProfileDrawService.SegmentGap, 0);
+            if (!options.DrawMultipleRoutes || drawn >= targets.Count)
+                continue;
+
+            // Dàn trang xuống: insert tiếp theo sao cho đỉnh MCD sau ≈ Y_min_trước − 50.
+            var yMin = ProfileDrawService.GetProfileYMin(doc, profile.EntityHandles, profile.InsertY);
+            var nextBandH = ProfileBandRow.TotalHeight(options.Rows);
+            // Dự phòng chiều cao đất (cùng pad cũ 200) để MCD sau không chồng lên.
+            var nextHeightGuess = nextBandH + 200;
+            origin = new Point3d(insert.X, yMin - ProfileDrawService.BatchRouteGapY - nextHeightGuess, 0);
         }
 
         if (drawn == 0)
             ed.WriteMessage("\n[iSurvey] Không vẽ được mặt cắt nào.");
+        else if (options.DrawMultipleRoutes && drawn > 1)
+            ed.WriteMessage("\n[iSurvey] Đã vẽ " + drawn + " mặt cắt (dàn trang Y_min − 50).");
     }
 
     private static void RunUpdate(

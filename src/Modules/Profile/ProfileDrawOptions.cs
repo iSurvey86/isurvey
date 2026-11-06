@@ -7,8 +7,11 @@ public sealed class ProfileDrawOptions
 
     public string ProfileName { get; set; } = "";
 
+    /// <summary>Bước lấy mẫu Z bổ sung dọc tim (m). UI ẩn — engine luôn dùng 20.</summary>
+    public const double FixedSampleStepM = 20;
+
     /// <summary>Bước lấy mẫu Z bổ sung dọc tim (m). 0 = chỉ cọc (+ giao TIN nếu có).</summary>
-    public double SampleStepM { get; set; } = 20;
+    public double SampleStepM { get; set; } = FixedSampleStepM;
 
     public bool DrawMultipleRoutes { get; set; }
 
@@ -33,7 +36,8 @@ public sealed class ProfileDrawOptions
 
     public double ScaleBarWidth { get; set; } = 1;
 
-    public double RowGap { get; set; } = 5;
+    /// <summary>Đã bỏ khỏi UI — luôn 0.</summary>
+    public double RowGap { get; set; }
 
     public bool FillChainage { get; set; } = true;
 

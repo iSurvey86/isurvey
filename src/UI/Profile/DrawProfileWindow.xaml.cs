@@ -3,9 +3,6 @@ using System.Windows.Input;
 using iSurvey.Modules.Profile;
 using iSurvey.Modules.Tuyen;
 using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
-using AcadColor = Autodesk.AutoCAD.Colors.Color;
-using AcadColorDialog = Autodesk.AutoCAD.Windows.ColorDialog;
-using AcadColorMethod = Autodesk.AutoCAD.Colors.ColorMethod;
 using Win32OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Win32SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
@@ -92,30 +89,6 @@ public partial class DrawProfileWindow : Window
     private void AddRow_Click(object sender, RoutedEventArgs e) => _vm.AddRow();
 
     private void RemoveRow_Click(object sender, RoutedEventArgs e) => _vm.RemoveSelectedRow();
-
-    private void ColorCell_Click(object sender, MouseButtonEventArgs e)
-    {
-        if (sender is not FrameworkElement { DataContext: ProfileBandRowVm row })
-            return;
-        e.Handled = true;
-        try
-        {
-            var dlg = new AcadColorDialog();
-            var aci = row.ColorAci is >= 1 and <= 255 ? (short)row.ColorAci : (short)7;
-            dlg.Color = AcadColor.FromColorIndex(AcadColorMethod.ByAci, aci);
-            if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                return;
-            var picked = dlg.Color;
-            if (picked.ColorMethod == AcadColorMethod.ByAci || picked.ColorMethod == AcadColorMethod.ByLayer)
-                row.ColorAci = picked.ColorIndex;
-            else
-                row.ColorAci = picked.ColorIndex is >= 1 and <= 255 ? picked.ColorIndex : 7;
-        }
-        catch (Exception ex)
-        {
-            System.Windows.MessageBox.Show(this, "Không mở được bảng màu CAD: " + ex.Message, "iSurvey");
-        }
-    }
 
     private void Import_Click(object sender, RoutedEventArgs e)
     {

@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
@@ -17,10 +18,17 @@ public sealed class ProfileBandRowVm : INotifyPropertyChanged
     private string _content = "";
     private string _layer = iSurveyLayers.TdChu;
     private string _textStyle = ProfileTextStyles.StyleName;
-    private int _colorAci = 7;
+    private int _colorAci = 256; // ByLayer
     private double _textHeight = 12;
     private double _rowHeight = 50;
     private string _key = "";
+    private int _stt = 1;
+
+    public int Stt
+    {
+        get => _stt;
+        set => Set(ref _stt, value);
+    }
 
     public string Key
     {
@@ -144,9 +152,7 @@ public sealed class DrawProfileViewModel : INotifyPropertyChanged
     private string _verticalScaleText = "100";
     private string _horizontalScaleText = "1000";
     private string _datumText = "0";
-    private string _profileTextHeightText = "12";
     private string _labelWidthText = "250";
-    private string _scaleBarWidthText = "1";
     private string _rowGapText = "5";
     private string _headerClearanceText = "10";
     private bool _drawMultipleRoutes;
@@ -166,6 +172,7 @@ public sealed class DrawProfileViewModel : INotifyPropertyChanged
     public DrawProfileViewModel(IReadOnlyList<RouteRecord> routes, string? preferredRouteId, ProfileDrawOptions? saved)
     {
         Routes = routes.Where(r => r.Stations is { Count: > 0 }).ToList();
+        Rows.CollectionChanged += (_, _) => RenumberRows();
         foreach (var name in new[] { "Tiêu chuẩn", "235" })
             TemplateNames.Add(name);
 
@@ -300,22 +307,10 @@ public sealed class DrawProfileViewModel : INotifyPropertyChanged
         set => Set(ref _datumText, value ?? "");
     }
 
-    public string ProfileTextHeightText
-    {
-        get => _profileTextHeightText;
-        set => Set(ref _profileTextHeightText, value ?? "");
-    }
-
     public string LabelWidthText
     {
         get => _labelWidthText;
         set => Set(ref _labelWidthText, value ?? "");
-    }
-
-    public string ScaleBarWidthText
-    {
-        get => _scaleBarWidthText;
-        set => Set(ref _scaleBarWidthText, value ?? "");
     }
 
     public string RowGapText
@@ -405,7 +400,7 @@ public sealed class DrawProfileViewModel : INotifyPropertyChanged
             Content = "empty",
             Layer = iSurveyLayers.TdChu,
             TextStyle = ProfileTextStyles.StyleName,
-            ColorAci = 7,
+            ColorAci = 256,
             TextHeight = 12,
             RowHeight = 50
         };
@@ -443,6 +438,12 @@ public sealed class DrawProfileViewModel : INotifyPropertyChanged
             Rows.Add(ProfileBandRowVm.FromModel(row));
         if (!TemplateNames.Contains(TemplateName))
             TemplateNames.Add(TemplateName);
+    }
+
+    private void RenumberRows()
+    {
+        for (var i = 0; i < Rows.Count; i++)
+            Rows[i].Stt = i + 1;
     }
 
     public void RefreshDatumSuggestion()
@@ -507,12 +508,6 @@ public sealed class DrawProfileViewModel : INotifyPropertyChanged
             return false;
         }
 
-        if (!TryDouble(SampleStepText, out var step) || step < 0)
-        {
-            error = "Khoảng cách lấy Z phải ≥ 0.";
-            return false;
-        }
-
         if (!TryInt(VerticalScaleText, out var v) || v <= 0 || !TryInt(HorizontalScaleText, out var h) || h <= 0)
         {
             error = "Tỷ lệ đứng/ngang phải là số nguyên dương.";
@@ -525,50 +520,50 @@ public sealed class DrawProfileViewModel : INotifyPropertyChanged
             return false;
         }
 
-        if (!TryDouble(ProfileTextHeightText, out var th) || th <= 0)
-        {
-            error = "Cao chữ TD phải > 0.";
-            return false;
-        }
-
         if (!TryDouble(LabelWidthText, out var lw) || lw < 20)
         {
             error = "Rộng đầu bảng phải ≥ 20.";
             return false;
         }
 
-        TryDouble(ScaleBarWidthText, out var sbw);
-        TryDouble(RowGapText, out var gap);
         TryDouble(HeaderClearanceText, out var headerClearance);
 
+        // Hard-code chốt UI: Z step 20; chữ thước/MSS=12; rộng vạch thước=1;
+        // luôn MSS + đầu bảng + thước trái; tắt thước phải; RowGap=0, ShowGrid=false.
         options = new ProfileDrawOptions
         {
             RouteId = SelectedRoute.Id,
             ProfileName = "MCD " + SelectedRoute.Name,
-            SampleStepM = step,
+            SampleStepM = 20,
             DrawMultipleRoutes = DrawMultipleRoutes,
             VerticalScale = v,
             HorizontalScale = h,
             Datum = datum,
-            ProfileTextHeight = th,
+            ProfileTextHeight = 12,
             LabelWidth = lw,
             LabelInset = 40,
             HeaderClearance = headerClearance < 0 ? 0 : headerClearance,
-            ScaleBarWidth = sbw <= 0 ? 1 : sbw,
-            RowGap = gap < 0 ? 0 : gap,
+            ScaleBarWidth = 1,
+            RowGap = 0,
             FillChainage = FillChainage,
-            FillDatumLabels = FillDatumLabels,
-            InsertLeftScaleBar = InsertLeftScaleBar,
-            InsertRightScaleBar = InsertRightScaleBar,
-            DrawBandHeader = DrawBandHeader,
+            FillDatumLabels = true,
+            InsertLeftScaleBar = true,
+            InsertRightScaleBar = false,
+            DrawBandHeader = true,
             ElevationsAtStationsOnly = ElevationsAtStationsOnly,
-            ShowGrid = ShowGrid,
+            ShowGrid = false,
             DrawCrossMark = DrawCrossMark,
             TemplateName = TemplateName,
             Rows = new List<ProfileBandRow>()
         };
         foreach (var row in Rows)
-            options.Rows.Add(row.ToModel());
+        {
+            var model = row.ToModel();
+            // Nội dung UI chỉ đụng Label; Content type giữ nguyên từ hàng.
+            // Màu luôn ByLayer khi vẽ (ACI trong file mẫu vẫn xuất/nhập được).
+            model.ColorAci = 256;
+            options.Rows.Add(model);
+        }
         if (options.Rows.Count == 0)
             options.Rows = ProfileBandRow.CreateDefaultList();
         return true;
@@ -586,9 +581,7 @@ public sealed class DrawProfileViewModel : INotifyPropertyChanged
         VerticalScaleText = opts.VerticalScale.ToString(CultureInfo.InvariantCulture);
         HorizontalScaleText = opts.HorizontalScale.ToString(CultureInfo.InvariantCulture);
         DatumText = opts.Datum.ToString("0.###", CultureInfo.InvariantCulture);
-        ProfileTextHeightText = opts.ProfileTextHeight.ToString("0.###", CultureInfo.InvariantCulture);
         LabelWidthText = opts.LabelWidth.ToString("0.###", CultureInfo.InvariantCulture);
-        ScaleBarWidthText = opts.ScaleBarWidth.ToString("0.###", CultureInfo.InvariantCulture);
         RowGapText = opts.RowGap.ToString("0.###", CultureInfo.InvariantCulture);
         HeaderClearanceText = opts.HeaderClearance.ToString("0.###", CultureInfo.InvariantCulture);
         DrawMultipleRoutes = opts.DrawMultipleRoutes;

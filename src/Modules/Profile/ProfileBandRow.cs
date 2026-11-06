@@ -22,7 +22,7 @@ public sealed class ProfileBandRow
     /// <summary>Màu ACI (1–255). 256 = ByLayer.</summary>
     public int ColorAci { get; set; } = 256;
 
-    public double TextHeight { get; set; } = 7.5;
+    public double TextHeight { get; set; } = 12;
 
     /// <summary>Cao hàng (đơn vị bản vẽ = mét lý trình trên trục X).</summary>
     public double RowHeight { get; set; } = 50;
@@ -40,18 +40,18 @@ public sealed class ProfileBandRow
     };
 
     /// <summary>
-    /// Mẫu mặc định Pha 3. Sơ họa 200; các hàng còn lại 50.
+    /// Mẫu mặc định Pha 3. Sơ họa 200; các hàng còn lại 50. Màu ByLayer.
     /// </summary>
     public static IReadOnlyList<ProfileBandRow> DefaultRows { get; } =
     [
-        new() { Key = "so_hoa", Label = "Sơ họa mặt bằng", Content = "so_hoa", Layer = iSurveyLayers.TdBang, TextStyle = ProfileTextStyles.StyleName, ColorAci = 7, TextHeight = 12, RowHeight = 200 },
-        new() { Key = "cao_do", Label = "Độ cao tự nhiên", Content = "cao_do", Layer = iSurveyLayers.TdChu, TextStyle = ProfileTextStyles.StyleName, ColorAci = 7, TextHeight = 12, RowHeight = 50 },
-        new() { Key = "le", Label = "Khoảng cách lẻ", Content = "le", Layer = iSurveyLayers.TdChu, TextStyle = ProfileTextStyles.StyleName, ColorAci = 7, TextHeight = 12, RowHeight = 50 },
-        new() { Key = "huong", Label = "Hướng tuyến", Content = "huong", Layer = iSurveyLayers.TdChu, TextStyle = ProfileTextStyles.StyleName, ColorAci = 7, TextHeight = 12, RowHeight = 50 },
-        new() { Key = "kc_100", Label = "Khoảng cách 100m", Content = "kc_100", Layer = iSurveyLayers.TdChu, TextStyle = ProfileTextStyles.StyleName, ColorAci = 7, TextHeight = 12, RowHeight = 50 },
-        new() { Key = "cong_don", Label = "Khoảng cách cộng dồn", Content = "cong_don", Layer = iSurveyLayers.TdChu, TextStyle = ProfileTextStyles.StyleName, ColorAci = 7, TextHeight = 12, RowHeight = 50 },
-        new() { Key = "neo", Label = "Khoảng néo", Content = "neo", Layer = iSurveyLayers.TdChu, TextStyle = ProfileTextStyles.StyleName, ColorAci = 7, TextHeight = 12, RowHeight = 50 },
-        new() { Key = "cot", Label = "Khoảng cột", Content = "cot", Layer = iSurveyLayers.TdChu, TextStyle = ProfileTextStyles.StyleName, ColorAci = 7, TextHeight = 12, RowHeight = 50 }
+        new() { Key = "so_hoa", Label = "Sơ họa mặt bằng", Content = "so_hoa", Layer = iSurveyLayers.TdBang, TextStyle = ProfileTextStyles.StyleName, ColorAci = 256, TextHeight = 12, RowHeight = 200 },
+        new() { Key = "cao_do", Label = "Độ cao tự nhiên", Content = "cao_do", Layer = iSurveyLayers.TdChu, TextStyle = ProfileTextStyles.StyleName, ColorAci = 256, TextHeight = 12, RowHeight = 50 },
+        new() { Key = "le", Label = "Khoảng cách lẻ", Content = "le", Layer = iSurveyLayers.TdChu, TextStyle = ProfileTextStyles.StyleName, ColorAci = 256, TextHeight = 12, RowHeight = 50 },
+        new() { Key = "huong", Label = "Hướng tuyến", Content = "huong", Layer = iSurveyLayers.TdChu, TextStyle = ProfileTextStyles.StyleName, ColorAci = 256, TextHeight = 12, RowHeight = 50 },
+        new() { Key = "kc_100", Label = "Khoảng cách 100m", Content = "kc_100", Layer = iSurveyLayers.TdChu, TextStyle = ProfileTextStyles.StyleName, ColorAci = 256, TextHeight = 12, RowHeight = 50 },
+        new() { Key = "cong_don", Label = "Khoảng cách cộng dồn", Content = "cong_don", Layer = iSurveyLayers.TdChu, TextStyle = ProfileTextStyles.StyleName, ColorAci = 256, TextHeight = 12, RowHeight = 50 },
+        new() { Key = "neo", Label = "Khoảng néo", Content = "neo", Layer = iSurveyLayers.TdChu, TextStyle = ProfileTextStyles.StyleName, ColorAci = 256, TextHeight = 12, RowHeight = 50 },
+        new() { Key = "cot", Label = "Khoảng cột", Content = "cot", Layer = iSurveyLayers.TdChu, TextStyle = ProfileTextStyles.StyleName, ColorAci = 256, TextHeight = 12, RowHeight = 50 }
     ];
 
     public static List<ProfileBandRow> CreateDefaultList()

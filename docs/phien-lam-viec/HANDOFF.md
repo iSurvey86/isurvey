@@ -5,6 +5,43 @@
 
 ---
 
+## 2026-11-06 — VEMCD UI Zero-Clutter (1.8.17, không bump)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026 Metric. Cuối phiên đầy đủ. **Không bump.** Vẫn **1.8.17** (đã phát hành 2026-11-03).
+
+### Đã chốt / đã làm
+
+- **VEMCD** Zero-Clutter (đã nhìn hộp trên `_test_vemcd_ui.dwg`, không ghi đè bản vẽ công trình):
+  - Bỏ ô cao chữ thước/MSS (`ProfileTextHeight = 12`) và rộng thước (vạch `textH × 0.55`).
+  - Cột trái: 2×2 tỷ lệ/cao độ; checkbox; CTA 2×2 dưới «Vẽ nhiều tuyến».
+  - Cột phải: bỏ Layer trên lưới; toolbar tiêu đề + Nhập/Xuất/+/− rồi Rộng đầu bảng | Mẫu.
+  - Footer chỉ Hủy/Lưu. Giữ Z=20, MSS/đầu bảng/thước trái, ByLayer, batch `Y_min − 50`.
+- Catalog Excel, README, CHANGELOG, kịch bản `vemcd-1.8.17` (Chưa quay). Không quay, không đăng. Không phát hành lại.
+
+### File chính
+
+| Khu vực | File |
+|---------|------|
+| UI | `DrawProfileWindow.xaml`, `DrawProfileViewModel.cs`, `DrawProfileWindow.xaml.cs` |
+| Engine | `ProfileDrawService`, `ProfileDrawOptions`, `ProfileBandRow`, `ProfileModule`, `ProfileSettingsStore` |
+| Docs / video | `README.md`, `CHANGELOG.md`, `CATALOG.md`, `kich-ban/vemcd-1.8.17.*`, catalog Excel |
+
+### Việc tiếp
+
+- [ ] Video VEMCD 1.8.17 chưa quay. YouTube vẫn thiếu `client_secret.json`.
+- [ ] Thử batch nhiều tuyến trên bản vẽ có ≥2 tuyến có cọc khi cần.
+- [ ] Bump / phát hành bản sau 1.8.17 khi được yêu cầu.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff đầu. iSurvey 1.8.17 đã phát hành; phiên 06/11 tối Zero-Clutter VEMCD (không bump): chữ thước=12; CTA 2×2; lưới không Layer; footer Hủy/Lưu. Tiếp: quay video khi được yêu cầu, bump/phát hành khi được bảo, hoặc việc mới.
+```
+
+**Lưu trữ ngày:** [2026-11-06-vemcd-ui-zero-clutter.md](./2026-11-06-vemcd-ui-zero-clutter.md)
+
+---
+
 ## 2026-11-06 — VEMCD KC 100m / néo / chữ thập + kiểu cọc (1.8.17, không bump)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026 Metric. Cuối phiên đầy đủ. **Không bump.** Vẫn **1.8.17** (đã phát hành 2026-11-03).

@@ -49,6 +49,7 @@ public static class ProfileSettingsStore
                     row.TextHeight = 12;
             }
 
+            ProfileDrawService.NormalizeHardCodedOptions(opts);
             return opts;
         }
         catch
@@ -59,6 +60,7 @@ public static class ProfileSettingsStore
 
     public static void Save(ProfileDrawOptions options)
     {
+        ProfileDrawService.NormalizeHardCodedOptions(options);
         var dir = Path.GetDirectoryName(FilePath);
         if (!string.IsNullOrEmpty(dir))
             Directory.CreateDirectory(dir);

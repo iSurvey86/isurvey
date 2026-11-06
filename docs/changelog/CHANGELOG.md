@@ -6,6 +6,7 @@
 
 ### Sau phát hành (2026-11-06, chưa bump)
 
+- **VEMCD** UI chốt: ẩn Z (20 m); luôn MSS + đầu bảng + thước trái; ByLayer; bỏ ô cao chữ/rộng thước; lưới chỉ STT/Nội dung/Cao chữ/Cao hàng (Layer giữ trong mẫu, không hiện); cột trái 2×2 + CTA 2×2; toolbar mẫu: tiêu đề + Nhập/Xuất/+/−, dưới là Rộng đầu bảng | Mẫu; footer Hủy/Lưu; batch `Y_min − 50`.
 - **VEMCD**: **Cách đầu bảng** = khoảng ngang thước→đất (đứng luôn 0); hàng **Khoảng cách 100m** picket 0/100/200… chữ ngang, vạch đứng cắt rỗng qua chiều cao chữ; **Khoảng néo** theo điểm G, số khoảng chữ ngang; checkbox **Chữ thập** (đỏ tại đầu mặt cắt × giữa hàng sơ họa). Đã nhìn trên Civil 3D 2026 Metric (bản sao `_test_vemcd_kc100`, không ghi đè bản vẽ công trình).
 - **THIETLAPCOC** / phát sinh cọc: cao chữ mặc định 2,5 mm giấy @ 1:1000 (không theo zoom); bỏ giá trị cao chữ/offset lệch quá lớn đã lưu nhầm.
 - **ABT**: hình thức trực tuyến ghi Network; bỏ ghi chú tự xác minh 24 giờ.

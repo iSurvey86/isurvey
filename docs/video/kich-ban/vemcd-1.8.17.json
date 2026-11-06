@@ -9,7 +9,7 @@
   "voice": "vi-VN-HoaiMyNeural",
   "rate": "-8%",
   "tags": ["iSurvey", "Civil 3D", "mặt cắt dọc", "VEMCD"],
-  "description": "Cách vẽ mặt cắt dọc tự nhiên trên Model bằng iSurvey.\n\nHành vi trong video có từ iSurvey 1.8.17 (lệnh VEMCD, lệnh đủ ISURVEY_PROFILE_DRAW).\nHộp thoại 2 cột: Cách đầu bảng (ngang), chữ thập, mẫu bảng 8 hàng. Hàng Khoảng cách 100m: picket 0/100/200… chữ ngang, vạch cắt rỗng. Khoảng néo: số khoảng chữ ngang. RAIMCD chỉ rải khung in sau khi đã vẽ.",
+  "description": "Cách vẽ mặt cắt dọc tự nhiên trên Model bằng iSurvey.\n\nHành vi trong video có từ iSurvey 1.8.17 (lệnh VEMCD, lệnh đủ ISURVEY_PROFILE_DRAW).\nHộp Zero-Clutter: Z luôn 20 m; chữ thước=12; CTA 2×2 cột trái; lưới STT/Nội dung/Cao chữ/Cao hàng (không Layer); luôn MSS + đầu bảng + thước trái; batch Y_min − 50. RAIMCD chỉ rải khung in sau khi đã vẽ.",
   "shots": [
     {
       "id": "01-mo-dau",
@@ -20,14 +20,14 @@
     {
       "id": "02-hop",
       "type": "screen",
-      "action": "Gõ VEMCD. Hộp 2 cột: tuyến, khoảng cách Z, tỷ lệ, mức so sánh, Cách đầu bảng; mẫu bảng. Bấm Vẽ trắc dọc tự nhiên.",
-      "narration": "Gõ V E M C D. Chọn tuyến đã có cọc. Kiểm tra khoảng cách lấy Z, tỷ lệ đứng ngang, mức so sánh và Cách đầu bảng. Bên phải là mẫu bảng tám hàng. Bấm Vẽ trắc dọc tự nhiên."
+      "action": "Gõ VEMCD. Cột trái: tỷ lệ, cao độ, checkbox, rồi 4 nút CTA xếp dọc dưới Vẽ nhiều tuyến. Bấm Vẽ trắc dọc tự nhiên.",
+      "narration": "Gõ V E M C D. Chọn tuyến đã có cọc. Kiểm tra tỷ lệ và mức so sánh. Bốn nút vẽ và cập nhật nằm cột trái dưới Vẽ nhiều tuyến. Bên phải sửa nhãn hàng bảng. Bấm Vẽ trắc dọc tự nhiên."
     },
     {
       "id": "03-chen",
       "type": "screen",
-      "action": "Chỉ góc chèn. Hiện bảng và đường đất. Zoom chữ dọc; zoom hàng 100m (0/100/200 chữ ngang, vạch hở chỗ chữ); zoom hướng tuyến /\\ và \\/ với A= căn giữa V.",
-      "narration": "Chỉ góc dưới trái cột tên trên Model. Số cao độ và khoảng cách lẻ xoay chữ nằm dọc. Hàng khoảng cách một trăm mét ghi 0, 100, 200 đến hết, chữ nằm ngang, vạch đứng cắt rỗng qua chiều cao chữ. Hàng hướng tuyến vẽ kiểu A D S: đỉnh góc lên hoặc xuống, góc A căn giữa chữ V."
+      "action": "Chỉ góc chèn. Hiện bảng, MSS, thước trái và đường đất. Zoom chữ dọc; zoom hàng 100m; zoom hướng tuyến ADS.",
+      "narration": "Chỉ góc dưới trái cột tên trên Model. Số cao độ và khoảng cách lẻ xoay chữ nằm dọc. Hàng khoảng cách một trăm mét ghi 0, 100, 200 đến hết. Hàng hướng tuyến vẽ kiểu A D S."
     },
     {
       "id": "04-ket",

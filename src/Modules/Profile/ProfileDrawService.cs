@@ -17,6 +17,9 @@ internal static class ProfileDrawService
 {
     public const double SegmentGap = 40;
 
+    /// <summary>Khoảng cách dàn trang giữa các MCD khi vẽ nhiều tuyến (xuống dưới).</summary>
+    public const double BatchRouteGapY = 50;
+
     public const double PaperMapHeightA3Mm = 277;
 
     /// <summary>Cách mép trái cột tên khi ghi nhãn hàng (mặc định).</summary>
@@ -24,6 +27,71 @@ internal static class ProfileDrawService
 
     public static double Exaggerate(int horizontalScale, int verticalScale) =>
         horizontalScale / (double)verticalScale;
+
+    /// <summary>
+    /// Ép các cờ đã chốt UI (ẩn checkbox / ô Z / cao chữ / rộng thước): bước Z 20,
+    /// chữ thước/MSS = 12, rộng vạch = 1; MSS, đầu bảng, thước trái, không thước phải, màu ByLayer.
+    /// </summary>
+    public static void NormalizeHardCodedOptions(ProfileDrawOptions options)
+    {
+        options.SampleStepM = ProfileDrawOptions.FixedSampleStepM;
+        options.ProfileTextHeight = 12;
+        options.ScaleBarWidth = 1;
+        options.FillDatumLabels = true;
+        options.DrawBandHeader = true;
+        options.InsertLeftScaleBar = true;
+        options.InsertRightScaleBar = false;
+        options.RowGap = 0;
+        options.ShowGrid = false;
+        if (options.Rows is null)
+            return;
+        foreach (var row in options.Rows)
+            row.ColorAci = 256;
+    }
+
+    /// <summary>Y_min bounding box các entity của một MCD (fallback = insertY).</summary>
+    public static double GetProfileYMin(Document doc, IReadOnlyList<string>? handles, double fallbackY)
+    {
+        if (handles is null || handles.Count == 0)
+            return fallbackY;
+        var minY = double.PositiveInfinity;
+        try
+        {
+            using (doc.LockDocument())
+            using (var tr = doc.TransactionManager.StartTransaction())
+            {
+                var db = doc.Database;
+                foreach (var h in handles)
+                {
+                    if (string.IsNullOrWhiteSpace(h))
+                        continue;
+                    try
+                    {
+                        var handle = new Handle(Convert.ToInt64(h, 16));
+                        if (!db.TryGetObjectId(handle, out var id) || id.IsNull)
+                            continue;
+                        if (tr.GetObject(id, OpenMode.ForRead, openErased: false) is not Entity ent)
+                            continue;
+                        var ext = ent.GeometricExtents;
+                        if (ext.MinPoint.Y < minY)
+                            minY = ext.MinPoint.Y;
+                    }
+                    catch
+                    {
+                        // bỏ entity lỗi / erased
+                    }
+                }
+
+                tr.Commit();
+            }
+        }
+        catch
+        {
+            return fallbackY;
+        }
+
+        return double.IsInfinity(minY) ? fallbackY : minY;
+    }
 
     public static double ViewHeightA3(int horizontalScale) =>
         PaperMapHeightA3Mm * horizontalScale / 1000.0;
@@ -111,6 +179,8 @@ internal static class ProfileDrawService
     {
         if (eraseHandles is { Count: > 0 })
             EraseHandles(doc, eraseHandles);
+
+        NormalizeHardCodedOptions(options);
 
         var terrain = ResolveTerrain(doc, route);
         var samples = ProfileSampleService.Collect(doc, route, options.SampleStepM, terrain);
@@ -223,10 +293,10 @@ internal static class ProfileDrawService
             AddLine(tr, space, iSurveyLayers.TdBang, 7, origin.X, yCut, xRight, yCut, handles);
             AddLine(tr, space, iSurveyLayers.TdBang, 7, origin.X, yBandTop, xRight, yBandTop, handles);
             AddLine(tr, space, iSurveyLayers.TdBang, 7, origin.X, yCut, origin.X, yBandTop, handles);
-            AddLine(tr, space, iSurveyLayers.TdBang, 7, xSplit, yCut, xSplit, yBandTop, handles);
             AddLine(tr, space, iSurveyLayers.TdBang, 7, xRight, yCut, xRight, yBandTop, handles);
 
             // Hàng từ trên xuống: rows[0] sát đường đất.
+            // Thanh dọc xSplit (vàng/đỏ) vẽ sau khi biết yGroundMax — xem cuối DrawOneStrip.
             var yTop = yBandTop;
             foreach (var row in rows)
             {
@@ -240,6 +310,24 @@ internal static class ProfileDrawService
                     row.Label, th, handles);
                 yTop = yBottom;
             }
+        }
+
+        // Điểm cắt đầu bảng (đáy sơ họa) | thân — dùng cho 2 polyline vàng/đỏ.
+        double ySplitHead;
+        {
+            var yTop = yBandTop;
+            double? yAfterSoHoa = null;
+            foreach (var row in rows)
+            {
+                var h = Math.Max(1, row.RowHeight);
+                var yBottom = yTop - h;
+                if (yAfterSoHoa is null && ContentKey(row.Content) == "so_hoa")
+                    yAfterSoHoa = yBottom;
+                yTop = yBottom;
+            }
+
+            ySplitHead = yAfterSoHoa
+                ?? (rows.Count > 0 ? yBandTop - Math.Max(1, rows[0].RowHeight) : yBandTop);
         }
 
         // Vạch đứng tại cọc + số liệu hàng.
@@ -355,7 +443,7 @@ internal static class ProfileDrawService
         // Đường đất: chỉ polyline bề mặt (+ vạch đứng tại cọc). Không ghi số Z trên đường đất.
         // Y sát mép trên bảng (khoảng đứng = 0). X lệch thước theo Cách đầu bảng.
         _ = textProfile;
-        var ground = new Point2dCollection();
+        var ground = new List<Point2d>(samples.Count);
         double yGroundMax = yDatum;
         foreach (var st in samples)
         {
@@ -364,19 +452,28 @@ internal static class ProfileDrawService
             if (y > yGroundMax)
                 yGroundMax = y;
             ground.Add(new Point2d(x, y));
-            if (st.IsStation)
-                AddLine(tr, space, iSurveyLayers.TdLuoi, 8, x, yDatum, x, y, handles);
         }
 
-        // Lưới tùy chọn chỉ trên phần đường đất (không xuyên đầu bảng).
-        if (options.ShowGrid && samples.Count >= 2)
+        // Lưới: mỗi vạch dừng đúng cao độ đất tại X đó — không kéo tới yGroundMax (gây nét thừa nhô trên mặt đất).
+        if (options.ShowGrid && ground.Count >= 2)
         {
             var step = Math.Max(10, NiceStep(length / 10.0));
             for (var c = Math.Ceiling(l0 / step) * step; c < l1 - 1e-6; c += step)
             {
                 var x = xProfile0 + (c - l0);
-                AddLine(tr, space, iSurveyLayers.TdLuoi, 8, x, yDatum, x, yGroundMax, handles);
+                if (!TryGroundYAtX(ground, x, out var yTop))
+                    continue;
+                AddLine(tr, space, iSurveyLayers.TdLuoi, 8, x, yDatum, x, yTop, handles);
             }
+        }
+
+        // Vạch đứng tại cọc — đỉnh = đúng đỉnh ground; vẽ trước đường đất để nét xanh đè lên, không thấy nhô.
+        for (var i = 0; i < samples.Count; i++)
+        {
+            if (!samples[i].IsStation)
+                continue;
+            var g = ground[i];
+            AddLine(tr, space, iSurveyLayers.TdLuoi, 8, g.X, yDatum, g.X, g.Y, handles);
         }
 
         if (ground.Count >= 2)
@@ -393,6 +490,65 @@ internal static class ProfileDrawService
 
         if (options.InsertLeftScaleBar || options.InsertRightScaleBar || options.FillDatumLabels)
             DrawScaleBars(tr, space, styleId, options, origin.X, xSplit, xRight, labelWidth, yDatum, yGroundMax, datum, phong, textProfile, handles);
+
+        // Thanh dọc chia đầu bảng | thân MCD = 2 polyline riêng.
+        // Pline 1 vàng: đúng chiều cao ô Sơ họa mặt bằng (không kéo lên vùng đất).
+        // Pline 2 đỏ: thân bảng từ đáy sơ họa xuống đáy.
+        if (options.DrawBandHeader)
+        {
+            if (ySplitHead < yBandTop - 1e-9)
+                AddPolyline2(tr, space, iSurveyLayers.TdBang, 2,
+                    xSplit, yBandTop, xSplit, ySplitHead, handles);
+            if (ySplitHead > yCut + 1e-9)
+                AddPolyline2(tr, space, iSurveyLayers.TdBang, 1,
+                    xSplit, ySplitHead, xSplit, yCut, handles);
+        }
+    }
+
+    /// <summary>Nội suy Y đường đất tại X (các đỉnh ground đã theo X tăng).</summary>
+    private static bool TryGroundYAtX(IReadOnlyList<Point2d> ground, double x, out double y)
+    {
+        y = 0;
+        if (ground is null || ground.Count == 0)
+            return false;
+        if (ground.Count == 1)
+        {
+            y = ground[0].Y;
+            return Math.Abs(ground[0].X - x) < 1e-6;
+        }
+
+        if (x <= ground[0].X)
+        {
+            y = ground[0].Y;
+            return x >= ground[0].X - 1e-6;
+        }
+
+        var last = ground[ground.Count - 1];
+        if (x >= last.X)
+        {
+            y = last.Y;
+            return x <= last.X + 1e-6;
+        }
+
+        for (var i = 1; i < ground.Count; i++)
+        {
+            var a = ground[i - 1];
+            var b = ground[i];
+            if (x > b.X + 1e-12)
+                continue;
+            var dx = b.X - a.X;
+            if (Math.Abs(dx) < 1e-12)
+            {
+                y = Math.Max(a.Y, b.Y);
+                return true;
+            }
+
+            var t = (x - a.X) / dx;
+            y = a.Y + t * (b.Y - a.Y);
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>Tọa độ X giữa ô khoảng lẻ — không cắt vào vạch đứng.</summary>
@@ -442,7 +598,8 @@ internal static class ProfileDrawService
         if (stepZ <= 0)
             return;
 
-        var tick = Math.Max(textHeight * 0.55, Math.Max(0.2, options.ScaleBarWidth) * textHeight * 0.5);
+        // Vạch thước theo cao chữ (đã khóa 12); không còn hệ số ScaleBarWidth trên UI.
+        var tick = textHeight * 0.55;
         tick = Math.Min(tick, Math.Max(textHeight, labelWidth * 0.12));
         var zTop = datum + spanZ;
         var zStart = Math.Ceiling(datum / stepZ) * stepZ;
@@ -452,7 +609,7 @@ internal static class ProfileDrawService
 
         if (options.InsertLeftScaleBar)
         {
-            // Trục thước = vị trí đầu tiên của cắt dọc.
+            // Trục thước đứng (vùng đất) — tách với polyline vàng ô sơ họa.
             AddLine(tr, space, iSurveyLayers.TdBang, 7, xProfileLeft, yBandTop, xProfileLeft, yGroundMax, handles);
 
             for (var z = zStart; z <= zTop + 1e-6; z += stepZ)
@@ -549,14 +706,16 @@ internal static class ProfileDrawService
         if (stations.Count < 2)
             return;
 
-        // Đường hướng tuyến giữa khuông; mũi rộng–thấp; DMS giữa đường hướng tuyến và mép hàng (đối diện mũi).
+        // Đường hướng tuyến giữa khuông; DMS giữa đường hướng tuyến và mép hàng (đối diện mũi).
+        // Góc tại đỉnh mũi cố định 86° — halfW suy từ peakH (mọi góc cùng độ mở).
         var yTop = yBottom + rowHeight;
         var yBase = yBottom + rowHeight * 0.5;
-        var peakH = rowHeight * 0.16;
-        var halfWWish = Math.Max(rowHeight * 0.42, Math.Max(0.5, row.TextHeight) * 1.35);
+        var peakH = Math.Max(rowHeight * 0.20, Math.Max(0.5, row.TextHeight) * 0.55);
+        const double apexDeg = 86.0;
+        var halfW = peakH * Math.Tan(apexDeg * 0.5 * Math.PI / 180.0);
         var th = Math.Max(0.5, row.TextHeight * 0.85);
         var layer = string.IsNullOrWhiteSpace(row.Layer) ? iSurveyLayers.TdBang : row.Layer;
-        var color = row.ColorAci is >= 1 and <= 255 ? (short)row.ColorAci : (short)7;
+        var color = ResolveRowColor(row);
 
         var gaps = new List<(double Left, double Right, bool LeftTurn, double X, string Label)>();
         for (var i = 0; i < stations.Count; i++)
@@ -564,17 +723,14 @@ internal static class ProfileDrawService
             if (!TryDeflection(stations, i, out var left, out _, out var dms))
                 continue;
             var x = xSplit + (stations[i].Chainage - l0);
-            var xPrev = i > 0
-                ? xSplit + (stations[i - 1].Chainage - l0)
-                : xSplit;
-            var xNext = i < stations.Count - 1
-                ? xSplit + (stations[i + 1].Chainage - l0)
-                : xRight;
-            var halfW = Math.Min(halfWWish, Math.Min((x - xPrev) * 0.48, (xNext - x) * 0.48));
-            if (halfW < 0.5)
-                halfW = Math.Min(halfWWish, Math.Max(0.5, (xNext - xPrev) * 0.28));
+            // Chỉ kẹp mép strip — không thu nhỏ theo khoảng cọc lân cận.
+            var hw = halfW;
+            if (x - hw < xSplit)
+                hw = Math.Max(0.5, x - xSplit);
+            if (x + hw > xRight)
+                hw = Math.Min(hw, Math.Max(0.5, xRight - x));
             var label = (left ? "RTr = " : "RPh = ") + dms;
-            gaps.Add((x - halfW, x + halfW, left, x, label));
+            gaps.Add((x - hw, x + hw, left, x, label));
         }
 
         gaps.Sort((a, b) => a.Left.CompareTo(b.Left));
@@ -590,7 +746,7 @@ internal static class ProfileDrawService
             v.AddVertexAt(1, new Point2d(g.X, yPeak), 0, 0, 0);
             v.AddVertexAt(2, new Point2d(g.Right, yBase), 0, 0, 0);
             v.Layer = layer;
-            v.Color = AcadColor.FromColorIndex(ColorMethod.ByAci, color);
+            ApplyEntityColor(v, color);
             space.AppendEntity(v);
             tr.AddNewlyCreatedDBObject(v, true);
             handles.Add(v.Handle.ToString());
@@ -619,7 +775,7 @@ internal static class ProfileDrawService
         double yBottom, double rowHeight, List<string> handles)
     {
         var layer = string.IsNullOrWhiteSpace(row.Layer) ? iSurveyLayers.TdBang : row.Layer;
-        var color = row.ColorAci is >= 1 and <= 255 ? (short)row.ColorAci : (short)7;
+        var color = ResolveRowColor(row);
         var th = Math.Max(0.5, row.TextHeight);
         var yMid = yBottom + rowHeight * 0.5;
         // Rỗng qua chiều cao chữ (± nửa H + chút đệm).
@@ -678,7 +834,7 @@ internal static class ProfileDrawService
             return;
 
         var layer = string.IsNullOrWhiteSpace(row.Layer) ? iSurveyLayers.TdBang : row.Layer;
-        var color = row.ColorAci is >= 1 and <= 255 ? (short)row.ColorAci : (short)1;
+        var color = ResolveRowColor(row);
         var th = Math.Max(0.5, row.TextHeight);
         var yMid = yBottom + rowHeight * 0.5;
 
@@ -807,18 +963,43 @@ internal static class ProfileDrawService
         handles.Add(dbText.Handle.ToString());
     }
 
+    /// <summary>256 = ByLayer (màu mặc định của layer).</summary>
+    private static short ResolveRowColor(ProfileBandRow row) =>
+        row.ColorAci is >= 1 and <= 255 ? (short)row.ColorAci : (short)256;
+
+    private static void ApplyEntityColor(Entity ent, short colorAci)
+    {
+        if (colorAci is >= 1 and <= 255)
+            ent.Color = AcadColor.FromColorIndex(ColorMethod.ByAci, colorAci);
+        // else: giữ ByLayer
+    }
+
     private static void AddLine(
         Transaction tr, BlockTableRecord space, string layer, short color,
         double x0, double y0, double x1, double y1, List<string> handles)
     {
         var line = new Line(new Point3d(x0, y0, 0), new Point3d(x1, y1, 0))
         {
-            Layer = layer,
-            Color = AcadColor.FromColorIndex(ColorMethod.ByAci, color)
+            Layer = layer
         };
+        ApplyEntityColor(line, color);
         space.AppendEntity(line);
         tr.AddNewlyCreatedDBObject(line, true);
         handles.Add(line.Handle.ToString());
+    }
+
+    private static void AddPolyline2(
+        Transaction tr, BlockTableRecord space, string layer, short color,
+        double x0, double y0, double x1, double y1, List<string> handles)
+    {
+        var pl = new Polyline();
+        pl.AddVertexAt(0, new Point2d(x0, y0), 0, 0, 0);
+        pl.AddVertexAt(1, new Point2d(x1, y1), 0, 0, 0);
+        pl.Layer = layer;
+        ApplyEntityColor(pl, color);
+        space.AppendEntity(pl);
+        tr.AddNewlyCreatedDBObject(pl, true);
+        handles.Add(pl.Handle.ToString());
     }
 
     /// <summary>Đường dóng nét đứt bằng đoạn ngắn — không phụ thuộc LTSCALE / DASHED.</summary>
