@@ -5,37 +5,44 @@
 
 ---
 
-## 2026-11-10 — Bump 1.8.18 + kiểm toán Video Factory Phase 01
+## 2026-11-10 — Phát hành 1.8.18
 
-**Máy / ngữ cảnh:** Cursor — máy văn phòng. Cuối phiên đầy đủ. **Có bump → 1.8.18.** Chưa `publish-release` / chưa UPD máy chủ.
+**Máy / ngữ cảnh:** Cursor — máy văn phòng. Đã chạy `publish-release.ps1`. **Đã phát hành 1.8.18.**
 
 ### Đã chốt / đã làm
 
-- Bump `iSurvey.csproj` + `deploy/iSurvey.bundle/PackageContents.xml` → **1.8.18**.
-- Changelog đóng gói VEMCD Zero-Clutter (và mục sau phát hành 1.8.17 liên quan) vào 1.8.18.
-- Kiểm toán tĩnh VF Phase 01 → `docs/audits/2026-11-10_ISURVEY_VIDEO_FACTORY_SOURCE_AUDIT/` (12 báo cáo). **Chưa** triển khai Video Factory; **chưa** chạy CAD trong đợt audit.
-- Catalog Excel VEMCD 1.8.18; kịch bản `vemcd-1.8.18` + CATALOG (Chưa quay). Không quay, không đăng.
-
-### File chính
-
-| Khu vực | File |
-|---------|------|
-| Version | `iSurvey.csproj`, `deploy/iSurvey.bundle/PackageContents.xml` |
-| Audit | `docs/audits/2026-11-10_ISURVEY_VIDEO_FACTORY_SOURCE_AUDIT/*` |
-| Docs / video | `CHANGELOG.md`, `README.md`, `CATALOG.md`, `kich-ban/vemcd-1.8.18.*`, catalog Excel, HANDOFF |
+- Upload `iSurvey-Setup-1.8.18.zip` (~41 MB) + `version.json` lên Storage `isurvey-releases` (trước đó server 1.8.17).
+- Nội dung chính đóng gói: **VEMCD Zero-Clutter** và các mục sau 1.8.17 đã ghi trong changelog 1.8.18.
+- Máy cũ: chạy **ISURVEY_UPDATE** / **UPD** để nhận bản mới.
 
 ### Việc tiếp
 
-- [ ] Phát hành UPD 1.8.18 khi được yêu cầu (`publish-release`).
 - [ ] Quay video VEMCD 1.8.18 khi được yêu cầu.
-- [ ] Triển khai Video Factory chỉ sau khi Chủ dự án duyệt audit và ra lệnh riêng.
-- [ ] YouTube: vẫn thiếu `client_secret.json` trên máy snapshot audit.
+- [ ] Video Factory: chỉ khi Chủ dự án duyệt audit và ra lệnh riêng (không gắn bump/HDSD).
 
 ### Câu mở phiên sau
 
 ```text
-git pull, đọc handoff đầu. iSurvey đã bump 1.8.18 (chưa publish UPD). Có hồ sơ audit VF Phase 01 trong docs/audits/2026-11-10_.... Tiếp: phát hành khi được bảo, quay video VEMCD 1.8.18 khi được yêu cầu, hoặc triển khai Video Factory chỉ khi được phép riêng.
+git pull, đọc handoff đầu. iSurvey 1.8.18 đã phát hành. VEMCD Zero-Clutter đã trên UPD. Tiếp: quay video khi được yêu cầu, hoặc việc mới (Video Factory chỉ khi được phép riêng).
 ```
+
+**Lưu trữ ngày:** [2026-11-10-bump-1818-audit-vf.md](./2026-11-10-bump-1818-audit-vf.md)
+
+---
+
+## 2026-11-10 — Bump 1.8.18 + kiểm toán Video Factory Phase 01
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng. Cuối phiên đầy đủ. **Bump → 1.8.18** (sau đó đã phát hành — xem block trên).
+
+### Đã chốt / đã làm
+
+- Bump `iSurvey.csproj` + `PackageContents.xml` → **1.8.18**; changelog; catalog; kịch bản `vemcd-1.8.18`.
+- Kiểm toán tĩnh VF Phase 01 → `docs/audits/2026-11-10_ISURVEY_VIDEO_FACTORY_SOURCE_AUDIT/`. Chưa triển khai Video Factory trong đợt audit.
+
+### Việc tiếp
+
+- [x] Phát hành UPD 1.8.18.
+- [ ] Quay video / Video Factory khi được yêu cầu riêng.
 
 **Lưu trữ ngày:** [2026-11-10-bump-1818-audit-vf.md](./2026-11-10-bump-1818-audit-vf.md)
 

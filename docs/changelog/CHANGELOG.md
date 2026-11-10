@@ -2,7 +2,7 @@
 
 ## 1.8.18 — 2026-11-10
 
-Bump số phiên bản. **Chưa chạy `publish-release`** trong phiên này (UPD máy chủ vẫn có thể là 1.8.17 cho đến khi được yêu cầu phát hành).
+Đã phát hành 2026-11-10 (`publish-release.ps1`: Setup zip + `version.json` trên Storage `isurvey-releases`).
 
 ### Đóng gói hành vi sau 1.8.17
 
