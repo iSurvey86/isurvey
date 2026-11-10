@@ -1,12 +1,20 @@
 # Changelog — iSurvey
 
+## 1.8.19 — 2026-11-10
+
+Đã phát hành 2026-11-10 (`publish-release.ps1`: Setup zip + `version.json` trên Storage `isurvey-releases`).
+
+### Cập nhật tự động
+
+- Khi **mở** AutoCAD/Civil: nền đọc `version.json`; có bản mới → hiện hộp như `UPD`; đã mới nhất / lỗi mạng → im lặng. Mỗi lần mở ứng dụng hỏi lại; trong phiên chỉ một lần. `UPD` thủ công giữ nguyên. Đã nhìn trên Civil 3D 2026 Metric (Drawing1 thử).
+
 ## 1.8.18 — 2026-11-10
 
 Đã phát hành 2026-11-10 (`publish-release.ps1`: Setup zip + `version.json` trên Storage `isurvey-releases`).
 
-### Sau phát hành (chưa bump)
+### Sau phát hành → đã gộp vào 1.8.19
 
-- **Cập nhật tự động lúc mở Civil:** nền đọc `version.json`; có bản mới → hiện hộp như `UPD`; đã mới nhất / lỗi mạng → im lặng. Mỗi lần mở ứng dụng hỏi lại; trong phiên chỉ một lần. `UPD` thủ công giữ nguyên.
+- Xem mục **1.8.19** (tự thông báo cập nhật khi mở Civil).
 
 ### Đóng gói hành vi sau 1.8.17
 

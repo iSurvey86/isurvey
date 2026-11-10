@@ -1,0 +1,39 @@
+{
+  "id": "upd-1.8.19",
+  "command": "UPD",
+  "commandFull": "ISURVEY_UPDATE",
+  "feature": "Kiểm tra cập nhật",
+  "version": "1.8.19",
+  "title": "Kiểm tra cập nhật phiên bản 1.8.19",
+  "privacy": "unlisted",
+  "voice": "vi-VN-HoaiMyNeural",
+  "rate": "-8%",
+  "tags": ["iSurvey", "Civil 3D", "cập nhật", "UPD"],
+  "description": "Cách iSurvey báo bản mới khi mở Civil và khi gõ UPD.\n\nHành vi trong video có từ iSurvey 1.8.19 (lệnh UPD, lệnh đủ ISURVEY_UPDATE).\nMở Civil tự kiểm tra version.json; có bản mới thì hiện hộp như UPD. Đã mới nhất hoặc mất mạng thì im lặng. UPD thủ công vẫn dùng được.",
+  "shots": [
+    {
+      "id": "01-mo-dau",
+      "type": "card",
+      "lines": ["Kiểm tra cập nhật", "phiên bản 1.8.19"],
+      "narration": "Kiểm tra cập nhật, phiên bản một chấm tám chấm mười chín. Từ bản này, mở Civil là tự hỏi nếu có bản mới."
+    },
+    {
+      "id": "02-tu-dong",
+      "type": "screen",
+      "action": "Mở Civil bản vẽ trắng. Vài giây sau hiện hộp Có bản mới. Đóng hộp.",
+      "narration": "Mở Civil. Không cần gõ U P D. Nếu máy chủ có bản mới hơn, hộp cập nhật hiện sau vài giây."
+    },
+    {
+      "id": "03-upd",
+      "type": "screen",
+      "action": "Gõ UPD. Hộp báo đang mới nhất hoặc Có bản mới.",
+      "narration": "Gõ U P D bất cứ lúc nào để kiểm tra tay. Đang dùng bản mới nhất thì cửa sổ báo rõ."
+    },
+    {
+      "id": "04-ket",
+      "type": "card",
+      "lines": ["Cập nhật ngay khi có bản mới"],
+      "narration": "Bấm Cập nhật ngay để tải gói, đóng Civil và cài bản mới."
+    }
+  ]
+}

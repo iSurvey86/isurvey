@@ -34,7 +34,7 @@ Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georefere
 | `ISURVEY_ABOUT` | **ABT** | Thông tin tài khoản và giấy phép trên máy (hình thức trực tuyến ghi Network; không ghi chú tự xác minh 24 giờ) |
 | `ISURVEY_HDSD` | **HD** | Mở hướng dẫn iSurvey trên web. Không cần đăng nhập |
 | `ISURVEY_LOGOUT` | **LGO** | Đăng xuất / đổi máy (trả suất thiết bị nếu đang trực tuyến) |
-| `ISURVEY_UPDATE` | **UPD** | Kiểm tra cập nhật: tải gói và giải nén, rồi đóng Civil như bấm nút đóng. Bản vẽ chưa lưu thì hỏi lưu. Đóng xong thì cài ngay và mở lại |
+| `ISURVEY_UPDATE` | **UPD** | Kiểm tra cập nhật thủ công. Từ **1.8.19**: mỗi lần mở Civil cũng tự kiểm tra nền; có bản mới thì hiện cùng hộp (đã mới nhất / mất mạng thì im lặng). Tải gói → đóng Civil như bấm nút đóng → cài → mở lại |
 | `ISURVEY_GENOTP` |  | In mã kích hoạt trong ngày (chỉ máy Admin có `AdminSecret`) |
 | `ISURVEY_UAV_CLIP` | **UAVCLIP** | Clip biên ảnh UAV (polyline hoặc Auto-Clip nền trắng/đen). Ảnh sơ họa cùng file được siết theo biên mới; reload ảnh không chép biên cắt |
 | `ISURVEY_NUMBER_VERTICES` | **GOC** | Đánh số góc tuyến (chữ G né tim); xuất `MoTaTuyen-….txt` UTF-8 (mô tả đoạn, góc °′″, placeholder điền tay) |

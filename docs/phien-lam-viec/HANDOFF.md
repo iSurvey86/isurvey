@@ -5,25 +5,24 @@
 
 ---
 
-## 2026-11-10 — Tự thông báo cập nhật khi mở Civil
+## 2026-11-10 — Phát hành 1.8.19 (tự hỏi cập nhật khi mở Civil)
 
-**Máy / ngữ cảnh:** Cursor — máy văn phòng. **1.8.18 đã phát hành.** Chưa bump; hành vi mới nằm «Sau phát hành» changelog.
+**Máy / ngữ cảnh:** Cursor — máy văn phòng. **Đã bump và phát hành 1.8.19.**
 
 ### Đã chốt / đã làm
 
-- `UpdateStartupChecker`: mỗi lần mở Civil kiểm tra `version.json` nền; có bản mới → hộp như UPD; mới nhất / lỗi mạng → im lặng. Trong phiên chỉ một lần.
-- `UpdateFlow` dùng chung với `UPD`. Đã nhìn trên Civil 2026 Metric (Drawing1 trắng): DLL giả 1.8.17 → hộp v1.8.17 → 1.8.18; Esc đóng; đã cài lại DLL 1.8.18.
-- Docs: `Huong_dan_Phat_hanh.md`, HDSD ksnpsc mục Cập nhật, changelog sau phát hành.
+- Bump `1.8.19` (csproj + PackageContents). Nội dung: tự kiểm tra cập nhật khi mở Civil (`UpdateStartupChecker` / `UpdateFlow`).
+- Upload Setup zip + `version.json`. Máy cũ: mở Civil sẽ được hỏi (sau khi đã có 1.8.19 trên máy qua UPD/cài lần đầu vẫn cần UPD thủ công từ 1.8.18).
+- Catalog video `upd-1.8.19` (Chưa quay). HDSD fallback 1.8.19.
 
 ### Việc tiếp
 
-- [ ] Bump/phát hành khi được yêu cầu (để máy cũ nhận auto-check).
-- [ ] Quay video VEMCD 1.8.18 khi được yêu cầu.
+- [ ] Quay video UPD 1.8.19 / VEMCD 1.8.18 khi được yêu cầu.
 
 ### Câu mở phiên sau
 
 ```text
-git pull, đọc handoff đầu. iSurvey 1.8.18 đã phát hành; thêm tự hỏi cập nhật khi mở Civil (chưa bump). Tiếp: bump/phát hành khi được bảo, quay video khi được yêu cầu.
+git pull, đọc handoff đầu. iSurvey 1.8.19 đã phát hành (tự hỏi cập nhật khi mở Civil). Tiếp: quay video khi được yêu cầu, hoặc việc mới.
 ```
 
 **Lưu trữ ngày:** [2026-11-10-bump-1818-audit-vf.md](./2026-11-10-bump-1818-audit-vf.md)
