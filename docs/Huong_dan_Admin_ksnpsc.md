@@ -4,6 +4,7 @@
 - Tab **iSurvey** (chỉ Admin hệ thống: `Q_ADMIN` hoặc `q_system_log`)
 - Tổng quan: máy active, seen 24h / N ngày, email, lỗi, top lệnh
 - Thiết bị:
+  - Nhấn **tên máy** hoặc **HWID** → panel lịch sử hoạt động của máy đó (lọc theo HWID, khoảng 30 ngày).
   - **Đăng xuất** (`force_logout`): cắt phiên ngay, hiện **Đã đăng xuất**, trả suất máy. Người dùng phải nhập lại Gmail và mã OTP. Plugin bản mới hỏi khoảng 15 giây rồi xóa giấy phép trên máy. Bản trước 1.8.7 không tự thoát khi Civil đang mở.
   - **Khóa** (`is_active = false`): cấm máy đó đăng nhập cho đến khi bấm **Mở**. Dùng khi mất máy, nghỉ việc, hoặc cần chặn hẳn.
 - SQL: `deploy/supabase/schema_force_logout.sql` (chạy lại khi đổi cách đếm suất máy).
@@ -11,7 +12,7 @@
 
 API server (service role iSurvey, không lộ ra browser):
 - `GET /api/isurvey/summary?admin_email=`
-- `GET /api/isurvey/activity?admin_email=`
+- `GET /api/isurvey/activity?admin_email=` (& `hwid=` để lọc theo máy)
 - `GET|PATCH /api/isurvey/licenses`
 
 ## Cấu hình `.env.local` (ksnpsc)
