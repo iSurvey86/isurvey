@@ -1,0 +1,62 @@
+﻿label,cmd,enabled,file,line
+Bảng Dữ liệu,ISURVEY_PALETTE,True,src/UI/RibbonBuilder.cs,142
+Nhập File KML/KMZ,ISURVEY_IMPORT_KML,True,src/UI/RibbonBuilder.cs,150
+Xuất File KML/KMZ,ISURVEY_EXPORT_KML,True,src/UI/RibbonBuilder.cs,151
+Chèn Ảnh Vệ Tinh,ISURVEY_MAP_SAT,True,src/UI/RibbonBuilder.cs,154
+Cập Nhật Ảnh GE,ISURVEY_UPDATE_GE,True,src/UI/RibbonBuilder.cs,155
+Xóa Ảnh Vệ Tinh,ISURVEY_DELETE_GE,True,src/UI/RibbonBuilder.cs,156
+Nhập TAB ➔ CAD,ISURVEY_TAB_TO_CAD,True,src/UI/RibbonBuilder.cs,160
+Nhập DGN ➔ CAD,ISURVEY_DGN_TO_CAD,True,src/UI/RibbonBuilder.cs,162
+Xuất CAD ➔ DGN,ISURVEY_CAD_TO_DGN,True,src/UI/RibbonBuilder.cs,164
+Khung Bản Đồ,ISURVEY_KHUNG,True,src/UI/RibbonBuilder.cs,174
+Khung Bản Vẽ Kỹ Thuật,ISURVEY_KHUNG_BV,True,src/UI/RibbonBuilder.cs,176
+Tạo Khung Lưới TĐ,TAOKHUNG,False,src/UI/RibbonBuilder.cs,178
+Cắt Bình Đồ,CATBD,True,src/UI/RibbonBuilder.cs,179
+Rải Khung Theo Tuyến,RAIKHUNG,True,src/UI/RibbonBuilder.cs,182
+Vẽ Mặt Cắt Dọc,VEMCD,True,src/UI/RibbonBuilder.cs,184
+Rải Khung Mặt Cắt,RAIMCD,True,src/UI/RibbonBuilder.cs,186
+Thiết Lập Tỉ Lệ Khung,TILEKHUNG,False,src/UI/RibbonBuilder.cs,188
+Bảo Vệ Layer Khung,KHOAKHUNG,False,src/UI/RibbonBuilder.cs,189
+Rải Móng & Biên Đất,RAIMONG,False,src/UI/RibbonBuilder.cs,197
+Đánh Số Góc Tuyến,ISURVEY_NUMBER_VERTICES,True,src/UI/RibbonBuilder.cs,198
+Duỗi Thẳng Tuyến,ISURVEY_STRIP_MAP,True,src/UI/RibbonBuilder.cs,200
+Tạo Biên Đường Tạm,BIENDUONGTAM,False,src/UI/RibbonBuilder.cs,204
+Kẻ Tuyến 110kV/220kV,KETUYEN,False,src/UI/RibbonBuilder.cs,205
+Đánh Số Thứ Tự,STT,True,src/UI/RibbonBuilder.cs,206
+Bảng TĐ & Diện Tích,BANGTOADO,False,src/UI/RibbonBuilder.cs,213
+Kiểm Tra Lỗi Cao Độ,KIEMTRACAODO,False,src/UI/RibbonBuilder.cs,216
+Quét Cấu Trúc (AutoScan),AUTOSCAN,True,src/UI/RibbonBuilder.cs,217
+Xuất Thống Kê Excel,XUATEXCEL,False,src/UI/RibbonBuilder.cs,218
+Kiểm Tra Cập Nhật,ISURVEY_UPDATE,True,src/UI/RibbonBuilder.cs,227
+Thông Tin & Giấy Phép,ISURVEY_ABOUT,True,src/UI/RibbonBuilder.cs,228
+Hướng dẫn,ISURVEY_HDSD,True,src/UI/RibbonBuilder.cs,229
+Nạp lại Menu,ISURVEY_RIBBON,True,src/UI/RibbonBuilder.cs,230
+Trợ Lý AI,ISURVEY_AI_ASSIST,True,src/UI/RibbonBuilder.cs,284
+Cấu Hình AI,ISURVEY_AI_SETTINGS,True,src/UI/RibbonBuilder.cs,288
+Ghi Số Đồng Mức,GHISODM,False,src/UI/RibbonBuilder.cs,368
+Nhập điểm đo,NHAPDIEM,True,src/UI/RibbonBuilder.cs,379
+Xuất điểm đo,XUATDIEM,True,src/UI/RibbonBuilder.cs,380
+Nâng hạ cao độ điểm đo,NANGLCAO,False,src/UI/RibbonBuilder.cs,381
+Tạo điểm từ đối tượng AutoCAD,TAODIEMCAD,False,src/UI/RibbonBuilder.cs,382
+Hiện điểm đo theo mã,HIENDIEMMA,False,src/UI/RibbonBuilder.cs,383
+Lọc điểm đo theo mã,LOCDIEMMA,False,src/UI/RibbonBuilder.cs,384
+Chèn địa vật theo mã điểm,CHENDIAVAT,False,src/UI/RibbonBuilder.cs,385
+Tắt điểm đo trên bình đồ,TATDIEMBD,False,src/UI/RibbonBuilder.cs,386
+Hiện điểm đo đã tắt,HIENDIEMTAT,False,src/UI/RibbonBuilder.cs,387
+Xóa điểm trong vùng,XOADIEMVUNG,False,src/UI/RibbonBuilder.cs,388
+Nối điểm tự động,NOIDIEM,False,src/UI/RibbonBuilder.cs,389
+Gán cao độ điểm theo địa hình,GANCAO,False,src/UI/RibbonBuilder.cs,390
+Phát sinh điểm trong vùng,PHATSINHDIEM,False,src/UI/RibbonBuilder.cs,391
+Định vị điểm mia theo cọc,DINHVIMIA,False,src/UI/RibbonBuilder.cs,392
+Xoay điểm mia theo Polyline,XOAYMIA,False,src/UI/RibbonBuilder.cs,393
+Lọc Giãn Điểm Mia,LOCDIEM,False,src/UI/RibbonBuilder.cs,397
+Ẩn / Hiện Lưới TIN,ANTIN,True,src/UI/RibbonBuilder.cs,398
+Chuẩn Hóa Mã Font,CHUYENFONT,False,src/UI/RibbonBuilder.cs,399
+Cắt Ảnh Theo Biên,ISURVEY_UAV_CLIP,True,src/UI/RibbonBuilder.cs,421
+Tắt/Bật Khung Ảnh,ISURVEY_UAV_FRAME_TOGGLE,True,src/UI/RibbonBuilder.cs,423
+Đưa Ảnh Xuống Dưới,ISURVEY_UAV_SEND_BACK,True,src/UI/RibbonBuilder.cs,425
+Vẽ Đường Đồng Mức,ISURVEY_UAV_CONTOUR,True,src/UI/RibbonBuilder.cs,437
+Hệ Tọa Độ UAV,ISURVEY_UAV_CRS,True,src/UI/RibbonBuilder.cs,439
+Nhập Point Cloud,ISURVEY_PC_IMPORT,True,src/UI/RibbonBuilder.cs,445
+Lọc Điểm Mặt Đất,ISURVEY_PC_FILTER,True,src/UI/RibbonBuilder.cs,447
+Rải Lưới Điểm,ISURVEY_PC_GRID,True,src/UI/RibbonBuilder.cs,449

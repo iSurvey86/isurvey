@@ -9,6 +9,7 @@ Một dòng là một video. Video cũ giữ lại khi có bản mới của cù
 | RAIMCD | Rải khung mặt cắt dọc | 1.8.16 | Chưa quay | |
 | UAVCLIP | Cắt ảnh UAV | 1.8.16 | Chưa quay | |
 | VEMCD | Vẽ mặt cắt dọc tự nhiên (Zero-Clutter: Z=20; chữ thước=12; CTA 2×2; lưới không Layer; batch Y_min−50) | 1.8.17 | Chưa quay | |
+| VEMCD | Vẽ mặt cắt dọc tự nhiên (Zero-Clutter đóng gói 1.8.18) | 1.8.18 | Chưa quay | |
 | TAOTUYEN | Tạo tuyến | 1.8.16 | Chưa quay | |
 | THEMMOHINH | Thêm điểm vào mô hình | 1.8.16 | Chưa quay | |
 | XAYMOHINH | Xây dựng lưới | 1.8.16 | Chưa quay | |

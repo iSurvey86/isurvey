@@ -1,15 +1,25 @@
 # Changelog — iSurvey
 
+## 1.8.18 — 2026-11-10
+
+Bump số phiên bản. **Chưa chạy `publish-release`** trong phiên này (UPD máy chủ vẫn có thể là 1.8.17 cho đến khi được yêu cầu phát hành).
+
+### Đóng gói hành vi sau 1.8.17
+
+- **VEMCD** Zero-Clutter: ẩn Z (20 m); chữ thước/MSS=12; bỏ ô rộng thước; lưới STT/Nội dung/Cao chữ/Cao hàng (không Layer trên UI); cột trái 2×2 + CTA 2×2; toolbar mẫu gọn; footer Hủy/Lưu; batch `Y_min − 50`; luôn MSS + đầu bảng + thước trái; ByLayer. (Đã nhìn hộp trên bản sao trong phiên 06/11.)
+- Gộp thêm các mục đã ghi dưới «Sau phát hành» của 1.8.17 (KC 100m / néo / chữ thập; THIETLAPCOC cao chữ giấy; ABT Network) vào mốc đóng gói 1.8.18.
+
+### Kiểm toán / tài liệu
+
+- Hồ sơ kiểm toán tĩnh Video Factory giai đoạn 01: `docs/audits/2026-11-10_ISURVEY_VIDEO_FACTORY_SOURCE_AUDIT/` (12 báo cáo + phụ lục). **Chưa** triển khai Video Factory; **chưa** kiểm chứng runtime trong đợt audit.
+
 ## 1.8.17 — 2026-11-03
 
 Đã phát hành 2026-11-03. Gộp các thay đổi đã làm dưới số 1.8.16 (chưa đóng gói) và bump lên 1.8.17.
 
-### Sau phát hành (2026-11-06, chưa bump)
+### Sau phát hành (2026-11-06 → đã gộp vào 1.8.18)
 
-- **VEMCD** UI chốt: ẩn Z (20 m); luôn MSS + đầu bảng + thước trái; ByLayer; bỏ ô cao chữ/rộng thước; lưới chỉ STT/Nội dung/Cao chữ/Cao hàng (Layer giữ trong mẫu, không hiện); cột trái 2×2 + CTA 2×2; toolbar mẫu: tiêu đề + Nhập/Xuất/+/−, dưới là Rộng đầu bảng | Mẫu; footer Hủy/Lưu; batch `Y_min − 50`.
-- **VEMCD**: **Cách đầu bảng** = khoảng ngang thước→đất (đứng luôn 0); hàng **Khoảng cách 100m** picket 0/100/200… chữ ngang, vạch đứng cắt rỗng qua chiều cao chữ; **Khoảng néo** theo điểm G, số khoảng chữ ngang; checkbox **Chữ thập** (đỏ tại đầu mặt cắt × giữa hàng sơ họa). Đã nhìn trên Civil 3D 2026 Metric (bản sao `_test_vemcd_kc100`, không ghi đè bản vẽ công trình).
-- **THIETLAPCOC** / phát sinh cọc: cao chữ mặc định 2,5 mm giấy @ 1:1000 (không theo zoom); bỏ giá trị cao chữ/offset lệch quá lớn đã lưu nhầm.
-- **ABT**: hình thức trực tuyến ghi Network; bỏ ghi chú tự xác minh 24 giờ.
+- Xem mục **1.8.18** (VEMCD Zero-Clutter, KC 100m/néo/chữ thập, THIETLAPCOC, ABT).
 
 ### Sau phát hành (2026-11-05, chưa bump)
 
