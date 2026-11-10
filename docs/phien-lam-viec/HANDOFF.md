@@ -5,6 +5,30 @@
 
 ---
 
+## 2026-11-10 — Cập nhật HDSD web (ksnpsc) theo 1.8.18
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng. **iSurvey 1.8.18 đã phát hành.** HDSD web trên repo **ksnpsc**.
+
+### Đã chốt / đã làm
+
+- Đồng bộ `/huong-dan/isurvey`: mô hình/TIN, tuyến–cọc, **VEMCD** Zero-Clutter (mục mới), RAIMCD/UAVCLIP/BANGIS, mục lục La Mã I–VIII, fallback version 1.8.18.
+- File chính (ksnpsc): `docs/hdsd/isurvey/*`, `src/lib/isurveyHdsdMeta.js`, `isurveyHdsd.js`, `hdsdPdfHtml.js`.
+
+### Việc tiếp
+
+- [ ] Quay video VEMCD 1.8.18 khi được yêu cầu.
+- [ ] Video Factory: chỉ khi Chủ dự án duyệt audit và ra lệnh riêng.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff đầu. iSurvey 1.8.18 đã phát hành; HDSD web đã cập nhật trên ksnpsc. Tiếp: quay video khi được yêu cầu, hoặc việc mới (Video Factory chỉ khi được phép riêng).
+```
+
+**Lưu trữ ngày:** [2026-11-10-bump-1818-audit-vf.md](./2026-11-10-bump-1818-audit-vf.md)
+
+---
+
 ## 2026-11-10 — Phát hành 1.8.18
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng. Đã chạy `publish-release.ps1`. **Đã phát hành 1.8.18.**
@@ -17,14 +41,9 @@
 
 ### Việc tiếp
 
+- [x] Cập nhật HDSD web (ksnpsc) theo 1.8.18.
 - [ ] Quay video VEMCD 1.8.18 khi được yêu cầu.
-- [ ] Video Factory: chỉ khi Chủ dự án duyệt audit và ra lệnh riêng (không gắn bump/HDSD).
-
-### Câu mở phiên sau
-
-```text
-git pull, đọc handoff đầu. iSurvey 1.8.18 đã phát hành. VEMCD Zero-Clutter đã trên UPD. Tiếp: quay video khi được yêu cầu, hoặc việc mới (Video Factory chỉ khi được phép riêng).
-```
+- [ ] Video Factory: chỉ khi Chủ dự án duyệt audit và ra lệnh riêng.
 
 **Lưu trữ ngày:** [2026-11-10-bump-1818-audit-vf.md](./2026-11-10-bump-1818-audit-vf.md)
 
