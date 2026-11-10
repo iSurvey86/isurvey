@@ -64,6 +64,9 @@ public sealed class Main : IExtensionApplication
 
         // Kiểm tra lại giấy phép (24 giờ/lần) chạy NỀN, timeout ngắn: không chặn Initialize() / thời gian mở Civil.
         AuthManager.StartBackgroundRecheck();
+
+        // Mỗi lần mở Civil: nền đọc version.json; chỉ hiện hộp khi có bản mới (im lặng nếu đã mới / lỗi mạng).
+        iSurvey.Auth.UpdateStartupChecker.Start();
     }
 
     private static void OnFirstIdle(object? sender, EventArgs e)

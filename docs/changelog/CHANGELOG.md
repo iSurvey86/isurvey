@@ -4,6 +4,10 @@
 
 Đã phát hành 2026-11-10 (`publish-release.ps1`: Setup zip + `version.json` trên Storage `isurvey-releases`).
 
+### Sau phát hành (chưa bump)
+
+- **Cập nhật tự động lúc mở Civil:** nền đọc `version.json`; có bản mới → hiện hộp như `UPD`; đã mới nhất / lỗi mạng → im lặng. Mỗi lần mở ứng dụng hỏi lại; trong phiên chỉ một lần. `UPD` thủ công giữ nguyên.
+
 ### Đóng gói hành vi sau 1.8.17
 
 - **VEMCD** Zero-Clutter: ẩn Z (20 m); chữ thước/MSS=12; bỏ ô rộng thước; lưới STT/Nội dung/Cao chữ/Cao hàng (không Layer trên UI); cột trái 2×2 + CTA 2×2; toolbar mẫu gọn; footer Hủy/Lưu; batch `Y_min − 50`; luôn MSS + đầu bảng + thước trái; ByLayer. (Đã nhìn hộp trên bản sao trong phiên 06/11.)

@@ -69,13 +69,14 @@ Nội dung `version.json` mẫu:
 1. Đóng hết AutoCAD / Civil 3D.
 2. Giải nén zip → chạy `Install-iSurvey.bat` (hoặc `.ps1`).
 3. Mở Civil → Ribbon iSurvey.
-4. Lần sau: nút **Cập nhật** / lệnh `UPD` → nếu có bản mới → **Cập nhật ngay** → thanh tiến trình tải zip → Civil tự thoát → helper cài (`Install-iSurvey.ps1`) → mở lại Civil. Nhật ký ghi `update_download` / `update_quit` / `update_result`. Nếu bản đang dùng còn helper cũ (treo), cài tay zip Setup **một lần** rồi các lần UPD sau mới chạy hết.
+4. Lần sau: khi **mở** AutoCAD/Civil, iSurvey tự đọc `version.json` nền; nếu có bản mới thì hiện cùng hộp như `UPD` (đã mới nhất hoặc lỗi mạng thì im lặng). Mỗi lần mở ứng dụng hỏi lại nếu vẫn còn bản mới; trong cùng phiên chỉ hỏi một lần. Nút **Cập nhật** / lệnh `UPD` vẫn dùng tay (kể cả khi đang mới nhất vẫn báo). Bấm **Cập nhật ngay** → thanh tiến trình tải zip → Civil tự thoát → helper cài (`Install-iSurvey.ps1`) → mở lại Civil. Nhật ký ghi `update_check` (`source`: `auto` hoặc `upd`) / `update_download` / `update_quit` / `update_result`. Nếu bản đang dùng còn helper cũ (treo), cài tay zip Setup **một lần** rồi các lần UPD sau mới chạy hết.
 
 Gỡ: `Uninstall-iSurvey.bat`. Chi tiết trong `CAI_DAT.txt` trong zip.
 
 ## 4. Kiểm tra nhanh sau phát hành
 
 - [ ] Cài zip trên máy sạch → mở Civil → Ribbon hiện đúng phiên bản (`ISURVEY_ABOUT`).
+- [ ] Mở Civil khi `version.json` mới hơn bản đang cài → vài giây sau hiện hộp cập nhật (không cần gõ `UPD`).
 - [ ] `ISURVEY_UPDATE` khi đã upload `version.json` mới hơn → hiện hộp “Có bản mới”.
 - [ ] Đăng nhập Online → Table `isurvey_activity` có dòng `login` / `command`.
 - [ ] Gửi zip cho 1–2 user thử, không cần họ cấu hình gì.

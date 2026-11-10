@@ -610,7 +610,8 @@ public static class AuthManager
     }
 
     // ---------- Tiện ích ----------
-    private static void PostToUi(Action action)
+    /// <summary>Chạy trên UI thread (Dispatcher đã ghi lúc Initialize). Dùng cho recheck giấy phép và hộp cập nhật tự động.</summary>
+    internal static void PostToUi(Action action)
     {
         if (_ui is null)
         {

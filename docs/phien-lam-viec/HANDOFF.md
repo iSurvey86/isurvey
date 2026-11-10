@@ -5,25 +5,43 @@
 
 ---
 
+## 2026-11-10 — Tự thông báo cập nhật khi mở Civil
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng. **1.8.18 đã phát hành.** Chưa bump; hành vi mới nằm «Sau phát hành» changelog.
+
+### Đã chốt / đã làm
+
+- `UpdateStartupChecker`: mỗi lần mở Civil kiểm tra `version.json` nền; có bản mới → hộp như UPD; mới nhất / lỗi mạng → im lặng. Trong phiên chỉ một lần.
+- `UpdateFlow` dùng chung với `UPD`. Đã nhìn trên Civil 2026 Metric (Drawing1 trắng): DLL giả 1.8.17 → hộp v1.8.17 → 1.8.18; Esc đóng; đã cài lại DLL 1.8.18.
+- Docs: `Huong_dan_Phat_hanh.md`, HDSD ksnpsc mục Cập nhật, changelog sau phát hành.
+
+### Việc tiếp
+
+- [ ] Bump/phát hành khi được yêu cầu (để máy cũ nhận auto-check).
+- [ ] Quay video VEMCD 1.8.18 khi được yêu cầu.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff đầu. iSurvey 1.8.18 đã phát hành; thêm tự hỏi cập nhật khi mở Civil (chưa bump). Tiếp: bump/phát hành khi được bảo, quay video khi được yêu cầu.
+```
+
+**Lưu trữ ngày:** [2026-11-10-bump-1818-audit-vf.md](./2026-11-10-bump-1818-audit-vf.md)
+
+---
+
 ## 2026-11-10 — Cập nhật HDSD web (ksnpsc) theo 1.8.18
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng. **iSurvey 1.8.18 đã phát hành.** HDSD web trên repo **ksnpsc**.
 
 ### Đã chốt / đã làm
 
-- Đồng bộ `/huong-dan/isurvey`: mô hình/TIN, tuyến–cọc, **VEMCD** Zero-Clutter (mục mới), RAIMCD/UAVCLIP/BANGIS, mục lục La Mã I–VIII, fallback version 1.8.18.
-- File chính (ksnpsc): `docs/hdsd/isurvey/*`, `src/lib/isurveyHdsdMeta.js`, `isurveyHdsd.js`, `hdsdPdfHtml.js`.
+- Đồng bộ `/huong-dan/isurvey`: mô hình/TIN, tuyến–cọc, **VEMCD** Zero-Clutter, RAIMCD/UAVCLIP/BANGIS, mục lục I–VIII.
 
 ### Việc tiếp
 
-- [ ] Quay video VEMCD 1.8.18 khi được yêu cầu.
-- [ ] Video Factory: chỉ khi Chủ dự án duyệt audit và ra lệnh riêng.
-
-### Câu mở phiên sau
-
-```text
-git pull, đọc handoff đầu. iSurvey 1.8.18 đã phát hành; HDSD web đã cập nhật trên ksnpsc. Tiếp: quay video khi được yêu cầu, hoặc việc mới (Video Factory chỉ khi được phép riêng).
-```
+- [x] Tự thông báo cập nhật khi mở Civil (xem block trên).
+- [ ] Quay video / bump khi được yêu cầu.
 
 **Lưu trữ ngày:** [2026-11-10-bump-1818-audit-vf.md](./2026-11-10-bump-1818-audit-vf.md)
 
