@@ -61,6 +61,20 @@ Tham số mặc định trong `ads-config.xml` (`DTMSETTING`): cạnh dài nhấ
 - **Vào mô hình:** polyline 3D (hoặc đường có Z) làm cạnh bắt buộc khi tam giác hóa.
 - **Ra khỏi mô hình:** vẽ lại đồng mức sau khi đã có TIN (và tùy chọn tự cập nhật khi rebuild).
 
+### 2.1.1 Cách ADS xử lý đồng mức 3D khi xây DTM (học tư duy, không copy mã)
+
+Đối chiếu UI / `ads-config.xml` / release note (không decompile ARX):
+
+| Ý ADS | Nghĩa nghiệp vụ | Bài học cho iSurvey |
+|-------|-----------------|---------------------|
+| Đồng mức vào mô hình = breakline có Z | Mỗi đoạn polyline là cạnh bắt buộc của TIN | Giữ: `THEMMOHINH` đồng mức → `TinSegment` |
+| `CanhDaiNhat` mặc định 50 | Lọc / hạn chế cạnh tam giác quá dài sau (hoặc lúc) dựng | iSurvey cố ý không có tham số này; không copy lọc cạnh dài |
+| `TuCapNhatDuongDongMuc` | Đồng mức **đầu ra** vẽ lại từ TIN sau build | Tách với đồng mức đầu vào; chưa làm «vẽ lại đồng mức» |
+| Lật cạnh thủ công trên lưới | CDT dựa trên lật cạnh local, không quét lại toàn bộ mặt | Ép ràng buộc phải đi bộ trên adjacency O(đường đi), không O(T) mỗi cạnh |
+| 3DFace dạng breakline (release note) | Ràng buộc cứng theo cạnh đã biết | Cùng họ breakline; iSurvey dùng polyline đỉnh |
+
+Chỗ iSurvey từng «nghẹn» ở «Đang ép cạnh ràng buộc 0 / N» với N ~ 10⁵: thuật toán cũ mỗi lần lật quét toàn bộ tam giác (`Neighbor`/`Crossing` O(T)). Với hàng trăm nghìn đoạn đồng mức, bước ép đứng hình dù Delaunay đã xong. Cách tham khảo đúng tinh thần ADS/CDT: giữ breakline cứng, nhưng ép cạnh bằng **lưới kề + đi từ đầu đoạn tới cuối**, cập nhật adjacency tại chỗ.
+
 iSurvey 1.8.16: nhập điểm, `GHISODM` ghi số đồng mức, mô hình đặt tên (`TAOMOHINH`), thêm điểm / đứt gãy / đồng mức / đường bao (`THEMMOHINH`), xây dựng lưới (`XAYMOHINH`). Không lọc cạnh dài. Đứt gãy và đồng mức là cạnh bắt buộc. Đường bao là chỗ cắt duy nhất. Thêm điểm mở hộp chọn loại: điểm, block, chữ số (bật sẵn), «Block + chữ cao độ cạnh» (XY block, Z chữ gần nhất, không sửa CAD), và đường nối điểm (tắt sẵn, chỉ lấy đỉnh). Không có mục «đối tượng khác», mặt 3D hay đám mây điểm. `ANTIN` ẩn hoặc hiện lưới của mô hình. `TRACAOD` lấy cao độ trên lưới. Có tuyến và cọc; `VEMCD` vẽ mặt cắt trên Model (đầu bảng + đường đất); `RAIMCD` chỉ rải khung.
 
 ### 2.2 Road — tuyến bám bề mặt, rồi mới cọc và TD

@@ -169,6 +169,7 @@ internal sealed class PaletteViewModel : ObservableObject
                 model.Contours.Count + " đường đồng mức. Cạnh bắt buộc, cao độ không đổi dọc cạnh.",
                 "Contour");
             contours.Actions.Add(new NodeAction("Thêm đường đồng mức", PaletteCommands.ForModel("THEMMOHINH", model.Id, "contour")));
+            contours.Actions.Add(new NodeAction("Gán cao độ đồng mức (GHISODM)", PaletteCommands.ForModel("GHISODM", model.Id, null)));
             contours.Actions.Add(new NodeAction("Gỡ đã chọn...", PaletteCommands.ForModel("GOMOHINH", model.Id, "contour")));
             contours.Actions.Add(new NodeAction("Xóa toàn bộ đường đồng mức", PaletteCommands.ForModel("XOATHANHPHAN", model.Id, "contour")));
             var bao = model.BoundaryCount;

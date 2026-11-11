@@ -365,7 +365,7 @@ public static class RibbonBuilder
     {
         var source = new RibbonPanelSource { Title = "Biên tập Địa hình" };
         source.Items.Add(CreateButton(
-            new Btn("Ghi Số\nĐồng Mức", "GHISODM", RibbonIcons.GhiSoDm, false),
+            new Btn("Ghi Số\nĐồng Mức", "GHISODM", RibbonIcons.GhiSoDm, true, "Gán cao độ (Elevation) cho đường đồng mức 2D"),
             isLarge: true,
             gated: true));
         source.Items.Add(CreateSplitButton(

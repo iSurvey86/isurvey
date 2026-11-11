@@ -1,0 +1,17 @@
+﻿cmd_a,cmd_b,decision,reason,evidence
+ISURVEY_PROFILE_DRAW,VEMCD,SAME_FEATURE,cùng file + effective method `Draw`,src/Modules/Profile/ProfileModule.cs:14/17; eff 20-147
+BANGCOC,ISURVEY_STATION_LIST,SAME_FEATURE,cùng file + effective method `ListStations`,src/Modules/Tuyen/RouteModule.cs:59/56; eff 368-415
+ISURVEY_ROUTE_NEW,TAOTUYEN,SAME_FEATURE,cùng file + effective method `New`,src/Modules/Tuyen/RouteModule.cs:14/17; eff 92-192
+ISURVEY_ROUTE_STATIONS,PHATSINHCOC,SAME_FEATURE,cùng file + effective method `Stations`,src/Modules/Tuyen/RouteModule.cs:20/23; eff 194-262
+ISURVEY_TERRAIN_BUILD,XAYMOHINH,SAME_FEATURE,cùng file + effective method `Build`,src/Modules/Terrain/TerrainModule.cs:26/29; eff 165-186
+ISURVEY_TERRAIN_NEW,TAOMOHINH,SAME_FEATURE,cùng thin-target `New` trong `src/Modules/Terrain/TerrainModule.cs`,"src/Modules/Terrain/TerrainModule.cs; methods ['NewCommand', 'NewAlias']"
+ISURVEY_TERRAIN_ADD,THEMMOHINH,SAME_FEATURE,cùng thin-target `Add` trong `src/Modules/Terrain/TerrainModule.cs`,"src/Modules/Terrain/TerrainModule.cs; methods ['AddCommand', 'AddAlias']"
+ANTIN,ISURVEY_TERRAIN_TOGGLE,SAME_FEATURE,cùng thin-target `Toggle` trong `src/Modules/Terrain/TerrainModule.cs`,"src/Modules/Terrain/TerrainModule.cs; methods ['ToggleCommand', 'ToggleAlias']"
+ISURVEY_TERRAIN_Z,TRACAOD,SAME_FEATURE,cùng thin-target `Query` trong `src/Modules/Terrain/TerrainModule.cs`,"src/Modules/Terrain/TerrainModule.cs; methods ['QueryCommand', 'QueryAlias']"
+GOMOHINH,ISURVEY_TERRAIN_DETACH,SAME_FEATURE,cùng thin-target `Detach` trong `src/Modules/Terrain/TerrainModule.cs`,"src/Modules/Terrain/TerrainModule.cs; methods ['DetachCommand', 'DetachAlias']"
+ISURVEY_TERRAIN_CLEAR,XOATHANHPHAN,SAME_FEATURE,cùng thin-target `Clear` trong `src/Modules/Terrain/TerrainModule.cs`,"src/Modules/Terrain/TerrainModule.cs; methods ['ClearCommand', 'ClearAlias']"
+ISURVEY_ROUTE_CLEAR_STATIONS,XOACOC,SAME_FEATURE,cùng thin-target `ClearStations` trong `src/Modules/Tuyen/RouteModule.cs`,"src/Modules/Tuyen/RouteModule.cs; methods ['ClearStationsCommand', 'ClearStationsAlias']"
+DAODAUTUYEN,ISURVEY_ROUTE_REVERSE,SAME_FEATURE,cùng thin-target `Reverse` trong `src/Modules/Tuyen/RouteModule.cs`,"src/Modules/Tuyen/RouteModule.cs; methods ['ReverseCommand', 'ReverseAlias']"
+ISURVEY_STATION_STYLE,THIETLAPCOC,SAME_FEATURE,cùng thin-target `StationStyle` trong `src/Modules/Tuyen/RouteModule.cs`,"src/Modules/Tuyen/RouteModule.cs; methods ['StationStyleCommand', 'StationStyleAlias']"
+ISURVEY_STATION_REMOVE_ONE,XOACOC1,SAME_FEATURE,cùng thin-target `RemoveOne` trong `src/Modules/Tuyen/RouteModule.cs`,"src/Modules/Tuyen/RouteModule.cs; methods ['RemoveOneCommand', 'RemoveOneAlias']"
+ISURVEY_STATION_ADD_ONE,THEMCOC,SAME_FEATURE,cùng thin-target `AddOne` trong `src/Modules/Tuyen/RouteModule.cs`,"src/Modules/Tuyen/RouteModule.cs; methods ['AddOneCommand', 'AddOneAlias']"

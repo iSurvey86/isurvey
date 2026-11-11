@@ -1,0 +1,34 @@
+﻿entry_type,id_or_cmd,name,reason,file,line
+STUB_FEATURE,AUD-054,ISURVEY_PC_FILTER,stub hint/method,src/Modules/Uav/UavModule.cs,52
+STUB_FEATURE,AUD-055,ISURVEY_PC_GRID,stub hint/method,src/Modules/Uav/UavModule.cs,55
+STUB_FEATURE,AUD-056,ISURVEY_PC_IMPORT,stub hint/method,src/Modules/Uav/UavModule.cs,49
+STUB_FEATURE,AUD-058,ISURVEY_UAV_CONTOUR,stub hint/method,src/Modules/Uav/UavModule.cs,43
+STUB_FEATURE,AUD-059,ISURVEY_UAV_CRS,stub hint/method,src/Modules/Uav/UavModule.cs,46
+STUB_FEATURE,AUD-060,ISURVEY_UAV_DEM,stub hint/method,src/Modules/Uav/UavModule.cs,40
+STUB_FEATURE,AUD-062,ISURVEY_UAV_INSERT,stub hint/method,src/Modules/Uav/UavModule.cs,37
+STUB_FEATURE,AUD-063,ISURVEY_UAV_SEND_BACK,stub hint/method,src/Modules/Uav/UavModule.cs,28
+RIBBON_PLACEHOLDER,TAOKHUNG,Tạo Khung Lưới TĐ,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,178
+RIBBON_PLACEHOLDER,TILEKHUNG,Thiết Lập Tỉ Lệ Khung,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,188
+RIBBON_PLACEHOLDER,KHOAKHUNG,Bảo Vệ Layer Khung,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,189
+RIBBON_PLACEHOLDER,RAIMONG,Rải Móng & Biên Đất,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,197
+RIBBON_PLACEHOLDER,BIENDUONGTAM,Tạo Biên Đường Tạm,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,204
+RIBBON_PLACEHOLDER,KETUYEN,Kẻ Tuyến 110kV/220kV,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,205
+RIBBON_PLACEHOLDER,BANGTOADO,Bảng TĐ & Diện Tích,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,213
+RIBBON_PLACEHOLDER,KIEMTRACAODO,Kiểm Tra Lỗi Cao Độ,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,216
+RIBBON_PLACEHOLDER,XUATEXCEL,Xuất Thống Kê Excel,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,218
+RIBBON_PLACEHOLDER,GHISODM,Ghi Số Đồng Mức,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,368
+RIBBON_PLACEHOLDER,NANGLCAO,Nâng hạ cao độ điểm đo,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,381
+RIBBON_PLACEHOLDER,TAODIEMCAD,Tạo điểm từ đối tượng AutoCAD,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,382
+RIBBON_PLACEHOLDER,HIENDIEMMA,Hiện điểm đo theo mã,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,383
+RIBBON_PLACEHOLDER,LOCDIEMMA,Lọc điểm đo theo mã,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,384
+RIBBON_PLACEHOLDER,CHENDIAVAT,Chèn địa vật theo mã điểm,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,385
+RIBBON_PLACEHOLDER,TATDIEMBD,Tắt điểm đo trên bình đồ,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,386
+RIBBON_PLACEHOLDER,HIENDIEMTAT,Hiện điểm đo đã tắt,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,387
+RIBBON_PLACEHOLDER,XOADIEMVUNG,Xóa điểm trong vùng,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,388
+RIBBON_PLACEHOLDER,NOIDIEM,Nối điểm tự động,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,389
+RIBBON_PLACEHOLDER,GANCAO,Gán cao độ điểm theo địa hình,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,390
+RIBBON_PLACEHOLDER,PHATSINHDIEM,Phát sinh điểm trong vùng,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,391
+RIBBON_PLACEHOLDER,DINHVIMIA,Định vị điểm mia theo cọc,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,392
+RIBBON_PLACEHOLDER,XOAYMIA,Xoay điểm mia theo Polyline,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,393
+RIBBON_PLACEHOLDER,LOCDIEM,Lọc Giãn Điểm Mia,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,397
+RIBBON_PLACEHOLDER,CHUYENFONT,Chuẩn Hóa Mã Font,"Ribbon disabled, không có CommandMethod",src/UI/RibbonBuilder.cs,399

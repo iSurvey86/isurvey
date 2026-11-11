@@ -188,7 +188,34 @@ public static class TerrainService
         if (selection.Status != PromptStatus.OK || selection.Value is null)
             return 0;
 
+        // Đồng mức thiếu cao độ: hỏi trước khi gắn.
+        var skipWithoutElev = false;
+        if (kind == "contour")
+        {
+            using (var probe = doc.Database.TransactionManager.StartTransaction())
+            {
+                var missing = ContourElevationService.CountSelectionWithoutElevation(probe, selection.Value);
+                var total = selection.Value.Count;
+                probe.Commit();
+                if (missing > 0)
+                {
+                    var answer = System.Windows.MessageBox.Show(
+                        missing + " / " + total
+                        + " đường đồng mức chưa có cao độ (Z và Elevation ≈ 0).\n\n"
+                        + "Có = gắn tất cả\nKhông = chỉ gắn đường đã có cao độ\nHủy = không gắn\n\n"
+                        + "Gợi ý: lệnh GHISODM để gán cao độ trước.",
+                        "iSurvey — Đồng mức thiếu cao độ",
+                        System.Windows.MessageBoxButton.YesNoCancel,
+                        System.Windows.MessageBoxImage.Warning);
+                    if (answer == System.Windows.MessageBoxResult.Cancel)
+                        return 0;
+                    skipWithoutElev = answer == System.Windows.MessageBoxResult.No;
+                }
+            }
+        }
+
         var added = 0;
+        var skippedFlat = 0;
         using (doc.LockDocument())
         using (var tr = doc.Database.TransactionManager.StartTransaction())
         {
@@ -212,6 +239,13 @@ public static class TerrainService
                 }
                 else
                 {
+                    if (kind == "contour" && skipWithoutElev
+                        && !ContourElevationService.HasElevation(tr, entity, out _))
+                    {
+                        skippedFlat++;
+                        continue;
+                    }
+
                     var list = kind switch
                     {
                         "contour" => model.Contours,
@@ -228,6 +262,8 @@ public static class TerrainService
             tr.Commit();
         }
 
+        if (skippedFlat > 0)
+            editor.WriteMessage("\n[iSurvey] Đã bỏ qua " + skippedFlat + " đường đồng mức chưa có cao độ.");
         if (added > 0)
             TerrainStore.Save(doc.Database, model);
         return added;
@@ -325,72 +361,132 @@ public static class TerrainService
         model.Breaklines ??= new List<string>();
         model.Contours ??= new List<string>();
         model.Points ??= new List<string>();
-        using (var tr = doc.Database.TransactionManager.StartTransaction())
-        {
-            missing += PruneList(tr, doc.Database, model.Points, out var pointsChanged);
-            missing += PruneList(tr, doc.Database, model.Breaklines, out var breakChanged);
-            missing += PruneList(tr, doc.Database, model.Contours, out var contourChanged);
-            var boundaryHandles = model.BoundaryHandles();
-            missing += PruneList(tr, doc.Database, boundaryHandles, out var boundaryChanged);
-            if (boundaryChanged)
-            {
-                model.Boundaries = boundaryHandles;
-                model.Boundary = null;
-            }
-
-            pruned = pointsChanged || breakChanged || contourChanged || boundaryChanged;
-            List<ElevLabel>? elevPool = null;
-            var unmatchedBlockElev = 0;
-            if (model.BlockElevFromLabels)
-                elevPool = LoadElevLabels(tr, doc.Database);
-            foreach (var handle in model.Points)
-                Collect(tr, doc.Database, handle, points, null, elevPool, ref unmatchedBlockElev);
-            foreach (var handle in model.Breaklines)
-                Collect(tr, doc.Database, handle, points, constraints, null, ref unmatchedBlockElev);
-            foreach (var handle in model.Contours)
-                Collect(tr, doc.Database, handle, points, constraints, null, ref unmatchedBlockElev);
-            if (model.BlockElevFromLabels && unmatchedBlockElev > 0)
-            {
-                doc.Editor.WriteMessage(
-                    "\n[iSurvey] " + unmatchedBlockElev
-                    + " điểm/block không tìm thấy chữ cao độ gần; dùng Z sẵn có.");
-            }
-            var boundaryHandlesNow = model.BoundaryHandles();
-            foreach (var boundaryHandle in boundaryHandlesNow)
-            {
-                var ring = new List<TinVertex>();
-                var unused = 0;
-                var lost = Collect(tr, doc.Database, boundaryHandle, ring, null, null, ref unused);
-                if (lost == 0 && ring.Count >= 3)
-                    boundaries.Add(ring);
-            }
-
-            tr.Commit();
-            if (boundaryHandlesNow.Count > 0 && boundaries.Count == 0)
-            {
-                doc.Editor.WriteMessage(
-                    "\n[iSurvey] Có " + boundaryHandlesNow.Count
-                    + " đường bao trong mô hình nhưng không đọc được đa giác kín. Lưới sẽ là bao lồi.");
-            }
-        }
-
-        if (pruned)
-            TerrainStore.Save(doc.Database, model);
-        if (missing > 0)
-            doc.Editor.WriteMessage("\n[iSurvey] Đã bỏ " + missing + " đối tượng không còn trong bản vẽ khỏi mô hình.");
-        if (points.Count < 3)
-        {
-            doc.Editor.WriteMessage("\n[iSurvey] Cần ít nhất 3 điểm để xây dựng lưới.");
-            return 0;
-        }
-
-        if (boundaries.Count > 0)
-            doc.Editor.WriteMessage("\n[iSurvey] Chỉ dựng điểm nằm trong " + boundaries.Count + " đường bao.");
-
         var window = BuildProgressWindow.ShowNew();
         try
         {
+            using (var tr = doc.Database.TransactionManager.StartTransaction())
+            {
+                missing += PruneList(tr, doc.Database, model.Points, out var pointsChanged);
+                missing += PruneList(tr, doc.Database, model.Breaklines, out var breakChanged);
+                missing += PruneList(tr, doc.Database, model.Contours, out var contourChanged);
+                var boundaryHandles = model.BoundaryHandles();
+                missing += PruneList(tr, doc.Database, boundaryHandles, out var boundaryChanged);
+                if (boundaryChanged)
+                {
+                    model.Boundaries = boundaryHandles;
+                    model.Boundary = null;
+                }
+
+                pruned = pointsChanged || breakChanged || contourChanged || boundaryChanged;
+                List<ElevLabel>? elevPool = null;
+                var unmatchedBlockElev = 0;
+                if (model.BlockElevFromLabels)
+                    elevPool = LoadElevLabels(tr, doc.Database);
+                foreach (var handle in model.Points)
+                    Collect(tr, doc.Database, handle, points, null, elevPool, ref unmatchedBlockElev);
+                foreach (var handle in model.Breaklines)
+                    Collect(tr, doc.Database, handle, points, constraints, null, ref unmatchedBlockElev);
+
+                var contourTotal = model.Contours.Count;
+                for (var i = 0; i < contourTotal; i++)
+                {
+                    Collect(tr, doc.Database, model.Contours[i], points, constraints, null, ref unmatchedBlockElev);
+                    if ((i & 63) == 0 || i + 1 == contourTotal)
+                    {
+                        window.Report(
+                            i + 1,
+                            contourTotal,
+                            "Đang đọc đường đồng mức " + (i + 1).ToString("N0") + " / " + contourTotal.ToString("N0"));
+                        if (window.Cancelled)
+                            throw new OperationCanceledException();
+                    }
+                }
+
+                if (model.BlockElevFromLabels && unmatchedBlockElev > 0)
+                {
+                    doc.Editor.WriteMessage(
+                        "\n[iSurvey] " + unmatchedBlockElev
+                        + " điểm/block không tìm thấy chữ cao độ gần; dùng Z sẵn có.");
+                }
+                var boundaryHandlesNow = model.BoundaryHandles();
+                foreach (var boundaryHandle in boundaryHandlesNow)
+                {
+                    var ring = new List<TinVertex>();
+                    var unused = 0;
+                    var lost = Collect(tr, doc.Database, boundaryHandle, ring, null, null, ref unused);
+                    if (lost == 0 && ring.Count >= 3)
+                        boundaries.Add(ring);
+                }
+
+                tr.Commit();
+                if (boundaryHandlesNow.Count > 0 && boundaries.Count == 0)
+                {
+                    doc.Editor.WriteMessage(
+                        "\n[iSurvey] Có " + boundaryHandlesNow.Count
+                        + " đường bao trong mô hình nhưng không đọc được đa giác kín. Lưới sẽ là bao lồi.");
+                }
+            }
+
+            if (pruned)
+                TerrainStore.Save(doc.Database, model);
+            if (missing > 0)
+                doc.Editor.WriteMessage("\n[iSurvey] Đã bỏ " + missing + " đối tượng không còn trong bản vẽ khỏi mô hình.");
+            if (points.Count < 3)
+            {
+                doc.Editor.WriteMessage("\n[iSurvey] Cần ít nhất 3 điểm để xây dựng lưới.");
+                return 0;
+            }
+
+            if (boundaries.Count > 0)
+                doc.Editor.WriteMessage("\n[iSurvey] Chỉ dựng điểm nằm trong " + boundaries.Count + " đường bao.");
+
+            var flatContours = ContourElevationService.CountWithoutElevation(doc, model.Contours ?? new List<string>());
+            if (flatContours > 0)
+            {
+                var answer = System.Windows.MessageBox.Show(
+                    flatContours + " đường đồng mức trong mô hình chưa có cao độ (Z/Elevation ≈ 0).\n"
+                    + "Lưới vẫn dựng được nhưng bề mặt có thể phẳng/sai.\n\n"
+                    + "Tiếp tục xây dựng?\n(Gợi ý: GHISODM để gán cao độ trước.)",
+                    "iSurvey — Đồng mức thiếu cao độ",
+                    System.Windows.MessageBoxButton.YesNo,
+                    System.Windows.MessageBoxImage.Warning);
+                if (answer != System.Windows.MessageBoxResult.Yes)
+                {
+                    doc.Editor.WriteMessage("\n[iSurvey] Đã hủy xây dựng lưới (đồng mức thiếu cao độ).");
+                    return 0;
+                }
+            }
+
+            // Cảnh báo phụ: toàn bộ điểm Z gần như nhau.
+            var zMin = double.PositiveInfinity;
+            var zMax = double.NegativeInfinity;
+            foreach (var p in points)
+            {
+                if (p.Z < zMin) zMin = p.Z;
+                if (p.Z > zMax) zMax = p.Z;
+            }
+
+            if (zMax - zMin < 1e-6)
+            {
+                var answer = System.Windows.MessageBox.Show(
+                    "Các điểm nguồn có cao độ gần như nhau (Z ≈ " + zMin.ToString("0.###") + " m).\n"
+                    + "TIN sẽ gần như phẳng. Vẫn xây dựng?",
+                    "iSurvey — Cao độ đồng đều",
+                    System.Windows.MessageBoxButton.YesNo,
+                    System.Windows.MessageBoxImage.Warning);
+                if (answer != System.Windows.MessageBoxResult.Yes)
+                {
+                    doc.Editor.WriteMessage("\n[iSurvey] Đã hủy xây dựng lưới (cao độ đồng đều).");
+                    return 0;
+                }
+            }
+
             return BuildMesh(doc, model, points, constraints, boundaries, window);
+        }
+        catch (OperationCanceledException)
+        {
+            doc.Editor.WriteMessage("\n[iSurvey] Đã hủy xây dựng lưới.");
+            return 0;
         }
         finally
         {
@@ -410,15 +506,15 @@ public static class TerrainService
         int unforced;
         try
         {
-            window.Report(0, points.Count, "Đang dựng " + points.Count.ToString("N0") + " điểm...");
+            window.Report(0, points.Count, "Đang dựng lưới từ " + points.Count.ToString("N0") + " điểm…");
             triangles = TinBuilder.Build(
                 points,
                 constraints,
                 boundaries.Count == 0 ? null : boundaries,
                 out unforced,
-                (done, total) =>
+                (done, total, text) =>
                 {
-                    window.Report(done, total, "Đang dựng tam giác " + done.ToString("N0") + " / " + total.ToString("N0"));
+                    window.Report(done, total, text);
                     if (window.Cancelled)
                         throw new OperationCanceledException();
                 });
@@ -427,8 +523,7 @@ public static class TerrainService
         }
         catch (OperationCanceledException)
         {
-            doc.Editor.WriteMessage("\n[iSurvey] Đã hủy xây dựng lưới.");
-            return 0;
+            throw;
         }
 
         if (boundaries.Count == 0)
@@ -463,7 +558,10 @@ public static class TerrainService
                 drawn++;
                 if ((drawn & 127) == 0)
                 {
-                    window.Report(drawn, triangles.Count, "Đang vẽ tam giác " + drawn.ToString("N0") + " / " + triangles.Count.ToString("N0"));
+                    window.Report(
+                        drawn,
+                        triangles.Count,
+                        "Đang vẽ lưới lên bản vẽ " + drawn.ToString("N0") + " / " + triangles.Count.ToString("N0"));
                     if (window.Cancelled)
                     {
                         doc.Editor.WriteMessage("\n[iSurvey] Đã hủy xây dựng lưới.");
@@ -493,8 +591,12 @@ public static class TerrainService
             tr.Commit();
         }
 
+        window.Report(triangles.Count, triangles.Count, "Đang lưu mô hình…");
         model.SetTriangles(triangles);
+        // Face trên bản vẽ đủ tra Z — không nhồi tọa độ Mesh vào NOD (tránh đơ TAOTUYEN / BANGIS).
+        model.DropMeshCoordinates();
         TerrainStore.Save(doc.Database, model);
+        window.Report(triangles.Count, triangles.Count, "Đang làm mới bản vẽ…");
         TrySetShadedVisualStyle(doc);
         doc.Editor.Regen();
         doc.Editor.WriteMessage(
@@ -609,9 +711,59 @@ public static class TerrainService
         return TinBuilder.TryElevation(triangles, x, y, out z);
     }
 
+    public static bool TryQuery(TinElevationIndex? index, double x, double y, out double z)
+    {
+        if (index is null)
+        {
+            z = 0;
+            return false;
+        }
+
+        return index.TryElevation(x, y, out z);
+    }
+
+    /// <summary>
+    /// Đọc tam giác một lần (Mesh trong bộ nhớ, không thì Face trên bản vẽ).
+    /// Dùng khi phát sinh nhiều cọc — tránh quét lại toàn bộ Face mỗi lần hỏi Z.
+    /// </summary>
+    public static List<TinTriangle> LoadTinTriangles(
+        Autodesk.AutoCAD.ApplicationServices.Document doc,
+        TerrainRecord model)
+    {
+        var fromMesh = model.Triangles();
+        if (fromMesh.Count > 0)
+            return fromMesh;
+
+        var faces = new List<TinTriangle>();
+        if (doc is null)
+            return faces;
+
+        using var tr = doc.Database.TransactionManager.StartTransaction();
+        var space = (BlockTableRecord)tr.GetObject(doc.Database.CurrentSpaceId, OpenMode.ForRead);
+        foreach (ObjectId id in space)
+        {
+            if (tr.GetObject(id, OpenMode.ForRead) is not Face face || face.IsErased)
+                continue;
+            if (!Owned(face, model.Id))
+                continue;
+            var a = face.GetVertexAt(0);
+            var b = face.GetVertexAt(1);
+            var c = face.GetVertexAt(2);
+            faces.Add(new TinTriangle(
+                new TinVertex(a.X, a.Y, a.Z),
+                new TinVertex(b.X, b.Y, b.Z),
+                new TinVertex(c.X, c.Y, c.Z)));
+        }
+
+        tr.Commit();
+        if (faces.Count > 0 && model.StoredTriangleCount <= 0)
+            model.StoredTriangleCount = faces.Count;
+        return faces;
+    }
+
     /// <summary>
     /// Tra Z: ưu tiên Face trên bản vẽ (đúng với lưới đang hiện), rồi mới tới Mesh đã lưu.
-    /// Nếu Mesh trống mà Face có dữ liệu thì ghi lại Mesh.
+    /// Không nhồi lại Mesh vào NOD khi hỏi Z (tránh đơ phát sinh cọc).
     /// </summary>
     public static bool TryQuery(
         Autodesk.AutoCAD.ApplicationServices.Document doc,
@@ -624,38 +776,9 @@ public static class TerrainService
         if (doc is null)
             return TryQuery(model, x, y, out z);
 
-        var faces = new List<TinTriangle>();
-        using (var tr = doc.Database.TransactionManager.StartTransaction())
-        {
-            var space = (BlockTableRecord)tr.GetObject(doc.Database.CurrentSpaceId, OpenMode.ForRead);
-            foreach (ObjectId id in space)
-            {
-                if (tr.GetObject(id, OpenMode.ForRead) is not Face face || face.IsErased)
-                    continue;
-                if (!Owned(face, model.Id))
-                    continue;
-                var a = face.GetVertexAt(0);
-                var b = face.GetVertexAt(1);
-                var c = face.GetVertexAt(2);
-                faces.Add(new TinTriangle(
-                    new TinVertex(a.X, a.Y, a.Z),
-                    new TinVertex(b.X, b.Y, b.Z),
-                    new TinVertex(c.X, c.Y, c.Z)));
-            }
-
-            tr.Commit();
-        }
-
-        if (faces.Count > 0 && TinBuilder.TryElevation(faces, x, y, out z))
-        {
-            if (model.TriangleCount == 0)
-            {
-                model.SetTriangles(faces);
-                TerrainStore.Save(doc.Database, model);
-            }
-
-            return true;
-        }
+        var faces = LoadTinTriangles(doc, model);
+        if (faces.Count > 0)
+            return TinBuilder.TryElevation(faces, x, y, out z);
 
         return TryQuery(model, x, y, out z);
     }
@@ -1068,6 +1191,7 @@ public static class TerrainService
     {
         var hadMesh = model.TriangleCount > 0;
         model.Mesh = new List<double>();
+        model.StoredTriangleCount = 0;
         using (doc.LockDocument())
         using (var tr = doc.Database.TransactionManager.StartTransaction())
         {

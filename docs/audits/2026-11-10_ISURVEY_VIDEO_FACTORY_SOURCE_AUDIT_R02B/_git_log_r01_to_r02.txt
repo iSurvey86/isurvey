@@ -1,0 +1,6 @@
+3a16cb3 docs: Admin iSurvey — nhan may de xem lich su theo HWID.
+2e10072 Bump 1.8.19: tu thong bao cap nhat khi mo Civil.
+f19b2b6 Them tu thong bao cap nhat khi mo Civil (cung hop UPD; moi phien mot lan).
+0ff5e58 Ghi HANDOFF: da cap nhat HDSD web (ksnpsc) theo iSurvey 1.8.18.
+ee07f5c Ghi dã phát hành iSurvey 1.8.18 (Setup zip + version.json trên Storage).
+26fd13f Bump 1.8.18: dóng gói VEMCD Zero-Clutter; h? so audit Video Factory Phase 01.

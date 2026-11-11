@@ -141,6 +141,14 @@ public static class RouteService
             (fromChainage, toChainage) = (toChainage, fromChainage);
 
         var terrain = ResolveTerrain(doc.Database, route);
+        // Nạp TIN một lần + chỉ mục không gian — trước đây mỗi cọc quét lại mọi Face (đơ với đồng mức lớn).
+        TinElevationIndex? elevIndex = null;
+        if (terrain is not null)
+        {
+            var tris = TerrainService.LoadTinTriangles(doc, terrain);
+            elevIndex = TinElevationIndex.Build(tris);
+        }
+
         var stations = new List<StationRecord>();
         using (doc.LockDocument())
         using (var tr = doc.Database.TransactionManager.StartTransaction())
@@ -174,7 +182,9 @@ public static class RouteService
             var progress = TaskProgressWindow.ShowNew(
                 "iSurvey — Phát sinh cọc",
                 "Đang phát sinh cọc trên tuyến",
-                $"0 / ~{estimate:N0} cọc…");
+                elevIndex is null
+                    ? $"0 / ~{estimate:N0} cọc…"
+                    : $"Đã nạp {elevIndex.TriangleCount:N0} tam giác — 0 / ~{estimate:N0} cọc…");
             try
             {
                 for (var chain = from; chain <= to + 1e-6; chain += step)
@@ -182,7 +192,7 @@ public static class RouteService
                     if (progress.Cancelled)
                         break;
                     var use = Math.Min(chain, to);
-                    AddStation(tr, doc, space, curve, route, terrain, stations, use, start, length, height, tick, textOffset, ref missingZ, false);
+                    AddStation(tr, doc, space, curve, route, elevIndex, stations, use, start, length, height, tick, textOffset, ref missingZ, false);
                     if (stations.Count == 1 || stations.Count % 20 == 0)
                         progress.Report(stations.Count, estimate, $"Đã tạo {stations.Count:N0} cọc…");
                     if (Math.Abs(use - to) <= 1e-6)
@@ -191,7 +201,7 @@ public static class RouteService
 
                 if (!progress.Cancelled
                     && (stations.Count == 0 || Math.Abs(stations[stations.Count - 1].Chainage - to) > 1e-4))
-                    AddStation(tr, doc, space, curve, route, terrain, stations, to, start, length, height, tick, textOffset, ref missingZ, false);
+                    AddStation(tr, doc, space, curve, route, elevIndex, stations, to, start, length, height, tick, textOffset, ref missingZ, false);
 
                 // Bắt buộc có cọc tại mọi đỉnh polyline nằm trong khoảng lý trình.
                 if (!progress.Cancelled)
@@ -205,7 +215,7 @@ public static class RouteService
                         var chainage = start + distance;
                         if (chainage < from - 1e-6 || chainage > to + 1e-6)
                             continue;
-                        AddStation(tr, doc, space, curve, route, terrain, stations, chainage, start, length, height, tick, textOffset, ref missingZ, false);
+                        AddStation(tr, doc, space, curve, route, elevIndex, stations, chainage, start, length, height, tick, textOffset, ref missingZ, false);
                     }
                 }
 
@@ -384,6 +394,9 @@ public static class RouteService
             var space = (BlockTableRecord)tr.GetObject(doc.Database.CurrentSpaceId, OpenMode.ForWrite);
             ResolveStationStyle(doc, curve, out var height, out var tick, out var textOffset);
             var terrain = ResolveTerrain(doc.Database, route);
+            TinElevationIndex? elevIndex = null;
+            if (terrain is not null)
+                elevIndex = TinElevationIndex.Build(TerrainService.LoadTinTriangles(doc, terrain));
             var before = route.Stations.Count;
             AddStation(
                 tr,
@@ -391,7 +404,7 @@ public static class RouteService
                 space,
                 curve,
                 route,
-                terrain,
+                elevIndex,
                 route.Stations,
                 chainage,
                 route.StartChainage,
@@ -464,7 +477,7 @@ public static class RouteService
         BlockTableRecord space,
         Curve curve,
         RouteRecord route,
-        TerrainRecord? terrain,
+        TinElevationIndex? elevIndex,
         List<StationRecord> stations,
         double chainage,
         double start,
@@ -507,7 +520,7 @@ public static class RouteService
 
         var hasZ = false;
         var z = 0.0;
-        if (terrain is not null && TerrainService.TryQuery(doc, terrain, point.X, point.Y, out var tinZ))
+        if (elevIndex is not null && TerrainService.TryQuery(elevIndex, point.X, point.Y, out var tinZ))
         {
             z = tinZ;
             hasZ = true;

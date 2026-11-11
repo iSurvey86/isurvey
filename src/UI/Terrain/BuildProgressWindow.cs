@@ -80,7 +80,7 @@ internal sealed class BuildProgressWindow : Window
     {
         var window = new BuildProgressWindow();
         AcadApp.ShowModelessWindow(window);
-        window.Report(0, 0, "Đang đọc điểm...");
+        window.Report(0, 0, "Đang đọc nguồn điểm…");
         return window;
     }
 

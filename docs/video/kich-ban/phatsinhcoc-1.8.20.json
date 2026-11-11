@@ -1,0 +1,12 @@
+{
+  "command": "PHATSINHCOC",
+  "title": "Phát sinh cọc (tra Z TIN nhanh) phiên bản 1.8.20",
+  "version": "1.8.20",
+  "status": "Chưa quay",
+  "drawing": "bản thử tuyến + TIN lớn (bản sao)",
+  "steps": [
+    "PHATSINHCOC → hộp gọn (tên tuyến text; Từ–Đến một hàng)",
+    "Chấp nhận → tiến trình tăng đều trên TIN lớn",
+    "Cọc có Z từ TinElevationIndex"
+  ]
+}

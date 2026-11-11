@@ -1,0 +1,286 @@
+﻿entry_type,name,feature_id,file,line,method,note
+PRIMARY_COMMAND,ISURVEY_LOGIN,AUD-006,src/Auth/AuthModule.cs,24,LoginCommand,
+PRIMARY_COMMAND,ISURVEY_HDSD,AUD-005,src/Auth/AuthModule.cs,35,HelpCommand,
+PRIMARY_COMMAND,ISURVEY_RIBBON,AUD-008,src/Auth/AuthModule.cs,52,RibbonCommand,
+PRIMARY_COMMAND,ISURVEY_ABOUT,AUD-003,src/Auth/AuthModule.cs,67,AboutCommand,
+PRIMARY_COMMAND,ISURVEY_UPDATE,AUD-009,src/Auth/AuthModule.cs,74,UpdateCommand,
+PRIMARY_COMMAND,ISURVEY_LOGOUT,AUD-007,src/Auth/AuthModule.cs,77,LogoutCommand,
+PRIMARY_COMMAND,ISURVEY_GENOTP,AUD-004,src/Auth/AuthModule.cs,106,GenerateOtpCommand,
+ALIAS_COMMANDALIASES,IG,AUD-028,src/CommandAliases.cs,52,AliasInsertMap,=> InsertMapCommand
+ALIAS_COMMANDALIASES,SG,AUD-029,src/CommandAliases.cs,55,AliasInsertSatellite,=> InsertSatelliteCommand
+ALIAS_COMMANDALIASES,XG,AUD-027,src/CommandAliases.cs,58,AliasDeleteGe,=> DeleteGeCommand
+ALIAS_COMMANDALIASES,UG,AUD-030,src/CommandAliases.cs,61,AliasUpdateGe,=> UpdateGeCommand
+ALIAS_COMMANDALIASES,EG,AUD-025,src/CommandAliases.cs,64,AliasExportKml,=> ExportKmlCommand
+ALIAS_COMMANDALIASES,INK,AUD-026,src/CommandAliases.cs,67,AliasImportKml,=> ImportKmlCommand
+ALIAS_COMMANDALIASES,EXK,AUD-025,src/CommandAliases.cs,70,AliasExportKmlShort,=> ExportKmlCommand
+ALIAS_COMMANDALIASES,D2C,AUD-011,src/CommandAliases.cs,73,AliasDgnToCad,=> DgnToCadCommand
+ALIAS_COMMANDALIASES,T2C,AUD-046,src/CommandAliases.cs,76,AliasTabToCad,=> TabToCadCommand
+ALIAS_COMMANDALIASES,C2D,AUD-010,src/CommandAliases.cs,79,AliasCadToDgn,=> CadToDgnCommand
+ALIAS_COMMANDALIASES,UAVCLIP,AUD-057,src/CommandAliases.cs,82,AliasUavClip,=> ClipCommand
+ALIAS_COMMANDALIASES,AK,AUD-061,src/CommandAliases.cs,85,AliasUavFrame,=> FrameToggleCommand
+ALIAS_COMMANDALIASES,AD,AUD-063,src/CommandAliases.cs,88,AliasUavSendBack,=> SendBackCommand
+ALIAS_COMMANDALIASES,AU,AUD-062,src/CommandAliases.cs,91,AliasUavInsert,=> InsertStub
+ALIAS_COMMANDALIASES,DEM,AUD-060,src/CommandAliases.cs,94,AliasUavDem,=> DemStub
+ALIAS_COMMANDALIASES,DM,AUD-058,src/CommandAliases.cs,97,AliasUavContour,=> ContourStub
+ALIAS_COMMANDALIASES,HT,AUD-059,src/CommandAliases.cs,100,AliasUavCrs,=> CrsStub
+ALIAS_COMMANDALIASES,NP,AUD-056,src/CommandAliases.cs,103,AliasPcImport,=> PcImportStub
+ALIAS_COMMANDALIASES,LP,AUD-054,src/CommandAliases.cs,106,AliasPcFilter,=> PcFilterStub
+ALIAS_COMMANDALIASES,RL,AUD-055,src/CommandAliases.cs,109,AliasPcGrid,=> PcGridStub
+ALIAS_COMMANDALIASES,GOC,AUD-036,src/CommandAliases.cs,112,AliasGocTuyen,=> NumberVerticesCommand
+ALIAS_COMMANDALIASES,DUOITUYEN,AUD-037,src/CommandAliases.cs,115,AliasStripMap,=> StripMapCommand
+ALIAS_COMMANDALIASES,KHUNG,AUD-016,src/CommandAliases.cs,118,AliasFrame,=> FrameCommand
+ALIAS_COMMANDALIASES,KHUNGBV,AUD-017,src/CommandAliases.cs,121,AliasTechFrame,=> TechFrameCommand
+ALIAS_COMMANDALIASES,ANLOGO,AUD-018,src/CommandAliases.cs,124,AliasToggleLogo,=> ToggleLogoCommand
+ALIAS_COMMANDALIASES,ANLOGO1,AUD-019,src/CommandAliases.cs,127,AliasToggleLogoOwner,=> ToggleLogoOwnerCommand
+ALIAS_COMMANDALIASES,ANLOGO2,AUD-020,src/CommandAliases.cs,130,AliasToggleLogoDesign,=> ToggleLogoDesignCommand
+ALIAS_COMMANDALIASES,RAIKHUNG,AUD-024,src/CommandAliases.cs,133,AliasRouteLayout,=> RouteLayoutCommand
+ALIAS_COMMANDALIASES,RAIMCD,AUD-022,src/CommandAliases.cs,136,AliasProfileLayout,=> ProfileLayoutCommand
+ALIAS_COMMANDALIASES,INTUYEN,AUD-023,src/CommandAliases.cs,139,AliasRoutePlot,=> RoutePlotCommand
+ALIAS_COMMANDALIASES,THAYLOGO,AUD-021,src/CommandAliases.cs,142,AliasReplaceLogo,=> ReplaceLogoCommand
+ALIAS_COMMANDALIASES,CODAN,AUD-014,src/CommandAliases.cs,145,AliasFitTitle,=> FitTitleCommand
+ALIAS_COMMANDALIASES,SK,AUD-015,src/CommandAliases.cs,148,AliasEditFrame,=> EditFrameInfoCommand
+ALIAS_COMMANDALIASES,AIA,AUD-001,src/CommandAliases.cs,151,AliasAiAssist,=> AssistCommand
+ALIAS_COMMANDALIASES,AIC,AUD-002,src/CommandAliases.cs,154,AliasAiSettings,=> SettingsCommand
+ALIAS_COMMANDALIASES,ND,AUD-012,src/CommandAliases.cs,157,AliasImportPoints,=> ImportPointsCommand
+ALIAS_COMMANDALIASES,XD,AUD-013,src/CommandAliases.cs,160,AliasExportPoints,=> ExportPointsCommand
+ALIAS_COMMANDALIASES,CBD,AUD-032,src/CommandAliases.cs,163,AliasCutPlan,=> CutPlanCommand
+ALIAS_COMMANDALIASES,SCN,AUD-045,src/CommandAliases.cs,166,AliasAutoScan,=> AutoScanCommand
+ALIAS_COMMANDALIASES,LGI,AUD-006,src/CommandAliases.cs,170,AliasLogin,=> LoginCommand
+ALIAS_COMMANDALIASES,UPD,AUD-009,src/CommandAliases.cs,173,AliasUpdate,=> UpdateCommand
+ALIAS_COMMANDALIASES,ABT,AUD-003,src/CommandAliases.cs,176,AliasAbout,=> AboutCommand
+ALIAS_COMMANDALIASES,HD,AUD-005,src/CommandAliases.cs,179,AliasHelp,=> HelpCommand
+ALIAS_COMMANDALIASES,LGO,AUD-007,src/CommandAliases.cs,182,AliasLogout,=> LogoutCommand
+ALIAS_COMMANDALIASES,MENUISURVEY,AUD-008,src/CommandAliases.cs,185,AliasRibbon,=> RibbonCommand
+ALIAS_COMMANDALIASES,BANGIS,AUD-031,src/CommandAliases.cs,188,AliasPalette,=> ShowCommand
+PRIMARY_COMMAND,ISURVEY_DGN_TO_CAD,AUD-011,src/Dgn/DgnModule.cs,21,DgnToCadCommand,
+PRIMARY_COMMAND,ISURVEY_CAD_TO_DGN,AUD-010,src/Dgn/DgnModule.cs,87,CadToDgnCommand,
+PRIMARY_COMMAND,ISURVEY_AI_ASSIST,AUD-001,src/Modules/Ai/AiAssistantModule.cs,13,AssistCommand,
+PRIMARY_COMMAND,ISURVEY_AI_SETTINGS,AUD-002,src/Modules/Ai/AiAssistantModule.cs,26,SettingsCommand,
+PRIMARY_COMMAND,NHAPDIEM,AUD-012,src/Modules/DiemDo/PointFileModule.cs,13,ImportPointsCommand,
+PRIMARY_COMMAND,XUATDIEM,AUD-013,src/Modules/DiemDo/PointFileModule.cs,62,ExportPointsCommand,
+PRIMARY_COMMAND,ISURVEY_EXPORT_KML,AUD-025,src/Modules/Export/ExportModule.cs,22,ExportKmlCommand,
+PRIMARY_COMMAND,ISURVEY_KHUNG,AUD-016,src/Modules/Frame/FrameService.cs,54,FrameCommand,
+PRIMARY_COMMAND,ISURVEY_KHUNG_BV,AUD-017,src/Modules/Frame/FrameService.cs,58,TechFrameCommand,
+PRIMARY_COMMAND,ISURVEY_LOGO,AUD-018,src/Modules/Frame/FrameService.cs,62,ToggleLogoCommand,
+PRIMARY_COMMAND,ISURVEY_LOGO1,AUD-019,src/Modules/Frame/FrameService.cs,76,ToggleLogoOwnerCommand,
+PRIMARY_COMMAND,ISURVEY_LOGO2,AUD-020,src/Modules/Frame/FrameService.cs,79,ToggleLogoDesignCommand,
+PRIMARY_COMMAND,ISURVEY_LOGO_REPLACE,AUD-021,src/Modules/Frame/FrameService.cs,130,ReplaceLogoCommand,
+PRIMARY_COMMAND,ISURVEY_FIT_TITLE,AUD-014,src/Modules/Frame/FrameService.cs,296,FitTitleCommand,
+PRIMARY_COMMAND,ISURVEY_FRAME_EDIT,AUD-015,src/Modules/Frame/FrameService.FrameEdit.cs,16,EditFrameInfoCommand,
+PRIMARY_COMMAND,ISURVEY_PROFILE_SHEETS,AUD-022,src/Modules/Frame/FrameService.ProfileLayout.cs,28,ProfileLayoutCommand,
+PRIMARY_COMMAND,ISURVEY_ROUTE_SHEETS,AUD-024,src/Modules/Frame/FrameService.RouteLayout.cs,29,RouteLayoutCommand,
+PRIMARY_COMMAND,ISURVEY_ROUTE_PLOT,AUD-023,src/Modules/Frame/FrameService.RouteLayout.cs,33,RoutePlotCommand,
+PRIMARY_COMMAND,ISURVEY_IMPORT_KML,AUD-026,src/Modules/Import/KmlImportModule.cs,21,ImportKmlCommand,
+PRIMARY_COMMAND,ISURVEY_TAB_TO_CAD,AUD-046,src/Modules/Import/TabImportModule.cs,29,TabToCadCommand,
+PRIMARY_COMMAND,ISURVEY_MAP,AUD-028,src/Modules/Map/MapModule.cs,25,InsertMapCommand,
+PRIMARY_COMMAND,ISURVEY_MAP_SAT,AUD-029,src/Modules/Map/MapModule.cs,32,InsertSatelliteCommand,
+PRIMARY_COMMAND,ISURVEY_UPDATE_GE,AUD-030,src/Modules/Map/MapModule.cs,123,UpdateGeCommand,
+PRIMARY_COMMAND,ISURVEY_DELETE_GE,AUD-027,src/Modules/Map/MapModule.cs,169,DeleteGeCommand,
+PRIMARY_COMMAND,CATBD,AUD-032,src/Modules/Plan/PlanModule.cs,46,CutPlanCommand,
+MODULE_WRAPPER_ALIAS,ISURVEY_PROFILE_DRAW,AUD-033,src/Modules/Profile/ProfileModule.cs,14,DrawCommand,thin-wrapper DrawCommand→Draw
+PRIMARY_COMMAND,VEMCD,AUD-033,src/Modules/Profile/ProfileModule.cs,17,DrawAlias,thin-wrapper DrawAlias→Draw
+PRIMARY_COMMAND,AUTOSCAN,AUD-045,src/Modules/Scan/ScanModule.cs,25,AutoScanCommand,
+MODULE_WRAPPER_ALIAS,ISURVEY_TERRAIN_NEW,AUD-049,src/Modules/Terrain/TerrainModule.cs,14,NewCommand,thin-wrapper NewCommand→New
+PRIMARY_COMMAND,TAOMOHINH,AUD-049,src/Modules/Terrain/TerrainModule.cs,17,NewAlias,thin-wrapper NewAlias→New
+MODULE_WRAPPER_ALIAS,ISURVEY_TERRAIN_ADD,AUD-050,src/Modules/Terrain/TerrainModule.cs,20,AddCommand,thin-wrapper AddCommand→Add
+PRIMARY_COMMAND,THEMMOHINH,AUD-050,src/Modules/Terrain/TerrainModule.cs,23,AddAlias,thin-wrapper AddAlias→Add
+MODULE_WRAPPER_ALIAS,ISURVEY_TERRAIN_BUILD,AUD-052,src/Modules/Terrain/TerrainModule.cs,26,BuildCommand,thin-wrapper BuildCommand→Build
+PRIMARY_COMMAND,XAYMOHINH,AUD-052,src/Modules/Terrain/TerrainModule.cs,29,BuildAlias,thin-wrapper BuildAlias→Build
+MODULE_WRAPPER_ALIAS,ISURVEY_TERRAIN_TOGGLE,AUD-047,src/Modules/Terrain/TerrainModule.cs,32,ToggleCommand,thin-wrapper ToggleCommand→Toggle
+PRIMARY_COMMAND,ANTIN,AUD-047,src/Modules/Terrain/TerrainModule.cs,35,ToggleAlias,thin-wrapper ToggleAlias→Toggle
+MODULE_WRAPPER_ALIAS,ISURVEY_TERRAIN_Z,AUD-051,src/Modules/Terrain/TerrainModule.cs,38,QueryCommand,thin-wrapper QueryCommand→Query
+PRIMARY_COMMAND,TRACAOD,AUD-051,src/Modules/Terrain/TerrainModule.cs,41,QueryAlias,thin-wrapper QueryAlias→Query
+MODULE_WRAPPER_ALIAS,ISURVEY_TERRAIN_DETACH,AUD-048,src/Modules/Terrain/TerrainModule.cs,44,DetachCommand,thin-wrapper DetachCommand→Detach
+PRIMARY_COMMAND,GOMOHINH,AUD-048,src/Modules/Terrain/TerrainModule.cs,47,DetachAlias,thin-wrapper DetachAlias→Detach
+MODULE_WRAPPER_ALIAS,ISURVEY_TERRAIN_CLEAR,AUD-053,src/Modules/Terrain/TerrainModule.cs,50,ClearCommand,thin-wrapper ClearCommand→Clear
+PRIMARY_COMMAND,XOATHANHPHAN,AUD-053,src/Modules/Terrain/TerrainModule.cs,53,ClearAlias,thin-wrapper ClearAlias→Clear
+MODULE_WRAPPER_ALIAS,ISURVEY_ROUTE_NEW,AUD-040,src/Modules/Tuyen/RouteModule.cs,14,RouteNewCommand,thin-wrapper RouteNewCommand→New
+PRIMARY_COMMAND,TAOTUYEN,AUD-040,src/Modules/Tuyen/RouteModule.cs,17,RouteNewAlias,thin-wrapper RouteNewAlias→New
+MODULE_WRAPPER_ALIAS,ISURVEY_ROUTE_STATIONS,AUD-038,src/Modules/Tuyen/RouteModule.cs,20,StationsCommand,thin-wrapper StationsCommand→Stations
+PRIMARY_COMMAND,PHATSINHCOC,AUD-038,src/Modules/Tuyen/RouteModule.cs,23,StationsAlias,thin-wrapper StationsAlias→Stations
+MODULE_WRAPPER_ALIAS,ISURVEY_ROUTE_CLEAR_STATIONS,AUD-043,src/Modules/Tuyen/RouteModule.cs,26,ClearStationsCommand,thin-wrapper ClearStationsCommand→ClearStations
+PRIMARY_COMMAND,XOACOC,AUD-043,src/Modules/Tuyen/RouteModule.cs,29,ClearStationsAlias,thin-wrapper ClearStationsAlias→ClearStations
+MODULE_WRAPPER_ALIAS,ISURVEY_ROUTE_REVERSE,AUD-035,src/Modules/Tuyen/RouteModule.cs,32,ReverseCommand,thin-wrapper ReverseCommand→Reverse
+PRIMARY_COMMAND,DAODAUTUYEN,AUD-035,src/Modules/Tuyen/RouteModule.cs,35,ReverseAlias,thin-wrapper ReverseAlias→Reverse
+MODULE_WRAPPER_ALIAS,ISURVEY_STATION_STYLE,AUD-042,src/Modules/Tuyen/RouteModule.cs,38,StationStyleCommand,thin-wrapper StationStyleCommand→StationStyle
+PRIMARY_COMMAND,THIETLAPCOC,AUD-042,src/Modules/Tuyen/RouteModule.cs,41,StationStyleAlias,thin-wrapper StationStyleAlias→StationStyle
+MODULE_WRAPPER_ALIAS,ISURVEY_STATION_REMOVE_ONE,AUD-044,src/Modules/Tuyen/RouteModule.cs,44,RemoveOneCommand,thin-wrapper RemoveOneCommand→RemoveOne
+PRIMARY_COMMAND,XOACOC1,AUD-044,src/Modules/Tuyen/RouteModule.cs,47,RemoveOneAlias,thin-wrapper RemoveOneAlias→RemoveOne
+MODULE_WRAPPER_ALIAS,ISURVEY_STATION_ADD_ONE,AUD-041,src/Modules/Tuyen/RouteModule.cs,50,AddOneCommand,thin-wrapper AddOneCommand→AddOne
+PRIMARY_COMMAND,THEMCOC,AUD-041,src/Modules/Tuyen/RouteModule.cs,53,AddOneAlias,thin-wrapper AddOneAlias→AddOne
+MODULE_WRAPPER_ALIAS,ISURVEY_STATION_LIST,AUD-034,src/Modules/Tuyen/RouteModule.cs,56,ListCommand,thin-wrapper ListCommand→ListStations
+PRIMARY_COMMAND,BANGCOC,AUD-034,src/Modules/Tuyen/RouteModule.cs,59,ListAlias,thin-wrapper ListAlias→ListStations
+PRIMARY_COMMAND,STT,AUD-039,src/Modules/Tuyen/SequenceNumberService.cs,28,SequenceCommand,
+PRIMARY_COMMAND,ISURVEY_STRIP_MAP,AUD-037,src/Modules/Tuyen/StripMapService.cs,27,StripMapCommand,
+PRIMARY_COMMAND,ISURVEY_NUMBER_VERTICES,AUD-036,src/Modules/Tuyen/VertexNumberingService.cs,37,NumberVerticesCommand,
+PRIMARY_COMMAND,ISURVEY_UAV_CLIP,AUD-057,src/Modules/Uav/UavModule.cs,10,ClipCommand,
+PRIMARY_COMMAND,ISURVEY_UAV_FRAME_TOGGLE,AUD-061,src/Modules/Uav/UavModule.cs,19,FrameToggleCommand,
+PRIMARY_COMMAND,ISURVEY_UAV_SEND_BACK,AUD-063,src/Modules/Uav/UavModule.cs,28,SendBackCommand,
+PRIMARY_COMMAND,ISURVEY_UAV_INSERT,AUD-062,src/Modules/Uav/UavModule.cs,37,InsertStub,stub-entry (không gộp qua helper Stub)
+PRIMARY_COMMAND,ISURVEY_UAV_DEM,AUD-060,src/Modules/Uav/UavModule.cs,40,DemStub,stub-entry (không gộp qua helper Stub)
+PRIMARY_COMMAND,ISURVEY_UAV_CONTOUR,AUD-058,src/Modules/Uav/UavModule.cs,43,ContourStub,stub-entry (không gộp qua helper Stub)
+PRIMARY_COMMAND,ISURVEY_UAV_CRS,AUD-059,src/Modules/Uav/UavModule.cs,46,CrsStub,stub-entry (không gộp qua helper Stub)
+PRIMARY_COMMAND,ISURVEY_PC_IMPORT,AUD-056,src/Modules/Uav/UavModule.cs,49,PcImportStub,stub-entry (không gộp qua helper Stub)
+PRIMARY_COMMAND,ISURVEY_PC_FILTER,AUD-054,src/Modules/Uav/UavModule.cs,52,PcFilterStub,stub-entry (không gộp qua helper Stub)
+PRIMARY_COMMAND,ISURVEY_PC_GRID,AUD-055,src/Modules/Uav/UavModule.cs,55,PcGridStub,stub-entry (không gộp qua helper Stub)
+PRIMARY_COMMAND,ISURVEY_PALETTE,AUD-031,src/UI/Palette/PaletteModule.cs,9,ShowCommand,
+RIBBON_BTN,Bảng Dữ liệu|ISURVEY_PALETTE,AUD-031,src/UI/RibbonBuilder.cs,142,,enabled=True
+RIBBON_BTN,Nhập File KML/KMZ|ISURVEY_IMPORT_KML,AUD-026,src/UI/RibbonBuilder.cs,150,,enabled=True
+RIBBON_BTN,Xuất File KML/KMZ|ISURVEY_EXPORT_KML,AUD-025,src/UI/RibbonBuilder.cs,151,,enabled=True
+RIBBON_BTN,Chèn Ảnh Vệ Tinh|ISURVEY_MAP_SAT,AUD-029,src/UI/RibbonBuilder.cs,154,,enabled=True
+RIBBON_BTN,Cập Nhật Ảnh GE|ISURVEY_UPDATE_GE,AUD-030,src/UI/RibbonBuilder.cs,155,,enabled=True
+RIBBON_BTN,Xóa Ảnh Vệ Tinh|ISURVEY_DELETE_GE,AUD-027,src/UI/RibbonBuilder.cs,156,,enabled=True
+RIBBON_BTN,Nhập TAB ➔ CAD|ISURVEY_TAB_TO_CAD,AUD-046,src/UI/RibbonBuilder.cs,160,,enabled=True
+RIBBON_BTN,Nhập DGN ➔ CAD|ISURVEY_DGN_TO_CAD,AUD-011,src/UI/RibbonBuilder.cs,162,,enabled=True
+RIBBON_BTN,Xuất CAD ➔ DGN|ISURVEY_CAD_TO_DGN,AUD-010,src/UI/RibbonBuilder.cs,164,,enabled=True
+RIBBON_BTN,Khung Bản Đồ|ISURVEY_KHUNG,AUD-016,src/UI/RibbonBuilder.cs,174,,enabled=True
+RIBBON_BTN,Khung Bản Vẽ Kỹ Thuật|ISURVEY_KHUNG_BV,AUD-017,src/UI/RibbonBuilder.cs,176,,enabled=True
+RIBBON_PLACEHOLDER,Tạo Khung Lưới TĐ|TAOKHUNG,,src/UI/RibbonBuilder.cs,178,,enabled=False
+RIBBON_BTN,Cắt Bình Đồ|CATBD,AUD-032,src/UI/RibbonBuilder.cs,179,,enabled=True
+RIBBON_BTN,Rải Khung Theo Tuyến|RAIKHUNG,AUD-024,src/UI/RibbonBuilder.cs,182,,enabled=True
+RIBBON_BTN,Vẽ Mặt Cắt Dọc|VEMCD,AUD-033,src/UI/RibbonBuilder.cs,184,,enabled=True
+RIBBON_BTN,Rải Khung Mặt Cắt|RAIMCD,AUD-022,src/UI/RibbonBuilder.cs,186,,enabled=True
+RIBBON_PLACEHOLDER,Thiết Lập Tỉ Lệ Khung|TILEKHUNG,,src/UI/RibbonBuilder.cs,188,,enabled=False
+RIBBON_PLACEHOLDER,Bảo Vệ Layer Khung|KHOAKHUNG,,src/UI/RibbonBuilder.cs,189,,enabled=False
+RIBBON_PLACEHOLDER,Rải Móng & Biên Đất|RAIMONG,,src/UI/RibbonBuilder.cs,197,,enabled=False
+RIBBON_BTN,Đánh Số Góc Tuyến|ISURVEY_NUMBER_VERTICES,AUD-036,src/UI/RibbonBuilder.cs,198,,enabled=True
+RIBBON_BTN,Duỗi Thẳng Tuyến|ISURVEY_STRIP_MAP,AUD-037,src/UI/RibbonBuilder.cs,200,,enabled=True
+RIBBON_PLACEHOLDER,Tạo Biên Đường Tạm|BIENDUONGTAM,,src/UI/RibbonBuilder.cs,204,,enabled=False
+RIBBON_PLACEHOLDER,Kẻ Tuyến 110kV/220kV|KETUYEN,,src/UI/RibbonBuilder.cs,205,,enabled=False
+RIBBON_BTN,Đánh Số Thứ Tự|STT,AUD-039,src/UI/RibbonBuilder.cs,206,,enabled=True
+RIBBON_PLACEHOLDER,Bảng TĐ & Diện Tích|BANGTOADO,,src/UI/RibbonBuilder.cs,213,,enabled=False
+RIBBON_PLACEHOLDER,Kiểm Tra Lỗi Cao Độ|KIEMTRACAODO,,src/UI/RibbonBuilder.cs,216,,enabled=False
+RIBBON_BTN,Quét Cấu Trúc (AutoScan)|AUTOSCAN,AUD-045,src/UI/RibbonBuilder.cs,217,,enabled=True
+RIBBON_PLACEHOLDER,Xuất Thống Kê Excel|XUATEXCEL,,src/UI/RibbonBuilder.cs,218,,enabled=False
+RIBBON_BTN,Kiểm Tra Cập Nhật|ISURVEY_UPDATE,AUD-009,src/UI/RibbonBuilder.cs,227,,enabled=True
+RIBBON_BTN,Thông Tin & Giấy Phép|ISURVEY_ABOUT,AUD-003,src/UI/RibbonBuilder.cs,228,,enabled=True
+RIBBON_BTN,Hướng dẫn|ISURVEY_HDSD,AUD-005,src/UI/RibbonBuilder.cs,229,,enabled=True
+RIBBON_BTN,Nạp lại Menu|ISURVEY_RIBBON,AUD-008,src/UI/RibbonBuilder.cs,230,,enabled=True
+RIBBON_BTN,Trợ Lý AI|ISURVEY_AI_ASSIST,AUD-001,src/UI/RibbonBuilder.cs,284,,enabled=True
+RIBBON_BTN,Cấu Hình AI|ISURVEY_AI_SETTINGS,AUD-002,src/UI/RibbonBuilder.cs,288,,enabled=True
+RIBBON_PLACEHOLDER,Ghi Số Đồng Mức|GHISODM,,src/UI/RibbonBuilder.cs,368,,enabled=False
+RIBBON_BTN,Nhập điểm đo|NHAPDIEM,AUD-012,src/UI/RibbonBuilder.cs,379,,enabled=True
+RIBBON_BTN,Xuất điểm đo|XUATDIEM,AUD-013,src/UI/RibbonBuilder.cs,380,,enabled=True
+RIBBON_PLACEHOLDER,Nâng hạ cao độ điểm đo|NANGLCAO,,src/UI/RibbonBuilder.cs,381,,enabled=False
+RIBBON_PLACEHOLDER,Tạo điểm từ đối tượng AutoCAD|TAODIEMCAD,,src/UI/RibbonBuilder.cs,382,,enabled=False
+RIBBON_PLACEHOLDER,Hiện điểm đo theo mã|HIENDIEMMA,,src/UI/RibbonBuilder.cs,383,,enabled=False
+RIBBON_PLACEHOLDER,Lọc điểm đo theo mã|LOCDIEMMA,,src/UI/RibbonBuilder.cs,384,,enabled=False
+RIBBON_PLACEHOLDER,Chèn địa vật theo mã điểm|CHENDIAVAT,,src/UI/RibbonBuilder.cs,385,,enabled=False
+RIBBON_PLACEHOLDER,Tắt điểm đo trên bình đồ|TATDIEMBD,,src/UI/RibbonBuilder.cs,386,,enabled=False
+RIBBON_PLACEHOLDER,Hiện điểm đo đã tắt|HIENDIEMTAT,,src/UI/RibbonBuilder.cs,387,,enabled=False
+RIBBON_PLACEHOLDER,Xóa điểm trong vùng|XOADIEMVUNG,,src/UI/RibbonBuilder.cs,388,,enabled=False
+RIBBON_PLACEHOLDER,Nối điểm tự động|NOIDIEM,,src/UI/RibbonBuilder.cs,389,,enabled=False
+RIBBON_PLACEHOLDER,Gán cao độ điểm theo địa hình|GANCAO,,src/UI/RibbonBuilder.cs,390,,enabled=False
+RIBBON_PLACEHOLDER,Phát sinh điểm trong vùng|PHATSINHDIEM,,src/UI/RibbonBuilder.cs,391,,enabled=False
+RIBBON_PLACEHOLDER,Định vị điểm mia theo cọc|DINHVIMIA,,src/UI/RibbonBuilder.cs,392,,enabled=False
+RIBBON_PLACEHOLDER,Xoay điểm mia theo Polyline|XOAYMIA,,src/UI/RibbonBuilder.cs,393,,enabled=False
+RIBBON_PLACEHOLDER,Lọc Giãn Điểm Mia|LOCDIEM,,src/UI/RibbonBuilder.cs,397,,enabled=False
+RIBBON_BTN,Ẩn / Hiện Lưới TIN|ANTIN,AUD-047,src/UI/RibbonBuilder.cs,398,,enabled=True
+RIBBON_PLACEHOLDER,Chuẩn Hóa Mã Font|CHUYENFONT,,src/UI/RibbonBuilder.cs,399,,enabled=False
+RIBBON_BTN,Cắt Ảnh Theo Biên|ISURVEY_UAV_CLIP,AUD-057,src/UI/RibbonBuilder.cs,421,,enabled=True
+RIBBON_BTN,Tắt/Bật Khung Ảnh|ISURVEY_UAV_FRAME_TOGGLE,AUD-061,src/UI/RibbonBuilder.cs,423,,enabled=True
+RIBBON_BTN,Đưa Ảnh Xuống Dưới|ISURVEY_UAV_SEND_BACK,AUD-063,src/UI/RibbonBuilder.cs,425,,enabled=True
+RIBBON_BTN,Vẽ Đường Đồng Mức|ISURVEY_UAV_CONTOUR,AUD-058,src/UI/RibbonBuilder.cs,437,,enabled=True
+RIBBON_BTN,Hệ Tọa Độ UAV|ISURVEY_UAV_CRS,AUD-059,src/UI/RibbonBuilder.cs,439,,enabled=True
+RIBBON_BTN,Nhập Point Cloud|ISURVEY_PC_IMPORT,AUD-056,src/UI/RibbonBuilder.cs,445,,enabled=True
+RIBBON_BTN,Lọc Điểm Mặt Đất|ISURVEY_PC_FILTER,AUD-054,src/UI/RibbonBuilder.cs,447,,enabled=True
+RIBBON_BTN,Rải Lưới Điểm|ISURVEY_PC_GRID,AUD-055,src/UI/RibbonBuilder.cs,449,,enabled=True
+XAML_EVENT,BtnCancel_Click,,src/Dgn/DgnExportWindow.xaml,133,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,BtnExport_Click,,src/Dgn/DgnExportWindow.xaml,135,SETTINGS,handler cấu hình trong dialog
+XAML_EVENT,Add_Click,,src/Dgn/DgnImportWindow.xaml,39,SETTINGS,handler cấu hình trong dialog
+XAML_EVENT,Up_Click,,src/Dgn/DgnImportWindow.xaml,40,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,Down_Click,,src/Dgn/DgnImportWindow.xaml,41,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,Remove_Click,,src/Dgn/DgnImportWindow.xaml,42,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,Cancel_Click,,src/Dgn/DgnImportWindow.xaml,111,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Confirm_Click,,src/Dgn/DgnImportWindow.xaml,113,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Secondary_Click,,src/UI/Account/DarkDialog.xaml,27,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,Secondary_Click,,src/UI/Account/DarkDialog.xaml,47,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,Primary_Click,,src/UI/Account/DarkDialog.xaml,49,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,Close_Click,,src/UI/Account/LoginWindow.xaml,129,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Send_Click,,src/UI/Account/LoginWindow.xaml,145,SETTINGS,handler cấu hình trong dialog
+XAML_EVENT,Close_Click,,src/UI/Account/UpdateWindow.xaml,131,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Update_Click,,src/UI/Account/UpdateWindow.xaml,133,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Close_Click,,src/UI/Account/UpdateWindow.xaml,135,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Close_Click,,src/UI/Ai/AiChatWindow.xaml,83,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Send_Click,,src/UI/Ai/AiChatWindow.xaml,106,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,Cancel_Click,,src/UI/DiemDo/ExportPointsWindow.xaml,31,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,PickLayer_Click,,src/UI/DiemDo/ExportPointsWindow.xaml,53,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,Pick_Click,,src/UI/DiemDo/ExportPointsWindow.xaml,65,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,Cancel_Click,,src/UI/DiemDo/ExportPointsWindow.xaml,81,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Save_Click,,src/UI/DiemDo/ExportPointsWindow.xaml,83,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Cancel_Click,,src/UI/DiemDo/ImportPointsWindow.xaml,42,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Open_Click,,src/UI/DiemDo/ImportPointsWindow.xaml,51,SETTINGS,handler cấu hình trong dialog
+XAML_EVENT,MarkerDot_Click,,src/UI/DiemDo/ImportPointsWindow.xaml,133,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,MarkerNone_Click,,src/UI/DiemDo/ImportPointsWindow.xaml,146,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,MarkerCross_Click,,src/UI/DiemDo/ImportPointsWindow.xaml,159,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,Add_Click,,src/UI/DiemDo/ImportPointsWindow.xaml,184,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,Delete_Click,,src/UI/DiemDo/ImportPointsWindow.xaml,186,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,Cancel_Click,,src/UI/DiemDo/ImportPointsWindow.xaml,189,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Create_Click,,src/UI/DiemDo/ImportPointsWindow.xaml,191,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Grid_DoubleClick,,src/UI/Frame/RouteLayoutWindow.xaml,211,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,Grid_DoubleClick,,src/UI/Frame/RouteLayoutWindow.xaml,219,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,Sign_Click,,src/UI/Frame/RouteLayoutWindow.xaml,236,DIALOG_OK,xác nhận dialog
+XAML_EVENT,SignClear_Click,,src/UI/Frame/RouteLayoutWindow.xaml,241,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,Logo_Click,,src/UI/Frame/RouteLayoutWindow.xaml,246,DIALOG_OK,xác nhận dialog
+XAML_EVENT,HideLogo_Click,,src/UI/Frame/RouteLayoutWindow.xaml,248,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,LogoClear_Click,,src/UI/Frame/RouteLayoutWindow.xaml,250,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,StampPick_Click,,src/UI/Frame/RouteLayoutWindow.xaml,271,DIALOG_OK,xác nhận dialog
+XAML_EVENT,StampClear_Click,,src/UI/Frame/RouteLayoutWindow.xaml,275,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,Sample_Click,,src/UI/Frame/RouteLayoutWindow.xaml,287,DIALOG_OK,xác nhận dialog
+XAML_EVENT,Export_Click,,src/UI/Frame/RouteLayoutWindow.xaml,289,DIALOG_OK,xác nhận dialog
+XAML_EVENT,Import_Click,,src/UI/Frame/RouteLayoutWindow.xaml,291,DIALOG_OK,xác nhận dialog
+XAML_EVENT,Cancel_Click,,src/UI/Frame/RouteLayoutWindow.xaml,295,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Ok_Click,,src/UI/Frame/RouteLayoutWindow.xaml,296,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Cancel_Click,,src/UI/Import/TabImportWindow.xaml,59,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Browse_Click,,src/UI/Import/TabImportWindow.xaml,72,DIALOG_OK,xác nhận dialog
+XAML_EVENT,Cancel_Click,,src/UI/Import/TabImportWindow.xaml,98,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Ok_Click,,src/UI/Import/TabImportWindow.xaml,100,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Export_Click,,src/UI/KmlExport/KmlExportWindow.xaml,102,SETTINGS,handler cấu hình trong dialog
+XAML_EVENT,Cancel_Click,,src/UI/KmlExport/KmlExportWindow.xaml,104,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Delete_Click,,src/UI/MapInsert/MapInsertWindow.xaml,102,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Apply_Click,,src/UI/MapInsert/MapInsertWindow.xaml,105,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Cancel_Click,,src/UI/MapInsert/MapInsertWindow.xaml,107,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Cancel_Click,,src/UI/Profile/DrawProfileWindow.xaml,143,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Draw_Click,,src/UI/Profile/DrawProfileWindow.xaml,225,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,UpdateFromProfile_Click,,src/UI/Profile/DrawProfileWindow.xaml,229,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,UpdateProps_Click,,src/UI/Profile/DrawProfileWindow.xaml,233,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,UpdateFromTin_Click,,src/UI/Profile/DrawProfileWindow.xaml,237,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,Import_Click,,src/UI/Profile/DrawProfileWindow.xaml,257,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,Export_Click,,src/UI/Profile/DrawProfileWindow.xaml,258,SETTINGS,handler cấu hình trong dialog
+XAML_EVENT,AddRow_Click,,src/UI/Profile/DrawProfileWindow.xaml,260,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,RemoveRow_Click,,src/UI/Profile/DrawProfileWindow.xaml,261,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,Cancel_Click,,src/UI/Profile/DrawProfileWindow.xaml,349,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,SaveSettings_Click,,src/UI/Profile/DrawProfileWindow.xaml,351,SETTINGS,handler cấu hình trong dialog
+XAML_EVENT,Cancel_Click,,src/UI/Sequence/SequenceWindow.xaml,78,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Cancel_Click,,src/UI/Sequence/SequenceWindow.xaml,161,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Start_Click,,src/UI/Sequence/SequenceWindow.xaml,163,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Cancel_Click,,src/UI/Terrain/AddPointSourcesWindow.xaml,31,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Cancel_Click,,src/UI/Terrain/AddPointSourcesWindow.xaml,50,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Accept_Click,,src/UI/Terrain/AddPointSourcesWindow.xaml,52,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Cancel_Click,,src/UI/Terrain/CreateTerrainWindow.xaml,30,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Cancel_Click,,src/UI/Terrain/CreateTerrainWindow.xaml,46,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Create_Click,,src/UI/Terrain/CreateTerrainWindow.xaml,48,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Cancel_Click,,src/UI/Tuyen/CreateRouteWindow.xaml,30,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Cancel_Click,,src/UI/Tuyen/CreateRouteWindow.xaml,46,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Create_Click,,src/UI/Tuyen/CreateRouteWindow.xaml,48,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Cancel_Click,,src/UI/Tuyen/CreateStationsWindow.xaml,30,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Cancel_Click,,src/UI/Tuyen/CreateStationsWindow.xaml,47,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Create_Click,,src/UI/Tuyen/CreateStationsWindow.xaml,49,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Close_Click,,src/UI/Tuyen/StationListWindow.xaml,30,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Zoom_Click,,src/UI/Tuyen/StationListWindow.xaml,53,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,Delete_Click,,src/UI/Tuyen/StationListWindow.xaml,55,INTERNAL,logic nội bộ dialog/window
+XAML_EVENT,Add_Click,,src/UI/Tuyen/StationListWindow.xaml,57,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Close_Click,,src/UI/Tuyen/StationListWindow.xaml,61,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Cancel_Click,,src/UI/Tuyen/StationStyleWindow.xaml,30,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Cancel_Click,,src/UI/Tuyen/StationStyleWindow.xaml,63,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Save_Click,,src/UI/Tuyen/StationStyleWindow.xaml,65,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Cancel_Click,,src/UI/Vn2000/Vn2000SetupWindow.xaml,307,CLOSE_CANCEL,handler đóng/hủy dialog
+XAML_EVENT,Confirm_Click,,src/UI/Vn2000/Vn2000SetupWindow.xaml,309,DIALOG_OK,xác nhận dialog
+PALETTE_RUN,NHAPDIEM,AUD-012,src/UI/Palette/PaletteViewModel.cs,118,,PaletteCommands.Run
+PALETTE_RUN,XUATDIEM,AUD-013,src/UI/Palette/PaletteViewModel.cs,119,,PaletteCommands.Run
+PALETTE_RUN,TAOMOHINH,AUD-049,src/UI/Palette/PaletteViewModel.cs,140,,PaletteCommands.Run
+PALETTE_RUN,TAOTUYEN,AUD-040,src/UI/Palette/PaletteViewModel.cs,210,,PaletteCommands.Run
+PALETTE_RUN,THIETLAPCOC,AUD-042,src/UI/Palette/PaletteViewModel.cs,211,,PaletteCommands.Run
+PALETTE_RUN,THIETLAPCOC,AUD-042,src/UI/Palette/PaletteViewModel.cs,222,,PaletteCommands.Run
+PALETTE_RUN,VEMCD,AUD-033,src/UI/Palette/PaletteViewModel.cs,280,,PaletteCommands.Run
+PALETTE_RUN,VEMCD,AUD-033,src/UI/Palette/PaletteViewModel.cs,287,,PaletteCommands.Run

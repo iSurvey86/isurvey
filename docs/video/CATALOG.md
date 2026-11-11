@@ -14,8 +14,16 @@ Một dòng là một video. Video cũ giữ lại khi có bản mới của cù
 | TAOTUYEN | Tạo tuyến | 1.8.16 | Chưa quay | |
 | THEMMOHINH | Thêm điểm vào mô hình | 1.8.16 | Chưa quay | |
 | XAYMOHINH | Xây dựng lưới | 1.8.16 | Chưa quay | |
+| XAYMOHINH | Xây dựng lưới (tiến trình thân thiện + Thành công; NOD không Mesh) | 1.8.19 | Chưa quay | |
+| XAYMOHINH | Xây dựng lưới (tiến trình + Thành công; NOD không Mesh; TIN nhanh) | 1.8.20 | Chưa quay | |
 | GOMOHINH | Gỡ điểm khỏi mô hình | 1.8.16 | Chưa quay | |
 | PHATSINHCOC | Phát sinh cọc | 1.8.16 | Chưa quay | |
+| PHATSINHCOC | Phát sinh cọc (tra Z TIN nhanh — không quét Face mỗi cọc) | 1.8.19 | Chưa quay | |
+| PHATSINHCOC | Phát sinh cọc (TinElevationIndex + hộp gọn) | 1.8.20 | Chưa quay | |
+| GHISODM | Gán cao độ đường đồng mức | 1.8.19 | Chưa quay | |
+| GHISODM | Ghi Số Đồng Mức (hộp thoại WPF; Z gốc + bước cùng hàng) | 1.8.20 | Chưa quay | |
+| THEMMOHINH | Thêm đồng mức (cảnh báo thiếu cao độ) | 1.8.19 | Chưa quay | |
+| THEMMOHINH | Thêm đồng mức (cảnh báo thiếu cao độ) | 1.8.20 | Chưa quay | |
 | DAODAUTUYEN | Đảo đầu tuyến | 1.8.16 | Chưa quay | |
 | MENUISURVEY | Nạp lại menu Ribbon | 1.8.16 | Chưa quay | |
 | THIETLAPCOC | Thiết lập kiểu cọc | 1.8.16 | Chưa quay | |

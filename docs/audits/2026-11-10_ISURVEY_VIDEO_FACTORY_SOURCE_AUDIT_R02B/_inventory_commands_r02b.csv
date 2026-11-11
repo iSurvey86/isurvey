@@ -1,0 +1,2762 @@
+﻿cmd,flags,method,file,line,is_alias_file,alias_delegates_to_method,stub_hint,effective_method,eff_body,eff_start,eff_end,eff_note,types
+ISURVEY_LOGIN,,LoginCommand,src/Auth/AuthModule.cs,24,False,,False,LoginCommand,"{
+        AuthManager.Refresh();
+        if (AuthManager.IsAuthenticated)
+            ShowAbout();
+        else
+            AuthManager.ShowLogin();
+    }",25,32,,['AuthManager']
+ISURVEY_HDSD,,HelpCommand,src/Auth/AuthModule.cs,35,False,,False,HelpCommand,"{
+        const string url = ""https://ksnpsc.vercel.app/huong-dan/isurvey"";
+        try
+        {
+            Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
+            AuthManager.Print(""\n[iSurvey] Da mo huong dan tren trinh duyet."");
+            ActivityLogger.Enqueue(""hdsd"", ""ISURVEY_HDSD"");
+        }
+        catch (System.Exception ex)
+        {
+            AuthManager.Print(""\n[iSurvey] Khong mo duoc huong dan: "" + ex.Message);
+        }
+    }",36,49,,"['ActivityLogger', 'AuthManager']"
+ISURVEY_RIBBON,,RibbonCommand,src/Auth/AuthModule.cs,52,False,,False,RibbonCommand,"{
+        try
+        {
+            RibbonBuilder.ReloadRibbon();
+            AuthManager.Print(""\n[iSurvey] Da nap lai menu Ribbon iSurvey."");
+            ActivityLogger.Enqueue(""ribbon_reload"", ""ISURVEY_RIBBON"");
+        }
+        catch (System.Exception ex)
+        {
+            AuthManager.Print(""\n[iSurvey] Khong nap duoc menu Ribbon: "" + ex.Message);
+        }
+    }",53,65,,"['ActivityLogger', 'AuthManager', 'RibbonBuilder']"
+ISURVEY_ABOUT,,AboutCommand,src/Auth/AuthModule.cs,67,False,,False,AboutCommand,"{
+        AuthManager.Refresh();
+        ShowAbout();
+    }",68,72,,['AuthManager']
+ISURVEY_UPDATE,,UpdateCommand,src/Auth/AuthModule.cs,74,False,,False,UpdateCommand,=> UpdateFlow.RunManualCheck();,75,75,,['UpdateFlow']
+ISURVEY_LOGOUT,,LogoutCommand,src/Auth/AuthModule.cs,77,False,,False,LogoutCommand,"{
+        AuthManager.Refresh();
+        if (!AuthManager.IsAuthenticated)
+        {
+            AuthManager.Print(""\n[iSurvey] Chua dang nhap."");
+            return;
+        }
+
+        var email = AuthManager.License!.Email;
+        var ok = DarkDialog.Confirm(
+            ""ĐĂNG XUẤT / ĐỔI MÁY"",
+            $""Đăng xuất tài khoản {email} khỏi máy này?\n\nGiấy phép trên máy sẽ bị xóa và các tính năng bị khóa cho tới khi kích hoạt lại.\nNếu đang kích hoạt trực tuyến, suất thiết bị sẽ được trả lại để dùng trên máy khác."",
+            ""Đăng xuất"");
+        if (!ok)
+        {
+            AuthManager.Print(""\n[iSurvey] Da huy dang xuat."");
+            return;
+        }
+
+        AuthManager.SignOut();
+        AuthManager.Print(""\n[iSurvey] Da dang xuat. Cac tinh nang da bi khoa."");
+    }",78,100,,"['AuthManager', 'DarkDialog']"
+ISURVEY_GENOTP,,GenerateOtpCommand,src/Auth/AuthModule.cs,106,False,,False,GenerateOtpCommand,"{
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+
+        var ed = doc.Editor;
+        var config = AuthConfig.Load();
+        if (!config.HasAdminSecret)
+        {
+            ed.WriteMessage(""\n[iSurvey] Lenh nay chi chay tren may Admin (can khoa AdminSecret trong auth.config.json)."");
+            return;
+        }
+
+        var pso = new PromptStringOptions(""\niSurvey: Nhập Gmail cần cấp mã: "") { AllowSpaces = false };
+        var res = ed.GetString(pso);
+        if (res.Status != PromptStatus.OK)
+            return;
+
+        if (!OtpAuthService.TryNormalizeGmail(res.StringResult, out var email))
+        {
+            ed.WriteMessage(""\n[iSurvey] Gmail khong hop le (chi nhan @gmail.com)."");
+            return;
+        }
+
+        var now = DateTime.Now;
+        var code = OtpAuthService.ComputeAdminCode(config.AdminSecret!, email, now);
+        ed.WriteMessage($""\n[iSurvey] Ma kich hoat cho {email} ngay {now:dd/MM/yyyy}: {code}"");
+        ed.WriteMessage(""\n[iSurvey] (Ma chi co hieu luc trong ngay hom nay; gui cho nguoi dung de nhap vao o xac thuc.)"");
+    }",107,136,,"['DocumentManager', 'OtpAuthService']"
+IG,,AliasInsertMap,src/CommandAliases.cs,52,True,InsertMapCommand,False,,,,,,
+SG,,AliasInsertSatellite,src/CommandAliases.cs,55,True,InsertSatelliteCommand,False,,,,,,
+XG,,AliasDeleteGe,src/CommandAliases.cs,58,True,DeleteGeCommand,False,,,,,,
+UG,,AliasUpdateGe,src/CommandAliases.cs,61,True,UpdateGeCommand,False,,,,,,
+EG,,AliasExportKml,src/CommandAliases.cs,64,True,ExportKmlCommand,False,,,,,,
+INK,,AliasImportKml,src/CommandAliases.cs,67,True,ImportKmlCommand,False,,,,,,
+EXK,,AliasExportKmlShort,src/CommandAliases.cs,70,True,ExportKmlCommand,False,,,,,,
+D2C,,AliasDgnToCad,src/CommandAliases.cs,73,True,DgnToCadCommand,False,,,,,,
+T2C,,AliasTabToCad,src/CommandAliases.cs,76,True,TabToCadCommand,False,,,,,,
+C2D,,AliasCadToDgn,src/CommandAliases.cs,79,True,CadToDgnCommand,False,,,,,,
+UAVCLIP,,AliasUavClip,src/CommandAliases.cs,82,True,ClipCommand,True,,,,,,
+AK,,AliasUavFrame,src/CommandAliases.cs,85,True,FrameToggleCommand,True,,,,,,
+AD,,AliasUavSendBack,src/CommandAliases.cs,88,True,SendBackCommand,True,,,,,,
+AU,,AliasUavInsert,src/CommandAliases.cs,91,True,InsertStub,True,,,,,,
+DEM,,AliasUavDem,src/CommandAliases.cs,94,True,DemStub,True,,,,,,
+DM,,AliasUavContour,src/CommandAliases.cs,97,True,ContourStub,True,,,,,,
+HT,,AliasUavCrs,src/CommandAliases.cs,100,True,CrsStub,True,,,,,,
+NP,,AliasPcImport,src/CommandAliases.cs,103,True,PcImportStub,True,,,,,,
+LP,,AliasPcFilter,src/CommandAliases.cs,106,True,PcFilterStub,True,,,,,,
+RL,,AliasPcGrid,src/CommandAliases.cs,109,True,PcGridStub,True,,,,,,
+GOC,,AliasGocTuyen,src/CommandAliases.cs,112,True,NumberVerticesCommand,False,,,,,,
+DUOITUYEN,,AliasStripMap,src/CommandAliases.cs,115,True,StripMapCommand,False,,,,,,
+KHUNG,,AliasFrame,src/CommandAliases.cs,118,True,FrameCommand,False,,,,,,
+KHUNGBV,,AliasTechFrame,src/CommandAliases.cs,121,True,TechFrameCommand,False,,,,,,
+ANLOGO,,AliasToggleLogo,src/CommandAliases.cs,124,True,ToggleLogoCommand,False,,,,,,
+ANLOGO1,,AliasToggleLogoOwner,src/CommandAliases.cs,127,True,ToggleLogoOwnerCommand,False,,,,,,
+ANLOGO2,,AliasToggleLogoDesign,src/CommandAliases.cs,130,True,ToggleLogoDesignCommand,False,,,,,,
+RAIKHUNG,,AliasRouteLayout,src/CommandAliases.cs,133,True,RouteLayoutCommand,False,,,,,,
+RAIMCD,,AliasProfileLayout,src/CommandAliases.cs,136,True,ProfileLayoutCommand,False,,,,,,
+INTUYEN,CommandFlags.UsePickSet | CommandFlags.Redraw,AliasRoutePlot,src/CommandAliases.cs,139,True,RoutePlotCommand,False,,,,,,
+THAYLOGO,,AliasReplaceLogo,src/CommandAliases.cs,142,True,ReplaceLogoCommand,False,,,,,,
+CODAN,,AliasFitTitle,src/CommandAliases.cs,145,True,FitTitleCommand,False,,,,,,
+SK,,AliasEditFrame,src/CommandAliases.cs,148,True,EditFrameInfoCommand,False,,,,,,
+AIA,,AliasAiAssist,src/CommandAliases.cs,151,True,AssistCommand,False,,,,,,
+AIC,,AliasAiSettings,src/CommandAliases.cs,154,True,SettingsCommand,False,,,,,,
+ND,,AliasImportPoints,src/CommandAliases.cs,157,True,ImportPointsCommand,False,,,,,,
+XD,,AliasExportPoints,src/CommandAliases.cs,160,True,ExportPointsCommand,False,,,,,,
+CBD,,AliasCutPlan,src/CommandAliases.cs,163,True,CutPlanCommand,False,,,,,,
+SCN,,AliasAutoScan,src/CommandAliases.cs,166,True,AutoScanCommand,False,,,,,,
+LGI,,AliasLogin,src/CommandAliases.cs,170,True,LoginCommand,False,,,,,,
+UPD,,AliasUpdate,src/CommandAliases.cs,173,True,UpdateCommand,False,,,,,,
+ABT,,AliasAbout,src/CommandAliases.cs,176,True,AboutCommand,False,,,,,,
+HD,,AliasHelp,src/CommandAliases.cs,179,True,HelpCommand,False,,,,,,
+LGO,,AliasLogout,src/CommandAliases.cs,182,True,LogoutCommand,False,,,,,,
+MENUISURVEY,,AliasRibbon,src/CommandAliases.cs,185,True,RibbonCommand,False,,,,,,
+BANGIS,,AliasPalette,src/CommandAliases.cs,188,True,ShowCommand,False,,,,,,
+ISURVEY_DGN_TO_CAD,,DgnToCadCommand,src/Dgn/DgnModule.cs,21,False,,False,DgnToCadCommand,"{
+        if (!AuthManager.EnsureAuthenticated(track: false))
+            return;
+
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+
+        var ed = doc.Editor;
+        if (!MapModule.IsModelSpace(doc.Database))
+        {
+            ed.WriteMessage(""\n[iSurvey] Hãy mở Model Space trước khi nhập DGN."");
+            return;
+        }
+
+        DgnImportOptions? options = TryLoadProgressSeed();
+        if (options is null)
+        {
+            try
+            {
+                var drawingPath = string.IsNullOrWhiteSpace(doc.Database.Filename) ? null : doc.Database.Filename;
+                options = DgnImportDialog.ShowImport(drawingPath);
+            }
+            catch (System.Exception ex)
+            {
+                ed.WriteMessage($""\n[iSurvey] Không mở được hộp thoại DGN: {ex.Message}"");
+                return;
+            }
+        }
+
+        if (options is null)
+        {
+            ed.WriteMessage(""\n[iSurvey] Đã hủy nhập DGN."");
+            ActivityLogger.Result(""ISURVEY_DGN_TO_CAD"", ""đã hủy, chưa chọn file"");
+            return;
+        }
+
+        if (options.IsBatch)
+        {
+            var batchProgress = TaskProgressWindow.ShowNew(
+                ""iSurvey — Nhập DGN"",
+                options.BatchCombine ? ""Đang ghép nhiều file DGN"" : ""Đang nhập DGN (rời từng file)"",
+                $""Chuẩn bị {options.BatchFiles.Count} tệp…"");
+            DgnBatchService.Start(doc, options, (results, combined) =>
+            {
+                batchProgress.ForceClose();
+                WriteBatchSummary(AcadApp.DocumentManager.MdiActiveDocument?.Editor ?? ed, results, combined);
+            }, batchProgress);
+            return;
+        }
+
+        // DGNIMPORT hoàn tất bất đồng bộ: Start trả về ngay, báo cáo in ra khi hậu xử lý xong.
+        var progress = TaskProgressWindow.ShowNew(
+            ""iSurvey — Nhập DGN"",
+            ""Đang nhập DGN"",
+            ""Chuẩn bị — "" + Path.GetFileName(options.FilePath));
+        DgnImportService.Start(doc, options, report =>
+        {
+            progress.ForceClose();
+            WriteSummary(AcadApp.DocumentManager.MdiActiveDocument?.Editor ?? ed, report, options.FilePath);
+        }, progress);
+    }",22,84,,"['ActivityLogger', 'AuthManager', 'DgnBatchService', 'DgnImportDialog', 'DgnImportService', 'DocumentManager', 'MapModule', 'TaskProgressWindow']"
+ISURVEY_CAD_TO_DGN,CommandFlags.UsePickSet,CadToDgnCommand,src/Dgn/DgnModule.cs,87,False,,False,CadToDgnCommand,"{
+        if (!AuthManager.EnsureAuthenticated(track: false))
+            return;
+
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+
+        var ed = doc.Editor;
+        if (!MapModule.IsModelSpace(doc.Database))
+        {
+            ed.WriteMessage(""\n[iSurvey] Hãy mở Model Space trước khi xuất DGN."");
+            return;
+        }
+
+        // Chụp vùng chọn (PICKFIRST) NGAY, trước khi mở hộp thoại.
+        ObjectId[] selected = [];
+        try
+        {
+            var picked = ed.SelectImplied();
+            if (picked.Status == PromptStatus.OK)
+                selected = picked.Value.GetObjectIds();
+        }
+        catch
+        {
+            // không có vùng chọn
+        }
+
+        DgnExportOptions? options;
+        try
+        {
+            var drawingPath = string.IsNullOrWhiteSpace(doc.Database.Filename) ? null : doc.Database.Filename;
+            options = DgnExportDialog.ShowExport(drawingPath, selected.Length);
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage($""\n[iSurvey] Không mở được hộp thoại xuất DGN: {ex.Message}"");
+            return;
+        }
+
+        if (options is null)
+        {
+            ed.WriteMessage(""\n[iSurvey] Đã hủy xuất DGN."");
+            ActivityLogger.Result(""ISURVEY_CAD_TO_DGN"", ""đã hủy, chưa xuất"");
+            return;
+        }
+
+        options.SelectedIds = selected;
+        var exportProgress = TaskProgressWindow.ShowNew(
+            ""iSurvey — Xuất DGN"",
+            ""Đang xuất CAD ➔ DGN"",
+            ""Chuẩn bị — "" + Path.GetFileName(options.OutputPath));
+        DgnExportService.Start(doc, options, report =>
+        {
+            exportProgress.ForceClose();
+            WriteExportSummary(AcadApp.DocumentManager.MdiActiveDocument?.Editor ?? ed, report);
+        }, exportProgress);
+    }",88,146,,"['ActivityLogger', 'AuthManager', 'DgnExportDialog', 'DgnExportService', 'DocumentManager', 'MapModule', 'TaskProgressWindow']"
+ISURVEY_AI_ASSIST,,AssistCommand,src/Modules/Ai/AiAssistantModule.cs,13,False,,False,AssistCommand,"{
+        if (!AuthManager.EnsureAdmin()) return;
+        if (AcadApp.DocumentManager.MdiActiveDocument is null)
+        {
+            AuthManager.Print(""\n[iSurvey] Can mo mot ban ve truoc khi dung Tro ly AI."");
+            return;
+        }
+
+        AiChatWindow.ShowOrFocus();
+    }",14,24,,"['AiChatWindow', 'AuthManager', 'DocumentManager']"
+ISURVEY_AI_SETTINGS,,SettingsCommand,src/Modules/Ai/AiAssistantModule.cs,26,False,,False,SettingsCommand,"{
+        if (!AuthManager.EnsureAdmin()) return;
+
+        AiConfig.EnsureExampleFile();
+        var cfg = AiConfig.Load();
+        var path = AiConfig.DefaultPath;
+        var mcpCount = cfg.McpServers.Count(s => s.Enabled);
+        var keyHint = cfg.HasApiKey ? ""ApiKey: đã có"" : ""ApiKey: CHƯA — dán key Anthropic (Claude)"";
+
+        DarkDialog.ShowInfo(
+            ""CẤU HÌNH TRỢ LÝ AI"",
+            ""Claude + MCP"",
+            [
+                (""File"", path),
+                (""Provider"", cfg.Provider),
+                (""Model"", cfg.Model),
+                (""Key"", keyHint),
+                (""MCP bật"", mcpCount.ToString())
+            ],
+            note: ""Provider=Claude, ApiKey=sk-ant-... từ console.anthropic.com. "" +
+                  ""McpServers: bật Enabled=true, Command/Args (vd npx @modelcontextprotocol/server-filesystem)."");
+
+        try
+        {
+            Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+        }
+        catch
+        {
+            AuthManager.Print(""\n[iSurvey] Mo thu cong: "" + path);
+        }
+    }",27,58,,"['AuthManager', 'DarkDialog']"
+NHAPDIEM,,ImportPointsCommand,src/Modules/DiemDo/PointFileModule.cs,13,False,,False,ImportPointsCommand,"{
+        if (!AuthManager.EnsureAuthenticated(""NHAPDIEM""))
+            return;
+
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+        if (!IsModelSpace())
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Hãy mở Model Space trước khi nhập điểm."");
+            return;
+        }
+
+        ImportPointsRequest? request;
+        try
+        {
+            request = ImportPointsWindow.Prompt();
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage($""\n[iSurvey] Không mở được hộp thoại: {ex.Message}"");
+            return;
+        }
+
+        if (request is null)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy nhập điểm."");
+            return;
+        }
+
+        try
+        {
+            var made = PointDrawService.Draw(
+                doc, request.Points, request.TextHeight, request.PointMode, request.PointSizePercent);
+            doc.Editor.WriteMessage($""\n[iSurvey] Đã tạo {made} điểm trên layer {iSurveyLayers.DiemDo}."");
+            if (made > 0)
+            {
+                ZoomExtents(doc.Editor);
+                ActivityLogger.Result(""NHAPDIEM"", $""đã tạo {made} điểm trên layer {iSurveyLayers.DiemDo}"");
+            }
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage($""\n[iSurvey] Không tạo được điểm: {ex.Message}"");
+        }
+    }",14,60,,"['ActivityLogger', 'AuthManager', 'DocumentManager', 'ImportPointsWindow', 'PointDrawService']"
+XUATDIEM,,ExportPointsCommand,src/Modules/DiemDo/PointFileModule.cs,62,False,,False,ExportPointsCommand,"{
+        if (!AuthManager.EnsureAuthenticated(""XUATDIEM""))
+            return;
+
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+
+        ExportPointsRequest? request;
+        try
+        {
+            request = ExportPointsWindow.Prompt();
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage($""\n[iSurvey] Không mở được hộp thoại: {ex.Message}"");
+            return;
+        }
+
+        if (request is null)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy xuất điểm."");
+            return;
+        }
+
+        doc.Editor.WriteMessage($""\n[iSurvey] Đã ghi {request.Count} điểm ra {request.FileName}."");
+        ActivityLogger.Result(""XUATDIEM"", $""đã ghi {request.Count} điểm ra {request.FileName}"");
+    }",63,91,,"['ActivityLogger', 'AuthManager', 'DocumentManager', 'ExportPointsWindow']"
+ISURVEY_EXPORT_KML,,ExportKmlCommand,src/Modules/Export/ExportModule.cs,22,False,,False,ExportKmlCommand,"{
+        if (!AuthManager.EnsureAuthenticated(track: false))
+            return;
+
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+
+        var ed = doc.Editor;
+        var db = doc.Database;
+
+        if (!MapModule.IsModelSpace(db))
+        {
+            ed.WriteMessage(""\n[iSurvey] Hãy mở Model Space trước khi xuất."");
+            return;
+        }
+
+        var drawingPath = string.IsNullOrWhiteSpace(db.Filename) ? null : db.Filename;
+
+        Vn2000SetupResult? setup;
+        try
+        {
+            setup = Vn2000SetupDialog.Show(drawingPath, Vn2000SetupMode.Export);
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage($""\n[iSurvey] Không mở được hộp thoại: {ex.Message}"");
+            return;
+        }
+
+        if (setup is null)
+        {
+            ed.WriteMessage(""\n[iSurvey] Đã hủy xuất."");
+            return;
+        }
+
+        if (Math.Abs(setup.CentralMeridian - setup.EnteredMeridian) > 1e-6)
+        {
+            ed.WriteMessage(
+                $""\n[iSurvey] Múi 6°: kinh tuyến {setup.EnteredMeridian:0.###}° được đưa về {setup.CentralMeridian:0.#}°."");
+        }
+
+        var settings = new KmlExportSettings
+        {
+            CentralMeridian = setup.CentralMeridian,
+            ZoneWidthDegrees = setup.ZoneWidthDegrees,
+            SelectionOnly = setup.SelectionOnly,
+            UseKmz = setup.UseKmz,
+            GroupByLayer = setup.GroupByLayer,
+            UseElevationZ = setup.UseElevationZ,
+            OpenAfterExport = setup.OpenAfterExport
+        };
+
+        KmlExportService.KmlCollected collected;
+        try
+        {
+            collected = _service.Collect(doc, settings);
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage($""\n[iSurvey] Xuất thất bại: {ex.Message}"");
+            iSurvey.Auth.ActivityLogger.TrackError(ex);
+            return;
+        }
+
+        if (collected.Cancelled)
+        {
+            ed.WriteMessage(""\n[iSurvey] Đã hủy xuất."");
+            return;
+        }
+
+        if (collected.Features.Count == 0)
+        {
+            ed.WriteMessage($""\n[iSurvey] Không có hình học nào xuất được ({collected.Report})."");
+            return;
+        }
+
+        var path = AskOutputPath(setup.UseKmz);
+        if (path is null)
+        {
+            ed.WriteMessage(""\n[iSurvey] Đã hủy xuất."");
+            return;
+        }
+
+        settings.OutputPath = path;
+
+        try
+        {
+            ed.WriteMessage(
+                $""\n[iSurvey] Đang xuất (kinh tuyến {settings.CentralMeridian:0.##}°, TM-{settings.ZoneWidthDegrees})..."");
+            _service.Write(db, settings, collected.Features);
+            ed.WriteMessage($""\n[iSurvey] Đã lưu: {settings.OutputPath}"");
+            ed.WriteMessage($""\n[iSurvey] {collected.Report}"");
+            ActivityLogger.Result(""ISURVEY_EXPORT_KML"",
+                $""file {ActivityLogger.FileName(settings.OutputPath)}, {collected.Features.Count} đối tượng, TM-{settings.ZoneWidthDegrees} kinh tuyến {settings.CentralMeridian:0.##}°, từ bản vẽ {ActivityLogger.FileName(drawingPath)}"");
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage($""\n[iSurvey] Xuất thất bại: {ex.Message}"");
+            iSurvey.Auth.ActivityLogger.TrackError(ex);
+        }
+    }",23,125,,"['ActivityLogger', 'AuthManager', 'DocumentManager', 'KmlExportService', 'MapModule', 'Vn2000SetupDialog']"
+ISURVEY_KHUNG,,FrameCommand,src/Modules/Frame/FrameService.cs,54,False,,False,FrameCommand,"=> Execute(mapMode: true, ""ISURVEY_KHUNG"");",55,55,,[]
+ISURVEY_KHUNG_BV,,TechFrameCommand,src/Modules/Frame/FrameService.cs,58,False,,False,TechFrameCommand,"=> Execute(mapMode: false, ""ISURVEY_KHUNG_BV"");",59,59,,[]
+ISURVEY_LOGO,,ToggleLogoCommand,src/Modules/Frame/FrameService.cs,62,False,,False,ToggleLogoCommand,"{
+        if (!AuthManager.EnsureAuthenticated(track: false))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+        var which = PromptLogo(doc.Editor);
+        if (which is null)
+            return;
+        ApplyLogo(doc, which.Value);
+    }",63,74,,"['AuthManager', 'DocumentManager']"
+ISURVEY_LOGO1,,ToggleLogoOwnerCommand,src/Modules/Frame/FrameService.cs,76,False,,False,ToggleLogoOwnerCommand,=> ToggleLogoDirect(owner: true);,77,77,,[]
+ISURVEY_LOGO2,,ToggleLogoDesignCommand,src/Modules/Frame/FrameService.cs,79,False,,False,ToggleLogoDesignCommand,=> ToggleLogoDirect(owner: false);,80,80,,[]
+ISURVEY_LOGO_REPLACE,,ReplaceLogoCommand,src/Modules/Frame/FrameService.cs,130,False,,False,ReplaceLogoCommand,"{
+        if (!AuthManager.EnsureAuthenticated(track: false))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+
+        try
+        {
+            ReplaceLogoCore(doc);
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage($""\n[iSurvey] Thay logo không thực hiện được: {ex.Message}"");
+            ActivityLogger.TrackError(ex);
+        }
+    }",131,148,,"['ActivityLogger', 'AuthManager', 'DocumentManager']"
+ISURVEY_FIT_TITLE,,FitTitleCommand,src/Modules/Frame/FrameService.cs,296,False,,False,FitTitleCommand,"{
+        if (!AuthManager.EnsureAuthenticated(track: false))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+        var n = TitleBlockFit.FitDocument(doc);
+        doc.Editor.WriteMessage(n > 0
+            ? $""\n[iSurvey] Đã co {n} ô chủ đầu tư về một dòng.""
+            : ""\n[iSurvey] Không có ô chủ đầu tư nào cần co."");
+    }",297,308,,"['AuthManager', 'DocumentManager']"
+ISURVEY_FRAME_EDIT,,EditFrameInfoCommand,src/Modules/Frame/FrameService.FrameEdit.cs,16,False,,False,EditFrameInfoCommand,"{
+        if (!AuthManager.EnsureAuthenticated(track: false))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+
+        var id = FrameDoubleClick.TakePending();
+        if (id.IsNull)
+        {
+            var opt = new PromptEntityOptions(""\nChọn khung cần sửa thông tin: "")
+            {
+                AllowNone = false
+            };
+            opt.SetRejectMessage(""\nHãy chọn block khung (KB_A0 … KB_A4)."");
+            opt.AddAllowedClass(typeof(BlockReference), exactMatch: false);
+            var picked = doc.Editor.GetEntity(opt);
+            if (picked.Status != PromptStatus.OK)
+                return;
+            id = picked.ObjectId;
+        }
+
+        try
+        {
+            EditFrameInfo(doc, id);
+        }
+        catch (System.Exception ex)
+        {
+            ActivityLogger.TrackError(ex, ""ISURVEY_FRAME_EDIT"");
+            doc.Editor.WriteMessage($""\n[iSurvey] Sửa khung lỗi: {ex.Message}"");
+        }
+        finally
+        {
+            FrameDoubleClick.Release();
+        }
+    }",17,53,,"['ActivityLogger', 'AuthManager', 'DocumentManager']"
+ISURVEY_PROFILE_SHEETS,,ProfileLayoutCommand,src/Modules/Frame/FrameService.ProfileLayout.cs,28,False,,False,ProfileLayoutCommand,"=> RunProfile(""ISURVEY_PROFILE_SHEETS"");",29,29,,[]
+ISURVEY_ROUTE_SHEETS,,RouteLayoutCommand,src/Modules/Frame/FrameService.RouteLayout.cs,29,False,,False,RouteLayoutCommand,"=> RunRouteLayout(""ISURVEY_ROUTE_SHEETS"");",30,30,,[]
+ISURVEY_ROUTE_PLOT,CommandFlags.UsePickSet | CommandFlags.Redraw,RoutePlotCommand,src/Modules/Frame/FrameService.RouteLayout.cs,33,False,,False,RoutePlotCommand,"{
+        if (!AuthManager.EnsureAuthenticated(track: false))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+        try
+        {
+            PlotExistingRoute(doc);
+        }
+        catch (System.Exception ex)
+        {
+            ActivityLogger.TrackError(ex, ""ISURVEY_ROUTE_PLOT"");
+            doc.Editor.WriteMessage($""\n[iSurvey] In layout lỗi: {ex.Message}"");
+        }
+    }",34,50,,"['ActivityLogger', 'AuthManager', 'DocumentManager']"
+ISURVEY_IMPORT_KML,,ImportKmlCommand,src/Modules/Import/KmlImportModule.cs,21,False,,False,ImportKmlCommand,"{
+        if (!AuthManager.EnsureAuthenticated(track: false))
+            return;
+
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+
+        var ed = doc.Editor;
+        if (!MapModule.IsModelSpace(doc.Database))
+        {
+            ed.WriteMessage(""\n[iSurvey] Hãy mở Model Space trước khi nhập."");
+            return;
+        }
+
+        var dialog = new WinFormsDialog
+        {
+            Title = ""Chọn file KML/KMZ"",
+            Filter = ""Google Earth (*.kml;*.kmz)|*.kml;*.kmz|KML (*.kml)|*.kml|KMZ (*.kmz)|*.kmz"",
+            CheckFileExists = true,
+            Multiselect = false
+        };
+
+        if (dialog.ShowDialog(new AcadWindow(AcadApp.MainWindow.Handle)) != System.Windows.Forms.DialogResult.OK)
+        {
+            ed.WriteMessage(""\n[iSurvey] Đã hủy."");
+            return;
+        }
+
+        var drawingPath = string.IsNullOrWhiteSpace(doc.Database.Filename) ? null : doc.Database.Filename;
+        Vn2000SetupResult? setup;
+        try
+        {
+            setup = Vn2000SetupDialog.Show(drawingPath, Vn2000SetupMode.Import);
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage($""\n[iSurvey] Không mở được hộp thoại: {ex.Message}"");
+            return;
+        }
+
+        if (setup is null)
+        {
+            ed.WriteMessage(""\n[iSurvey] Đã hủy nhập."");
+            return;
+        }
+
+        NoteMeridian(ed, setup);
+
+        string? temp = null;
+        try
+        {
+            var kmlPath = KmlPackage.Materialize(dialog.FileName, out temp);
+            var read = KmlReader.Read(kmlPath);
+            if (read.Shapes.Count == 0)
+            {
+                ed.WriteMessage(""\n[iSurvey] File không có Point, LineString hoặc Polygon để vẽ."");
+                NoteSkipped(ed, read.InnerRings, read.TracksSkipped);
+                return;
+            }
+
+            var coordinates = new CoordinateService();
+            var report = KmlDrawService.Draw(
+                doc.Database,
+                read.Shapes,
+                coordinates,
+                setup.CentralMeridian,
+                setup.ZoneWidthDegrees,
+                setup.InsertPoints,
+                setup.LabelNames,
+                setup.TextHeight,
+                setup.SimplifyVertices,
+                setup.SimplifyTolerance);
+            report.InnerRings = read.InnerRings;
+            report.TracksSkipped = read.TracksSkipped;
+
+            if (report.Points > 0)
+                report.PointStyleAdjusted = EnsurePointVisible();
+
+            ed.Regen();
+            ed.WriteMessage(
+                $""\n[iSurvey] Đã nhập vào layer {KmlDrawService.LayerName}: {report.Points} điểm, {report.Texts} chữ, {report.Lines} đường, {report.Polygons} vùng."");
+            ActivityLogger.Result(""ISURVEY_IMPORT_KML"",
+                $""file {ActivityLogger.FileName(dialog.FileName)}, {report.Points} điểm, {report.Texts} chữ, {report.Lines} đường, {report.Polygons} vùng, TM-{setup.ZoneWidthDegrees} kinh tuyến {setup.CentralMeridian:0.##}°"");
+            NoteSkipped(ed, report.InnerRings, report.TracksSkipped);
+            if (report.Simplified)
+            {
+                ed.WriteMessage(
+                    $""\n[iSurvey] Da loc bot dinh thua: Giam tu {report.OriginalVertices} xuong con {report.SimplifiedVertices} dinh."");
+            }
+            if (report.PointStyleAdjusted)
+                ed.WriteMessage(""\n[iSurvey] PDMODE đang bằng 0 (điểm không hiện). Đã đặt PDMODE = 3."");
+            KmlDrawService.FitImported(ed, report);
+        }
+        catch (IOException ex)
+        {
+            ed.WriteMessage($""\n[iSurvey] Không đọc được file (đang mở ở chương trình khác?): {ex.Message}"");
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage($""\n[iSurvey] Nhập thất bại: {ex.Message}"");
+            iSurvey.Auth.ActivityLogger.TrackError(ex);
+        }
+        finally
+        {
+            KmlPackage.Cleanup(temp);
+        }
+    }",22,130,,"['AcadWindow', 'ActivityLogger', 'AuthManager', 'CoordinateService', 'DocumentManager', 'KmlDrawService', 'MainWindow', 'MapModule', 'ShowDialog', 'Vn2000SetupDialog', 'WinFormsDialog']"
+ISURVEY_TAB_TO_CAD,,TabToCadCommand,src/Modules/Import/TabImportModule.cs,29,False,,False,TabToCadCommand,"{
+        if (!AuthManager.EnsureAuthenticated(track: false))
+            return;
+
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+
+        var ed = doc.Editor;
+        if (!MapModule.IsModelSpace(doc.Database))
+        {
+            ed.WriteMessage(""\n[iSurvey] Hãy mở Model Space trước khi nhập TAB."");
+            return;
+        }
+
+        var drawingPath = string.IsNullOrWhiteSpace(doc.Database.Filename) ? null : doc.Database.Filename;
+        var settings = UserSettingsStore.Load(drawingPath);
+
+        TabImportOptions? options;
+        try
+        {
+            options = TabImportWindow.Show(settings);
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage($""\n[iSurvey] Không mở được hộp thoại TAB: {ex.Message}"");
+            return;
+        }
+
+        if (options is null)
+        {
+            ed.WriteMessage(""\n[iSurvey] Đã hủy nhập TAB."");
+            return;
+        }
+
+        try
+        {
+            var stats = Import(doc.Database, ed, options, settings);
+            ZoomExtents(ed);
+            var report = BuildReport(stats, options);
+            ActivityLogger.Result(""ISURVEY_TAB_TO_CAD"",
+                $""file {ActivityLogger.FileName(options.Path)}, {stats.Hatches} hatch, {stats.Outlines} viền, {stats.Labels} nhãn, lỗi {stats.Errors}, bản vẽ {ActivityLogger.FileName(drawingPath)}"");
+            foreach (var line in report.Split('\n'))
+                ed.WriteMessage(""\n[iSurvey] "" + line.TrimEnd('\r'));
+            AcadApp.ShowAlertDialog(report);
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage($""\n[iSurvey] Nhập TAB thất bại: {ex.Message}"");
+            ActivityLogger.TrackError(ex);
+        }
+    }",30,82,,"['ActivityLogger', 'AuthManager', 'DocumentManager', 'MapModule', 'ShowAlertDialog', 'TabImportWindow', 'UserSettingsStore']"
+ISURVEY_MAP,,InsertMapCommand,src/Modules/Map/MapModule.cs,25,False,,False,InsertMapCommand,"{
+        if (!AuthManager.EnsureAuthenticated(track: false)) return;
+        RunMapWorkflow(MapInsertAction.Insert);
+    }",26,30,,['AuthManager']
+ISURVEY_MAP_SAT,,InsertSatelliteCommand,src/Modules/Map/MapModule.cs,32,False,,False,InsertSatelliteCommand,"{
+        if (!AuthManager.EnsureAuthenticated(track: false)) return;
+
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null) return;
+
+        if (!IsModelSpace(doc.Database))
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Hãy mở Model Space."");
+            return;
+        }
+
+        if (!EnsureProvince(doc))
+        {
+            ActivityLogger.Result(""ISURVEY_MAP_SAT"", ""đã hủy, chưa chọn múi chiếu"");
+            return;
+        }
+
+        var mode = PromptSatelliteMode(doc.Editor);
+        if (mode is null)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy."");
+            ActivityLogger.Result(""ISURVEY_MAP_SAT"", ""đã hủy, chưa chọn chế độ"");
+            return;
+        }
+
+        if (mode == 2)
+            HdMosaicWorkflow.Run(doc);
+        else
+            ApplyBasemap(""google-satellite"", ""ISURVEY_MAP_SAT"", ""xem lướt"");
+    }",33,64,,"['ActivityLogger', 'AuthManager', 'DocumentManager']"
+ISURVEY_UPDATE_GE,,UpdateGeCommand,src/Modules/Map/MapModule.cs,123,False,,False,UpdateGeCommand,"{
+        if (!AuthManager.EnsureAuthenticated(track: false)) return;
+
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null) return;
+
+        if (!IsModelSpace(doc.Database))
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Hãy mở Model Space."");
+            return;
+        }
+
+        try
+        {
+            if (!BasemapSession.IsActive)
+            {
+                var drawingPath = string.IsNullOrWhiteSpace(doc.Database.Filename) ? null : doc.Database.Filename;
+                var saved = UserSettingsStore.Load(drawingPath);
+                if (string.IsNullOrWhiteSpace(saved.ProvinceName))
+                {
+                    doc.Editor.WriteMessage(""\n[iSurvey] Chưa có ảnh GE trong phiên này. Hãy chèn ảnh vệ tinh trước."");
+                    return;
+                }
+
+                var basemap = string.IsNullOrWhiteSpace(saved.BasemapId) ? ""google-satellite"" : saved.BasemapId;
+                BasemapSession.Activate(
+                    saved.CentralMeridian,
+                    basemap,
+                    saved.AutoRefresh,
+                    null,
+                    saved.ZoneWidthDegrees);
+            }
+
+            var result = _refresh.Refresh(doc, BasemapSession.CentralMeridian, BasemapSession.BasemapId);
+            ActivityLogger.Result(""ISURVEY_UPDATE_GE"",
+                $""cập nhật khung nhìn, {BasemapSession.BasemapId}, zoom {result.Zoom}, {result.TileCount} tile, lỗi {result.FailedTileCount}, TM-{BasemapSession.ZoneWidthDegrees} kinh tuyến {BasemapSession.CentralMeridian:0.##}°, bản vẽ {ActivityLogger.FileName(doc.Database.Filename)}"");
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage($""\n[iSurvey] {ex.Message}"");
+            iSurvey.Auth.ActivityLogger.TrackError(ex);
+        }
+    }",124,167,,"['ActivityLogger', 'AuthManager', 'DocumentManager', 'UserSettingsStore']"
+ISURVEY_DELETE_GE,,DeleteGeCommand,src/Modules/Map/MapModule.cs,169,False,,False,DeleteGeCommand,"{
+        if (!AuthManager.EnsureAuthenticated(track: false)) return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null) return;
+        GeDeleteWorkflow.Run(doc);
+    }",170,176,,"['AuthManager', 'DocumentManager']"
+CATBD,,CutPlanCommand,src/Modules/Plan/PlanModule.cs,46,False,,False,CutPlanCommand,"{
+        if (!AuthManager.EnsureAuthenticated(track: false))
+            return;
+
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+
+        var ed = doc.Editor;
+        var db = doc.Database;
+
+        if (!MapModule.IsModelSpace(db))
+        {
+            ed.WriteMessage(""\n[iSurvey] Hay mo tab Model hoac vao Model Space (lenh MSPACE)."");
+            return;
+        }
+
+        // Buoc 1: duong ranh gioi cat khep kin
+        var peo = new PromptEntityOptions(""\niSurvey: Chọn đường ranh giới cắt khép kín: "")
+        {
+            AllowNone = false
+        };
+        peo.SetRejectMessage(""\niSurvey: Chỉ chọn LWPolyline hoặc Polyline."");
+        peo.AddAllowedClass(typeof(Polyline), true);
+        peo.AddAllowedClass(typeof(Polyline2d), true);
+        peo.AddAllowedClass(typeof(Polyline3d), true);
+
+        var pe = ed.GetEntity(peo);
+        if (pe.Status != PromptStatus.OK)
+        {
+            ed.WriteMessage(""\n[iSurvey] Da huy CATBD."");
+            return;
+        }
+
+        // Buoc 2: quet chon toan bo ban ve
+        var pso = new PromptSelectionOptions
+        {
+            MessageForAdding = ""\niSurvey: Quét chọn bản vẽ cần cắt (gõ ALL để chọn hết): ""
+        };
+        var ps = ed.GetSelection(pso);
+        if (ps.Status != PromptStatus.OK)
+        {
+            ed.WriteMessage(""\n[iSurvey] Da huy CATBD."");
+            return;
+        }
+
+        try
+        {
+            var stats = Run(db, pe.ObjectId, ps.Value.GetObjectIds());
+            ed.WriteMessage(
+                $""\n[iSurvey] CATBD xong: bao ve {stats.Protected}, giu trong bien {stats.KeptInside}, "" +
+                $""xoa {stats.Erased}, cat {stats.Cut} (tao {stats.NewPieces} doan moi), "" +
+                $""bo qua {stats.Skipped}, loi {stats.Errors}."");
+            ActivityLogger.Result(""CATBD"",
+                $""giữ {stats.KeptInside}, xóa {stats.Erased}, cắt {stats.Cut} (tạo {stats.NewPieces}), bỏ qua {stats.Skipped}, lỗi {stats.Errors}, bản vẽ {ActivityLogger.FileName(db.Filename)}"");
+            if (stats.FirstError is not null)
+                ed.WriteMessage($""\n[iSurvey] Loi dau tien: {stats.FirstError}"");
+            ed.WriteMessage(""\n[iSurvey] Go UNDO de hoan tac toan bo lan cat nay."");
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage($""\n[iSurvey] CATBD that bai: {ex.Message}"");
+            iSurvey.Auth.ActivityLogger.TrackError(ex);
+        }
+    }",47,112,,"['ActivityLogger', 'AuthManager', 'DocumentManager', 'MapModule']"
+ISURVEY_PROFILE_DRAW,,DrawCommand,src/Modules/Profile/ProfileModule.cs,14,False,,False,Draw,"{
+        if (!AuthManager.EnsureAuthenticated(""VEMCD""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+        var ed = doc.Editor;
+        if (doc.Database.TileMode == false)
+        {
+            ed.WriteMessage(""\n[iSurvey] VEMCD chỉ vẽ trên Model Space."");
+            return;
+        }
+
+        var seeded = TrySeedDemoRoute(doc, ed);
+
+        List<RouteRecord> routes;
+        try
+        {
+            routes = RouteStore.Load(doc.Database);
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage(""\n[iSurvey] Không đọc được tuyến: "" + ex.Message);
+            return;
+        }
+
+        if (routes.Count == 0)
+        {
+            ed.WriteMessage(""\n[iSurvey] Chưa có tuyến. Chạy TAOTUYEN rồi PHATSINHCOC trước."");
+            return;
+        }
+
+        ProfileDrawOptions options;
+        ProfileDialogAction action;
+        Point3d insert;
+
+        if (seeded)
+        {
+            var route = routes[0];
+            options = ProfileSettingsStore.Load();
+            options.RouteId = route.Id;
+            options.ProfileName = ""MCD "" + route.Name;
+            var samples = route.Stations!
+                .Where(s => s.HasZ)
+                .Select(s => new ProfileSampleService.SamplePoint
+                {
+                    Chainage = s.Chainage,
+                    X = s.X,
+                    Y = s.Y,
+                    Z = s.Z,
+                    HasZ = true,
+                    IsStation = true,
+                    Name = s.Name
+                })
+                .ToList();
+            var bandH = ProfileBandRow.TotalHeight(options.Rows);
+            options.Datum = ProfileDrawService.SuggestDatum(
+                samples, options.HorizontalScale, options.VerticalScale, bandH);
+            action = ProfileDialogAction.Draw;
+            insert = Point3d.Origin;
+            ed.WriteMessage(""\n[iSurvey] Thử nhanh: vẽ tại gốc (0,0), mức "" + options.Datum.ToString(""0.###"") + ""."");
+        }
+        else
+        {
+            DrawProfileDialogResult? dialog;
+            try
+            {
+                dialog = DrawProfileWindow.Prompt(routes, RouteContext.TakeRoute());
+            }
+            catch (System.Exception ex)
+            {
+                ed.WriteMessage(""\n[iSurvey] Không mở được hộp thoại: "" + ex.Message);
+                return;
+            }
+
+            if (dialog is null || dialog.Action == ProfileDialogAction.Cancel || dialog.Options is null)
+            {
+                ed.WriteMessage(""\n[iSurvey] Đã hủy vẽ mặt cắt."");
+                return;
+            }
+
+            options = dialog.Options;
+            action = dialog.Action;
+            ProfileSettingsStore.Save(options);
+
+            if (action == ProfileDialogAction.Draw)
+            {
+                // Luôn pick vị trí; nếu đã có MCD thì xóa bản cũ rồi vẽ tại điểm mới.
+                var pOpts = new PromptPointOptions(""\niSurvey: Chỉ góc dưới-trái cột tên (đáy bảng) trên Model: "")
+                {
+                    AllowNone = false
+                };
+                var pRes = ed.GetPoint(pOpts);
+                if (pRes.Status != PromptStatus.OK)
+                {
+                    ed.WriteMessage(""\n[iSurvey] Đã hủy — chưa chọn điểm chèn."");
+                    return;
+                }
+
+                insert = pRes.Value;
+            }
+            else
+            {
+                insert = Point3d.Origin;
+            }
+        }
+
+        try
+        {
+            switch (action)
+            {
+                case ProfileDialogAction.Draw:
+                    RunDraw(doc, ed, routes, options, insert);
+                    break;
+                case ProfileDialogAction.UpdateFromProfile:
+                case ProfileDialogAction.UpdateProperties:
+                case ProfileDialogAction.UpdateFromTin:
+                    RunUpdate(doc, ed, routes, options, action);
+                    break;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage(""\n[iSurvey] Lỗi mặt cắt dọc: "" + ex.Message);
+            ActivityLogger.TrackError(ex, ""ISURVEY_PROFILE_DRAW"");
+        }
+    }",20,147,thin-wrapper DrawCommand→Draw,"['ActivityLogger', 'AuthManager', 'DocumentManager', 'DrawProfileWindow', 'ProfileDrawService', 'ProfileSampleService', 'ProfileSettingsStore', 'RouteStore']"
+VEMCD,,DrawAlias,src/Modules/Profile/ProfileModule.cs,17,False,,False,Draw,"{
+        if (!AuthManager.EnsureAuthenticated(""VEMCD""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+        var ed = doc.Editor;
+        if (doc.Database.TileMode == false)
+        {
+            ed.WriteMessage(""\n[iSurvey] VEMCD chỉ vẽ trên Model Space."");
+            return;
+        }
+
+        var seeded = TrySeedDemoRoute(doc, ed);
+
+        List<RouteRecord> routes;
+        try
+        {
+            routes = RouteStore.Load(doc.Database);
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage(""\n[iSurvey] Không đọc được tuyến: "" + ex.Message);
+            return;
+        }
+
+        if (routes.Count == 0)
+        {
+            ed.WriteMessage(""\n[iSurvey] Chưa có tuyến. Chạy TAOTUYEN rồi PHATSINHCOC trước."");
+            return;
+        }
+
+        ProfileDrawOptions options;
+        ProfileDialogAction action;
+        Point3d insert;
+
+        if (seeded)
+        {
+            var route = routes[0];
+            options = ProfileSettingsStore.Load();
+            options.RouteId = route.Id;
+            options.ProfileName = ""MCD "" + route.Name;
+            var samples = route.Stations!
+                .Where(s => s.HasZ)
+                .Select(s => new ProfileSampleService.SamplePoint
+                {
+                    Chainage = s.Chainage,
+                    X = s.X,
+                    Y = s.Y,
+                    Z = s.Z,
+                    HasZ = true,
+                    IsStation = true,
+                    Name = s.Name
+                })
+                .ToList();
+            var bandH = ProfileBandRow.TotalHeight(options.Rows);
+            options.Datum = ProfileDrawService.SuggestDatum(
+                samples, options.HorizontalScale, options.VerticalScale, bandH);
+            action = ProfileDialogAction.Draw;
+            insert = Point3d.Origin;
+            ed.WriteMessage(""\n[iSurvey] Thử nhanh: vẽ tại gốc (0,0), mức "" + options.Datum.ToString(""0.###"") + ""."");
+        }
+        else
+        {
+            DrawProfileDialogResult? dialog;
+            try
+            {
+                dialog = DrawProfileWindow.Prompt(routes, RouteContext.TakeRoute());
+            }
+            catch (System.Exception ex)
+            {
+                ed.WriteMessage(""\n[iSurvey] Không mở được hộp thoại: "" + ex.Message);
+                return;
+            }
+
+            if (dialog is null || dialog.Action == ProfileDialogAction.Cancel || dialog.Options is null)
+            {
+                ed.WriteMessage(""\n[iSurvey] Đã hủy vẽ mặt cắt."");
+                return;
+            }
+
+            options = dialog.Options;
+            action = dialog.Action;
+            ProfileSettingsStore.Save(options);
+
+            if (action == ProfileDialogAction.Draw)
+            {
+                // Luôn pick vị trí; nếu đã có MCD thì xóa bản cũ rồi vẽ tại điểm mới.
+                var pOpts = new PromptPointOptions(""\niSurvey: Chỉ góc dưới-trái cột tên (đáy bảng) trên Model: "")
+                {
+                    AllowNone = false
+                };
+                var pRes = ed.GetPoint(pOpts);
+                if (pRes.Status != PromptStatus.OK)
+                {
+                    ed.WriteMessage(""\n[iSurvey] Đã hủy — chưa chọn điểm chèn."");
+                    return;
+                }
+
+                insert = pRes.Value;
+            }
+            else
+            {
+                insert = Point3d.Origin;
+            }
+        }
+
+        try
+        {
+            switch (action)
+            {
+                case ProfileDialogAction.Draw:
+                    RunDraw(doc, ed, routes, options, insert);
+                    break;
+                case ProfileDialogAction.UpdateFromProfile:
+                case ProfileDialogAction.UpdateProperties:
+                case ProfileDialogAction.UpdateFromTin:
+                    RunUpdate(doc, ed, routes, options, action);
+                    break;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage(""\n[iSurvey] Lỗi mặt cắt dọc: "" + ex.Message);
+            ActivityLogger.TrackError(ex, ""ISURVEY_PROFILE_DRAW"");
+        }
+    }",20,147,thin-wrapper DrawAlias→Draw,"['ActivityLogger', 'AuthManager', 'DocumentManager', 'DrawProfileWindow', 'ProfileDrawService', 'ProfileSampleService', 'ProfileSettingsStore', 'RouteStore']"
+AUTOSCAN,,AutoScanCommand,src/Modules/Scan/ScanModule.cs,25,False,,False,AutoScanCommand,"{
+        if (!AuthManager.EnsureAuthenticated(track: false))
+            return;
+
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+
+        var ed = doc.Editor;
+        var db = doc.Database;
+
+        var pso = new PromptSelectionOptions
+        {
+            MessageForAdding = ""\niSurvey: Quét chọn vùng cần phân tích (gõ ALL để chọn hết): ""
+        };
+        var ps = ed.GetSelection(pso);
+        if (ps.Status != PromptStatus.OK)
+        {
+            ed.WriteMessage(""\n[iSurvey] Da huy AUTOSCAN."");
+            return;
+        }
+
+        var dialog = new Win32SaveFileDialog
+        {
+            Title = ""Luu bao cao AutoScan"",
+            Filter = ""Text (*.txt)|*.txt"",
+            DefaultExt = "".txt"",
+            AddExtension = true,
+            FileName = ""CAD_AutoScan_Report.txt""
+        };
+        if (!string.IsNullOrWhiteSpace(db.Filename) && Path.IsPathRooted(db.Filename))
+            dialog.InitialDirectory = Path.GetDirectoryName(db.Filename);
+
+        if (dialog.ShowDialog() != true)
+        {
+            ed.WriteMessage(""\n[iSurvey] Da huy AUTOSCAN."");
+            return;
+        }
+
+        try
+        {
+            string text;
+            using (var tr = db.TransactionManager.StartTransaction())
+            {
+                var name = string.IsNullOrWhiteSpace(db.Filename) ? ""(chua luu)"" : db.Filename;
+                text = new ScanReport().Build(db, tr, ps.Value.GetObjectIds(), name);
+                tr.Commit();
+            }
+
+            File.WriteAllText(dialog.FileName, text, new UTF8Encoding(encoderShouldEmitUTF8Identifier: true));
+            ed.WriteMessage($""\n[iSurvey] Da luu bao cao: {dialog.FileName}"");
+            ActivityLogger.Result(""AUTOSCAN"",
+                $""báo cáo {ActivityLogger.FileName(dialog.FileName)}, {ps.Value.Count} đối tượng, bản vẽ {ActivityLogger.FileName(db.Filename)}"");
+
+            Process.Start(new ProcessStartInfo(""notepad.exe"", $""\""{dialog.FileName}\"""") { UseShellExecute = true });
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage($""\n[iSurvey] AUTOSCAN that bai: {ex.Message}"");
+            iSurvey.Auth.ActivityLogger.TrackError(ex);
+        }
+    }",26,88,,"['ActivityLogger', 'AuthManager', 'DocumentManager', 'ShowDialog', 'TransactionManager', 'Win32SaveFileDialog']"
+ISURVEY_TERRAIN_NEW,,NewCommand,src/Modules/Terrain/TerrainModule.cs,14,False,,False,New,"{
+        if (!AuthManager.EnsureAuthenticated(""TAOMOHINH""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+
+        var count = 1;
+        try
+        {
+            count = TerrainStore.Load(doc.Database).Count + 1;
+        }
+        catch (System.Exception)
+        {
+            count = 1;
+        }
+
+        CreateTerrainRequest? request;
+        try
+        {
+            request = CreateTerrainWindow.Prompt(""Mô hình "" + count);
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Không mở được hộp thoại: "" + ex.Message);
+            return;
+        }
+
+        if (request is null)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy tạo mô hình."");
+            return;
+        }
+
+        var model = new TerrainRecord
+        {
+            Id = Guid.NewGuid().ToString(""N""),
+            Name = request.Name,
+            Layer = request.Layer
+        };
+        TerrainStore.Save(doc.Database, model);
+        doc.Editor.WriteMessage(""\n[iSurvey] Đã tạo mô hình \"""" + model.Name + ""\"". Hãy thêm điểm, đứt gãy hoặc đồng mức, và đường bao, rồi xây dựng."");
+        SurveyPaletteManager.Reload();
+    }",56,100,thin-wrapper NewCommand→New,"['AuthManager', 'CreateTerrainWindow', 'DocumentManager', 'SurveyPaletteManager', 'TerrainStore']"
+TAOMOHINH,,NewAlias,src/Modules/Terrain/TerrainModule.cs,17,False,,False,New,"{
+        if (!AuthManager.EnsureAuthenticated(""TAOMOHINH""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+
+        var count = 1;
+        try
+        {
+            count = TerrainStore.Load(doc.Database).Count + 1;
+        }
+        catch (System.Exception)
+        {
+            count = 1;
+        }
+
+        CreateTerrainRequest? request;
+        try
+        {
+            request = CreateTerrainWindow.Prompt(""Mô hình "" + count);
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Không mở được hộp thoại: "" + ex.Message);
+            return;
+        }
+
+        if (request is null)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy tạo mô hình."");
+            return;
+        }
+
+        var model = new TerrainRecord
+        {
+            Id = Guid.NewGuid().ToString(""N""),
+            Name = request.Name,
+            Layer = request.Layer
+        };
+        TerrainStore.Save(doc.Database, model);
+        doc.Editor.WriteMessage(""\n[iSurvey] Đã tạo mô hình \"""" + model.Name + ""\"". Hãy thêm điểm, đứt gãy hoặc đồng mức, và đường bao, rồi xây dựng."");
+        SurveyPaletteManager.Reload();
+    }",56,100,thin-wrapper NewAlias→New,"['AuthManager', 'CreateTerrainWindow', 'DocumentManager', 'SurveyPaletteManager', 'TerrainStore']"
+ISURVEY_TERRAIN_ADD,,AddCommand,src/Modules/Terrain/TerrainModule.cs,20,False,,False,Add,"{
+        if (!AuthManager.EnsureAuthenticated(""THEMMOHINH""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+        var model = TerrainService.Choose(doc.Editor, doc.Database);
+        if (model is null)
+            return;
+        var kind = Kind(doc.Editor, ""\nThêm vào mô hình [Điểm/Đứt gãy/Đồng mức/Bao]"");
+        if (kind is null)
+            return;
+        int added;
+        if (kind == ""point"")
+        {
+            PointSourceChoice? choice;
+            try
+            {
+                choice = AddPointSourcesWindow.Prompt();
+            }
+            catch (System.Exception ex)
+            {
+                doc.Editor.WriteMessage(""\n[iSurvey] Không mở được hộp thoại: "" + ex.Message);
+                return;
+            }
+
+            if (choice is null)
+            {
+                doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy thêm điểm."");
+                return;
+            }
+
+            added = TerrainService.AddPoints(
+                doc,
+                model,
+                choice.Points,
+                choice.Blocks,
+                choice.BlockElevFromLabels,
+                choice.Labels,
+                choice.Chains);
+        }
+        else
+        {
+            added = TerrainService.Add(doc, model, kind);
+        }
+
+        var hadMesh = model.TriangleCount > 0;
+        if (added > 0 && hadMesh)
+            TerrainService.DropMesh(doc, model);
+
+        var label = kind switch
+        {
+            ""contour"" => ""đường đồng mức"",
+            ""break"" => ""đường đứt gãy"",
+            ""boundary"" => ""đường bao"",
+            _ => ""nguồn điểm""
+        };
+        var rebuild = added > 0 && hadMesh ? "" Lưới cũ đã xóa. Hãy xây dựng lại."" : """";
+        doc.Editor.WriteMessage(""\n[iSurvey] Đã gắn "" + added + "" "" + label + "" vào \"""" + model.Name + ""\""."" + rebuild);
+        SurveyPaletteManager.Reload();
+    }",102,163,thin-wrapper AddCommand→Add,"['AddPointSourcesWindow', 'AuthManager', 'DocumentManager', 'SurveyPaletteManager', 'TerrainService']"
+THEMMOHINH,,AddAlias,src/Modules/Terrain/TerrainModule.cs,23,False,,False,Add,"{
+        if (!AuthManager.EnsureAuthenticated(""THEMMOHINH""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+        var model = TerrainService.Choose(doc.Editor, doc.Database);
+        if (model is null)
+            return;
+        var kind = Kind(doc.Editor, ""\nThêm vào mô hình [Điểm/Đứt gãy/Đồng mức/Bao]"");
+        if (kind is null)
+            return;
+        int added;
+        if (kind == ""point"")
+        {
+            PointSourceChoice? choice;
+            try
+            {
+                choice = AddPointSourcesWindow.Prompt();
+            }
+            catch (System.Exception ex)
+            {
+                doc.Editor.WriteMessage(""\n[iSurvey] Không mở được hộp thoại: "" + ex.Message);
+                return;
+            }
+
+            if (choice is null)
+            {
+                doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy thêm điểm."");
+                return;
+            }
+
+            added = TerrainService.AddPoints(
+                doc,
+                model,
+                choice.Points,
+                choice.Blocks,
+                choice.BlockElevFromLabels,
+                choice.Labels,
+                choice.Chains);
+        }
+        else
+        {
+            added = TerrainService.Add(doc, model, kind);
+        }
+
+        var hadMesh = model.TriangleCount > 0;
+        if (added > 0 && hadMesh)
+            TerrainService.DropMesh(doc, model);
+
+        var label = kind switch
+        {
+            ""contour"" => ""đường đồng mức"",
+            ""break"" => ""đường đứt gãy"",
+            ""boundary"" => ""đường bao"",
+            _ => ""nguồn điểm""
+        };
+        var rebuild = added > 0 && hadMesh ? "" Lưới cũ đã xóa. Hãy xây dựng lại."" : """";
+        doc.Editor.WriteMessage(""\n[iSurvey] Đã gắn "" + added + "" "" + label + "" vào \"""" + model.Name + ""\""."" + rebuild);
+        SurveyPaletteManager.Reload();
+    }",102,163,thin-wrapper AddAlias→Add,"['AddPointSourcesWindow', 'AuthManager', 'DocumentManager', 'SurveyPaletteManager', 'TerrainService']"
+ISURVEY_TERRAIN_BUILD,,BuildCommand,src/Modules/Terrain/TerrainModule.cs,26,False,,False,Build,"{
+        if (!AuthManager.EnsureAuthenticated(""XAYMOHINH""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+        var model = TerrainService.Choose(doc.Editor, doc.Database);
+        if (model is null)
+            return;
+        try
+        {
+            var count = TerrainService.Build(doc, model);
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã xây dựng "" + count + "" tam giác cho \"""" + model.Name + ""\""."");
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Không xây dựng được: "" + ex.Message);
+        }
+
+        SurveyPaletteManager.Reload();
+    }",165,186,thin-wrapper BuildCommand→Build,"['AuthManager', 'DocumentManager', 'SurveyPaletteManager', 'TerrainService']"
+XAYMOHINH,,BuildAlias,src/Modules/Terrain/TerrainModule.cs,29,False,,False,Build,"{
+        if (!AuthManager.EnsureAuthenticated(""XAYMOHINH""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+        var model = TerrainService.Choose(doc.Editor, doc.Database);
+        if (model is null)
+            return;
+        try
+        {
+            var count = TerrainService.Build(doc, model);
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã xây dựng "" + count + "" tam giác cho \"""" + model.Name + ""\""."");
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Không xây dựng được: "" + ex.Message);
+        }
+
+        SurveyPaletteManager.Reload();
+    }",165,186,thin-wrapper BuildAlias→Build,"['AuthManager', 'DocumentManager', 'SurveyPaletteManager', 'TerrainService']"
+ISURVEY_TERRAIN_TOGGLE,,ToggleCommand,src/Modules/Terrain/TerrainModule.cs,32,False,,False,Toggle,"{
+        if (!AuthManager.EnsureAuthenticated(""ANTIN""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+        var pending = TerrainContext.ModelId;
+        if (string.IsNullOrWhiteSpace(pending))
+        {
+            var models = TerrainStore.Load(doc.Database);
+            if (models.Count == 0)
+            {
+                doc.Editor.WriteMessage(""\n[iSurvey] Chưa có mô hình để ẩn hoặc hiện lưới."");
+                return;
+            }
+
+            foreach (var model in models)
+                Flip(doc, model);
+            SurveyPaletteManager.Reload();
+            return;
+        }
+
+        var one = TerrainService.Choose(doc.Editor, doc.Database);
+        if (one is null)
+            return;
+        Flip(doc, one);
+        SurveyPaletteManager.Reload();
+    }",273,301,thin-wrapper ToggleCommand→Toggle,"['AuthManager', 'DocumentManager', 'SurveyPaletteManager', 'TerrainService', 'TerrainStore']"
+ANTIN,,ToggleAlias,src/Modules/Terrain/TerrainModule.cs,35,False,,False,Toggle,"{
+        if (!AuthManager.EnsureAuthenticated(""ANTIN""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+        var pending = TerrainContext.ModelId;
+        if (string.IsNullOrWhiteSpace(pending))
+        {
+            var models = TerrainStore.Load(doc.Database);
+            if (models.Count == 0)
+            {
+                doc.Editor.WriteMessage(""\n[iSurvey] Chưa có mô hình để ẩn hoặc hiện lưới."");
+                return;
+            }
+
+            foreach (var model in models)
+                Flip(doc, model);
+            SurveyPaletteManager.Reload();
+            return;
+        }
+
+        var one = TerrainService.Choose(doc.Editor, doc.Database);
+        if (one is null)
+            return;
+        Flip(doc, one);
+        SurveyPaletteManager.Reload();
+    }",273,301,thin-wrapper ToggleAlias→Toggle,"['AuthManager', 'DocumentManager', 'SurveyPaletteManager', 'TerrainService', 'TerrainStore']"
+ISURVEY_TERRAIN_Z,,QueryCommand,src/Modules/Terrain/TerrainModule.cs,38,False,,False,Query,"{
+        if (!AuthManager.EnsureAuthenticated(""TRACAOD""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+        var model = TerrainService.Choose(doc.Editor, doc.Database);
+        if (model is null)
+            return;
+        if (model.TriangleCount == 0)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Mô hình chưa có lưới. Hãy xây dựng trước."");
+            return;
+        }
+
+        doc.Editor.WriteMessage(""\n[iSurvey] Tra cao độ \"""" + model.Name + ""\"". Chọn điểm trên lưới; Enter để kết thúc."");
+        ObjectId labelId = ObjectId.Null;
+        while (true)
+        {
+            var options = new PromptPointOptions(""\nChọn vị trí cần tra cao độ [Enter để xong]: "")
+            {
+                AllowNone = true
+            };
+            var picked = doc.Editor.GetPoint(options);
+            if (picked.Status == PromptStatus.None || picked.Status == PromptStatus.Cancel)
+                break;
+            if (picked.Status != PromptStatus.OK)
+                break;
+            if (!TerrainService.TryQuery(model, picked.Value.X, picked.Value.Y, out var z))
+            {
+                doc.Editor.WriteMessage(""\n[iSurvey] Điểm nằm ngoài lưới."");
+                continue;
+            }
+
+            var text = z.ToString(""0.000"", System.Globalization.CultureInfo.CurrentCulture);
+            doc.Editor.WriteMessage(""\n[iSurvey] Z = "" + text + "" ("" + model.Name + "")."");
+            labelId = TerrainService.ShowElevationMark(doc, model, picked.Value.X, picked.Value.Y, z, labelId);
+        }
+
+        TerrainService.EraseElevationMark(doc, labelId);
+    }",303,344,thin-wrapper QueryCommand→Query,"['AuthManager', 'DocumentManager', 'TerrainService']"
+TRACAOD,,QueryAlias,src/Modules/Terrain/TerrainModule.cs,41,False,,False,Query,"{
+        if (!AuthManager.EnsureAuthenticated(""TRACAOD""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+        var model = TerrainService.Choose(doc.Editor, doc.Database);
+        if (model is null)
+            return;
+        if (model.TriangleCount == 0)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Mô hình chưa có lưới. Hãy xây dựng trước."");
+            return;
+        }
+
+        doc.Editor.WriteMessage(""\n[iSurvey] Tra cao độ \"""" + model.Name + ""\"". Chọn điểm trên lưới; Enter để kết thúc."");
+        ObjectId labelId = ObjectId.Null;
+        while (true)
+        {
+            var options = new PromptPointOptions(""\nChọn vị trí cần tra cao độ [Enter để xong]: "")
+            {
+                AllowNone = true
+            };
+            var picked = doc.Editor.GetPoint(options);
+            if (picked.Status == PromptStatus.None || picked.Status == PromptStatus.Cancel)
+                break;
+            if (picked.Status != PromptStatus.OK)
+                break;
+            if (!TerrainService.TryQuery(model, picked.Value.X, picked.Value.Y, out var z))
+            {
+                doc.Editor.WriteMessage(""\n[iSurvey] Điểm nằm ngoài lưới."");
+                continue;
+            }
+
+            var text = z.ToString(""0.000"", System.Globalization.CultureInfo.CurrentCulture);
+            doc.Editor.WriteMessage(""\n[iSurvey] Z = "" + text + "" ("" + model.Name + "")."");
+            labelId = TerrainService.ShowElevationMark(doc, model, picked.Value.X, picked.Value.Y, z, labelId);
+        }
+
+        TerrainService.EraseElevationMark(doc, labelId);
+    }",303,344,thin-wrapper QueryAlias→Query,"['AuthManager', 'DocumentManager', 'TerrainService']"
+ISURVEY_TERRAIN_DETACH,,DetachCommand,src/Modules/Terrain/TerrainModule.cs,44,False,,False,Detach,"{
+        if (!AuthManager.EnsureAuthenticated(""GOMOHINH""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+        var model = TerrainService.Choose(doc.Editor, doc.Database);
+        if (model is null)
+            return;
+        var kind = Kind(doc.Editor, ""\nGỡ khỏi mô hình [Điểm/Đứt gãy/Đồng mức/Bao]"");
+        if (kind is null)
+            return;
+        if (TerrainService.CountKind(model, kind) == 0)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] \"""" + model.Name + ""\"" chưa có "" + TerrainService.KindLabel(kind, true) + "" để gỡ."");
+            return;
+        }
+
+        var removed = TerrainService.Detach(doc, model, kind);
+        if (removed == 0)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Không gỡ được đối tượng nào. Hãy chọn đúng đối tượng đã gắn vào mô hình."");
+            return;
+        }
+
+        doc.Editor.WriteMessage(
+            ""\n[iSurvey] Đã gỡ "" + removed + "" "" + TerrainService.KindLabel(kind, true)
+            + "" khỏi \"""" + model.Name + ""\"". Đối tượng trên bản vẽ vẫn giữ. Hãy xây dựng lại lưới."");
+        SurveyPaletteManager.Reload();
+    }",188,218,thin-wrapper DetachCommand→Detach,"['AuthManager', 'DocumentManager', 'SurveyPaletteManager', 'TerrainService']"
+GOMOHINH,,DetachAlias,src/Modules/Terrain/TerrainModule.cs,47,False,,False,Detach,"{
+        if (!AuthManager.EnsureAuthenticated(""GOMOHINH""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+        var model = TerrainService.Choose(doc.Editor, doc.Database);
+        if (model is null)
+            return;
+        var kind = Kind(doc.Editor, ""\nGỡ khỏi mô hình [Điểm/Đứt gãy/Đồng mức/Bao]"");
+        if (kind is null)
+            return;
+        if (TerrainService.CountKind(model, kind) == 0)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] \"""" + model.Name + ""\"" chưa có "" + TerrainService.KindLabel(kind, true) + "" để gỡ."");
+            return;
+        }
+
+        var removed = TerrainService.Detach(doc, model, kind);
+        if (removed == 0)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Không gỡ được đối tượng nào. Hãy chọn đúng đối tượng đã gắn vào mô hình."");
+            return;
+        }
+
+        doc.Editor.WriteMessage(
+            ""\n[iSurvey] Đã gỡ "" + removed + "" "" + TerrainService.KindLabel(kind, true)
+            + "" khỏi \"""" + model.Name + ""\"". Đối tượng trên bản vẽ vẫn giữ. Hãy xây dựng lại lưới."");
+        SurveyPaletteManager.Reload();
+    }",188,218,thin-wrapper DetachAlias→Detach,"['AuthManager', 'DocumentManager', 'SurveyPaletteManager', 'TerrainService']"
+ISURVEY_TERRAIN_CLEAR,,ClearCommand,src/Modules/Terrain/TerrainModule.cs,50,False,,False,Clear,"{
+        if (!AuthManager.EnsureAuthenticated(""XOATHANHPHAN""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+        var model = TerrainService.Choose(doc.Editor, doc.Database);
+        if (model is null)
+            return;
+        var kind = Kind(doc.Editor, ""\nXóa toàn bộ khỏi mô hình [Điểm/Đứt gãy/Đồng mức/Bao]"");
+        if (kind is null)
+            return;
+        var count = TerrainService.CountKind(model, kind);
+        if (count == 0)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] \"""" + model.Name + ""\"" chưa có "" + TerrainService.KindLabel(kind, true) + "" để xóa."");
+            return;
+        }
+
+        var label = TerrainService.KindLabel(kind, true);
+        var meshNote = model.TriangleCount > 0
+            ? "" Lưới hiện có sẽ bị xóa và cần xây dựng lại.""
+            : """";
+        bool ok;
+        try
+        {
+            ok = DarkDialog.Confirm(
+                ""iSurvey — Xóa khỏi mô hình"",
+                ""Gỡ toàn bộ "" + count.ToString(""N0"") + "" "" + label + "" khỏi \"""" + model.Name + ""\""?""
+                + "" Đối tượng trên bản vẽ vẫn giữ."" + meshNote,
+                ""Xóa toàn bộ"",
+                ""Hủy bỏ"");
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Không mở được hộp thoại: "" + ex.Message);
+            return;
+        }
+
+        if (!ok)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy xóa "" + label + ""."");
+            return;
+        }
+
+        var removed = TerrainService.ClearKind(doc, model, kind);
+        doc.Editor.WriteMessage(
+            ""\n[iSurvey] Đã gỡ "" + removed.ToString(""N0"") + "" "" + label
+            + "" khỏi \"""" + model.Name + ""\"". Đối tượng trên bản vẽ vẫn giữ."");
+        SurveyPaletteManager.Reload();
+    }",220,271,thin-wrapper ClearCommand→Clear,"['AuthManager', 'DarkDialog', 'DocumentManager', 'SurveyPaletteManager', 'TerrainService']"
+XOATHANHPHAN,,ClearAlias,src/Modules/Terrain/TerrainModule.cs,53,False,,False,Clear,"{
+        if (!AuthManager.EnsureAuthenticated(""XOATHANHPHAN""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+        var model = TerrainService.Choose(doc.Editor, doc.Database);
+        if (model is null)
+            return;
+        var kind = Kind(doc.Editor, ""\nXóa toàn bộ khỏi mô hình [Điểm/Đứt gãy/Đồng mức/Bao]"");
+        if (kind is null)
+            return;
+        var count = TerrainService.CountKind(model, kind);
+        if (count == 0)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] \"""" + model.Name + ""\"" chưa có "" + TerrainService.KindLabel(kind, true) + "" để xóa."");
+            return;
+        }
+
+        var label = TerrainService.KindLabel(kind, true);
+        var meshNote = model.TriangleCount > 0
+            ? "" Lưới hiện có sẽ bị xóa và cần xây dựng lại.""
+            : """";
+        bool ok;
+        try
+        {
+            ok = DarkDialog.Confirm(
+                ""iSurvey — Xóa khỏi mô hình"",
+                ""Gỡ toàn bộ "" + count.ToString(""N0"") + "" "" + label + "" khỏi \"""" + model.Name + ""\""?""
+                + "" Đối tượng trên bản vẽ vẫn giữ."" + meshNote,
+                ""Xóa toàn bộ"",
+                ""Hủy bỏ"");
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Không mở được hộp thoại: "" + ex.Message);
+            return;
+        }
+
+        if (!ok)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy xóa "" + label + ""."");
+            return;
+        }
+
+        var removed = TerrainService.ClearKind(doc, model, kind);
+        doc.Editor.WriteMessage(
+            ""\n[iSurvey] Đã gỡ "" + removed.ToString(""N0"") + "" "" + label
+            + "" khỏi \"""" + model.Name + ""\"". Đối tượng trên bản vẽ vẫn giữ."");
+        SurveyPaletteManager.Reload();
+    }",220,271,thin-wrapper ClearAlias→Clear,"['AuthManager', 'DarkDialog', 'DocumentManager', 'SurveyPaletteManager', 'TerrainService']"
+ISURVEY_ROUTE_NEW,,RouteNewCommand,src/Modules/Tuyen/RouteModule.cs,14,False,,False,New,"{
+        if (!AuthManager.EnsureAuthenticated(""TAOTUYEN""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+
+        var count = 1;
+        try
+        {
+            count = RouteStore.Load(doc.Database).Count + 1;
+        }
+        catch (System.Exception)
+        {
+            count = 1;
+        }
+
+        var models = new List<RouteModelChoice>();
+        string? preferredTerrainId = null;
+        try
+        {
+            foreach (var model in TerrainStore.Load(doc.Database))
+                models.Add(new RouteModelChoice { Id = model.Id, Name = model.Name });
+            preferredTerrainId = TerrainStore.LastCreated(doc.Database)?.Id;
+        }
+        catch (System.Exception)
+        {
+            models.Clear();
+            preferredTerrainId = null;
+        }
+
+        CreateRouteRequest? request;
+        try
+        {
+            request = CreateRouteWindow.Prompt(""Tuyến "" + count, models, preferredTerrainId);
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Không mở được hộp thoại: "" + ex.Message);
+            return;
+        }
+
+        if (request is null)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy tạo tuyến."");
+            return;
+        }
+
+        var picked = doc.Editor.GetEntity(new PromptEntityOptions(""\nChọn polyline tim tuyến: "")
+        {
+            AllowNone = false
+        });
+        if (picked.Status != PromptStatus.OK)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy chọn tim tuyến."");
+            return;
+        }
+
+        string handle;
+        using (var tr = doc.Database.TransactionManager.StartTransaction())
+        {
+            if (tr.GetObject(picked.ObjectId, OpenMode.ForRead) is not Entity entity
+                || entity is not (Polyline or Polyline2d or Polyline3d))
+            {
+                doc.Editor.WriteMessage(""\n[iSurvey] Hãy chọn một polyline."");
+                tr.Commit();
+                return;
+            }
+
+            handle = entity.Handle.ToString();
+            tr.Commit();
+        }
+
+        var reversed = RouteService.ResolveStart(doc.Editor, doc.Database, handle, out var startPt, out var endPt);
+        if (reversed is null)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy chọn điểm đầu tuyến."");
+            return;
+        }
+
+        var route = new RouteRecord
+        {
+            Id = Guid.NewGuid().ToString(""N""),
+            Name = request.Name,
+            PolylineHandle = handle,
+            StartChainage = request.StartChainage,
+            TerrainId = request.TerrainId,
+            Reversed = reversed.Value
+        };
+        RouteStore.Save(doc.Database, route);
+        var chain = request.StartChainage.ToString(""0.###"", System.Globalization.CultureInfo.InvariantCulture);
+        doc.Editor.WriteMessage(
+            ""\n[iSurvey] Đã tạo tuyến \"""" + route.Name + ""\"", lý trình gốc "" + chain
+            + "" m. Đầu ("" + startPt.X.ToString(""0.###"", System.Globalization.CultureInfo.InvariantCulture)
+            + "", "" + startPt.Y.ToString(""0.###"", System.Globalization.CultureInfo.InvariantCulture)
+            + "") → cuối ("" + endPt.X.ToString(""0.###"", System.Globalization.CultureInfo.InvariantCulture)
+            + "", "" + endPt.Y.ToString(""0.###"", System.Globalization.CultureInfo.InvariantCulture) + "")""
+            + (reversed.Value ? "" (đảo so với chiều vẽ)."" : "".""));
+        SurveyPaletteManager.Reload();
+    }",92,192,thin-wrapper RouteNewCommand→New,"['AuthManager', 'CreateRouteWindow', 'DocumentManager', 'RouteService', 'RouteStore', 'SurveyPaletteManager', 'TerrainStore', 'TransactionManager']"
+TAOTUYEN,,RouteNewAlias,src/Modules/Tuyen/RouteModule.cs,17,False,,False,New,"{
+        if (!AuthManager.EnsureAuthenticated(""TAOTUYEN""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+
+        var count = 1;
+        try
+        {
+            count = RouteStore.Load(doc.Database).Count + 1;
+        }
+        catch (System.Exception)
+        {
+            count = 1;
+        }
+
+        var models = new List<RouteModelChoice>();
+        string? preferredTerrainId = null;
+        try
+        {
+            foreach (var model in TerrainStore.Load(doc.Database))
+                models.Add(new RouteModelChoice { Id = model.Id, Name = model.Name });
+            preferredTerrainId = TerrainStore.LastCreated(doc.Database)?.Id;
+        }
+        catch (System.Exception)
+        {
+            models.Clear();
+            preferredTerrainId = null;
+        }
+
+        CreateRouteRequest? request;
+        try
+        {
+            request = CreateRouteWindow.Prompt(""Tuyến "" + count, models, preferredTerrainId);
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Không mở được hộp thoại: "" + ex.Message);
+            return;
+        }
+
+        if (request is null)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy tạo tuyến."");
+            return;
+        }
+
+        var picked = doc.Editor.GetEntity(new PromptEntityOptions(""\nChọn polyline tim tuyến: "")
+        {
+            AllowNone = false
+        });
+        if (picked.Status != PromptStatus.OK)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy chọn tim tuyến."");
+            return;
+        }
+
+        string handle;
+        using (var tr = doc.Database.TransactionManager.StartTransaction())
+        {
+            if (tr.GetObject(picked.ObjectId, OpenMode.ForRead) is not Entity entity
+                || entity is not (Polyline or Polyline2d or Polyline3d))
+            {
+                doc.Editor.WriteMessage(""\n[iSurvey] Hãy chọn một polyline."");
+                tr.Commit();
+                return;
+            }
+
+            handle = entity.Handle.ToString();
+            tr.Commit();
+        }
+
+        var reversed = RouteService.ResolveStart(doc.Editor, doc.Database, handle, out var startPt, out var endPt);
+        if (reversed is null)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy chọn điểm đầu tuyến."");
+            return;
+        }
+
+        var route = new RouteRecord
+        {
+            Id = Guid.NewGuid().ToString(""N""),
+            Name = request.Name,
+            PolylineHandle = handle,
+            StartChainage = request.StartChainage,
+            TerrainId = request.TerrainId,
+            Reversed = reversed.Value
+        };
+        RouteStore.Save(doc.Database, route);
+        var chain = request.StartChainage.ToString(""0.###"", System.Globalization.CultureInfo.InvariantCulture);
+        doc.Editor.WriteMessage(
+            ""\n[iSurvey] Đã tạo tuyến \"""" + route.Name + ""\"", lý trình gốc "" + chain
+            + "" m. Đầu ("" + startPt.X.ToString(""0.###"", System.Globalization.CultureInfo.InvariantCulture)
+            + "", "" + startPt.Y.ToString(""0.###"", System.Globalization.CultureInfo.InvariantCulture)
+            + "") → cuối ("" + endPt.X.ToString(""0.###"", System.Globalization.CultureInfo.InvariantCulture)
+            + "", "" + endPt.Y.ToString(""0.###"", System.Globalization.CultureInfo.InvariantCulture) + "")""
+            + (reversed.Value ? "" (đảo so với chiều vẽ)."" : "".""));
+        SurveyPaletteManager.Reload();
+    }",92,192,thin-wrapper RouteNewAlias→New,"['AuthManager', 'CreateRouteWindow', 'DocumentManager', 'RouteService', 'RouteStore', 'SurveyPaletteManager', 'TerrainStore', 'TransactionManager']"
+ISURVEY_ROUTE_STATIONS,,StationsCommand,src/Modules/Tuyen/RouteModule.cs,20,False,,False,Stations,"{
+        if (!AuthManager.EnsureAuthenticated(""PHATSINHCOC""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+        var route = RouteService.Choose(doc.Editor, doc.Database);
+        if (route is null)
+            return;
+        if (!RouteService.TryLength(doc.Database, route, out var length))
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Không đọc được polyline tim tuyến."");
+            return;
+        }
+
+        var from = route.StartChainage;
+        var to = route.StartChainage + length;
+        CreateStationsRequest? request;
+        try
+        {
+            request = CreateStationsWindow.Prompt(route.Name, from, to);
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Không mở được hộp thoại: "" + ex.Message);
+            return;
+        }
+
+        if (request is null)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy phát sinh cọc."");
+            return;
+        }
+
+        try
+        {
+            var count = RouteService.BuildStations(
+                doc,
+                route,
+                request.FromChainage,
+                request.ToChainage,
+                request.Step,
+                out var missingZ);
+            if (count == 0)
+            {
+                doc.Editor.WriteMessage(""\n[iSurvey] Không phát sinh được cọc trong khoảng lý trình đã chọn."");
+                return;
+            }
+
+            var msg = ""\n[iSurvey] Đã phát sinh "" + count + "" cọc trên \"""" + route.Name + ""\""."";
+            if (missingZ > 0)
+            {
+                msg += "" "" + missingZ + "" cọc chưa lấy được Z từ mô hình."";
+                if (string.IsNullOrWhiteSpace(route.TerrainId))
+                    msg += "" Hãy gắn mô hình khi tạo tuyến hoặc chỉ còn một mô hình đã dựng TIN."";
+                else
+                    msg += "" Kiểm tra mô hình đã Xây dựng TIN và tuyến nằm trong đường bao."";
+            }
+
+            doc.Editor.WriteMessage(msg);
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Không phát sinh được cọc: "" + ex.Message);
+        }
+
+        SurveyPaletteManager.Reload();
+    }",194,262,thin-wrapper StationsCommand→Stations,"['AuthManager', 'CreateStationsWindow', 'DocumentManager', 'RouteService', 'SurveyPaletteManager']"
+PHATSINHCOC,,StationsAlias,src/Modules/Tuyen/RouteModule.cs,23,False,,False,Stations,"{
+        if (!AuthManager.EnsureAuthenticated(""PHATSINHCOC""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+        var route = RouteService.Choose(doc.Editor, doc.Database);
+        if (route is null)
+            return;
+        if (!RouteService.TryLength(doc.Database, route, out var length))
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Không đọc được polyline tim tuyến."");
+            return;
+        }
+
+        var from = route.StartChainage;
+        var to = route.StartChainage + length;
+        CreateStationsRequest? request;
+        try
+        {
+            request = CreateStationsWindow.Prompt(route.Name, from, to);
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Không mở được hộp thoại: "" + ex.Message);
+            return;
+        }
+
+        if (request is null)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy phát sinh cọc."");
+            return;
+        }
+
+        try
+        {
+            var count = RouteService.BuildStations(
+                doc,
+                route,
+                request.FromChainage,
+                request.ToChainage,
+                request.Step,
+                out var missingZ);
+            if (count == 0)
+            {
+                doc.Editor.WriteMessage(""\n[iSurvey] Không phát sinh được cọc trong khoảng lý trình đã chọn."");
+                return;
+            }
+
+            var msg = ""\n[iSurvey] Đã phát sinh "" + count + "" cọc trên \"""" + route.Name + ""\""."";
+            if (missingZ > 0)
+            {
+                msg += "" "" + missingZ + "" cọc chưa lấy được Z từ mô hình."";
+                if (string.IsNullOrWhiteSpace(route.TerrainId))
+                    msg += "" Hãy gắn mô hình khi tạo tuyến hoặc chỉ còn một mô hình đã dựng TIN."";
+                else
+                    msg += "" Kiểm tra mô hình đã Xây dựng TIN và tuyến nằm trong đường bao."";
+            }
+
+            doc.Editor.WriteMessage(msg);
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Không phát sinh được cọc: "" + ex.Message);
+        }
+
+        SurveyPaletteManager.Reload();
+    }",194,262,thin-wrapper StationsAlias→Stations,"['AuthManager', 'CreateStationsWindow', 'DocumentManager', 'RouteService', 'SurveyPaletteManager']"
+ISURVEY_ROUTE_CLEAR_STATIONS,,ClearStationsCommand,src/Modules/Tuyen/RouteModule.cs,26,False,,False,ClearStations,"{
+        if (!AuthManager.EnsureAuthenticated(""XOACOC""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+        var route = RouteService.Choose(doc.Editor, doc.Database);
+        if (route is null)
+            return;
+        if (route.Stations is null || route.Stations.Count == 0)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] \"""" + route.Name + ""\"" chưa có cọc."");
+            return;
+        }
+
+        var removed = RouteService.ClearStations(doc, route);
+        doc.Editor.WriteMessage(""\n[iSurvey] Đã xóa "" + removed + "" cọc của \"""" + route.Name + ""\""."");
+        SurveyPaletteManager.Reload();
+    }",282,301,thin-wrapper ClearStationsCommand→ClearStations,"['AuthManager', 'DocumentManager', 'RouteService', 'SurveyPaletteManager']"
+XOACOC,,ClearStationsAlias,src/Modules/Tuyen/RouteModule.cs,29,False,,False,ClearStations,"{
+        if (!AuthManager.EnsureAuthenticated(""XOACOC""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+        var route = RouteService.Choose(doc.Editor, doc.Database);
+        if (route is null)
+            return;
+        if (route.Stations is null || route.Stations.Count == 0)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] \"""" + route.Name + ""\"" chưa có cọc."");
+            return;
+        }
+
+        var removed = RouteService.ClearStations(doc, route);
+        doc.Editor.WriteMessage(""\n[iSurvey] Đã xóa "" + removed + "" cọc của \"""" + route.Name + ""\""."");
+        SurveyPaletteManager.Reload();
+    }",282,301,thin-wrapper ClearStationsAlias→ClearStations,"['AuthManager', 'DocumentManager', 'RouteService', 'SurveyPaletteManager']"
+ISURVEY_ROUTE_REVERSE,,ReverseCommand,src/Modules/Tuyen/RouteModule.cs,32,False,,False,Reverse,"{
+        if (!AuthManager.EnsureAuthenticated(""DAODAUTUYEN""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+        var route = RouteService.Choose(doc.Editor, doc.Database);
+        if (route is null)
+            return;
+        var nowReversed = RouteService.Reverse(doc, route);
+        doc.Editor.WriteMessage(
+            ""\n[iSurvey] Đã đảo đầu tuyến \"""" + route.Name + ""\"". ""
+            + (nowReversed ? ""Lý trình tăng ngược chiều vẽ polyline."" : ""Lý trình tăng theo chiều vẽ polyline."")
+            + "" Cọc cũ đã xóa — hãy phát sinh cọc lại. Sau khi vẽ MCD cũng đảo lại bằng lệnh này nếu cần."");
+        SurveyPaletteManager.Reload();
+    }",264,280,thin-wrapper ReverseCommand→Reverse,"['AuthManager', 'DocumentManager', 'RouteService', 'SurveyPaletteManager']"
+DAODAUTUYEN,,ReverseAlias,src/Modules/Tuyen/RouteModule.cs,35,False,,False,Reverse,"{
+        if (!AuthManager.EnsureAuthenticated(""DAODAUTUYEN""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+        var route = RouteService.Choose(doc.Editor, doc.Database);
+        if (route is null)
+            return;
+        var nowReversed = RouteService.Reverse(doc, route);
+        doc.Editor.WriteMessage(
+            ""\n[iSurvey] Đã đảo đầu tuyến \"""" + route.Name + ""\"". ""
+            + (nowReversed ? ""Lý trình tăng ngược chiều vẽ polyline."" : ""Lý trình tăng theo chiều vẽ polyline."")
+            + "" Cọc cũ đã xóa — hãy phát sinh cọc lại. Sau khi vẽ MCD cũng đảo lại bằng lệnh này nếu cần."");
+        SurveyPaletteManager.Reload();
+    }",264,280,thin-wrapper ReverseAlias→Reverse,"['AuthManager', 'DocumentManager', 'RouteService', 'SurveyPaletteManager']"
+ISURVEY_STATION_STYLE,,StationStyleCommand,src/Modules/Tuyen/RouteModule.cs,38,False,,False,StationStyle,"{
+        if (!AuthManager.EnsureAuthenticated(""THIETLAPCOC""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+
+        StationStyleSettings? saved;
+        try
+        {
+            saved = StationStyleWindow.Prompt(StationStyleStore.Load());
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Không mở được hộp thoại: "" + ex.Message);
+            return;
+        }
+
+        if (saved is null)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy thiết lập kiểu cọc."");
+            return;
+        }
+
+        StationStyleStore.Save(saved);
+        doc.Editor.WriteMessage(
+            ""\n[iSurvey] Đã lưu kiểu cọc. Chạy PHATSINHCOC để vẽ lại theo thông số mới."");
+    }",62,90,thin-wrapper StationStyleCommand→StationStyle,"['AuthManager', 'DocumentManager', 'StationStyleStore', 'StationStyleWindow']"
+THIETLAPCOC,,StationStyleAlias,src/Modules/Tuyen/RouteModule.cs,41,False,,False,StationStyle,"{
+        if (!AuthManager.EnsureAuthenticated(""THIETLAPCOC""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+
+        StationStyleSettings? saved;
+        try
+        {
+            saved = StationStyleWindow.Prompt(StationStyleStore.Load());
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Không mở được hộp thoại: "" + ex.Message);
+            return;
+        }
+
+        if (saved is null)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy thiết lập kiểu cọc."");
+            return;
+        }
+
+        StationStyleStore.Save(saved);
+        doc.Editor.WriteMessage(
+            ""\n[iSurvey] Đã lưu kiểu cọc. Chạy PHATSINHCOC để vẽ lại theo thông số mới."");
+    }",62,90,thin-wrapper StationStyleAlias→StationStyle,"['AuthManager', 'DocumentManager', 'StationStyleStore', 'StationStyleWindow']"
+ISURVEY_STATION_REMOVE_ONE,,RemoveOneCommand,src/Modules/Tuyen/RouteModule.cs,44,False,,False,RemoveOne,"{
+        if (!AuthManager.EnsureAuthenticated(""XOACOC1""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+
+        var options = new PromptEntityOptions(""\nChọn gạch cọc hoặc chữ cọc cần xóa: "")
+        {
+            AllowNone = false
+        };
+        options.SetRejectMessage(""\nChỉ chọn Line, Text hoặc MText của cọc."");
+        options.AddAllowedClass(typeof(Line), exactMatch: false);
+        options.AddAllowedClass(typeof(DBText), exactMatch: false);
+        options.AddAllowedClass(typeof(MText), exactMatch: false);
+        var picked = doc.Editor.GetEntity(options);
+        if (picked.Status != PromptStatus.OK)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy xóa cọc."");
+            return;
+        }
+
+        if (!RouteService.RemoveStationByEntity(doc, picked.ObjectId, out var routeName, out var stationName))
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đối tượng không phải cọc iSurvey đã lưu."");
+            return;
+        }
+
+        doc.Editor.WriteMessage(""\n[iSurvey] Đã xóa cọc "" + stationName + "" trên \"""" + routeName + ""\""."");
+        SurveyPaletteManager.Reload();
+    }",303,334,thin-wrapper RemoveOneCommand→RemoveOne,"['AuthManager', 'DocumentManager', 'RouteService', 'SurveyPaletteManager']"
+XOACOC1,,RemoveOneAlias,src/Modules/Tuyen/RouteModule.cs,47,False,,False,RemoveOne,"{
+        if (!AuthManager.EnsureAuthenticated(""XOACOC1""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+
+        var options = new PromptEntityOptions(""\nChọn gạch cọc hoặc chữ cọc cần xóa: "")
+        {
+            AllowNone = false
+        };
+        options.SetRejectMessage(""\nChỉ chọn Line, Text hoặc MText của cọc."");
+        options.AddAllowedClass(typeof(Line), exactMatch: false);
+        options.AddAllowedClass(typeof(DBText), exactMatch: false);
+        options.AddAllowedClass(typeof(MText), exactMatch: false);
+        var picked = doc.Editor.GetEntity(options);
+        if (picked.Status != PromptStatus.OK)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy xóa cọc."");
+            return;
+        }
+
+        if (!RouteService.RemoveStationByEntity(doc, picked.ObjectId, out var routeName, out var stationName))
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đối tượng không phải cọc iSurvey đã lưu."");
+            return;
+        }
+
+        doc.Editor.WriteMessage(""\n[iSurvey] Đã xóa cọc "" + stationName + "" trên \"""" + routeName + ""\""."");
+        SurveyPaletteManager.Reload();
+    }",303,334,thin-wrapper RemoveOneAlias→RemoveOne,"['AuthManager', 'DocumentManager', 'RouteService', 'SurveyPaletteManager']"
+ISURVEY_STATION_ADD_ONE,,AddOneCommand,src/Modules/Tuyen/RouteModule.cs,50,False,,False,AddOne,"{
+        if (!AuthManager.EnsureAuthenticated(""THEMCOC""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+        var route = RouteService.Choose(doc.Editor, doc.Database);
+        if (route is null)
+            return;
+
+        var point = doc.Editor.GetPoint(new PromptPointOptions(""\nChọn vị trí thêm cọc (gần tim tuyến): ""));
+        if (point.Status != PromptStatus.OK)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy thêm cọc."");
+            return;
+        }
+
+        if (!RouteService.TryAddStationAtPoint(doc, route, point.Value, replaceNear: true, out var chainage, out var missingZ))
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Không thêm được cọc tại điểm đã chọn."");
+            return;
+        }
+
+        var msg = ""\n[iSurvey] Đã thêm cọc "" + RouteService.FormatChainage(chainage)
+            + "" trên \"""" + route.Name + ""\""."";
+        if (missingZ > 0)
+            msg += "" Chưa lấy được Z từ mô hình."";
+        doc.Editor.WriteMessage(msg);
+        SurveyPaletteManager.Reload();
+    }",336,366,thin-wrapper AddOneCommand→AddOne,"['AuthManager', 'DocumentManager', 'RouteService', 'SurveyPaletteManager']"
+THEMCOC,,AddOneAlias,src/Modules/Tuyen/RouteModule.cs,53,False,,False,AddOne,"{
+        if (!AuthManager.EnsureAuthenticated(""THEMCOC""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+        var route = RouteService.Choose(doc.Editor, doc.Database);
+        if (route is null)
+            return;
+
+        var point = doc.Editor.GetPoint(new PromptPointOptions(""\nChọn vị trí thêm cọc (gần tim tuyến): ""));
+        if (point.Status != PromptStatus.OK)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy thêm cọc."");
+            return;
+        }
+
+        if (!RouteService.TryAddStationAtPoint(doc, route, point.Value, replaceNear: true, out var chainage, out var missingZ))
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Không thêm được cọc tại điểm đã chọn."");
+            return;
+        }
+
+        var msg = ""\n[iSurvey] Đã thêm cọc "" + RouteService.FormatChainage(chainage)
+            + "" trên \"""" + route.Name + ""\""."";
+        if (missingZ > 0)
+            msg += "" Chưa lấy được Z từ mô hình."";
+        doc.Editor.WriteMessage(msg);
+        SurveyPaletteManager.Reload();
+    }",336,366,thin-wrapper AddOneAlias→AddOne,"['AuthManager', 'DocumentManager', 'RouteService', 'SurveyPaletteManager']"
+ISURVEY_STATION_LIST,,ListCommand,src/Modules/Tuyen/RouteModule.cs,56,False,,False,ListStations,"{
+        if (!AuthManager.EnsureAuthenticated(""BANGCOC""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+        var route = RouteService.Choose(doc.Editor, doc.Database);
+        if (route is null)
+            return;
+
+        while (true)
+        {
+            StationListResult result;
+            try
+            {
+                result = StationListWindow.Prompt(doc, route);
+            }
+            catch (System.Exception ex)
+            {
+                doc.Editor.WriteMessage(""\n[iSurvey] Không mở được danh sách cọc: "" + ex.Message);
+                return;
+            }
+
+            SurveyPaletteManager.Reload();
+            if (!result.AddRequested)
+                return;
+
+            var point = doc.Editor.GetPoint(new PromptPointOptions(""\nChọn vị trí thêm cọc (gần tim tuyến): ""));
+            if (point.Status != PromptStatus.OK)
+            {
+                doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy thêm cọc."");
+                return;
+            }
+
+            if (!RouteService.TryAddStationAtPoint(doc, route, point.Value, replaceNear: true, out var chainage, out var missingZ))
+            {
+                doc.Editor.WriteMessage(""\n[iSurvey] Không thêm được cọc tại điểm đã chọn."");
+                continue;
+            }
+
+            var msg = ""\n[iSurvey] Đã thêm cọc "" + RouteService.FormatChainage(chainage) + ""."";
+            if (missingZ > 0)
+                msg += "" Chưa lấy được Z từ mô hình."";
+            doc.Editor.WriteMessage(msg);
+            // Mở lại bảng sau khi thêm.
+        }
+    }",368,415,thin-wrapper ListCommand→ListStations,"['AuthManager', 'DocumentManager', 'RouteService', 'StationListWindow', 'SurveyPaletteManager']"
+BANGCOC,,ListAlias,src/Modules/Tuyen/RouteModule.cs,59,False,,False,ListStations,"{
+        if (!AuthManager.EnsureAuthenticated(""BANGCOC""))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+        var route = RouteService.Choose(doc.Editor, doc.Database);
+        if (route is null)
+            return;
+
+        while (true)
+        {
+            StationListResult result;
+            try
+            {
+                result = StationListWindow.Prompt(doc, route);
+            }
+            catch (System.Exception ex)
+            {
+                doc.Editor.WriteMessage(""\n[iSurvey] Không mở được danh sách cọc: "" + ex.Message);
+                return;
+            }
+
+            SurveyPaletteManager.Reload();
+            if (!result.AddRequested)
+                return;
+
+            var point = doc.Editor.GetPoint(new PromptPointOptions(""\nChọn vị trí thêm cọc (gần tim tuyến): ""));
+            if (point.Status != PromptStatus.OK)
+            {
+                doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy thêm cọc."");
+                return;
+            }
+
+            if (!RouteService.TryAddStationAtPoint(doc, route, point.Value, replaceNear: true, out var chainage, out var missingZ))
+            {
+                doc.Editor.WriteMessage(""\n[iSurvey] Không thêm được cọc tại điểm đã chọn."");
+                continue;
+            }
+
+            var msg = ""\n[iSurvey] Đã thêm cọc "" + RouteService.FormatChainage(chainage) + ""."";
+            if (missingZ > 0)
+                msg += "" Chưa lấy được Z từ mô hình."";
+            doc.Editor.WriteMessage(msg);
+            // Mở lại bảng sau khi thêm.
+        }
+    }",368,415,thin-wrapper ListAlias→ListStations,"['AuthManager', 'DocumentManager', 'RouteService', 'StationListWindow', 'SurveyPaletteManager']"
+STT,,SequenceCommand,src/Modules/Tuyen/SequenceNumberService.cs,28,False,,False,SequenceCommand,"{
+        if (!AuthManager.EnsureAuthenticated(""STT""))
+            return;
+
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+
+        var request = SequenceWindow.Prompt();
+        if (request is null)
+        {
+            doc.Editor.WriteMessage(""\n[iSurvey] Đã hủy."");
+            return;
+        }
+
+        try
+        {
+            AcadApp.SetSystemVariable(""WIPEOUTFRAME"", 2);
+        }
+        catch
+        {
+            // bản CAD không có biến này vẫn đặt số được
+        }
+
+        // Đóng hộp thoại để lại Esc hoặc Enter. Nếu không xóa, GetPoint nhận ngay và lệnh thoát.
+        try
+        {
+            ClearUserBreak();
+            EatPendingInput();
+        }
+        catch
+        {
+            // bản CAD không xuất hàm này thì vòng lặp bên dưới bỏ qua tín hiệu đến trong 400 ms
+        }
+
+        var placed = 0;
+        var number = request.Start;
+        var ed = doc.Editor;
+        var skippedPhantom = false;
+        while (true)
+        {
+            var label = request.Prefix + number + request.Suffix;
+            var ppo = new PromptPointOptions($""\niSurvey: Click điểm chèn {label} (Esc để thoát): "")
+            {
+                AllowNone = true
+            };
+            var asked = DateTime.UtcNow;
+            var ppr = ed.GetPoint(ppo);
+            // Đóng hộp thoại để lại Enter/Esc trong hàng đợi, GetPoint nhận ngay và thoát.
+            if (!skippedPhantom
+                && ppr.Status != PromptStatus.OK
+                && (DateTime.UtcNow - asked).TotalMilliseconds < 400)
+            {
+                skippedPhantom = true;
+                continue;
+            }
+
+            if (ppr.Status != PromptStatus.OK)
+                break;
+
+            using (doc.LockDocument())
+            using (var tr = doc.Database.TransactionManager.StartTransaction())
+            {
+                var space = (BlockTableRecord)tr.GetObject(doc.Database.CurrentSpaceId, OpenMode.ForWrite);
+                EnsureLayer(tr, doc.Database);
+                var radius = request.Height * RadiusFactor;
+                if (request.UseWipeout)
+                    AddWipeout(tr, space, ppr.Value, radius);
+                if (request.DrawCircle)
+                    AddCircle(tr, space, ppr.Value, radius);
+                var styleId = EnsureTextStyle(tr, doc.Database, request);
+                var textId = AddText(tr, space, ppr.Value, label, request.Height, request.WidthFactor, styleId);
+                var order = (DrawOrderTable)tr.GetObject(space.DrawOrderTableId, OpenMode.ForWrite);
+                order.MoveToTop(new ObjectIdCollection { textId });
+                tr.Commit();
+            }
+
+            placed++;
+            number += request.Step;
+        }
+
+        ed.WriteMessage(placed == 0
+            ? ""\n[iSurvey] Đã hủy.""
+            : $""\n[iSurvey] Đã ghi {placed} số trên layer {LayerName}."");
+        if (placed > 0)
+            ActivityLogger.Result(""STT"", $""đã ghi {placed} số trên layer {LayerName}"");
+    }",29,116,,"['ActivityLogger', 'AuthManager', 'DocumentManager', 'SequenceWindow', 'TransactionManager']"
+ISURVEY_STRIP_MAP,,StripMapCommand,src/Modules/Tuyen/StripMapService.cs,27,False,,False,StripMapCommand,"{
+        if (!AuthManager.EnsureAuthenticated(track: false))
+            return;
+
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+
+        var db = doc.Database;
+        var ed = doc.Editor;
+
+        try
+        {
+            Run(doc, db, ed);
+        }
+        catch (System.Exception ex)
+        {
+            ActivityLogger.TrackError(ex, ""ISURVEY_STRIP_MAP"");
+            ed.WriteMessage($""\n[iSurvey] Duỗi tuyến lỗi: {ex.Message}"");
+        }
+    }",28,49,,"['ActivityLogger', 'AuthManager', 'DocumentManager']"
+ISURVEY_NUMBER_VERTICES,,NumberVerticesCommand,src/Modules/Tuyen/VertexNumberingService.cs,37,False,,False,NumberVerticesCommand,"{
+        if (!AuthManager.EnsureAuthenticated(track: false))
+            return;
+
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+
+        var db = doc.Database;
+        var ed = doc.Editor;
+
+        var peo = new PromptEntityOptions(""\niSurvey: Chọn Polyline tim tuyến: "")
+        {
+            AllowNone = false
+        };
+        peo.SetRejectMessage(""\niSurvey: Chỉ chấp nhận Polyline."");
+        peo.AddAllowedClass(typeof(Polyline), true);
+        peo.AddAllowedClass(typeof(Polyline2d), true);
+        peo.AddAllowedClass(typeof(Polyline3d), true);
+
+        var per = ed.GetEntity(peo);
+        if (per.Status != PromptStatus.OK)
+            return;
+
+        var pso = new PromptStringOptions(""\niSurvey: Nhập tiền tố (Prefix) <G>: "")
+        {
+            AllowSpaces = false,
+            UseDefaultValue = true,
+            DefaultValue = ""G""
+        };
+        var prStr = ed.GetString(pso);
+        if (prStr.Status != PromptStatus.OK)
+            return;
+        var prefix = string.IsNullOrEmpty(prStr.StringResult) ? ""G"" : prStr.StringResult;
+
+        var pio = new PromptIntegerOptions(""\niSurvey: Nhập chỉ số bắt đầu <0>: "")
+        {
+            AllowNone = true,
+            DefaultValue = 0,
+            UseDefaultValue = true
+        };
+        var pir = ed.GetInteger(pio);
+        if (pir.Status == PromptStatus.Cancel)
+            return;
+        var startIndex = pir.Status == PromptStatus.OK ? pir.Value : 0;
+
+        // Tỷ lệ in bản đồ địa hình — mặc định 1:1000.
+        var pScale = new PromptIntegerOptions(""\niSurvey: Tỷ lệ bản đồ 1:<1000>: "")
+        {
+            AllowNone = true,
+            AllowNegative = false,
+            AllowZero = false,
+            LowerLimit = 100,
+            UpperLimit = 100000,
+            DefaultValue = 1000,
+            UseDefaultValue = true
+        };
+        var prScale = ed.GetInteger(pScale);
+        if (prScale.Status == PromptStatus.Cancel)
+            return;
+        var mapScale = prScale.Status == PromptStatus.OK ? prScale.Value : 1000;
+
+        // mm giấy → mét model: H_m = H_mm * M / 1000
+        var textHeight = PaperMmToModel(TextHeightMm, mapScale);
+        var dotRadius = PaperMmToModel(DotDiameterMm * 0.5, mapScale);
+        var baseOffset = dotRadius + PaperMmToModel(TextGapMm, mapScale);
+        var clearOfTim = PaperMmToModel(ClearOfTimMm, mapScale);
+        var pushStep = Math.Max(textHeight * PushStepFactor, clearOfTim * 0.5);
+        // Không để chữ cách đỉnh quá xa (kể cả khi đẩy né tim).
+        var maxOffset = baseOffset + textHeight * 1.8;
+
+        ed.WriteMessage(
+            $""\n[iSurvey] Tỷ lệ 1:{mapScale} — chữ {TextHeightMm:0.#} mm ({textHeight:0.###} m), "" +
+            $""chấm Ø {DotDiameterMm:0.#} mm ({dotRadius * 2:0.###} m)."");
+
+        using var tr = db.TransactionManager.StartTransaction();
+        var layerId = EnsureRedLayer(tr, db);
+
+        var ent = (Entity)tr.GetObject(per.ObjectId, OpenMode.ForRead);
+        var vertices = GetVertices(ent, tr, out var closed);
+        NormalizeVertices(vertices, ref closed);
+        if (vertices.Count < (closed ? 3 : 2))
+        {
+            ed.WriteMessage(""\n[iSurvey] Polyline cần ít nhất 2 đỉnh khác nhau (3 nếu khép kín)."");
+            return;
+        }
+
+        var btr = (BlockTableRecord)tr.GetObject(db.CurrentSpaceId, OpenMode.ForWrite);
+        var plane = new Plane(Point3d.Origin, Vector3d.ZAxis);
+        var pushed = 0;
+
+        for (var i = 0; i < vertices.Count; i++)
+        {
+            var v_i = vertices[i];
+            var vDir = ComputeOutsideBisector(vertices, i, closed);
+            vDir = new Vector3d(vDir.X, vDir.Y, 0);
+            if (vDir.Length < 1e-12)
+                vDir = Vector3d.XAxis;
+            else
+                vDir = vDir.GetNormal();
+
+            // Chấm tròn đặc
+            var dot = new Circle
+            {
+                Center = v_i,
+                Radius = dotRadius,
+                LayerId = layerId,
+                Color = AcadColor.FromColorIndex(ColorMethod.ByLayer, 256)
+            };
+            var dotId = btr.AppendEntity(dot);
+            tr.AddNewlyCreatedDBObject(dot, true);
+
+            var hatch = new Hatch();
+            btr.AppendEntity(hatch);
+            tr.AddNewlyCreatedDBObject(hatch, true);
+            hatch.Elevation = v_i.Z; // cùng cao độ với chấm tròn (đỉnh có Z ≠ 0 vẫn tô được)
+            hatch.LayerId = layerId;
+            hatch.Color = AcadColor.FromColorIndex(ColorMethod.ByLayer, 256);
+            hatch.SetHatchPattern(HatchPatternType.PreDefined, ""SOLID"");
+            hatch.Associative = false;
+            hatch.AppendLoop(HatchLoopTypes.Default, new ObjectIdCollection { dotId });
+            hatch.EvaluateHatch(true);
+
+            var label = $""{prefix}{startIndex + i}"";
+            GetAdjacent(vertices, i, closed, out var prev, out var next);
+            var halfAngle = HalfAngleFromVertex(prev, v_i, next);
+
+            // Text — gắn trước để đo vùng bao, rồi đẩy ra xa nếu còn đè tim.
+            // Góc nhọn (< 90°): ưu tiên phía ngoài (nêm rộng). Góc tù: giữ phân giác hiện tại.
+            Vector3d[] dirs;
+            if (halfAngle * 2.0 < Math.PI * 0.5)
+                dirs = [vDir * -1.0, vDir];
+            else
+                dirs = [vDir, vDir * -1.0];
+            DBText? placed = null;
+            for (var dirIdx = 0; dirIdx < dirs.Length; dirIdx++)
+            {
+                var dir = dirs[dirIdx];
+                var justify = JustifyForDirection(dir, plane);
+                var txt = placed ?? new DBText
+                {
+                    LayerId = layerId,
+                    Color = AcadColor.FromColorIndex(ColorMethod.ByLayer, 256),
+                    Height = textHeight,
+                    TextString = label
+                };
+                if (placed is null)
+                {
+                    btr.AppendEntity(txt);
+                    tr.AddNewlyCreatedDBObject(txt, true);
+                    placed = txt;
+                }
+
+                txt.Justify = justify;
+                // Luôn bắt đầu sát chấm/block góc; chỉ đẩy thêm khi còn đè tim, có trần maxOffset.
+                var offset = baseOffset;
+
+                PlaceTextAt(txt, v_i + dir * offset);
+                SafeAdjustAlignment(txt, db);
+
+                var moved = false;
+                for (var step = 0; step < PushMaxSteps; step++)
+                {
+                    if (!TextOverlapsTim(txt, prev, v_i, next, clearOfTim, textHeight))
+                        break;
+
+                    if (offset + pushStep > maxOffset)
+                        break;
+
+                    offset += pushStep;
+                    PlaceTextAt(txt, v_i + dir * offset);
+                    SafeAdjustAlignment(txt, db);
+                    moved = true;
+                }
+
+                if (!TextOverlapsTim(txt, prev, v_i, next, clearOfTim, textHeight))
+                {
+                    if (moved || dirIdx > 0)
+                        pushed++;
+                    break;
+                }
+
+                // Hết bước / chạm trần mà vẫn đè — thử phía phân giác còn lại.
+            }
+        }
+
+        tr.Commit();
+        ed.WriteMessage($""\n[iSurvey] Đã đánh số thành công {vertices.Count} góc tuyến (layer {LayerName})."");
+        if (pushed > 0)
+            ed.WriteMessage($""\n[iSurvey] Đã đẩy {pushed} chữ ra xa để không đè tim tuyến."");
+
+        // Mô tả tuyến .txt UTF-8: từ Góc → Góc+1; MOTATUYEN placeholder điền tay.
+        var txtPath = AngleTableExport.PromptSaveWriteAndOpen(ed, vertices, prefix, startIndex);
+        if (!string.IsNullOrEmpty(txtPath))
+            ed.WriteMessage($""\n[iSurvey] Đã lưu mô tả tuyến: {txtPath}"");
+
+        ActivityLogger.Result(""ISURVEY_NUMBER_VERTICES"",
+            $""{vertices.Count} góc, tiền tố {prefix}, bắt đầu {startIndex}, tỷ lệ 1/{mapScale}, đẩy né tim {pushed}"" +
+            (string.IsNullOrEmpty(txtPath) ? """" : $"", file {ActivityLogger.FileName(txtPath)}""));
+    }",38,238,,"['ActivityLogger', 'AuthManager', 'DocumentManager', 'TransactionManager']"
+ISURVEY_UAV_CLIP,,ClipCommand,src/Modules/Uav/UavModule.cs,10,False,,False,ClipCommand,"{
+        if (!AuthManager.EnsureAuthenticated(track: false)) return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null) return;
+        UavImageService.ClipByBoundary(doc.Editor, doc.Database);
+    }",11,17,,"['AuthManager', 'DocumentManager', 'UavImageService']"
+ISURVEY_UAV_FRAME_TOGGLE,,FrameToggleCommand,src/Modules/Uav/UavModule.cs,19,False,,False,FrameToggleCommand,"{
+        if (!AuthManager.EnsureAuthenticated(track: false)) return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null) return;
+        UavImageService.ToggleImageFrames(doc.Editor, doc.Database);
+    }",20,26,,"['AuthManager', 'DocumentManager', 'UavImageService']"
+ISURVEY_UAV_SEND_BACK,,SendBackCommand,src/Modules/Uav/UavModule.cs,28,False,,True,SendBackCommand,"{
+        if (!AuthManager.EnsureAuthenticated(track: false)) return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null) return;
+        UavImageService.SendImageToBack(doc.Editor, doc.Database);
+    }",29,35,,"['AuthManager', 'DocumentManager', 'UavImageService']"
+ISURVEY_UAV_INSERT,,InsertStub,src/Modules/Uav/UavModule.cs,37,False,,True,InsertStub,"=> Stub(""ISURVEY_UAV_INSERT"");",38,38,stub-entry (không gộp qua helper Stub),[]
+ISURVEY_UAV_DEM,,DemStub,src/Modules/Uav/UavModule.cs,40,False,,True,DemStub,"=> Stub(""ISURVEY_UAV_DEM"");",41,41,stub-entry (không gộp qua helper Stub),[]
+ISURVEY_UAV_CONTOUR,,ContourStub,src/Modules/Uav/UavModule.cs,43,False,,True,ContourStub,"=> Stub(""ISURVEY_UAV_CONTOUR"");",44,44,stub-entry (không gộp qua helper Stub),[]
+ISURVEY_UAV_CRS,,CrsStub,src/Modules/Uav/UavModule.cs,46,False,,True,CrsStub,"=> Stub(""ISURVEY_UAV_CRS"");",47,47,stub-entry (không gộp qua helper Stub),[]
+ISURVEY_PC_IMPORT,,PcImportStub,src/Modules/Uav/UavModule.cs,49,False,,True,PcImportStub,"=> Stub(""ISURVEY_PC_IMPORT"");",50,50,stub-entry (không gộp qua helper Stub),[]
+ISURVEY_PC_FILTER,,PcFilterStub,src/Modules/Uav/UavModule.cs,52,False,,True,PcFilterStub,"=> Stub(""ISURVEY_PC_FILTER"");",53,53,stub-entry (không gộp qua helper Stub),[]
+ISURVEY_PC_GRID,,PcGridStub,src/Modules/Uav/UavModule.cs,55,False,,True,PcGridStub,"=> Stub(""ISURVEY_PC_GRID"");",56,56,stub-entry (không gộp qua helper Stub),[]
+ISURVEY_PALETTE,,ShowCommand,src/UI/Palette/PaletteModule.cs,9,False,,False,ShowCommand,"{
+        if (!AuthManager.EnsureAuthenticated(""ISURVEY_PALETTE""))
+            return;
+        SurveyPaletteManager.Toggle();
+    }",10,15,,"['AuthManager', 'SurveyPaletteManager']"

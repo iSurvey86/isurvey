@@ -1,0 +1,32 @@
+{
+  "feature_rows": 79,
+  "unique_feature_ids": 79,
+  "duplicate_ids": [],
+  "evidence_counts": {
+    "SOURCE_BEHAVIOR_REVIEWED": 70,
+    "CALL_CHAIN_TRACED": 1,
+    "STUB_ONLY": 8
+  },
+  "samples_verified_open": 17,
+  "samples_total": 17,
+  "summary": {
+    "cs_xaml_files": 223,
+    "commandmethod_total": 125,
+    "commandmethod_alias_file": 46,
+    "commandmethod_primary_file": 79,
+    "canonical_features": 79,
+    "features_implemented": 71,
+    "features_stub": 8,
+    "ribbon_btns": 61,
+    "ribbon_enabled": 36,
+    "ribbon_disabled": 25,
+    "ribbon_placeholder_no_cmd": 25,
+    "xaml_click_handlers": 91,
+    "palette_run_refs": 8,
+    "aliases_resolved_to_primary": 46,
+    "aliases_unresolved": 0,
+    "r01_commands_declared": 125,
+    "r01_ribbon": 61,
+    "r01_csv_rows": 150
+  }
+}

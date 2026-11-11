@@ -41,6 +41,15 @@ public sealed class TerrainModule
     [CommandMethod("TRACAOD")]
     public void QueryAlias() => Query();
 
+    [CommandMethod("GHISODM")]
+    public void ContourElevAlias() => ContourElev();
+
+    [CommandMethod("ISURVEY_CONTOUR_ELEV")]
+    public void ContourElevCommand() => ContourElev();
+
+    [CommandMethod("ISURVEY_GAN_CAO_DO_PLINE")]
+    public void ContourElevInternal() => ContourElev();
+
     [CommandMethod("ISURVEY_TERRAIN_DETACH")]
     public void DetachCommand() => Detach();
 
@@ -162,6 +171,23 @@ public sealed class TerrainModule
         SurveyPaletteManager.Reload();
     }
 
+    private static void ContourElev()
+    {
+        if (!AuthManager.EnsureAuthenticated("GHISODM"))
+            return;
+        var doc = AcadApp.DocumentManager.MdiActiveDocument;
+        if (doc is null || !ModelSpace(doc.Editor))
+            return;
+        try
+        {
+            ContourElevationService.RunCommand();
+        }
+        catch (System.Exception ex)
+        {
+            doc.Editor.WriteMessage("\n[iSurvey] Không gán cao độ được: " + ex.Message);
+        }
+    }
+
     private static void Build()
     {
         if (!AuthManager.EnsureAuthenticated("XAYMOHINH"))
@@ -176,6 +202,14 @@ public sealed class TerrainModule
         {
             var count = TerrainService.Build(doc, model);
             doc.Editor.WriteMessage("\n[iSurvey] Đã xây dựng " + count + " tam giác cho \"" + model.Name + "\".");
+            if (count > 0)
+            {
+                System.Windows.MessageBox.Show(
+                    "Đã xây dựng thành công " + count.ToString("N0") + " tam giác cho \"" + model.Name + "\".",
+                    "iSurvey — Xây dựng TIN",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Information);
+            }
         }
         catch (System.Exception ex)
         {

@@ -1,0 +1,14 @@
+{
+  "command": "GHISODM",
+  "title": "Ghi Số Đồng Mức phiên bản 1.8.19",
+  "version": "1.8.19",
+  "status": "Chưa quay",
+  "drawing": "bản thử đồng mức 2D + chữ cao độ (bản sao)",
+  "steps": [
+    "GHISODM → hộp thoại Ghi Số Đồng Mức (mặc định Click Tuần tự)",
+    "Chữ: quét polyline + TEXT/MTEXT → Z theo chữ gần nhất",
+    "Số cố định: nhập Z → quét polyline gán đồng loạt",
+    "Click tuần tự: Z gốc / bước / tăng-giảm → click lần lượt; nhãn iSurvey_NhanDDM; polyline màu Magenta",
+    "THEMMOHINH đồng mức không cảnh báo thiếu Z; XAYMOHINH tô màu theo cao độ"
+  ]
+}

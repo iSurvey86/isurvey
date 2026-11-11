@@ -59,7 +59,7 @@ public static class TinBuilder
         IReadOnlyList<TinSegment>? constraints,
         IReadOnlyList<IReadOnlyList<TinVertex>>? boundaries,
         out int unforced,
-        Action<int, int>? progress = null)
+        Action<int, int, string>? progress = null)
     {
         unforced = 0;
         if (source.Count == 0)
@@ -75,11 +75,13 @@ public static class TinBuilder
         }
 
         TinVertex Shift(TinVertex point) => new(point.X - originX, point.Y - originY, point.Z);
+        progress?.Invoke(0, 0, "Đang chuẩn bị điểm…");
         var shifted = new List<TinVertex>(source.Count);
         foreach (var point in source)
             shifted.Add(Shift(point));
         var real = Dedup(shifted);
         var edges = new List<(int A, int B)>();
+        var index = new PointIndex(real);
 
         List<List<TinVertex>>? shiftedBoundaries = null;
         if (boundaries is { Count: > 0 })
@@ -109,28 +111,37 @@ public static class TinBuilder
                 }
 
                 real = inside;
+                index = new PointIndex(real);
                 foreach (var ring in shiftedBoundaries)
-                    AddRing(real, edges, ring);
+                    AddRing(index, edges, ring);
             }
         }
 
         if (constraints is not null)
         {
-            foreach (var segment in constraints)
+            var constraintTotal = constraints.Count;
+            for (var c = 0; c < constraintTotal; c++)
             {
+                var segment = constraints[c];
                 var a = Shift(segment.A);
                 var b = Shift(segment.B);
                 if (shiftedBoundaries is { Count: > 0 }
                     && (!InsideOrOnAny(shiftedBoundaries, a.X, a.Y) || !InsideOrOnAny(shiftedBoundaries, b.X, b.Y)))
                     continue;
-                AddEdge(real, edges, a, b);
+                AddEdge(index, edges, a, b);
+                if ((c & 4095) == 0)
+                    progress?.Invoke(
+                        c,
+                        constraintTotal,
+                        "Đang gắn đường đứt gãy / đồng mức " + c.ToString("N0") + " / " + constraintTotal.ToString("N0"));
             }
         }
 
         if (real.Count < 3)
             return new List<TinTriangle>();
 
-        Split(real, edges);
+        progress?.Invoke(0, 0, "Đang xử lý đường ràng buộc (" + edges.Count.ToString("N0") + " đoạn)…");
+        Split(real, edges, progress);
 
         var bounds = Bounds(real);
         var span = Math.Max(bounds.MaxX - bounds.MinX, bounds.MaxY - bounds.MinY);
@@ -155,25 +166,41 @@ public static class TinBuilder
             Insert(vertices, mesh, i, ref hint);
             here++;
             if ((here & 63) == 0)
-                progress?.Invoke(here, total);
+                progress?.Invoke(here, total, "Đang dựng lưới TIN " + here.ToString("N0") + " / " + total.ToString("N0") + " điểm");
         }
 
-        progress?.Invoke(total, total);
-        var triangles = new List<Tri>(mesh.Count);
-        foreach (var tri in mesh)
-        {
-            if (!tri.Dead)
-                triangles.Add(new Tri(tri.A, tri.B, tri.C));
-        }
+        progress?.Invoke(total, total, "Đang dựng lưới TIN " + total.ToString("N0") + " / " + total.ToString("N0") + " điểm");
 
-        foreach (var edge in edges)
+        // Khớp đường ràng buộc trên MeshTri (đã có Nab/Nbc/Nca) — tránh Dictionary adj mỗi lần lật.
+        // Cùng CDT; chỉ đổi cách lưu liên kết.
+        var live = CompactMesh(mesh);
+        var edgeKeys = BuildEdgeKeysMesh(live);
+        var tip = BuildTipMesh(live, vertices.Count);
+        var edgeTotal = edges.Count;
+        for (var e = 0; e < edgeTotal; e++)
         {
-            if (!Force(triangles, vertices, edge.A + 3, edge.B + 3))
+            if ((e & 255) == 0)
+                progress?.Invoke(
+                    e,
+                    edgeTotal,
+                    "Đang khớp đường đứt gãy / đồng mức vào lưới " + e.ToString("N0") + " / " + edgeTotal.ToString("N0"));
+            var edge = edges[e];
+            var a = edge.A + 3;
+            var b = edge.B + 3;
+            if (a == b || edgeKeys.Contains(EdgeKey(a, b)))
+                continue;
+            if (!ForceMesh(live, vertices, edgeKeys, tip, a, b))
                 unforced++;
         }
 
-        var result = new List<TinTriangle>();
-        foreach (var tri in triangles)
+        if (edgeTotal > 0)
+            progress?.Invoke(
+                edgeTotal,
+                edgeTotal,
+                "Đang khớp đường đứt gãy / đồng mức vào lưới " + edgeTotal.ToString("N0") + " / " + edgeTotal.ToString("N0"));
+
+        var result = new List<TinTriangle>(live.Count);
+        foreach (var tri in live)
         {
             if (tri.A < 3 || tri.B < 3 || tri.C < 3)
                 continue;
@@ -182,8 +209,6 @@ public static class TinBuilder
             var c = vertices[tri.C];
             if (Math.Abs(Orient(a, b, c)) < 1e-8)
                 continue;
-            // Chỉ giữ tam giác nằm trong bao: ba đỉnh + tâm + giữa ba cạnh.
-            // Chỉ kiểm tra đỉnh vẫn để lọt tam giác “bắc cầu” chỗ lõm (chữ L).
             if (shiftedBoundaries is { Count: > 0 }
                 && !TriangleInsideOrOn(shiftedBoundaries, a, b, c))
                 continue;
@@ -194,6 +219,446 @@ public static class TinBuilder
         }
 
         return result;
+    }
+
+    private static List<MeshTri> CompactMesh(List<MeshTri> mesh)
+    {
+        var map = new int[mesh.Count];
+        for (var i = 0; i < map.Length; i++)
+            map[i] = -1;
+        var live = new List<MeshTri>(mesh.Count);
+        for (var i = 0; i < mesh.Count; i++)
+        {
+            if (mesh[i].Dead)
+                continue;
+            map[i] = live.Count;
+            live.Add(mesh[i]);
+        }
+
+        foreach (var tri in live)
+        {
+            if (tri.Nab >= 0)
+                tri.Nab = map[tri.Nab];
+            if (tri.Nbc >= 0)
+                tri.Nbc = map[tri.Nbc];
+            if (tri.Nca >= 0)
+                tri.Nca = map[tri.Nca];
+        }
+
+        return live;
+    }
+
+    private static HashSet<long> BuildEdgeKeysMesh(List<MeshTri> mesh)
+    {
+        var keys = new HashSet<long>(mesh.Count * 3);
+        foreach (var tri in mesh)
+        {
+            keys.Add(EdgeKey(tri.A, tri.B));
+            keys.Add(EdgeKey(tri.B, tri.C));
+            keys.Add(EdgeKey(tri.C, tri.A));
+        }
+
+        return keys;
+    }
+
+    private static int[] BuildTipMesh(List<MeshTri> mesh, int vertexCount)
+    {
+        var tip = new int[vertexCount];
+        for (var i = 0; i < tip.Length; i++)
+            tip[i] = -1;
+        for (var i = 0; i < mesh.Count; i++)
+        {
+            var tri = mesh[i];
+            tip[tri.A] = i;
+            tip[tri.B] = i;
+            tip[tri.C] = i;
+        }
+
+        return tip;
+    }
+
+    private static bool ForceMesh(
+        List<MeshTri> mesh,
+        List<TinVertex> vertices,
+        HashSet<long> edgeKeys,
+        int[] tip,
+        int a,
+        int b)
+    {
+        var ab = EdgeKey(a, b);
+        if (edgeKeys.Contains(ab))
+            return true;
+        var limit = mesh.Count * 4 + 8;
+        var resume = -1;
+        for (var guard = 0; guard < limit; guard++)
+        {
+            if (edgeKeys.Contains(ab))
+                return true;
+            if (!FindCrossingWalkMesh(mesh, vertices, tip, a, b, resume, out var i, out var u, out var w, out var p))
+                return false;
+            var j = NeighborAcross(mesh, i, u, w);
+            if (j < 0)
+                return false;
+            var q = OtherVertexMesh(mesh[j], u, w);
+            if (!Opposite(vertices[u], vertices[w], vertices[p], vertices[q]))
+                return false;
+
+            FlipMesh(mesh, vertices, edgeKeys, tip, i, j, u, w, p, q);
+            if (edgeKeys.Contains(ab))
+                return true;
+
+            if (CutsMesh(vertices, a, b, mesh[i]))
+                resume = i;
+            else if (CutsMesh(vertices, a, b, mesh[j]))
+                resume = j;
+            else
+                resume = -1;
+        }
+
+        return edgeKeys.Contains(ab);
+    }
+
+    private static bool CutsMesh(List<TinVertex> vertices, int a, int b, MeshTri tri) =>
+        Cuts(vertices, a, b, tri.A, tri.B)
+        || Cuts(vertices, a, b, tri.B, tri.C)
+        || Cuts(vertices, a, b, tri.C, tri.A);
+
+    private static void FlipMesh(
+        List<MeshTri> mesh,
+        List<TinVertex> vertices,
+        HashSet<long> edgeKeys,
+        int[] tip,
+        int i,
+        int j,
+        int u,
+        int w,
+        int p,
+        int q)
+    {
+        var ti = mesh[i];
+        var tj = mesh[j];
+        var nPu = NeighborAcross(mesh, i, p, u);
+        var nWp = NeighborAcross(mesh, i, w, p);
+        var nQu = NeighborAcross(mesh, j, q, u);
+        var nWq = NeighborAcross(mesh, j, w, q);
+
+        edgeKeys.Remove(EdgeKey(u, w));
+
+        WriteCcw(ti, vertices, p, q, u);
+        WriteCcw(tj, vertices, p, q, w);
+        WireTriangle(ti, p, q, u, j, nQu, nPu);
+        WireTriangle(tj, p, q, w, i, nWq, nWp);
+
+        if (nPu >= 0)
+            PointNeighbor(mesh[nPu], u, p, i);
+        if (nQu >= 0)
+            PointNeighbor(mesh[nQu], q, u, i);
+        if (nWp >= 0)
+            PointNeighbor(mesh[nWp], p, w, j);
+        if (nWq >= 0)
+            PointNeighbor(mesh[nWq], w, q, j);
+
+        edgeKeys.Add(EdgeKey(p, q));
+        tip[p] = i;
+        tip[q] = i;
+        tip[u] = i;
+        tip[w] = j;
+    }
+
+    private static void WriteCcw(MeshTri tri, List<TinVertex> vertices, int a, int b, int c)
+    {
+        if (Orient(vertices[a], vertices[b], vertices[c]) < 0)
+            (b, c) = (c, b);
+        tri.A = a;
+        tri.B = b;
+        tri.C = c;
+    }
+
+    /// <summary>Gán neighbor cho tam giác CCW (a,b,c): cạnh ab→nAb, bc→nBc, ca→nCa.</summary>
+    private static void WireTriangle(MeshTri tri, int a, int b, int c, int nAb, int nBc, int nCa)
+    {
+        // tri đã là CCW của {a,b,c} nhưng thứ tự đỉnh có thể xoay.
+        tri.Nab = -1;
+        tri.Nbc = -1;
+        tri.Nca = -1;
+        AssignOrientedNeighbor(tri, a, b, nAb);
+        AssignOrientedNeighbor(tri, b, c, nBc);
+        AssignOrientedNeighbor(tri, c, a, nCa);
+    }
+
+    private static void AssignOrientedNeighbor(MeshTri tri, int u, int v, int neighbor)
+    {
+        if (tri.A == u && tri.B == v)
+            tri.Nab = neighbor;
+        else if (tri.B == u && tri.C == v)
+            tri.Nbc = neighbor;
+        else if (tri.C == u && tri.A == v)
+            tri.Nca = neighbor;
+        else if (tri.A == v && tri.B == u)
+            tri.Nab = neighbor;
+        else if (tri.B == v && tri.C == u)
+            tri.Nbc = neighbor;
+        else if (tri.C == v && tri.A == u)
+            tri.Nca = neighbor;
+    }
+
+    private static bool IsSameEdge(int a, int b, int c, int d) =>
+        (a == c && b == d) || (a == d && b == c);
+
+    private static int NeighborAcross(List<MeshTri> mesh, int triIndex, int u, int w)
+    {
+        var tri = mesh[triIndex];
+        if (IsSameEdge(tri.A, tri.B, u, w))
+            return tri.Nab;
+        if (IsSameEdge(tri.B, tri.C, u, w))
+            return tri.Nbc;
+        if (IsSameEdge(tri.C, tri.A, u, w))
+            return tri.Nca;
+        return -1;
+    }
+
+    private static int OtherVertexMesh(MeshTri tri, int u, int w)
+    {
+        if (tri.A != u && tri.A != w)
+            return tri.A;
+        if (tri.B != u && tri.B != w)
+            return tri.B;
+        return tri.C;
+    }
+
+    private static bool FindCrossingWalkMesh(
+        List<MeshTri> mesh,
+        List<TinVertex> vertices,
+        int[] tip,
+        int a,
+        int b,
+        int resume,
+        out int triIndex,
+        out int u,
+        out int w,
+        out int p)
+    {
+        triIndex = -1;
+        u = 0;
+        w = 0;
+        p = 0;
+
+        if (resume >= 0 && resume < mesh.Count)
+        {
+            if (TryEdgeCutMesh(mesh[resume], vertices, a, b, -1, -1, out u, out w, out p))
+            {
+                triIndex = resume;
+                return true;
+            }
+
+            if (ContinueCrossingWalkMesh(mesh, vertices, a, b, resume, -1, -1, out triIndex, out u, out w, out p))
+                return true;
+        }
+
+        var start = tip[a];
+        if (start < 0 || start >= mesh.Count)
+            return false;
+
+        const double eps = 1e-8;
+        var current = start;
+        var guard = 64;
+        for (var step = 0; step < guard; step++)
+        {
+            var tri = mesh[current];
+            if (!OtherTwoMesh(tri, a, out var v1, out var v2))
+                return false;
+            if (v1 == b || v2 == b)
+                return false;
+            if (Orient(vertices[a], vertices[v1], vertices[v2]) < 0)
+                (v1, v2) = (v2, v1);
+
+            if (Orient(vertices[a], vertices[v1], vertices[b]) >= -eps
+                && Orient(vertices[a], vertices[b], vertices[v2]) >= -eps)
+            {
+                if (Cuts(vertices, a, b, v1, v2))
+                {
+                    triIndex = current;
+                    u = v1;
+                    w = v2;
+                    p = a;
+                    return true;
+                }
+
+                if (Orient(vertices[v1], vertices[v2], vertices[b]) >= -eps)
+                    return false;
+
+                var next = NeighborAcross(mesh, current, v1, v2);
+                if (next < 0)
+                    return false;
+                return ContinueCrossingWalkMesh(
+                    mesh, vertices, a, b, next, v1, v2, out triIndex, out u, out w, out p);
+            }
+
+            // Xoay quanh a sang tam giác kế.
+            var across = NeighborAcross(mesh, current, a, v2);
+            if (across < 0)
+                across = NeighborAcross(mesh, current, a, v1);
+            if (across < 0 || across == start && step > 0)
+                return false;
+            current = across;
+            if (current == start)
+                return false;
+        }
+
+        return false;
+    }
+
+    private static bool ContinueCrossingWalkMesh(
+        List<MeshTri> mesh,
+        List<TinVertex> vertices,
+        int a,
+        int b,
+        int start,
+        int avoidU,
+        int avoidW,
+        out int triIndex,
+        out int u,
+        out int w,
+        out int p)
+    {
+        triIndex = -1;
+        u = 0;
+        w = 0;
+        p = 0;
+        var current = start;
+        var guard = mesh.Count + 8;
+        for (var step = 0; step < guard; step++)
+        {
+            var tri = mesh[current];
+            if (tri.A == b || tri.B == b || tri.C == b)
+                return false;
+            if (TryEdgeCutMesh(tri, vertices, a, b, avoidU, avoidW, out u, out w, out p))
+            {
+                triIndex = current;
+                return true;
+            }
+
+            if (!PickExitTowardMesh(tri, vertices, b, avoidU, avoidW, out var nextU, out var nextW))
+                return false;
+            var nxt = NeighborAcross(mesh, current, nextU, nextW);
+            if (nxt < 0)
+                return false;
+            avoidU = nextU;
+            avoidW = nextW;
+            current = nxt;
+        }
+
+        return false;
+    }
+
+    private static bool TryEdgeCutMesh(
+        MeshTri tri,
+        List<TinVertex> vertices,
+        int a,
+        int b,
+        int avoidU,
+        int avoidW,
+        out int u,
+        out int w,
+        out int p)
+    {
+        if (!IsAvoid(tri.A, tri.B, avoidU, avoidW) && Cuts(vertices, a, b, tri.A, tri.B))
+        {
+            u = tri.A;
+            w = tri.B;
+            p = tri.C;
+            return true;
+        }
+
+        if (!IsAvoid(tri.B, tri.C, avoidU, avoidW) && Cuts(vertices, a, b, tri.B, tri.C))
+        {
+            u = tri.B;
+            w = tri.C;
+            p = tri.A;
+            return true;
+        }
+
+        if (!IsAvoid(tri.C, tri.A, avoidU, avoidW) && Cuts(vertices, a, b, tri.C, tri.A))
+        {
+            u = tri.C;
+            w = tri.A;
+            p = tri.B;
+            return true;
+        }
+
+        u = 0;
+        w = 0;
+        p = 0;
+        return false;
+    }
+
+    private static bool PickExitTowardMesh(
+        MeshTri tri,
+        List<TinVertex> vertices,
+        int b,
+        int avoidU,
+        int avoidW,
+        out int exitU,
+        out int exitW)
+    {
+        exitU = 0;
+        exitW = 0;
+        var best = -1;
+        var bestScore = double.PositiveInfinity;
+        var target = vertices[b];
+        Span<(int U, int V)> edges = stackalloc (int U, int V)[3];
+        edges[0] = (tri.A, tri.B);
+        edges[1] = (tri.B, tri.C);
+        edges[2] = (tri.C, tri.A);
+        for (var i = 0; i < 3; i++)
+        {
+            var (eu, ev) = edges[i];
+            if (IsAvoid(eu, ev, avoidU, avoidW))
+                continue;
+            var midX = (vertices[eu].X + vertices[ev].X) * 0.5;
+            var midY = (vertices[eu].Y + vertices[ev].Y) * 0.5;
+            var dx = midX - target.X;
+            var dy = midY - target.Y;
+            var score = dx * dx + dy * dy;
+            if (score >= bestScore)
+                continue;
+            bestScore = score;
+            best = i;
+        }
+
+        if (best < 0)
+            return false;
+        exitU = edges[best].U;
+        exitW = edges[best].V;
+        return true;
+    }
+
+    private static bool OtherTwoMesh(MeshTri tri, int vertex, out int v1, out int v2)
+    {
+        if (tri.A == vertex)
+        {
+            v1 = tri.B;
+            v2 = tri.C;
+            return true;
+        }
+
+        if (tri.B == vertex)
+        {
+            v1 = tri.C;
+            v2 = tri.A;
+            return true;
+        }
+
+        if (tri.C == vertex)
+        {
+            v1 = tri.A;
+            v2 = tri.B;
+            return true;
+        }
+
+        v1 = 0;
+        v2 = 0;
+        return false;
     }
 
     private static bool TriangleInsideOrOn(
@@ -331,13 +796,13 @@ public static class TinBuilder
         return null;
     }
 
-    private static void AddRing(List<TinVertex> vertices, List<(int A, int B)> edges, IReadOnlyList<TinVertex> ring)
+    private static void AddRing(PointIndex index, List<(int A, int B)> edges, IReadOnlyList<TinVertex> ring)
     {
         var count = NormalizeRing(ring);
         if (count < 3)
             return;
         for (var i = 0; i < count; i++)
-            AddEdge(vertices, edges, ring[i], ring[(i + 1) % count]);
+            AddEdge(index, edges, ring[i], ring[(i + 1) % count]);
     }
 
     private static int NormalizeRing(IReadOnlyList<TinVertex> ring)
@@ -380,31 +845,79 @@ public static class TinBuilder
         return false;
     }
 
-    private static void AddEdge(List<TinVertex> vertices, List<(int A, int B)> edges, TinVertex a, TinVertex b)
+    private static void AddEdge(PointIndex index, List<(int A, int B)> edges, TinVertex a, TinVertex b)
     {
-        var ia = FindOrAdd(vertices, a);
-        var ib = FindOrAdd(vertices, b);
+        var ia = index.FindOrAdd(a);
+        var ib = index.FindOrAdd(b);
         if (ia != ib)
             edges.Add((ia, ib));
     }
 
-    private static int FindOrAdd(List<TinVertex> vertices, TinVertex point)
+    /// <summary>Lưới không gian cho FindOrAdd — tránh quét tuyến tính khi gắn hàng chục nghìn cạnh đồng mức.</summary>
+    private sealed class PointIndex
     {
-        for (var i = 0; i < vertices.Count; i++)
+        private const double Cell = 1e-4;
+        private readonly List<TinVertex> _vertices;
+        private readonly Dictionary<(int X, int Y), List<int>> _grid = new();
+
+        public PointIndex(List<TinVertex> vertices)
         {
-            if (Near(vertices[i], point))
-                return i;
+            _vertices = vertices;
+            for (var i = 0; i < vertices.Count; i++)
+                AddToGrid(i);
         }
 
-        vertices.Add(point);
-        return vertices.Count - 1;
+        public int FindOrAdd(TinVertex point)
+        {
+            var ix = (int)Math.Floor(point.X / Cell);
+            var iy = (int)Math.Floor(point.Y / Cell);
+            for (var dx = -1; dx <= 1; dx++)
+            {
+                for (var dy = -1; dy <= 1; dy++)
+                {
+                    if (!_grid.TryGetValue((ix + dx, iy + dy), out var bucket))
+                        continue;
+                    foreach (var i in bucket)
+                    {
+                        if (Near(_vertices[i], point))
+                            return i;
+                    }
+                }
+            }
+
+            var index = _vertices.Count;
+            _vertices.Add(point);
+            AddToGrid(index);
+            return index;
+        }
+
+        private void AddToGrid(int index)
+        {
+            var point = _vertices[index];
+            var key = ((int)Math.Floor(point.X / Cell), (int)Math.Floor(point.Y / Cell));
+            if (!_grid.TryGetValue(key, out var bucket))
+            {
+                bucket = new List<int>(4);
+                _grid[key] = bucket;
+            }
+
+            bucket.Add(index);
+        }
     }
 
-    private static void Split(List<TinVertex> vertices, List<(int A, int B)> edges)
+    private static void Split(
+        List<TinVertex> vertices,
+        List<(int A, int B)> edges,
+        Action<int, int, string>? progress)
     {
         var guard = 0;
         while (guard++ < 4000)
         {
+            if ((guard & 15) == 1)
+                progress?.Invoke(
+                    guard,
+                    0,
+                    "Đang xử lý đường ràng buộc (lượt " + guard + ", " + edges.Count.ToString("N0") + " đoạn)…");
             if (SplitAtVertex(vertices, edges))
                 continue;
             if (SplitAtCrossing(vertices, edges))
@@ -413,20 +926,111 @@ public static class TinBuilder
         }
     }
 
+    private static double GridCellSize(List<TinVertex> vertices, List<(int A, int B)> edges)
+    {
+        if (edges.Count == 0)
+            return 1;
+        var sum = 0.0;
+        var n = 0;
+        var step = Math.Max(1, edges.Count / 256);
+        for (var i = 0; i < edges.Count; i += step)
+        {
+            var (a, b) = edges[i];
+            var dx = vertices[a].X - vertices[b].X;
+            var dy = vertices[a].Y - vertices[b].Y;
+            sum += Math.Sqrt(dx * dx + dy * dy);
+            n++;
+        }
+
+        var avg = sum / Math.Max(1, n);
+        if (avg < 1e-3)
+            avg = 1e-3;
+        return avg * 2;
+    }
+
+    private static void AddEdgeToGrid(
+        Dictionary<(int X, int Y), List<int>> grid,
+        double cell,
+        List<TinVertex> vertices,
+        int edgeIndex,
+        int a,
+        int b)
+    {
+        var va = vertices[a];
+        var vb = vertices[b];
+        var minX = Math.Min(va.X, vb.X);
+        var maxX = Math.Max(va.X, vb.X);
+        var minY = Math.Min(va.Y, vb.Y);
+        var maxY = Math.Max(va.Y, vb.Y);
+        var x0 = (int)Math.Floor(minX / cell);
+        var x1 = (int)Math.Floor(maxX / cell);
+        var y0 = (int)Math.Floor(minY / cell);
+        var y1 = (int)Math.Floor(maxY / cell);
+        for (var x = x0; x <= x1; x++)
+        {
+            for (var y = y0; y <= y1; y++)
+            {
+                var key = (x, y);
+                if (!grid.TryGetValue(key, out var bucket))
+                {
+                    bucket = new List<int>(4);
+                    grid[key] = bucket;
+                }
+
+                bucket.Add(edgeIndex);
+            }
+        }
+    }
+
     private static bool SplitAtVertex(List<TinVertex> vertices, List<(int A, int B)> edges)
     {
+        if (edges.Count == 0 || vertices.Count == 0)
+            return false;
+        var cell = GridCellSize(vertices, edges);
+        var grid = new Dictionary<(int X, int Y), List<int>>();
+        for (var i = 0; i < vertices.Count; i++)
+        {
+            var p = vertices[i];
+            var key = ((int)Math.Floor(p.X / cell), (int)Math.Floor(p.Y / cell));
+            if (!grid.TryGetValue(key, out var bucket))
+            {
+                bucket = new List<int>(4);
+                grid[key] = bucket;
+            }
+
+            bucket.Add(i);
+        }
+
         for (var e = 0; e < edges.Count; e++)
         {
             var (a, b) = edges[e];
-            for (var i = 0; i < vertices.Count; i++)
+            var va = vertices[a];
+            var vb = vertices[b];
+            var minX = Math.Min(va.X, vb.X);
+            var maxX = Math.Max(va.X, vb.X);
+            var minY = Math.Min(va.Y, vb.Y);
+            var maxY = Math.Max(va.Y, vb.Y);
+            var x0 = (int)Math.Floor(minX / cell) - 1;
+            var x1 = (int)Math.Floor(maxX / cell) + 1;
+            var y0 = (int)Math.Floor(minY / cell) - 1;
+            var y1 = (int)Math.Floor(maxY / cell) + 1;
+            for (var x = x0; x <= x1; x++)
             {
-                if (i == a || i == b)
-                    continue;
-                if (!OnSegment(vertices[i], vertices[a], vertices[b]))
-                    continue;
-                edges[e] = (a, i);
-                edges.Add((i, b));
-                return true;
+                for (var y = y0; y <= y1; y++)
+                {
+                    if (!grid.TryGetValue((x, y), out var bucket))
+                        continue;
+                    foreach (var i in bucket)
+                    {
+                        if (i == a || i == b)
+                            continue;
+                        if (!OnSegment(vertices[i], va, vb))
+                            continue;
+                        edges[e] = (a, i);
+                        edges.Add((i, b));
+                        return true;
+                    }
+                }
             }
         }
 
@@ -435,65 +1039,401 @@ public static class TinBuilder
 
     private static bool SplitAtCrossing(List<TinVertex> vertices, List<(int A, int B)> edges)
     {
+        if (edges.Count < 2)
+            return false;
+        var cell = GridCellSize(vertices, edges);
+        var grid = new Dictionary<(int X, int Y), List<int>>();
         for (var i = 0; i < edges.Count; i++)
         {
-            for (var j = i + 1; j < edges.Count; j++)
+            var (a, b) = edges[i];
+            AddEdgeToGrid(grid, cell, vertices, i, a, b);
+        }
+
+        foreach (var bucket in grid.Values)
+        {
+            for (var i = 0; i < bucket.Count; i++)
             {
-                var (a, b) = edges[i];
-                var (c, d) = edges[j];
-                if (a == c || a == d || b == c || b == d)
-                    continue;
-                if (!ProperCross(vertices[a], vertices[b], vertices[c], vertices[d], out var t, out var u))
-                    continue;
-                var left = Lerp(vertices[a], vertices[b], t);
-                var right = Lerp(vertices[c], vertices[d], u);
-                var index = vertices.Count;
-                vertices.Add(new TinVertex(left.X, left.Y, (left.Z + right.Z) / 2));
-                edges[i] = (a, index);
-                edges.Add((index, b));
-                edges[j] = (c, index);
-                edges.Add((index, d));
-                return true;
+                for (var j = i + 1; j < bucket.Count; j++)
+                {
+                    var ei = bucket[i];
+                    var ej = bucket[j];
+                    if (ei == ej)
+                        continue;
+                    if (ei > ej)
+                        (ei, ej) = (ej, ei);
+                    var (a, b) = edges[ei];
+                    var (c, d) = edges[ej];
+                    if (a == c || a == d || b == c || b == d)
+                        continue;
+                    if (!ProperCross(vertices[a], vertices[b], vertices[c], vertices[d], out var t, out var u))
+                        continue;
+                    var left = Lerp(vertices[a], vertices[b], t);
+                    var right = Lerp(vertices[c], vertices[d], u);
+                    var index = vertices.Count;
+                    vertices.Add(new TinVertex(left.X, left.Y, (left.Z + right.Z) / 2));
+                    edges[ei] = (a, index);
+                    edges.Add((index, b));
+                    edges[ej] = (c, index);
+                    edges.Add((index, d));
+                    return true;
+                }
             }
         }
 
         return false;
     }
 
-    private static bool Force(List<Tri> triangles, List<TinVertex> vertices, int a, int b)
+    private static HashSet<long> BuildEdgeKeys(List<Tri> triangles)
+    {
+        var keys = new HashSet<long>(triangles.Count * 3);
+        foreach (var tri in triangles)
+        {
+            keys.Add(EdgeKey(tri.A, tri.B));
+            keys.Add(EdgeKey(tri.B, tri.C));
+            keys.Add(EdgeKey(tri.C, tri.A));
+        }
+
+        return keys;
+    }
+
+    private static Dictionary<long, (int T0, int T1)> BuildAdjacency(List<Tri> triangles)
+    {
+        var adj = new Dictionary<long, (int T0, int T1)>(triangles.Count * 3);
+        for (var i = 0; i < triangles.Count; i++)
+        {
+            LinkEdge(adj, triangles[i].A, triangles[i].B, i);
+            LinkEdge(adj, triangles[i].B, triangles[i].C, i);
+            LinkEdge(adj, triangles[i].C, triangles[i].A, i);
+        }
+
+        return adj;
+    }
+
+    private static void LinkEdge(Dictionary<long, (int T0, int T1)> adj, int u, int v, int tri)
+    {
+        var key = EdgeKey(u, v);
+        if (!adj.TryGetValue(key, out var pair))
+            adj[key] = (tri, -1);
+        else if (pair.T0 == tri || pair.T1 == tri)
+            return;
+        else if (pair.T1 < 0)
+            adj[key] = (pair.T0, tri);
+    }
+
+    private static void UnlinkEdge(Dictionary<long, (int T0, int T1)> adj, int u, int v, int tri)
+    {
+        var key = EdgeKey(u, v);
+        if (!adj.TryGetValue(key, out var pair))
+            return;
+        if (pair.T0 == tri)
+        {
+            if (pair.T1 < 0)
+                adj.Remove(key);
+            else
+                adj[key] = (pair.T1, -1);
+        }
+        else if (pair.T1 == tri)
+            adj[key] = (pair.T0, -1);
+    }
+
+    private static List<int>[] BuildIncident(List<Tri> triangles, int vertexCount)
+    {
+        var incident = new List<int>[vertexCount];
+        for (var i = 0; i < triangles.Count; i++)
+        {
+            var tri = triangles[i];
+            AddIncident(incident, tri.A, i);
+            AddIncident(incident, tri.B, i);
+            AddIncident(incident, tri.C, i);
+        }
+
+        return incident;
+    }
+
+    private static void AddIncident(List<int>[] incident, int vertex, int tri)
+    {
+        var list = incident[vertex];
+        if (list is null)
+        {
+            incident[vertex] = new List<int>(8) { tri };
+            return;
+        }
+
+        list.Add(tri);
+    }
+
+    private static void RemoveIncident(List<int>[] incident, int vertex, int tri)
+    {
+        incident[vertex]?.Remove(tri);
+    }
+
+    private static long EdgeKey(int a, int b)
+    {
+        if (a > b)
+            (a, b) = (b, a);
+        return ((long)a << 32) | (uint)b;
+    }
+
+    private static bool Force(
+        List<Tri> triangles,
+        List<TinVertex> vertices,
+        HashSet<long> edgeKeys,
+        Dictionary<long, (int T0, int T1)> adj,
+        List<int>[] incident,
+        int a,
+        int b)
     {
         if (a == b)
             return true;
+        var ab = EdgeKey(a, b);
+        if (edgeKeys.Contains(ab))
+            return true;
         var limit = triangles.Count * 4 + 8;
+        var resume = -1;
+        var avoidU = -1;
+        var avoidW = -1;
         for (var guard = 0; guard < limit; guard++)
         {
-            if (HasEdge(triangles, a, b))
+            if (edgeKeys.Contains(ab))
                 return true;
-            var flipped = false;
-            for (var i = 0; i < triangles.Count && !flipped; i++)
+
+            int i, u, w, p;
+            if (resume >= 0
+                && resume < triangles.Count
+                && TryEdgeCut(triangles[resume], vertices, a, b, avoidU, avoidW, out u, out w, out p))
             {
-                if (!Crossing(triangles[i], vertices, a, b, out var u, out var w, out var p))
-                    continue;
-                var j = Neighbor(triangles, i, u, w, out var q);
-                if (j < 0)
-                    continue;
-                if (!Opposite(vertices[u], vertices[w], vertices[p], vertices[q]))
-                    continue;
-                triangles[i] = Ccw(vertices, p, q, u);
-                triangles[j] = Ccw(vertices, p, q, w);
-                flipped = true;
+                i = resume;
+            }
+            else if (resume >= 0
+                     && ContinueCrossingWalk(
+                         triangles, vertices, adj, a, b, resume, avoidU, avoidW, out i, out u, out w, out p))
+            {
+                // tiếp từ chỗ vừa lật — không quay lại quét quạt đỉnh a
+            }
+            else if (!FindCrossingWalk(triangles, vertices, adj, incident, a, b, out i, out u, out w, out p))
+                return false;
+
+            var j = NeighborAdj(adj, triangles, i, u, w, out var q);
+            if (j < 0)
+                return false;
+            if (!Opposite(vertices[u], vertices[w], vertices[p], vertices[q]))
+                return false;
+
+            edgeKeys.Remove(EdgeKey(u, w));
+            UnlinkEdge(adj, u, w, i);
+            UnlinkEdge(adj, u, w, j);
+            RemoveIncident(incident, u, i);
+            RemoveIncident(incident, w, i);
+            RemoveIncident(incident, p, i);
+            RemoveIncident(incident, u, j);
+            RemoveIncident(incident, w, j);
+            RemoveIncident(incident, q, j);
+
+            UnlinkEdge(adj, p, u, i);
+            UnlinkEdge(adj, p, w, i);
+            UnlinkEdge(adj, q, u, j);
+            UnlinkEdge(adj, q, w, j);
+
+            triangles[i] = Ccw(vertices, p, q, u);
+            triangles[j] = Ccw(vertices, p, q, w);
+
+            edgeKeys.Add(EdgeKey(p, q));
+            edgeKeys.Add(EdgeKey(p, u));
+            edgeKeys.Add(EdgeKey(q, u));
+            edgeKeys.Add(EdgeKey(p, w));
+            edgeKeys.Add(EdgeKey(q, w));
+
+            LinkEdge(adj, p, q, i);
+            LinkEdge(adj, p, q, j);
+            LinkEdge(adj, p, u, i);
+            LinkEdge(adj, q, u, i);
+            LinkEdge(adj, p, w, j);
+            LinkEdge(adj, q, w, j);
+
+            AddIncident(incident, p, i);
+            AddIncident(incident, q, i);
+            AddIncident(incident, u, i);
+            AddIncident(incident, p, j);
+            AddIncident(incident, q, j);
+            AddIncident(incident, w, j);
+
+            // Tiếp tục về phía b từ một trong hai tam giác mới.
+            avoidU = -1;
+            avoidW = -1;
+            if (EdgeKey(p, q) == ab)
+            {
+                resume = -1;
+                return true;
             }
 
-            if (!flipped)
-                return false;
+            if (TryEdgeCut(triangles[i], vertices, a, b, -1, -1, out _, out _, out _))
+                resume = i;
+            else if (TryEdgeCut(triangles[j], vertices, a, b, -1, -1, out _, out _, out _))
+                resume = j;
+            else
+                resume = -1;
         }
 
-        return HasEdge(triangles, a, b);
+        return edgeKeys.Contains(ab);
     }
 
-    private static bool Crossing(Tri tri, List<TinVertex> vertices, int a, int b, out int u, out int w, out int p)
+    /// <summary>
+    /// Đi từ đỉnh a về phía b trên lưới, tìm một cạnh đang cắt đoạn ab — O(đường đi), không O(T).
+    /// </summary>
+    private static bool FindCrossingWalk(
+        List<Tri> triangles,
+        List<TinVertex> vertices,
+        Dictionary<long, (int T0, int T1)> adj,
+        List<int>[] incident,
+        int a,
+        int b,
+        out int triIndex,
+        out int u,
+        out int w,
+        out int p)
     {
-        if (Cuts(vertices, a, b, tri.A, tri.B))
+        triIndex = -1;
+        u = 0;
+        w = 0;
+        p = 0;
+        var around = incident[a];
+        if (around is null || around.Count == 0)
+            return false;
+
+        const double eps = 1e-8;
+        var current = -1;
+        var avoidU = -1;
+        var avoidW = -1;
+        foreach (var ti in around)
+        {
+            if (ti < 0 || ti >= triangles.Count)
+                continue;
+            var tri = triangles[ti];
+            if (!OtherTwo(tri, a, out var v1, out var v2))
+                continue;
+            if (v1 == b || v2 == b)
+                return false;
+            if (Orient(vertices[a], vertices[v1], vertices[v2]) < 0)
+                (v1, v2) = (v2, v1);
+            if (Orient(vertices[a], vertices[v1], vertices[b]) < -eps)
+                continue;
+            if (Orient(vertices[a], vertices[b], vertices[v2]) < -eps)
+                continue;
+
+            if (Cuts(vertices, a, b, v1, v2))
+            {
+                triIndex = ti;
+                u = v1;
+                w = v2;
+                p = a;
+                return true;
+            }
+
+            // b nằm trong tam giác → không ép được ab một cạnh.
+            if (Orient(vertices[v1], vertices[v2], vertices[b]) >= -eps)
+                return false;
+
+            var next = NeighborAdj(adj, triangles, ti, v1, v2, out _);
+            if (next < 0)
+                return false;
+            current = next;
+            avoidU = v1;
+            avoidW = v2;
+            break;
+        }
+
+        if (current < 0)
+            return false;
+
+        var guard = triangles.Count + 8;
+        for (var step = 0; step < guard; step++)
+        {
+            var tri = triangles[current];
+            if (tri.A == b || tri.B == b || tri.C == b)
+                return false;
+
+            if (TryEdgeCut(tri, vertices, a, b, avoidU, avoidW, out u, out w, out p))
+            {
+                triIndex = current;
+                return true;
+            }
+
+            if (!PickExitToward(tri, vertices, b, avoidU, avoidW, out var nextU, out var nextW))
+                return false;
+            var nxt = NeighborAdj(adj, triangles, current, nextU, nextW, out _);
+            if (nxt < 0)
+                return false;
+            avoidU = nextU;
+            avoidW = nextW;
+            current = nxt;
+        }
+
+        return false;
+    }
+
+    /// <summary>Tiếp walk từ một tam giác đã biết (sau lần lật), cùng kết quả hình học.</summary>
+    private static bool ContinueCrossingWalk(
+        List<Tri> triangles,
+        List<TinVertex> vertices,
+        Dictionary<long, (int T0, int T1)> adj,
+        int a,
+        int b,
+        int start,
+        int avoidU,
+        int avoidW,
+        out int triIndex,
+        out int u,
+        out int w,
+        out int p)
+    {
+        triIndex = -1;
+        u = 0;
+        w = 0;
+        p = 0;
+        if (start < 0 || start >= triangles.Count)
+            return false;
+        var current = start;
+        var guard = triangles.Count + 8;
+        for (var step = 0; step < guard; step++)
+        {
+            var tri = triangles[current];
+            if (tri.A == b || tri.B == b || tri.C == b)
+                return false;
+            if (TryEdgeCut(tri, vertices, a, b, avoidU, avoidW, out u, out w, out p))
+            {
+                triIndex = current;
+                return true;
+            }
+
+            if (!PickExitToward(tri, vertices, b, avoidU, avoidW, out var nextU, out var nextW))
+                return false;
+            var nxt = NeighborAdj(adj, triangles, current, nextU, nextW, out _);
+            if (nxt < 0)
+                return false;
+            avoidU = nextU;
+            avoidW = nextW;
+            current = nxt;
+        }
+
+        return false;
+    }
+
+    private static bool TryEdgeCut(
+        Tri tri,
+        List<TinVertex> vertices,
+        int a,
+        int b,
+        int avoidU,
+        int avoidW,
+        out int u,
+        out int w,
+        out int p)
+    {
+        if (IsAvoid(tri.A, tri.B, avoidU, avoidW))
+        {
+            // skip
+        }
+        else if (Cuts(vertices, a, b, tri.A, tri.B))
         {
             u = tri.A;
             w = tri.B;
@@ -501,7 +1441,7 @@ public static class TinBuilder
             return true;
         }
 
-        if (Cuts(vertices, a, b, tri.B, tri.C))
+        if (!IsAvoid(tri.B, tri.C, avoidU, avoidW) && Cuts(vertices, a, b, tri.B, tri.C))
         {
             u = tri.B;
             w = tri.C;
@@ -509,7 +1449,7 @@ public static class TinBuilder
             return true;
         }
 
-        if (Cuts(vertices, a, b, tri.C, tri.A))
+        if (!IsAvoid(tri.C, tri.A, avoidU, avoidW) && Cuts(vertices, a, b, tri.C, tri.A))
         {
             u = tri.C;
             w = tri.A;
@@ -523,6 +1463,87 @@ public static class TinBuilder
         return false;
     }
 
+    private static bool IsAvoid(int u, int w, int avoidU, int avoidW) =>
+        avoidU >= 0 && ((u == avoidU && w == avoidW) || (u == avoidW && w == avoidU));
+
+    private static bool PickExitToward(
+        Tri tri,
+        List<TinVertex> vertices,
+        int b,
+        int avoidU,
+        int avoidW,
+        out int exitU,
+        out int exitW)
+    {
+        exitU = 0;
+        exitW = 0;
+        var best = -1;
+        var bestScore = double.PositiveInfinity;
+        var target = vertices[b];
+        Span<(int U, int V)> edges = stackalloc (int U, int V)[3];
+        edges[0] = (tri.A, tri.B);
+        edges[1] = (tri.B, tri.C);
+        edges[2] = (tri.C, tri.A);
+        for (var i = 0; i < 3; i++)
+        {
+            var (eu, ev) = edges[i];
+            if (IsAvoid(eu, ev, avoidU, avoidW))
+                continue;
+            var midX = (vertices[eu].X + vertices[ev].X) * 0.5;
+            var midY = (vertices[eu].Y + vertices[ev].Y) * 0.5;
+            var dx = midX - target.X;
+            var dy = midY - target.Y;
+            var score = dx * dx + dy * dy;
+            if (score >= bestScore)
+                continue;
+            bestScore = score;
+            best = i;
+        }
+
+        if (best < 0)
+            return false;
+        exitU = edges[best].U;
+        exitW = edges[best].V;
+        return true;
+    }
+
+    private static int OtherVertex(Tri tri, int u, int w)
+    {
+        if (tri.A != u && tri.A != w)
+            return tri.A;
+        if (tri.B != u && tri.B != w)
+            return tri.B;
+        return tri.C;
+    }
+
+    private static bool OtherTwo(Tri tri, int vertex, out int v1, out int v2)
+    {
+        if (tri.A == vertex)
+        {
+            v1 = tri.B;
+            v2 = tri.C;
+            return true;
+        }
+
+        if (tri.B == vertex)
+        {
+            v1 = tri.C;
+            v2 = tri.A;
+            return true;
+        }
+
+        if (tri.C == vertex)
+        {
+            v1 = tri.A;
+            v2 = tri.B;
+            return true;
+        }
+
+        v1 = 0;
+        v2 = 0;
+        return false;
+    }
+
     private static bool Cuts(List<TinVertex> vertices, int a, int b, int u, int w)
     {
         if (u == a || u == b || w == a || w == b)
@@ -530,36 +1551,28 @@ public static class TinBuilder
         return ProperCross(vertices[a], vertices[b], vertices[u], vertices[w], out _, out _);
     }
 
-    private static int Neighbor(List<Tri> triangles, int skip, int u, int w, out int q)
+    private static int NeighborAdj(
+        Dictionary<long, (int T0, int T1)> adj,
+        List<Tri> triangles,
+        int skip,
+        int u,
+        int w,
+        out int q)
     {
-        for (var i = 0; i < triangles.Count; i++)
-        {
-            if (i == skip)
-                continue;
-            var tri = triangles[i];
-            var hasU = tri.A == u || tri.B == u || tri.C == u;
-            var hasW = tri.A == w || tri.B == w || tri.C == w;
-            if (!hasU || !hasW)
-                continue;
-            q = tri.A != u && tri.A != w ? tri.A : tri.B != u && tri.B != w ? tri.B : tri.C;
-            return i;
-        }
-
         q = -1;
-        return -1;
-    }
-
-    private static bool HasEdge(List<Tri> triangles, int a, int b)
-    {
-        foreach (var tri in triangles)
-        {
-            if ((tri.A == a && tri.B == b) || (tri.B == a && tri.C == b) || (tri.C == a && tri.A == b))
-                return true;
-            if ((tri.A == b && tri.B == a) || (tri.B == b && tri.C == a) || (tri.C == b && tri.A == a))
-                return true;
-        }
-
-        return false;
+        if (!adj.TryGetValue(EdgeKey(u, w), out var pair))
+            return -1;
+        int other;
+        if (pair.T0 == skip)
+            other = pair.T1;
+        else if (pair.T1 == skip)
+            other = pair.T0;
+        else
+            other = pair.T0 == skip ? pair.T1 : pair.T0;
+        if (other < 0 || other >= triangles.Count)
+            return -1;
+        q = OtherVertex(triangles[other], u, w);
+        return other;
     }
 
     private static bool Opposite(TinVertex u, TinVertex w, TinVertex p, TinVertex q)
@@ -585,8 +1598,9 @@ public static class TinBuilder
             return false;
         var apx = point.X - a.X;
         var apy = point.Y - a.Y;
-        var dist = Math.Abs(abx * apy - aby * apx) / Math.Sqrt(len2);
-        if (dist > 1e-4)
+        // |cross| / sqrt(len2) > 1e-4  ⇔  cross² > (1e-4)² * len2
+        var cross = abx * apy - aby * apx;
+        if (cross * cross > 1e-8 * len2)
             return false;
         var t = (apx * abx + apy * aby) / len2;
         return t > 1e-6 && t < 1 - 1e-6;
@@ -606,10 +1620,13 @@ public static class TinBuilder
         var ry = b.Y - a.Y;
         var sx = d.X - c.X;
         var sy = d.Y - c.Y;
-        var lenA = Math.Sqrt(rx * rx + ry * ry);
-        var lenB = Math.Sqrt(sx * sx + sy * sy);
+        var lenA2 = rx * rx + ry * ry;
+        var lenB2 = sx * sx + sy * sy;
+        if (lenA2 < 1e-18 || lenB2 < 1e-18)
+            return false;
         var den = rx * sy - ry * sx;
-        if (lenA < 1e-9 || lenB < 1e-9 || Math.Abs(den) < 1e-12 * lenA * lenB)
+        // |den| < 1e-12 * |A| * |B|  ⇔  den² < 1e-24 * lenA2 * lenB2
+        if (den * den < 1e-24 * lenA2 * lenB2)
             return false;
         var qpx = c.X - a.X;
         var qpy = c.Y - a.Y;
@@ -629,6 +1646,19 @@ public static class TinBuilder
         return dx * dx + dy * dy <= 1e-8;
     }
 
+    [ThreadStatic]
+    private static InsertScratch? _insertScratch;
+
+    private sealed class InsertScratch
+    {
+        public readonly List<int> Bad = new(64);
+        public readonly HashSet<int> Mark = new();
+        public readonly Queue<int> Queue = new();
+        public readonly List<(int U, int V, int Outside)> Boundary = new(64);
+        public readonly Dictionary<int, int> ByStart = new(64);
+        public readonly Dictionary<int, int> ByEnd = new(64);
+    }
+
     private static void Insert(List<TinVertex> vertices, List<MeshTri> mesh, int index, ref int hint)
     {
         var point = vertices[index];
@@ -636,9 +1666,20 @@ public static class TinBuilder
         if (seed < 0)
             return;
 
-        var bad = new List<int>();
-        var mark = new HashSet<int>();
-        var queue = new Queue<int>();
+        var scratch = _insertScratch ??= new InsertScratch();
+        var bad = scratch.Bad;
+        var mark = scratch.Mark;
+        var queue = scratch.Queue;
+        var boundary = scratch.Boundary;
+        var byStart = scratch.ByStart;
+        var byEnd = scratch.ByEnd;
+        bad.Clear();
+        mark.Clear();
+        queue.Clear();
+        boundary.Clear();
+        byStart.Clear();
+        byEnd.Clear();
+
         mark.Add(seed);
         queue.Enqueue(seed);
         while (queue.Count > 0)
@@ -651,7 +1692,6 @@ public static class TinBuilder
             Consider(vertices, mesh, mark, queue, tri.Nca, point);
         }
 
-        var boundary = new List<(int U, int V, int Outside)>(bad.Count * 2);
         foreach (var id in bad)
         {
             var tri = mesh[id];
@@ -661,8 +1701,6 @@ public static class TinBuilder
             tri.Dead = true;
         }
 
-        var byStart = new Dictionary<int, int>(boundary.Count);
-        var byEnd = new Dictionary<int, int>(boundary.Count);
         foreach (var edge in boundary)
         {
             var tri = new MeshTri(edge.U, edge.V, index);
@@ -799,7 +1837,7 @@ public static class TinBuilder
     private static double Orient(TinVertex a, TinVertex b, TinVertex c) =>
         (b.X - a.X) * (c.Y - a.Y) - (b.Y - a.Y) * (c.X - a.X);
 
-    private static bool Barycentric(TinTriangle tri, double x, double y, out double wa, out double wb, out double wc)
+    internal static bool Barycentric(TinTriangle tri, double x, double y, out double wa, out double wb, out double wc)
     {
         var area = Orient(tri.A, tri.B, tri.C);
         wa = 0;

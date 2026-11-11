@@ -1,0 +1,55 @@
+{
+  "head": "3a16cb3959dc4e65c08f77b6de26669b309739cd",
+  "commandmethod_total": 125,
+  "business_features": 63,
+  "source_present": 56,
+  "stub_features": 7,
+  "stub_commands_non_alias": 7,
+  "r02b_stub_cmd_set_size": 8,
+  "send_back_is_stub": false,
+  "send_back_status": "SOURCE_PRESENT",
+  "xaml_clicks": 91,
+  "xaml_with_parent": 81,
+  "xaml_without_parent_but_reason": 10,
+  "video_candidates": 52,
+  "evidence": {
+    "HANDLER_TRACE_COMPLETE": 40,
+    "SERVICE_CHAIN_VERIFIED_STATIC": 10,
+    "METHOD_BODY_SCANNED": 6,
+    "STUB_ONLY": 7
+  },
+  "ribbon_stub_enabled": [
+    {
+      "cmd": "ISURVEY_UAV_CONTOUR",
+      "label": "Vẽ Đường Đồng Mức",
+      "line": 437,
+      "bf": "BF-ISURVEY_UAV_CONTOUR"
+    },
+    {
+      "cmd": "ISURVEY_UAV_CRS",
+      "label": "Hệ Tọa Độ UAV",
+      "line": 439,
+      "bf": "BF-ISURVEY_UAV_CRS"
+    },
+    {
+      "cmd": "ISURVEY_PC_IMPORT",
+      "label": "Nhập Point Cloud",
+      "line": 445,
+      "bf": "BF-ISURVEY_PC_IMPORT"
+    },
+    {
+      "cmd": "ISURVEY_PC_FILTER",
+      "label": "Lọc Điểm Mặt Đất",
+      "line": 447,
+      "bf": "BF-ISURVEY_PC_FILTER"
+    },
+    {
+      "cmd": "ISURVEY_PC_GRID",
+      "label": "Rải Lưới Điểm",
+      "line": 449,
+      "bf": "BF-ISURVEY_PC_GRID"
+    }
+  ],
+  "service_chain_count": 10,
+  "not_enough": 6
+}

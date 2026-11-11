@@ -1,0 +1,19 @@
+{
+  "head": "3a16cb3959dc4e65c08f77b6de26669b309739cd",
+  "sc10": {
+    "SOURCE_BEHAVIOR_VERIFIED_STATIC": 7,
+    "SOURCE_PARTIAL_VERIFIED": 3
+  },
+  "sc10_still_partial": [
+    "BF-ISURVEY_DGN_TO_CAD",
+    "BF-ISURVEY_CAD_TO_DGN",
+    "BF-VEMCD"
+  ],
+  "xaml10_resolved": 9,
+  "user_features": 52,
+  "user_verdicts": {
+    "SOURCE_PARTIAL_VERIFIED": 43,
+    "SOURCE_BEHAVIOR_VERIFIED_STATIC": 9
+  },
+  "evidence_files": 68
+}

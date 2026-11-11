@@ -1,0 +1,14 @@
+{
+  "command": "XAYMOHINH",
+  "title": "Xây dựng lưới (tiến trình + Thành công) phiên bản 1.8.19",
+  "version": "1.8.19",
+  "status": "Chưa quay",
+  "drawing": "docs/MCD/dongmuc3D.dwg (bản sao)",
+  "steps": [
+    "Mở Civil Metric + bản vẽ thử có mô hình đồng mức 3D",
+    "Bảng dữ liệu → Xây dựng TIN / XAYMOHINH",
+    "Quay hộp tiến trình (chữ thân thiện, không «ép cạnh»)",
+    "Hộp Thành công + số tam giác; lưới trên bản vẽ",
+    "TAOTUYEN / BANGIS mở ngay, không đơ"
+  ]
+}

@@ -21,7 +21,7 @@ public partial class CreateStationsWindow : Window
     public CreateStationsWindow(string routeName, double from, double to)
     {
         InitializeComponent();
-        RouteText.Text = "Tuyến: " + routeName;
+        RouteNameRun.Text = routeName;
         FromBox.Text = from.ToString("0.###", CultureInfo.InvariantCulture);
         ToBox.Text = to.ToString("0.###", CultureInfo.InvariantCulture);
     }

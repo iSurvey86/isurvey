@@ -1,0 +1,187 @@
+﻿entry_kind,entry_name,feature_id,relation,file,line,merge_split_reason
+PRIMARY_COMMAND,ISURVEY_AI_ASSIST,AUD-001,IS_CANONICAL,src/Modules/Ai/AiAssistantModule.cs,13,primary CommandMethod outside CommandAliases.cs
+ALIAS,AIA,AUD-001,ALIAS_OF,src/CommandAliases.cs,151,delegates to AssistCommand
+RIBBON_BTN,Trợ Lý AI/ISURVEY_AI_ASSIST,AUD-001,UI_ENTRY,src/UI/RibbonBuilder.cs,284,en=True
+PRIMARY_COMMAND,ISURVEY_AI_SETTINGS,AUD-002,IS_CANONICAL,src/Modules/Ai/AiAssistantModule.cs,26,primary CommandMethod outside CommandAliases.cs
+ALIAS,AIC,AUD-002,ALIAS_OF,src/CommandAliases.cs,154,delegates to SettingsCommand
+RIBBON_BTN,Cấu Hình AI/ISURVEY_AI_SETTINGS,AUD-002,UI_ENTRY,src/UI/RibbonBuilder.cs,288,en=True
+PRIMARY_COMMAND,ISURVEY_ABOUT,AUD-003,IS_CANONICAL,src/Auth/AuthModule.cs,67,primary CommandMethod outside CommandAliases.cs
+ALIAS,ABT,AUD-003,ALIAS_OF,src/CommandAliases.cs,176,delegates to AboutCommand
+RIBBON_BTN,Thông Tin & Giấy Phép/ISURVEY_ABOUT,AUD-003,UI_ENTRY,src/UI/RibbonBuilder.cs,228,en=True
+PRIMARY_COMMAND,ISURVEY_GENOTP,AUD-004,IS_CANONICAL,src/Auth/AuthModule.cs,106,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,ISURVEY_HDSD,AUD-005,IS_CANONICAL,src/Auth/AuthModule.cs,35,primary CommandMethod outside CommandAliases.cs
+ALIAS,HD,AUD-005,ALIAS_OF,src/CommandAliases.cs,179,delegates to HelpCommand
+RIBBON_BTN,Hướng dẫn/ISURVEY_HDSD,AUD-005,UI_ENTRY,src/UI/RibbonBuilder.cs,229,en=True
+PRIMARY_COMMAND,ISURVEY_LOGIN,AUD-006,IS_CANONICAL,src/Auth/AuthModule.cs,24,primary CommandMethod outside CommandAliases.cs
+ALIAS,LGI,AUD-006,ALIAS_OF,src/CommandAliases.cs,170,delegates to LoginCommand
+PRIMARY_COMMAND,ISURVEY_LOGOUT,AUD-007,IS_CANONICAL,src/Auth/AuthModule.cs,77,primary CommandMethod outside CommandAliases.cs
+ALIAS,LGO,AUD-007,ALIAS_OF,src/CommandAliases.cs,182,delegates to LogoutCommand
+PRIMARY_COMMAND,ISURVEY_RIBBON,AUD-008,IS_CANONICAL,src/Auth/AuthModule.cs,52,primary CommandMethod outside CommandAliases.cs
+ALIAS,MENUISURVEY,AUD-008,ALIAS_OF,src/CommandAliases.cs,185,delegates to RibbonCommand
+RIBBON_BTN,Nạp lại Menu/ISURVEY_RIBBON,AUD-008,UI_ENTRY,src/UI/RibbonBuilder.cs,230,en=True
+PRIMARY_COMMAND,ISURVEY_UPDATE,AUD-009,IS_CANONICAL,src/Auth/AuthModule.cs,74,primary CommandMethod outside CommandAliases.cs
+ALIAS,UPD,AUD-009,ALIAS_OF,src/CommandAliases.cs,173,delegates to UpdateCommand
+RIBBON_BTN,Kiểm Tra Cập Nhật/ISURVEY_UPDATE,AUD-009,UI_ENTRY,src/UI/RibbonBuilder.cs,227,en=True
+PRIMARY_COMMAND,ISURVEY_UPDATE_GE,AUD-010,IS_CANONICAL,src/Modules/Map/MapModule.cs,123,primary CommandMethod outside CommandAliases.cs
+ALIAS,UG,AUD-010,ALIAS_OF,src/CommandAliases.cs,61,delegates to UpdateGeCommand
+RIBBON_BTN,Cập Nhật Ảnh GE/ISURVEY_UPDATE_GE,AUD-010,UI_ENTRY,src/UI/RibbonBuilder.cs,155,en=True
+PRIMARY_COMMAND,ISURVEY_CAD_TO_DGN,AUD-011,IS_CANONICAL,src/Dgn/DgnModule.cs,87,primary CommandMethod outside CommandAliases.cs
+ALIAS,C2D,AUD-011,ALIAS_OF,src/CommandAliases.cs,79,delegates to CadToDgnCommand
+RIBBON_BTN,Xuất CAD ➔ DGN/ISURVEY_CAD_TO_DGN,AUD-011,UI_ENTRY,src/UI/RibbonBuilder.cs,164,en=True
+PRIMARY_COMMAND,ISURVEY_DGN_TO_CAD,AUD-012,IS_CANONICAL,src/Dgn/DgnModule.cs,21,primary CommandMethod outside CommandAliases.cs
+ALIAS,D2C,AUD-012,ALIAS_OF,src/CommandAliases.cs,73,delegates to DgnToCadCommand
+RIBBON_BTN,Nhập DGN ➔ CAD/ISURVEY_DGN_TO_CAD,AUD-012,UI_ENTRY,src/UI/RibbonBuilder.cs,162,en=True
+PRIMARY_COMMAND,NHAPDIEM,AUD-013,IS_CANONICAL,src/Modules/DiemDo/PointFileModule.cs,13,primary CommandMethod outside CommandAliases.cs
+ALIAS,ND,AUD-013,ALIAS_OF,src/CommandAliases.cs,157,delegates to ImportPointsCommand
+RIBBON_BTN,Nhập điểm đo/NHAPDIEM,AUD-013,UI_ENTRY,src/UI/RibbonBuilder.cs,379,en=True
+PRIMARY_COMMAND,XUATDIEM,AUD-014,IS_CANONICAL,src/Modules/DiemDo/PointFileModule.cs,62,primary CommandMethod outside CommandAliases.cs
+ALIAS,XD,AUD-014,ALIAS_OF,src/CommandAliases.cs,160,delegates to ExportPointsCommand
+RIBBON_BTN,Xuất điểm đo/XUATDIEM,AUD-014,UI_ENTRY,src/UI/RibbonBuilder.cs,380,en=True
+PRIMARY_COMMAND,ISURVEY_FIT_TITLE,AUD-015,IS_CANONICAL,src/Modules/Frame/FrameService.cs,296,primary CommandMethod outside CommandAliases.cs
+ALIAS,CODAN,AUD-015,ALIAS_OF,src/CommandAliases.cs,145,delegates to FitTitleCommand
+PRIMARY_COMMAND,ISURVEY_FRAME_EDIT,AUD-016,IS_CANONICAL,src/Modules/Frame/FrameService.FrameEdit.cs,16,primary CommandMethod outside CommandAliases.cs
+ALIAS,SK,AUD-016,ALIAS_OF,src/CommandAliases.cs,148,delegates to EditFrameInfoCommand
+PRIMARY_COMMAND,ISURVEY_KHUNG,AUD-017,IS_CANONICAL,src/Modules/Frame/FrameService.cs,54,primary CommandMethod outside CommandAliases.cs
+ALIAS,KHUNG,AUD-017,ALIAS_OF,src/CommandAliases.cs,118,delegates to FrameCommand
+RIBBON_BTN,Khung Bản Đồ/ISURVEY_KHUNG,AUD-017,UI_ENTRY,src/UI/RibbonBuilder.cs,174,en=True
+PRIMARY_COMMAND,ISURVEY_KHUNG_BV,AUD-018,IS_CANONICAL,src/Modules/Frame/FrameService.cs,58,primary CommandMethod outside CommandAliases.cs
+ALIAS,KHUNGBV,AUD-018,ALIAS_OF,src/CommandAliases.cs,121,delegates to TechFrameCommand
+RIBBON_BTN,Khung Bản Vẽ Kỹ Thuật/ISURVEY_KHUNG_BV,AUD-018,UI_ENTRY,src/UI/RibbonBuilder.cs,176,en=True
+PRIMARY_COMMAND,ISURVEY_LOGO,AUD-019,IS_CANONICAL,src/Modules/Frame/FrameService.cs,62,primary CommandMethod outside CommandAliases.cs
+ALIAS,ANLOGO,AUD-019,ALIAS_OF,src/CommandAliases.cs,124,delegates to ToggleLogoCommand
+PRIMARY_COMMAND,ISURVEY_LOGO1,AUD-020,IS_CANONICAL,src/Modules/Frame/FrameService.cs,76,primary CommandMethod outside CommandAliases.cs
+ALIAS,ANLOGO1,AUD-020,ALIAS_OF,src/CommandAliases.cs,127,delegates to ToggleLogoOwnerCommand
+PRIMARY_COMMAND,ISURVEY_LOGO2,AUD-021,IS_CANONICAL,src/Modules/Frame/FrameService.cs,79,primary CommandMethod outside CommandAliases.cs
+ALIAS,ANLOGO2,AUD-021,ALIAS_OF,src/CommandAliases.cs,130,delegates to ToggleLogoDesignCommand
+PRIMARY_COMMAND,ISURVEY_LOGO_REPLACE,AUD-022,IS_CANONICAL,src/Modules/Frame/FrameService.cs,130,primary CommandMethod outside CommandAliases.cs
+ALIAS,THAYLOGO,AUD-022,ALIAS_OF,src/CommandAliases.cs,142,delegates to ReplaceLogoCommand
+PRIMARY_COMMAND,ISURVEY_PROFILE_SHEETS,AUD-023,IS_CANONICAL,src/Modules/Frame/FrameService.ProfileLayout.cs,28,primary CommandMethod outside CommandAliases.cs
+ALIAS,RAIMCD,AUD-023,ALIAS_OF,src/CommandAliases.cs,136,delegates to ProfileLayoutCommand
+RIBBON_BTN,Rải Khung Mặt Cắt/RAIMCD,AUD-023,UI_ENTRY,src/UI/RibbonBuilder.cs,186,en=True
+PRIMARY_COMMAND,ISURVEY_ROUTE_PLOT,AUD-024,IS_CANONICAL,src/Modules/Frame/FrameService.RouteLayout.cs,33,primary CommandMethod outside CommandAliases.cs
+ALIAS,INTUYEN,AUD-024,ALIAS_OF,src/CommandAliases.cs,139,delegates to RoutePlotCommand
+PRIMARY_COMMAND,ISURVEY_ROUTE_SHEETS,AUD-025,IS_CANONICAL,src/Modules/Frame/FrameService.RouteLayout.cs,29,primary CommandMethod outside CommandAliases.cs
+ALIAS,RAIKHUNG,AUD-025,ALIAS_OF,src/CommandAliases.cs,133,delegates to RouteLayoutCommand
+RIBBON_BTN,Rải Khung Theo Tuyến/RAIKHUNG,AUD-025,UI_ENTRY,src/UI/RibbonBuilder.cs,182,en=True
+PRIMARY_COMMAND,ISURVEY_EXPORT_KML,AUD-026,IS_CANONICAL,src/Modules/Export/ExportModule.cs,22,primary CommandMethod outside CommandAliases.cs
+ALIAS,EG,AUD-026,ALIAS_OF,src/CommandAliases.cs,64,delegates to ExportKmlCommand
+ALIAS,EXK,AUD-026,ALIAS_OF,src/CommandAliases.cs,70,delegates to ExportKmlCommand
+RIBBON_BTN,Xuất File KML/KMZ/ISURVEY_EXPORT_KML,AUD-026,UI_ENTRY,src/UI/RibbonBuilder.cs,151,en=True
+PRIMARY_COMMAND,ISURVEY_IMPORT_KML,AUD-027,IS_CANONICAL,src/Modules/Import/KmlImportModule.cs,21,primary CommandMethod outside CommandAliases.cs
+ALIAS,INK,AUD-027,ALIAS_OF,src/CommandAliases.cs,67,delegates to ImportKmlCommand
+RIBBON_BTN,Nhập File KML/KMZ/ISURVEY_IMPORT_KML,AUD-027,UI_ENTRY,src/UI/RibbonBuilder.cs,150,en=True
+PRIMARY_COMMAND,ISURVEY_DELETE_GE,AUD-028,IS_CANONICAL,src/Modules/Map/MapModule.cs,169,primary CommandMethod outside CommandAliases.cs
+ALIAS,XG,AUD-028,ALIAS_OF,src/CommandAliases.cs,58,delegates to DeleteGeCommand
+RIBBON_BTN,Xóa Ảnh Vệ Tinh/ISURVEY_DELETE_GE,AUD-028,UI_ENTRY,src/UI/RibbonBuilder.cs,156,en=True
+PRIMARY_COMMAND,ISURVEY_MAP,AUD-029,IS_CANONICAL,src/Modules/Map/MapModule.cs,25,primary CommandMethod outside CommandAliases.cs
+ALIAS,IG,AUD-029,ALIAS_OF,src/CommandAliases.cs,52,delegates to InsertMapCommand
+PRIMARY_COMMAND,ISURVEY_MAP_SAT,AUD-030,IS_CANONICAL,src/Modules/Map/MapModule.cs,32,primary CommandMethod outside CommandAliases.cs
+ALIAS,SG,AUD-030,ALIAS_OF,src/CommandAliases.cs,55,delegates to InsertSatelliteCommand
+RIBBON_BTN,Chèn Ảnh Vệ Tinh/ISURVEY_MAP_SAT,AUD-030,UI_ENTRY,src/UI/RibbonBuilder.cs,154,en=True
+PRIMARY_COMMAND,ISURVEY_STRIP_MAP,AUD-031,IS_CANONICAL,src/Modules/Tuyen/StripMapService.cs,27,primary CommandMethod outside CommandAliases.cs
+ALIAS,DUOITUYEN,AUD-031,ALIAS_OF,src/CommandAliases.cs,115,delegates to StripMapCommand
+RIBBON_BTN,Duỗi Thẳng Tuyến/ISURVEY_STRIP_MAP,AUD-031,UI_ENTRY,src/UI/RibbonBuilder.cs,200,en=True
+PRIMARY_COMMAND,ISURVEY_PC_FILTER,AUD-032,IS_CANONICAL,src/Modules/Uav/UavModule.cs,52,primary CommandMethod outside CommandAliases.cs
+ALIAS,LP,AUD-032,ALIAS_OF,src/CommandAliases.cs,106,delegates to PcFilterStub
+RIBBON_BTN,Lọc Điểm Mặt Đất/ISURVEY_PC_FILTER,AUD-032,UI_ENTRY,src/UI/RibbonBuilder.cs,447,en=True
+PRIMARY_COMMAND,ISURVEY_PC_GRID,AUD-033,IS_CANONICAL,src/Modules/Uav/UavModule.cs,55,primary CommandMethod outside CommandAliases.cs
+ALIAS,RL,AUD-033,ALIAS_OF,src/CommandAliases.cs,109,delegates to PcGridStub
+RIBBON_BTN,Rải Lưới Điểm/ISURVEY_PC_GRID,AUD-033,UI_ENTRY,src/UI/RibbonBuilder.cs,449,en=True
+PRIMARY_COMMAND,ISURVEY_PC_IMPORT,AUD-034,IS_CANONICAL,src/Modules/Uav/UavModule.cs,49,primary CommandMethod outside CommandAliases.cs
+ALIAS,NP,AUD-034,ALIAS_OF,src/CommandAliases.cs,103,delegates to PcImportStub
+RIBBON_BTN,Nhập Point Cloud/ISURVEY_PC_IMPORT,AUD-034,UI_ENTRY,src/UI/RibbonBuilder.cs,445,en=True
+PRIMARY_COMMAND,ISURVEY_PALETTE,AUD-035,IS_CANONICAL,src/UI/Palette/PaletteModule.cs,9,primary CommandMethod outside CommandAliases.cs
+ALIAS,BANGIS,AUD-035,ALIAS_OF,src/CommandAliases.cs,188,delegates to ShowCommand
+RIBBON_BTN,Bảng Dữ liệu/ISURVEY_PALETTE,AUD-035,UI_ENTRY,src/UI/RibbonBuilder.cs,142,en=True
+PRIMARY_COMMAND,CATBD,AUD-036,IS_CANONICAL,src/Modules/Plan/PlanModule.cs,46,primary CommandMethod outside CommandAliases.cs
+ALIAS,CBD,AUD-036,ALIAS_OF,src/CommandAliases.cs,163,delegates to CutPlanCommand
+RIBBON_BTN,Cắt Bình Đồ/CATBD,AUD-036,UI_ENTRY,src/UI/RibbonBuilder.cs,179,en=True
+PRIMARY_COMMAND,ISURVEY_PROFILE_DRAW,AUD-037,IS_CANONICAL,src/Modules/Profile/ProfileModule.cs,14,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,VEMCD,AUD-038,IS_CANONICAL,src/Modules/Profile/ProfileModule.cs,17,primary CommandMethod outside CommandAliases.cs
+RIBBON_BTN,Vẽ Mặt Cắt Dọc/VEMCD,AUD-038,UI_ENTRY,src/UI/RibbonBuilder.cs,184,en=True
+PRIMARY_COMMAND,BANGCOC,AUD-039,IS_CANONICAL,src/Modules/Tuyen/RouteModule.cs,59,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,ISURVEY_NUMBER_VERTICES,AUD-040,IS_CANONICAL,src/Modules/Tuyen/VertexNumberingService.cs,37,primary CommandMethod outside CommandAliases.cs
+ALIAS,GOC,AUD-040,ALIAS_OF,src/CommandAliases.cs,112,delegates to NumberVerticesCommand
+RIBBON_BTN,Đánh Số Góc Tuyến/ISURVEY_NUMBER_VERTICES,AUD-040,UI_ENTRY,src/UI/RibbonBuilder.cs,198,en=True
+PRIMARY_COMMAND,ISURVEY_ROUTE_CLEAR_STATIONS,AUD-041,IS_CANONICAL,src/Modules/Tuyen/RouteModule.cs,26,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,ISURVEY_ROUTE_NEW,AUD-042,IS_CANONICAL,src/Modules/Tuyen/RouteModule.cs,14,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,ISURVEY_ROUTE_REVERSE,AUD-043,IS_CANONICAL,src/Modules/Tuyen/RouteModule.cs,32,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,ISURVEY_ROUTE_STATIONS,AUD-044,IS_CANONICAL,src/Modules/Tuyen/RouteModule.cs,20,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,ISURVEY_STATION_LIST,AUD-045,IS_CANONICAL,src/Modules/Tuyen/RouteModule.cs,56,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,ISURVEY_STATION_REMOVE_ONE,AUD-046,IS_CANONICAL,src/Modules/Tuyen/RouteModule.cs,44,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,ISURVEY_STATION_STYLE,AUD-047,IS_CANONICAL,src/Modules/Tuyen/RouteModule.cs,38,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,PHATSINHCOC,AUD-048,IS_CANONICAL,src/Modules/Tuyen/RouteModule.cs,23,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,STT,AUD-049,IS_CANONICAL,src/Modules/Tuyen/SequenceNumberService.cs,28,primary CommandMethod outside CommandAliases.cs
+RIBBON_BTN,Đánh Số Thứ Tự/STT,AUD-049,UI_ENTRY,src/UI/RibbonBuilder.cs,206,en=True
+PRIMARY_COMMAND,TAOTUYEN,AUD-050,IS_CANONICAL,src/Modules/Tuyen/RouteModule.cs,17,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,THEMCOC,AUD-051,IS_CANONICAL,src/Modules/Tuyen/RouteModule.cs,53,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,THIETLAPCOC,AUD-052,IS_CANONICAL,src/Modules/Tuyen/RouteModule.cs,41,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,XOACOC,AUD-053,IS_CANONICAL,src/Modules/Tuyen/RouteModule.cs,29,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,XOACOC1,AUD-054,IS_CANONICAL,src/Modules/Tuyen/RouteModule.cs,47,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,ISURVEY_TAB_TO_CAD,AUD-055,IS_CANONICAL,src/Modules/Import/TabImportModule.cs,29,primary CommandMethod outside CommandAliases.cs
+ALIAS,T2C,AUD-055,ALIAS_OF,src/CommandAliases.cs,76,delegates to TabToCadCommand
+RIBBON_BTN,Nhập TAB ➔ CAD/ISURVEY_TAB_TO_CAD,AUD-055,UI_ENTRY,src/UI/RibbonBuilder.cs,160,en=True
+PRIMARY_COMMAND,ANTIN,AUD-056,IS_CANONICAL,src/Modules/Terrain/TerrainModule.cs,35,primary CommandMethod outside CommandAliases.cs
+RIBBON_BTN,Ẩn / Hiện Lưới TIN/ANTIN,AUD-056,UI_ENTRY,src/UI/RibbonBuilder.cs,398,en=True
+PRIMARY_COMMAND,GOMOHINH,AUD-057,IS_CANONICAL,src/Modules/Terrain/TerrainModule.cs,47,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,ISURVEY_TERRAIN_BUILD,AUD-058,IS_CANONICAL,src/Modules/Terrain/TerrainModule.cs,26,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,ISURVEY_TERRAIN_CLEAR,AUD-059,IS_CANONICAL,src/Modules/Terrain/TerrainModule.cs,50,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,ISURVEY_TERRAIN_DETACH,AUD-060,IS_CANONICAL,src/Modules/Terrain/TerrainModule.cs,44,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,ISURVEY_TERRAIN_NEW,AUD-061,IS_CANONICAL,src/Modules/Terrain/TerrainModule.cs,14,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,ISURVEY_TERRAIN_TOGGLE,AUD-062,IS_CANONICAL,src/Modules/Terrain/TerrainModule.cs,32,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,ISURVEY_TERRAIN_Z,AUD-063,IS_CANONICAL,src/Modules/Terrain/TerrainModule.cs,38,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,TAOMOHINH,AUD-064,IS_CANONICAL,src/Modules/Terrain/TerrainModule.cs,17,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,THEMMOHINH,AUD-065,IS_CANONICAL,src/Modules/Terrain/TerrainModule.cs,23,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,TRACAOD,AUD-066,IS_CANONICAL,src/Modules/Terrain/TerrainModule.cs,41,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,XAYMOHINH,AUD-067,IS_CANONICAL,src/Modules/Terrain/TerrainModule.cs,29,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,XOATHANHPHAN,AUD-068,IS_CANONICAL,src/Modules/Terrain/TerrainModule.cs,53,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,AUTOSCAN,AUD-069,IS_CANONICAL,src/Modules/Scan/ScanModule.cs,25,primary CommandMethod outside CommandAliases.cs
+ALIAS,SCN,AUD-069,ALIAS_OF,src/CommandAliases.cs,166,delegates to AutoScanCommand
+RIBBON_BTN,Quét Cấu Trúc (AutoScan)/AUTOSCAN,AUD-069,UI_ENTRY,src/UI/RibbonBuilder.cs,217,en=True
+PRIMARY_COMMAND,DAODAUTUYEN,AUD-070,IS_CANONICAL,src/Modules/Tuyen/RouteModule.cs,35,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,ISURVEY_STATION_ADD_ONE,AUD-071,IS_CANONICAL,src/Modules/Tuyen/RouteModule.cs,50,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,ISURVEY_TERRAIN_ADD,AUD-072,IS_CANONICAL,src/Modules/Terrain/TerrainModule.cs,20,primary CommandMethod outside CommandAliases.cs
+PRIMARY_COMMAND,ISURVEY_UAV_CLIP,AUD-073,IS_CANONICAL,src/Modules/Uav/UavModule.cs,10,primary CommandMethod outside CommandAliases.cs
+ALIAS,UAVCLIP,AUD-073,ALIAS_OF,src/CommandAliases.cs,82,delegates to ClipCommand
+RIBBON_BTN,Cắt Ảnh Theo Biên/ISURVEY_UAV_CLIP,AUD-073,UI_ENTRY,src/UI/RibbonBuilder.cs,421,en=True
+PRIMARY_COMMAND,ISURVEY_UAV_CONTOUR,AUD-074,IS_CANONICAL,src/Modules/Uav/UavModule.cs,43,primary CommandMethod outside CommandAliases.cs
+ALIAS,DM,AUD-074,ALIAS_OF,src/CommandAliases.cs,97,delegates to ContourStub
+RIBBON_BTN,Vẽ Đường Đồng Mức/ISURVEY_UAV_CONTOUR,AUD-074,UI_ENTRY,src/UI/RibbonBuilder.cs,437,en=True
+PRIMARY_COMMAND,ISURVEY_UAV_CRS,AUD-075,IS_CANONICAL,src/Modules/Uav/UavModule.cs,46,primary CommandMethod outside CommandAliases.cs
+ALIAS,HT,AUD-075,ALIAS_OF,src/CommandAliases.cs,100,delegates to CrsStub
+RIBBON_BTN,Hệ Tọa Độ UAV/ISURVEY_UAV_CRS,AUD-075,UI_ENTRY,src/UI/RibbonBuilder.cs,439,en=True
+PRIMARY_COMMAND,ISURVEY_UAV_DEM,AUD-076,IS_CANONICAL,src/Modules/Uav/UavModule.cs,40,primary CommandMethod outside CommandAliases.cs
+ALIAS,DEM,AUD-076,ALIAS_OF,src/CommandAliases.cs,94,delegates to DemStub
+PRIMARY_COMMAND,ISURVEY_UAV_FRAME_TOGGLE,AUD-077,IS_CANONICAL,src/Modules/Uav/UavModule.cs,19,primary CommandMethod outside CommandAliases.cs
+ALIAS,AK,AUD-077,ALIAS_OF,src/CommandAliases.cs,85,delegates to FrameToggleCommand
+RIBBON_BTN,Tắt/Bật Khung Ảnh/ISURVEY_UAV_FRAME_TOGGLE,AUD-077,UI_ENTRY,src/UI/RibbonBuilder.cs,423,en=True
+PRIMARY_COMMAND,ISURVEY_UAV_INSERT,AUD-078,IS_CANONICAL,src/Modules/Uav/UavModule.cs,37,primary CommandMethod outside CommandAliases.cs
+ALIAS,AU,AUD-078,ALIAS_OF,src/CommandAliases.cs,91,delegates to InsertStub
+PRIMARY_COMMAND,ISURVEY_UAV_SEND_BACK,AUD-079,IS_CANONICAL,src/Modules/Uav/UavModule.cs,28,primary CommandMethod outside CommandAliases.cs
+ALIAS,AD,AUD-079,ALIAS_OF,src/CommandAliases.cs,88,delegates to SendBackCommand
+RIBBON_BTN,Đưa Ảnh Xuống Dưới/ISURVEY_UAV_SEND_BACK,AUD-079,UI_ENTRY,src/UI/RibbonBuilder.cs,425,en=True
+RIBBON_PLACEHOLDER,Tạo Khung Lưới TĐ/TAOKHUNG,,NO_FEATURE,src/UI/RibbonBuilder.cs,178,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Thiết Lập Tỉ Lệ Khung/TILEKHUNG,,NO_FEATURE,src/UI/RibbonBuilder.cs,188,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Bảo Vệ Layer Khung/KHOAKHUNG,,NO_FEATURE,src/UI/RibbonBuilder.cs,189,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Rải Móng & Biên Đất/RAIMONG,,NO_FEATURE,src/UI/RibbonBuilder.cs,197,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Tạo Biên Đường Tạm/BIENDUONGTAM,,NO_FEATURE,src/UI/RibbonBuilder.cs,204,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Kẻ Tuyến 110kV/220kV/KETUYEN,,NO_FEATURE,src/UI/RibbonBuilder.cs,205,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Bảng TĐ & Diện Tích/BANGTOADO,,NO_FEATURE,src/UI/RibbonBuilder.cs,213,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Kiểm Tra Lỗi Cao Độ/KIEMTRACAODO,,NO_FEATURE,src/UI/RibbonBuilder.cs,216,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Xuất Thống Kê Excel/XUATEXCEL,,NO_FEATURE,src/UI/RibbonBuilder.cs,218,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Ghi Số Đồng Mức/GHISODM,,NO_FEATURE,src/UI/RibbonBuilder.cs,368,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Nâng hạ cao độ điểm đo/NANGLCAO,,NO_FEATURE,src/UI/RibbonBuilder.cs,381,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Tạo điểm từ đối tượng AutoCAD/TAODIEMCAD,,NO_FEATURE,src/UI/RibbonBuilder.cs,382,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Hiện điểm đo theo mã/HIENDIEMMA,,NO_FEATURE,src/UI/RibbonBuilder.cs,383,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Lọc điểm đo theo mã/LOCDIEMMA,,NO_FEATURE,src/UI/RibbonBuilder.cs,384,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Chèn địa vật theo mã điểm/CHENDIAVAT,,NO_FEATURE,src/UI/RibbonBuilder.cs,385,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Tắt điểm đo trên bình đồ/TATDIEMBD,,NO_FEATURE,src/UI/RibbonBuilder.cs,386,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Hiện điểm đo đã tắt/HIENDIEMTAT,,NO_FEATURE,src/UI/RibbonBuilder.cs,387,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Xóa điểm trong vùng/XOADIEMVUNG,,NO_FEATURE,src/UI/RibbonBuilder.cs,388,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Nối điểm tự động/NOIDIEM,,NO_FEATURE,src/UI/RibbonBuilder.cs,389,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Gán cao độ điểm theo địa hình/GANCAO,,NO_FEATURE,src/UI/RibbonBuilder.cs,390,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Phát sinh điểm trong vùng/PHATSINHDIEM,,NO_FEATURE,src/UI/RibbonBuilder.cs,391,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Định vị điểm mia theo cọc/DINHVIMIA,,NO_FEATURE,src/UI/RibbonBuilder.cs,392,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Xoay điểm mia theo Polyline/XOAYMIA,,NO_FEATURE,src/UI/RibbonBuilder.cs,393,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Lọc Giãn Điểm Mia/LOCDIEM,,NO_FEATURE,src/UI/RibbonBuilder.cs,397,enabled=false and no CommandMethod
+RIBBON_PLACEHOLDER,Chuẩn Hóa Mã Font/CHUYENFONT,,NO_FEATURE,src/UI/RibbonBuilder.cs,399,enabled=false and no CommandMethod

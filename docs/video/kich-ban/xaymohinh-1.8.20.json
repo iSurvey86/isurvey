@@ -1,0 +1,12 @@
+{
+  "command": "XAYMOHINH",
+  "title": "Xây dựng lưới (tiến trình + Thành công) phiên bản 1.8.20",
+  "version": "1.8.20",
+  "status": "Chưa quay",
+  "drawing": "bản thử đồng mức / TIN (bản sao)",
+  "steps": [
+    "XAYMOHINH → tiến trình thân thiện",
+    "Hộp Thành công + lưới trên bản vẽ",
+    "TAOTUYEN / BANGIS mở ngay (NOD không Mesh)"
+  ]
+}

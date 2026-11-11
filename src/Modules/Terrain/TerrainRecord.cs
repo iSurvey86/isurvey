@@ -88,10 +88,14 @@ public sealed class TerrainRecord
 
     public bool MeshVisible { get; set; } = true;
 
-    /// <summary>Mỗi tam giác chín số: x,y,z của ba đỉnh, theo trục CAD.</summary>
+    /// <summary>Mỗi tam giác chín số: x,y,z của ba đỉnh, theo trục CAD. Có thể trống — Z lấy từ Face trên bản vẽ.</summary>
     public List<double> Mesh { get; set; } = new();
 
-    public int TriangleCount => Mesh.Count / 9;
+    /// <summary>Số tam giác đã dựng (giữ khi không lưu tọa độ Mesh vào NOD để UI/tuyến không đơ).</summary>
+    public int StoredTriangleCount { get; set; }
+
+    public int TriangleCount =>
+        Mesh is { Count: >= 9 } ? Mesh.Count / 9 : Math.Max(0, StoredTriangleCount);
 
     public string Summary()
     {
@@ -135,5 +139,15 @@ public sealed class TerrainRecord
             Mesh.Add(tri.C.Y);
             Mesh.Add(tri.C.Z);
         }
+
+        StoredTriangleCount = triangles.Count;
+    }
+
+    /// <summary>Bỏ tọa độ Mesh khỏi bản ghi — giữ số tam giác. Face trên bản vẽ vẫn đủ để tra Z.</summary>
+    public void DropMeshCoordinates()
+    {
+        if (Mesh is { Count: >= 9 })
+            StoredTriangleCount = Mesh.Count / 9;
+        Mesh = new List<double>();
     }
 }

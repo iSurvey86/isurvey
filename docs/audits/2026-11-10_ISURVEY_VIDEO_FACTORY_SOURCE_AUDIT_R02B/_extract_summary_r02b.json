@@ -1,0 +1,39 @@
+{
+  "cs_xaml_files": 223,
+  "commandmethod_total": 125,
+  "alias_file": 46,
+  "non_alias_declarations": 79,
+  "canonical_features_r02b": 63,
+  "source_present": 55,
+  "stub_features": 8,
+  "same_feature_decisions": 16,
+  "ribbon": 61,
+  "xaml_clicks": 91,
+  "palette": 8,
+  "entries_total": 285,
+  "evidence": {
+    "SERVICE_CHAIN_VERIFIED_STATIC": 31,
+    "HANDLER_TRACE_COMPLETE": 18,
+    "METHOD_BODY_SCANNED": 6,
+    "STUB_ONLY": 8
+  },
+  "groups": {
+    "AI": 2,
+    "AUTH": 7,
+    "DGN": 2,
+    "DIEM": 2,
+    "FRAME": 11,
+    "KML": 2,
+    "MAP": 4,
+    "PALETTE": 1,
+    "PLAN": 1,
+    "PROFILE": 1,
+    "ROUTE": 11,
+    "SCAN": 1,
+    "TAB": 1,
+    "TERRAIN": 7,
+    "UAV": 10
+  },
+  "r02_canonical_was": 79,
+  "merged_away": 16
+}

@@ -1,0 +1,33 @@
+# Evidence INDEX
+
+- `E-D2C-START` — D2C Start → DGNIMPORT async → `03_EVIDENCE/E-D2C-START.md (src/Dgn/DgnImportService.cs:108-165)`
+- `E-D2C-MODULE` — D2C command entry → `03_EVIDENCE/E-D2C-MODULE.md (src/Dgn/DgnModule.cs:21-84)`
+- `E-C2D-OVERWRITE` — C2D file overwrite + Start path → `03_EVIDENCE/E-C2D-OVERWRITE.md (src/Dgn/DgnExportService.cs:106-148)`
+- `E-C2D-RUNEXPORT` — C2D -DGNEXPORT + poll File.Exists → `03_EVIDENCE/E-C2D-RUNEXPORT.md (src/Dgn/DgnExportService.cs:346-435)`
+- `E-C2D-MODULE` — C2D command entry → `03_EVIDENCE/E-C2D-MODULE.md (src/Dgn/DgnModule.cs:87-146)`
+- `E-VEMCD-DRAW` — VEMCD Draw() handler → `03_EVIDENCE/E-VEMCD-DRAW.md (src/Modules/Profile/ProfileModule.cs:20-147)`
+- `E-VEMCD-REDRAW` — VEMCD erase old + Draw + Save → `03_EVIDENCE/E-VEMCD-REDRAW.md (src/Modules/Profile/ProfileModule.cs:163-208)`
+- `E-VEMCD-SERVICE` — EraseHandles + Draw strip loop → `03_EVIDENCE/E-VEMCD-SERVICE.md (src/Modules/Profile/ProfileDrawService.cs:142-231)`
+- `E-TRACAOD-QUERY` — TRACAOD Query loop → `03_EVIDENCE/E-TRACAOD-QUERY.md (src/Modules/Terrain/TerrainModule.cs:303-344)`
+- `E-TRACAOD-MARK` — Show/Erase elevation mark → `03_EVIDENCE/E-TRACAOD-MARK.md (src/Modules/Terrain/TerrainService.cs:664-710)`
+- `E-LOGOUT-CMD` — LOGOUT command → `03_EVIDENCE/E-LOGOUT-CMD.md (src/Auth/AuthModule.cs:77-100)`
+- `E-LOGOUT-SIGNOUT` — AuthManager.SignOut → `03_EVIDENCE/E-LOGOUT-SIGNOUT.md (src/Auth/AuthManager.cs:204-215)`
+- `E-LOGOUT-STORAGE` — LicenseStorage.Delete → `03_EVIDENCE/E-LOGOUT-STORAGE.md (src/Auth/LicenseStorage.cs:196-207)`
+- `E-TAOTUYEN-SAVE` — RouteStore.Save → `03_EVIDENCE/E-TAOTUYEN-SAVE.md (src/Modules/Tuyen/RouteStore.cs:60-87)`
+- `E-TAOTUYEN-NEW` — TAOTUYEN New() start → `03_EVIDENCE/E-TAOTUYEN-NEW.md (src/Modules/Tuyen/RouteModule.cs:92-160)`
+- `E-TAOMOHINH-SAVE` — TerrainStore.Save → `03_EVIDENCE/E-TAOMOHINH-SAVE.md (src/Modules/Terrain/TerrainStore.cs:73-100)`
+- `E-TAOMOHINH-NEW` — TAOMOHINH New() → `03_EVIDENCE/E-TAOMOHINH-NEW.md (src/Modules/Terrain/TerrainModule.cs:56-100)`
+- `E-THIETLAPCOC` — THIETLAPCOC StationStyle → `03_EVIDENCE/E-THIETLAPCOC.md (src/Modules/Tuyen/RouteModule.cs:62-90)`
+- `E-THIETLAPCOC-STORE` — StationStyleStore.Save → `03_EVIDENCE/E-THIETLAPCOC-STORE.md (src/Modules/Tuyen/StationStyleStore.cs:30-50)`
+- `E-DELETE-GE` — DELETE_GE workflow → `03_EVIDENCE/E-DELETE-GE.md (src/Modules/Map/GeDeleteWorkflow.cs:11-57)`
+- `E-MAPSAT-HD` — MAP_SAT HdMosaicWorkflow.Run → `03_EVIDENCE/E-MAPSAT-HD.md (src/Modules/Map/HdMosaicWorkflow.cs:30-100)`
+- `E-NUMBER-VERTICES` — NUMBER_VERTICES CAD → `03_EVIDENCE/E-NUMBER-VERTICES.md (src/Modules/Tuyen/VertexNumberingService.cs:37-125)`
+- `E-NUMBER-TXT` — NUMBER_VERTICES txt → `03_EVIDENCE/E-NUMBER-TXT.md (src/Modules/Tuyen/VertexNumberingService.cs:225-237)`
+- `E-UAV-SENDBACK` — SEND_BACK → `03_EVIDENCE/E-UAV-SENDBACK.md (src/Modules/Uav/UavImageService.cs:468-489)`
+- `E-UAV-FRAME` — FRAME_TOGGLE → `03_EVIDENCE/E-UAV-FRAME.md (src/Modules/Uav/UavImageService.cs:439-465)`
+- `E-XAML-MAP-DELETE` — MapInsert Delete_Click → `03_EVIDENCE/E-XAML-MAP-DELETE.md (src/UI/MapInsert/MapInsertWindow.xaml.cs:366-374)`
+- `E-XAML-MAP-APPLY` — MapInsert Apply_Click → `03_EVIDENCE/E-XAML-MAP-APPLY.md (src/UI/MapInsert/MapInsertWindow.xaml.cs:378-430)`
+- `E-XAML-STN-DEL` — StationList Delete_Click → `03_EVIDENCE/E-XAML-STN-DEL.md (src/UI/Tuyen/StationListWindow.xaml.cs:78-94)`
+- `E-XAML-STN-ZOOM` — StationList Zoom_Click → `03_EVIDENCE/E-XAML-STN-ZOOM.md (src/UI/Tuyen/StationListWindow.xaml.cs:67-76)`
+- `E-XAML-STN-ADD` — StationList Add_Click → `03_EVIDENCE/E-XAML-STN-ADD.md (src/UI/Tuyen/StationListWindow.xaml.cs:96-100)`
+- `E-XAML-VN-CONFIRM` — Vn2000 Confirm_Click → `03_EVIDENCE/E-XAML-VN-CONFIRM.md (src/UI/Vn2000/Vn2000SetupWindow.xaml.cs:197-230)`

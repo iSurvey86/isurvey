@@ -1,0 +1,41 @@
+﻿ D docs/audits/2026-11-10_ISURVEY_VIDEO_FACTORY_SOURCE_AUDIT.zip
+?? docs/MCD/DGN2CAD.dwg
+?? docs/MCD/Diemdo2k.bak
+?? docs/MCD/Diemdo2k.dwg
+?? docs/MCD/Diemdo2k.rdsred
+?? "docs/MCD/MCD so bo.dwg"
+?? docs/MCD/MCD1.bak
+?? docs/MCD/MCD1.dwg
+?? docs/MCD/MCD2.dwg
+?? docs/MCD/_test_vemcd_ui.dwg
+?? docs/MCD/dongmuc3D.dwg
+?? docs/MCD/text.dwg
+?? "docs/SEED 1000/103000.dgn"
+?? "docs/SEED 1000/104000.dgn"
+?? "docs/SEED 1000/104030.dgn"
+?? "docs/SEED 1000/104045.dgn"
+?? "docs/SEED 1000/105000.dgn"
+?? "docs/SEED 1000/105030.dgn"
+?? "docs/SEED 1000/105045.dgn"
+?? "docs/SEED 1000/106000.dgn"
+?? "docs/SEED 1000/106015.dgn"
+?? "docs/SEED 1000/106030.dgn"
+?? "docs/SEED 1000/107000.dgn"
+?? "docs/SEED 1000/107015.dgn"
+?? "docs/SEED 1000/107030.dgn"
+?? "docs/SEED 1000/107045.dgn"
+?? "docs/SEED 1000/108000.dgn"
+?? "docs/SEED 1000/108015.dgn"
+?? "docs/SEED 1000/108030.dgn"
+?? "docs/SEED 1000/Default.mvba"
+?? "docs/SEED 1000/demo.dgn"
+?? "docs/SEED 1000/demo1.dgn"
+?? docs/audits/2026-11-10_ISURVEY_VIDEO_FACTORY_SOURCE_AUDIT_R02/_git_before.txt
+?? docs/audits/ISURVEY_THAM_DINH_DOC_LAP_PHASE01_2026-11-10.md
+?? docs/audits/ISURVEY_YEU_CAU_CURSOR_AUDIT_R02_2026-11-10.md
+?? docs/dau/DaiAn.png
+?? docs/dau/XNTV.png
+?? src/Templates/KhungBanDo_Chuan.bak
+?? tmp/in-tuyen-raw.png
+?? tmp/rai-khung-raw.png
+?? tmp/rai-khung.png

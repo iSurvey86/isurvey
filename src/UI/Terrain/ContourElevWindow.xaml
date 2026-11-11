@@ -1,0 +1,106 @@
+<Window x:Class="iSurvey.UI.Terrain.ContourElevWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="iSurvey — Ghi Số Đồng Mức"
+        Width="420" SizeToContent="Height"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ResizeMode="NoResize" ShowInTaskbar="False" FontFamily="Segoe UI"
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/iSurvey;component/src/UI/CtaStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Border Background="White" CornerRadius="12" Margin="12">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="18" ShadowDepth="2" Opacity="0.28"/>
+        </Border.Effect>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" Background="#1D4ED8" CornerRadius="12,12,0,0" MouseLeftButtonDown="Header_Drag">
+                <DockPanel Margin="14,10">
+                    <Button DockPanel.Dock="Right" Content="&#xE8BB;" FontFamily="Segoe MDL2 Assets" FontSize="12"
+                            Style="{StaticResource CtaClose}" Click="Cancel_Click" ToolTip="Đóng"/>
+                    <TextBlock Text="iSurvey — Ghi Số Đồng Mức" Foreground="White" FontWeight="SemiBold"
+                               VerticalAlignment="Center"/>
+                </DockPanel>
+            </Border>
+            <StackPanel Grid.Row="1" Margin="16,14,16,8">
+                <Border BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="CHỌN PHƯƠNG ÁN GÁN CAO ĐỘ" FontWeight="SemiBold"
+                                   Foreground="#1E293B" Margin="0,0,0,10"/>
+                        <RadioButton x:Name="RadChu" GroupName="Mode" Margin="0,0,0,8"
+                                     Checked="Mode_Changed">
+                            <StackPanel>
+                                <TextBlock Text="Chữ (Text/MText)" FontWeight="SemiBold" Foreground="#1E293B"/>
+                                <TextBlock Text="Tự động gán Z theo Text gần tuyến nhất (Quét hàng loạt)"
+                                           Foreground="#64748B" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </RadioButton>
+                        <RadioButton x:Name="RadSo" GroupName="Mode" Margin="0,0,0,8"
+                                     Checked="Mode_Changed">
+                            <StackPanel>
+                                <TextBlock Text="Số cố định" FontWeight="SemiBold" Foreground="#1E293B"/>
+                                <TextBlock Text="Nhập 1 số và gán đồng loạt cho các tuyến được quét chọn"
+                                           Foreground="#64748B" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </RadioButton>
+                        <RadioButton x:Name="RadTuanTu" GroupName="Mode" IsChecked="True"
+                                     Checked="Mode_Changed">
+                            <StackPanel>
+                                <TextBlock Text="Click Tuần tự (Khuyên dùng)" FontWeight="SemiBold" Foreground="#1E293B"/>
+                                <TextBlock Text="Click lần lượt từng tuyến. Cao độ tự cộng/trừ theo bước nhảy"
+                                           Foreground="#64748B" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </RadioButton>
+                    </StackPanel>
+                </Border>
+                <Border x:Name="ParamsBox" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="12">
+                    <StackPanel>
+                        <TextBlock Text="KHAI BÁO THÔNG SỐ" FontWeight="SemiBold"
+                                   Foreground="#1E293B" Margin="0,0,0,10"/>
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Cao độ gốc Z (m)" Foreground="#374151" Margin="0,0,0,4"/>
+                                <TextBox x:Name="ZBox" Padding="8,6" Text="10.0"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock x:Name="StepLabel" Text="Bước nhảy (m)" Foreground="#374151" Margin="0,0,0,4"/>
+                                <TextBox x:Name="StepBox" Padding="8,6" Text="5.0"/>
+                            </StackPanel>
+                        </Grid>
+                        <TextBlock x:Name="DirLabel" Text="Chiều biến thiên" Foreground="#374151" Margin="0,0,0,6"/>
+                        <StackPanel x:Name="DirPanel" Orientation="Horizontal">
+                            <RadioButton x:Name="RadTang" GroupName="Dir" Content="Tăng dần (+)"
+                                         IsChecked="True" Margin="0,0,16,0"/>
+                            <RadioButton x:Name="RadGiam" GroupName="Dir" Content="Giảm dần (−)"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+            <Border Grid.Row="2" Background="#F8FAFC" CornerRadius="0,0,12,12" Padding="16,12">
+                <DockPanel LastChildFill="False">
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                        <Button Content="Hủy bỏ" MinWidth="88" Margin="0,0,8,0" Click="Cancel_Click"
+                                Style="{StaticResource CtaSoft}"/>
+                        <Button Content="✓  Chấp nhận" MinWidth="120" Click="Accept_Click"
+                                Style="{StaticResource CtaPrimary}"/>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

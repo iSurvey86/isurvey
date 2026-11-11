@@ -1,0 +1,13 @@
+{
+  "command": "PHATSINHCOC",
+  "title": "Phát sinh cọc (tra Z TIN nhanh) phiên bản 1.8.19",
+  "version": "1.8.19",
+  "status": "Chưa quay",
+  "drawing": "bản thử tuyến + TIN lớn (bản sao)",
+  "steps": [
+    "Civil Metric + tuyến gắn mô hình đã dựng TIN",
+    "PHATSINHCOC / Phát sinh cọc",
+    "Tiến trình số cọc tăng đều, không đơ từng bước",
+    "Cọc có Z trên nhãn"
+  ]
+}

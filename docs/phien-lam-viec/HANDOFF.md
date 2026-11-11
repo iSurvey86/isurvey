@@ -5,6 +5,35 @@
 
 ---
 
+## 2026-11-11 — Bump 1.8.20 (GHISODM + TIN/cọc)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng (Civil 3D 2026 Metric). Cuối phiên đầy đủ. **Bump → 1.8.20.** Chưa `publish-release.ps1`.
+
+### Đã chốt / đã làm
+
+- **GHISODM**: hộp thoại WPF «Ghi Số Đồng Mức» (Chữ / Số cố định / Click tuần tự); Elevation DXF 38; Magenta; nhãn `iSurvey_NhanDDM`; Z gốc và Bước nhảy cùng hàng. Đã nhìn trên Civil.
+- **XAYMOHINH**: TIN nhanh + tiến trình thân thiện + Thành công; NOD không Mesh; cảnh báo đồng mức thiếu Z / Z phẳng.
+- **THEMMOHINH**: cảnh báo thiếu cao độ khi thêm đồng mức.
+- **PHATSINHCOC**: `TinElevationIndex` + hộp thoại gọn.
+- **TAOMOHINH**: bỏ ghi chú; thu hẹp ngang.
+- Bump csproj + PackageContents → **1.8.20**; changelog; catalog Excel; kịch bản video `*-1.8.20` (Chưa quay).
+
+### Việc tiếp
+
+- [ ] Phát hành UPD 1.8.20 (`publish-release.ps1`) khi được yêu cầu.
+- [ ] Quay video GHISODM / XAYMOHINH / PHATSINHCOC / THEMMOHINH 1.8.20 khi được yêu cầu.
+- [ ] Cập nhật HDSD web (ksnpsc) theo 1.8.20 sau phát hành.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff đầu. iSurvey đã bump 1.8.20 (GHISODM form, TIN/cọc). Chưa phát hành UPD. Tiếp: publish-release khi được yêu cầu, hoặc việc mới.
+```
+
+**Lưu trữ ngày:** [2026-11-11-bump-1820-ghisodm-tin.md](./2026-11-11-bump-1820-ghisodm-tin.md)
+
+---
+
 ## 2026-11-10 — Phát hành 1.8.19 (tự hỏi cập nhật khi mở Civil)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng. **Đã bump và phát hành 1.8.19.**

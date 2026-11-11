@@ -1,5 +1,23 @@
 # Changelog — iSurvey
 
+## 1.8.20 — 2026-11-11
+
+Bump sau phát hành 1.8.19. **Chưa** chạy `publish-release.ps1` trong phiên này (chỉ bump + đóng gói local).
+
+### Mô hình / TIN
+
+- **XAYMOHINH** UX + ổn định sau TIN: chữ tiến trình dễ hiểu; hộp **Thành công** sau khi dựng xong; không lưu tọa độ Mesh vào NOD (chỉ `StoredTriangleCount` + Face trên bản vẽ) — Load/BANGIS/`TAOTUYEN` không đơ vì parse JSON hàng trăm nghìn tam giác. Bản cũ: cắt `"Mesh":[...]` trước khi deserialize; `ReadText` dùng `StringBuilder`.
+- **XAYMOHINH** tối ưu tốc độ (không đổi độ chính xác TIN): ép ràng buộc trên `MeshTri` + liên kết kề sẵn có, tiếp walk sau mỗi lần lật, `tip[]`, tái sử dụng buffer Insert. Harness 2000×25 (~48k cạnh): ~16–17 s → **~6,5 s**, `unforced=0` / SelfCheck OK.
+- **XAYMOHINH** ép cạnh đồng mức: adjacency O(1) + đi bộ từ đầu đoạn (tránh quét toàn bộ Face mỗi lần lật). Harness 2000×25 xong ~18 s trước tối ưu tiếp; tiến trình cập nhật mỗi 16 cạnh.
+- **XAYMOHINH** hàng nghìn đường đồng mức 3D: chỉ mục lưới không gian + tra cạnh O(1); tiến trình từ lúc đọc đồng mức. Harness ~800 contour ~1,6 s.
+- **THEMMOHINH** / **XAYMOHINH**: cảnh báo khi đồng mức chưa có cao độ (Z và Elevation ≈ 0); lúc thêm chọn gắn tất cả / chỉ đường có Z / hủy; lúc dựng hỏi tiếp tục hay hủy. Cảnh báo thêm nếu mọi điểm nguồn Z gần như nhau.
+- **TAOMOHINH**: bỏ ghi chú dưới ô lớp lưới; thu hẹp chiều ngang hộp thoại (440 → 360).
+
+### Đồng mức / cọc
+
+- **GHISODM**: hộp thoại WPF «Ghi Số Đồng Mức» (Chữ / Số cố định / Click tuần tự; khóa ô theo phương án). Ghi `Elevation` (DXF 38), Magenta (6), nhãn MiddleCenter layer `iSurvey_NhanDDM`. Cao độ gốc Z và Bước nhảy cùng một hàng. Alias `ISURVEY_GAN_CAO_DO_PLINE`. Đã nhìn trên Civil 3D 2026 Metric.
+- **PHATSINHCOC**: tra Z TIN nhanh — nạp Face một lần + `TinElevationIndex` (không quét Face mỗi cọc; không ghi lại Mesh vào NOD). Hộp thoại gọn: tên tuyến text tĩnh; Từ–Đến một hàng; bước cọc ô ngắn.
+
 ## 1.8.19 — 2026-11-10
 
 Đã phát hành 2026-11-10 (`publish-release.ps1`: Setup zip + `version.json` trên Storage `isurvey-releases`).

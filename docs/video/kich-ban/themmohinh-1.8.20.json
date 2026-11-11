@@ -1,0 +1,12 @@
+{
+  "command": "THEMMOHINH",
+  "title": "Thêm đồng mức (cảnh báo thiếu cao độ) phiên bản 1.8.20",
+  "version": "1.8.20",
+  "status": "Chưa quay",
+  "drawing": "bản thử đồng mức 2D thiếu Z (bản sao)",
+  "steps": [
+    "THEMMOHINH → Đồng mức → chọn polyline Elevation≈0",
+    "Hộp cảnh báo: gắn tất cả / chỉ có Z / hủy",
+    "Gợi ý GHISODM nếu cần gán Elevation trước"
+  ]
+}

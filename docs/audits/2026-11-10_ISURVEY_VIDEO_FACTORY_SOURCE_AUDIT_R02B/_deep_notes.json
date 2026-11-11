@@ -1,0 +1,151 @@
+{
+  "AUD-001": [
+    "AiChatWindow@src/UI/Ai/AiChatWindow.xaml.cs: đã mở src/UI/Ai/AiChatWindow.xaml.cs (274 dòng), quét 8000 ký tự đầu; io=[]; catch~2"
+  ],
+  "AUD-002": [
+    "DarkDialog@src/UI/Account/DarkDialog.xaml.cs: đã mở src/UI/Account/DarkDialog.xaml.cs (128 dòng), quét 3904 ký tự đầu; io=[]; catch~0"
+  ],
+  "AUD-003": [],
+  "AUD-004": [
+    "OtpAuthService@src/Auth/OtpAuthService.cs: đã mở src/Auth/OtpAuthService.cs (498 dòng), quét 8000 ký tự đầu; io=[]; catch~0"
+  ],
+  "AUD-005": [],
+  "AUD-006": [],
+  "AUD-007": [
+    "DarkDialog@src/UI/Account/DarkDialog.xaml.cs: đã mở src/UI/Account/DarkDialog.xaml.cs (128 dòng), quét 3904 ký tự đầu; io=[]; catch~0"
+  ],
+  "AUD-008": [],
+  "AUD-009": [],
+  "AUD-010": [
+    "DgnExportDialog@src/Dgn/DgnExportDialog.cs: đã mở src/Dgn/DgnExportDialog.cs (16 dòng), quét 551 ký tự đầu; io=[]; catch~0",
+    "DgnExportService@src/Dgn/DgnExportService.cs: đã mở src/Dgn/DgnExportService.cs (697 dòng), quét 8000 ký tự đầu; io=['Directory.Exists', 'File.Delete', 'File.Exists']; catch~2"
+  ],
+  "AUD-011": [
+    "DgnBatchService@src/Dgn/DgnBatchService.cs: đã mở src/Dgn/DgnBatchService.cs (540 dòng), quét 8000 ký tự đầu; io=['DGNIMPORT', 'File.Exists', 'WriteMessage']; catch~2",
+    "DgnImportDialog@src/Dgn/DgnImportDialog.cs: đã mở src/Dgn/DgnImportDialog.cs (16 dòng), quét 517 ký tự đầu; io=[]; catch~0",
+    "DgnImportService@src/Dgn/DgnImportService.cs: đã mở src/Dgn/DgnImportService.cs (1193 dòng), quét 8000 ký tự đầu; io=['DGNIMPORT', 'File.Exists']; catch~1"
+  ],
+  "AUD-012": [
+    "ImportPointsWindow@src/UI/DiemDo/ImportPointsWindow.xaml.cs: đã mở src/UI/DiemDo/ImportPointsWindow.xaml.cs (171 dòng), quét 5256 ký tự đầu; io=['Directory.Exists', 'OpenFileDialog']; catch~1",
+    "PointDrawService@src/Modules/DiemDo/PointDrawService.cs: đã mở src/Modules/DiemDo/PointDrawService.cs (155 dòng), quét 5639 ký tự đầu; io=['StartTransaction']; catch~0"
+  ],
+  "AUD-013": [
+    "ExportPointsWindow@src/UI/DiemDo/ExportPointsWindow.xaml.cs: đã mở src/UI/DiemDo/ExportPointsWindow.xaml.cs (238 dòng), quét 6953 ký tự đầu; io=['Directory.Exists', 'SaveFileDialog']; catch~3"
+  ],
+  "AUD-014": [],
+  "AUD-015": [],
+  "AUD-016": [],
+  "AUD-017": [],
+  "AUD-018": [],
+  "AUD-019": [],
+  "AUD-020": [],
+  "AUD-021": [],
+  "AUD-022": [],
+  "AUD-023": [],
+  "AUD-024": [],
+  "AUD-025": [
+    "KmlExportService@src/Modules/Export/KmlExportService.cs: đã mở src/Modules/Export/KmlExportService.cs (104 dòng), quét 3225 ký tự đầu; io=['StartTransaction']; catch~0",
+    "Vn2000SetupDialog@src/UI/Vn2000/Vn2000SetupDialog.cs: đã mở src/UI/Vn2000/Vn2000SetupDialog.cs (17 dòng), quét 576 ký tự đầu; io=[]; catch~0"
+  ],
+  "AUD-026": [
+    "AcadWindow@?: CHƯA ĐỦ BẰNG CHỨNG: không tìm thấy file cho AcadWindow; io=[]; catch~0",
+    "CoordinateService@src/Modules/Map/CoordinateService.cs: đã mở src/Modules/Map/CoordinateService.cs (234 dòng), quét 8000 ký tự đầu; io=['File.Exists', 'File.ReadAllText']; catch~0",
+    "KmlDrawService@src/Modules/Import/KmlDrawService.cs: đã mở src/Modules/Import/KmlDrawService.cs (290 dòng), quét 8000 ký tự đầu; io=['StartTransaction']; catch~0"
+  ],
+  "AUD-027": [],
+  "AUD-028": [],
+  "AUD-029": [],
+  "AUD-030": [
+    "UserSettingsStore@src/Core/UserSettingsStore.cs: đã mở src/Core/UserSettingsStore.cs (101 dòng), quét 2723 ký tự đầu; io=['Directory.CreateDirectory', 'File.Exists', 'File.ReadAllText', 'File.WriteAllText']; catch~0"
+  ],
+  "AUD-031": [],
+  "AUD-032": [],
+  "AUD-033": [
+    "DrawProfileWindow@src/UI/Profile/DrawProfileWindow.xaml.cs: đã mở src/UI/Profile/DrawProfileWindow.xaml.cs (168 dòng), quét 5325 ký tự đầu; io=['OpenFileDialog', 'SaveFileDialog']; catch~2",
+    "ProfileDrawService@src/Modules/Profile/ProfileDrawService.cs: đã mở src/Modules/Profile/ProfileDrawService.cs (1143 dòng), quét 8000 ký tự đầu; io=['StartTransaction']; catch~0",
+    "ProfileSampleService@src/Modules/Profile/ProfileSampleService.cs: đã mở src/Modules/Profile/ProfileSampleService.cs (278 dòng), quét 8000 ký tự đầu; io=['StartTransaction']; catch~0"
+  ],
+  "AUD-036": [],
+  "AUD-043": [
+    "RouteService@src/Modules/Tuyen/RouteService.cs: đã mở src/Modules/Tuyen/RouteService.cs (806 dòng), quét 8000 ký tự đầu; io=['StartTransaction', 'WriteMessage']; catch~0"
+  ],
+  "AUD-040": [
+    "CreateRouteWindow@src/UI/Tuyen/CreateRouteWindow.xaml.cs: đã mở src/UI/Tuyen/CreateRouteWindow.xaml.cs (114 dòng), quét 3246 ký tự đầu; io=[]; catch~0",
+    "RouteService@src/Modules/Tuyen/RouteService.cs: đã mở src/Modules/Tuyen/RouteService.cs (806 dòng), quét 8000 ký tự đầu; io=['StartTransaction', 'WriteMessage']; catch~0",
+    "RouteStore@src/Modules/Tuyen/RouteStore.cs: đã mở src/Modules/Tuyen/RouteStore.cs (113 dòng), quét 3687 ký tự đầu; io=['StartTransaction']; catch~1"
+  ],
+  "AUD-035": [
+    "RouteService@src/Modules/Tuyen/RouteService.cs: đã mở src/Modules/Tuyen/RouteService.cs (806 dòng), quét 8000 ký tự đầu; io=['StartTransaction', 'WriteMessage']; catch~0"
+  ],
+  "AUD-038": [
+    "CreateStationsWindow@src/UI/Tuyen/CreateStationsWindow.xaml.cs: đã mở src/UI/Tuyen/CreateStationsWindow.xaml.cs (85 dòng), quét 2393 ký tự đầu; io=[]; catch~0",
+    "RouteService@src/Modules/Tuyen/RouteService.cs: đã mở src/Modules/Tuyen/RouteService.cs (806 dòng), quét 8000 ký tự đầu; io=['StartTransaction', 'WriteMessage']; catch~0"
+  ],
+  "AUD-041": [
+    "RouteService@src/Modules/Tuyen/RouteService.cs: đã mở src/Modules/Tuyen/RouteService.cs (806 dòng), quét 8000 ký tự đầu; io=['StartTransaction', 'WriteMessage']; catch~0"
+  ],
+  "AUD-034": [
+    "RouteService@src/Modules/Tuyen/RouteService.cs: đã mở src/Modules/Tuyen/RouteService.cs (806 dòng), quét 8000 ký tự đầu; io=['StartTransaction', 'WriteMessage']; catch~0",
+    "StationListWindow@src/UI/Tuyen/StationListWindow.xaml.cs: đã mở src/UI/Tuyen/StationListWindow.xaml.cs (122 dòng), quét 3603 ký tự đầu; io=[]; catch~0"
+  ],
+  "AUD-044": [
+    "RouteService@src/Modules/Tuyen/RouteService.cs: đã mở src/Modules/Tuyen/RouteService.cs (806 dòng), quét 8000 ký tự đầu; io=['StartTransaction', 'WriteMessage']; catch~0"
+  ],
+  "AUD-042": [
+    "StationStyleStore@src/Modules/Tuyen/StationStyleStore.cs: đã mở src/Modules/Tuyen/StationStyleStore.cs (52 dòng), quét 1465 ký tự đầu; io=['Directory.CreateDirectory', 'File.Exists', 'File.ReadAllText', 'File.WriteAllText']; catch~0",
+    "StationStyleWindow@src/UI/Tuyen/StationStyleWindow.xaml.cs: đã mở src/UI/Tuyen/StationStyleWindow.xaml.cs (99 dòng), quét 3019 ký tự đầu; io=[]; catch~0"
+  ],
+  "AUD-037": [],
+  "AUD-039": [
+    "SequenceWindow@src/UI/Sequence/SequenceWindow.xaml.cs: đã mở src/UI/Sequence/SequenceWindow.xaml.cs (324 dòng), quét 8000 ký tự đầu; io=['StartTransaction']; catch~0"
+  ],
+  "AUD-045": [
+    "ShowDialog@?: CHƯA ĐỦ BẰNG CHỨNG: không tìm thấy file cho ShowDialog; io=[]; catch~0",
+    "Win32SaveFileDialog@?: CHƯA ĐỦ BẰNG CHỨNG: không tìm thấy file cho Win32SaveFileDialog; io=[]; catch~0"
+  ],
+  "AUD-046": [
+    "ShowAlertDialog@?: CHƯA ĐỦ BẰNG CHỨNG: không tìm thấy file cho ShowAlertDialog; io=[]; catch~0",
+    "TabImportWindow@src/UI/Import/TabImportWindow.xaml.cs: đã mở src/UI/Import/TabImportWindow.xaml.cs (147 dòng), quét 4954 ký tự đầu; io=['OpenFileDialog']; catch~1"
+  ],
+  "AUD-050": [
+    "AddPointSourcesWindow@src/UI/Terrain/AddPointSourcesWindow.xaml.cs: đã mở src/UI/Terrain/AddPointSourcesWindow.xaml.cs (135 dòng), quét 4070 ký tự đầu; io=[]; catch~0",
+    "TerrainService@src/Modules/Terrain/TerrainService.cs: đã mở src/Modules/Terrain/TerrainService.cs (1182 dòng), quét 8000 ký tự đầu; io=['StartTransaction', 'WriteMessage']; catch~0"
+  ],
+  "AUD-052": [
+    "TerrainService@src/Modules/Terrain/TerrainService.cs: đã mở src/Modules/Terrain/TerrainService.cs (1182 dòng), quét 8000 ký tự đầu; io=['StartTransaction', 'WriteMessage']; catch~0"
+  ],
+  "AUD-053": [
+    "DarkDialog@src/UI/Account/DarkDialog.xaml.cs: đã mở src/UI/Account/DarkDialog.xaml.cs (128 dòng), quét 3904 ký tự đầu; io=[]; catch~0",
+    "TerrainService@src/Modules/Terrain/TerrainService.cs: đã mở src/Modules/Terrain/TerrainService.cs (1182 dòng), quét 8000 ký tự đầu; io=['StartTransaction', 'WriteMessage']; catch~0"
+  ],
+  "AUD-048": [
+    "TerrainService@src/Modules/Terrain/TerrainService.cs: đã mở src/Modules/Terrain/TerrainService.cs (1182 dòng), quét 8000 ký tự đầu; io=['StartTransaction', 'WriteMessage']; catch~0"
+  ],
+  "AUD-049": [
+    "CreateTerrainWindow@src/UI/Terrain/CreateTerrainWindow.xaml.cs: đã mở src/UI/Terrain/CreateTerrainWindow.xaml.cs (72 dòng), quét 1931 ký tự đầu; io=[]; catch~0",
+    "TerrainStore@src/Modules/Terrain/TerrainStore.cs: đã mở src/Modules/Terrain/TerrainStore.cs (137 dòng), quét 4397 ký tự đầu; io=['StartTransaction']; catch~1"
+  ],
+  "AUD-047": [
+    "TerrainService@src/Modules/Terrain/TerrainService.cs: đã mở src/Modules/Terrain/TerrainService.cs (1182 dòng), quét 8000 ký tự đầu; io=['StartTransaction', 'WriteMessage']; catch~0",
+    "TerrainStore@src/Modules/Terrain/TerrainStore.cs: đã mở src/Modules/Terrain/TerrainStore.cs (137 dòng), quét 4397 ký tự đầu; io=['StartTransaction']; catch~1"
+  ],
+  "AUD-051": [
+    "TerrainService@src/Modules/Terrain/TerrainService.cs: đã mở src/Modules/Terrain/TerrainService.cs (1182 dòng), quét 8000 ký tự đầu; io=['StartTransaction', 'WriteMessage']; catch~0"
+  ],
+  "AUD-054": [],
+  "AUD-055": [],
+  "AUD-056": [],
+  "AUD-057": [
+    "UavImageService@src/Modules/Uav/UavImageService.cs: đã mở src/Modules/Uav/UavImageService.cs (878 dòng), quét 8000 ký tự đầu; io=['StartTransaction', 'WriteMessage']; catch~2"
+  ],
+  "AUD-058": [],
+  "AUD-059": [],
+  "AUD-060": [],
+  "AUD-061": [
+    "UavImageService@src/Modules/Uav/UavImageService.cs: đã mở src/Modules/Uav/UavImageService.cs (878 dòng), quét 8000 ký tự đầu; io=['StartTransaction', 'WriteMessage']; catch~2"
+  ],
+  "AUD-062": [],
+  "AUD-063": [
+    "UavImageService@src/Modules/Uav/UavImageService.cs: đã mở src/Modules/Uav/UavImageService.cs (878 dòng), quét 8000 ký tự đầu; io=['StartTransaction', 'WriteMessage']; catch~2"
+  ]
+}

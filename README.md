@@ -2,7 +2,7 @@
 
 Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georeference **VN-2000** (TM-3 / TM-6), nhập và xuất **KML/KMZ**, cắt bình đồ theo biên (`CATBD`), quét cấu trúc bản vẽ (`AUTOSCAN`). Các lệnh nghiệp vụ khóa cho tới khi kích hoạt bằng Gmail + mã OTP.
 
-**Phiên bản bundle:** `1.8.17` (`deploy/iSurvey.bundle/PackageContents.xml`)
+**Phiên bản bundle:** `1.8.20` (`deploy/iSurvey.bundle/PackageContents.xml`)
 
 **Đồng bộ phiên làm việc (Cursor / đa máy):** đọc [docs/phien-lam-viec/HANDOFF.md](docs/phien-lam-viec/HANDOFF.md). Quy tắc cuối phiên: [docs/phien-lam-viec/README.md](docs/phien-lam-viec/README.md). Changelog: [docs/changelog/CHANGELOG.md](docs/changelog/CHANGELOG.md).
 
@@ -42,7 +42,7 @@ Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georefere
 | `NHAPDIEM` | **ND** | Nhập điểm đo từ CSV/TXT. Bảng giữ X Bắc (7 chữ số) và Y Đông (6 chữ số). Khi vẽ, CAD nhận Đông trên trục X và Bắc trên trục Y. Dấu điểm trên `iSurvey_DiemDo`, tên trên `iSurvey_DiemDo_Ten`, cao độ trên `iSurvey_DiemDo_CaoDo`. Kiểu điểm và cỡ điểm (%) lấy từ hộp thoại. Tạo xong thì phóng vừa vùng điểm |
 | `XUATDIEM` | **XD** | Xuất điểm, block hoặc chữ. CSV dùng dấu phân cách danh sách của Windows. TXT dùng tab. Thập phân luôn là dấu chấm. Chữ đọc được thành số thì thành cao độ và để trống tên. Tên xếp từ số nhỏ đến lớn, rồi A–Z |
 | `ISURVEY_ROUTE_NEW` | **TAOTUYEN** | Tạo tuyến: tên, lý trình gốc, mô hình bám (mặc định mô hình vừa tạo); chọn polyline rồi chọn điểm đầu gần một đầu mút |
-| `ISURVEY_ROUTE_STATIONS` | **PHATSINHCOC** | Phát sinh cọc vuông góc tuyến; Z từ TIN; chữ vuông góc; luôn có cọc tại đỉnh; layer `isurvey_Coctuyen` |
+| `ISURVEY_ROUTE_STATIONS` | **PHATSINHCOC** | Phát sinh cọc vuông góc tuyến; Z từ TIN (`TinElevationIndex`); chữ vuông góc; luôn có cọc tại đỉnh; layer `isurvey_Coctuyen` |
 | `ISURVEY_STATION_STYLE` | **THIETLAPCOC** | Thiết lập chiều dài cọc, cao chữ, khoảng cách chữ; để trống/0: cao chữ 2,5 mm giấy @ 1:1000 (không theo zoom); offset > 50 m bị bỏ; tùy chọn theo độ rộng polyline |
 | `ISURVEY_STATION_ADD_ONE` | **THEMCOC** | Thêm một cọc tại điểm pick gần tim |
 | `ISURVEY_STATION_REMOVE_ONE` | **XOACOC1** | Xóa một cọc (chọn gạch hoặc chữ) |
@@ -57,9 +57,10 @@ Add-in cho AutoCAD / Civil 3D **2022–2027**: chèn tile Google Earth georefere
 | `ISURVEY_LOGO_REPLACE` | **THAYLOGO** | Thay logo EVN bằng ảnh (chủ đầu tư hoặc đơn vị thiết kế); gõ `K` để khôi phục |
 | `ISURVEY_ROUTE_SHEETS` | **RAIKHUNG** | Rải khung in dọc tuyến (nút Ribbon «Rải Khung Theo Tuyến»): một layout lưới khung + viewport xoay. Chữ trong vùng tờ đọc ngang trên layout, góc và cao chữ bên Model không đổi. Hộp thoại hai cột: bố cục in bên trái, 25 ô khung tên bên phải. Cuối hộp thoại: Tải file mẫu, Xuất file, Nhập file. Excel ba cột STT, Tiêu đề, Nội dung. Không in PDF ở bước này. Logo đã chèn được nhớ trong file. Nhấp đúp khung để sửa thông tin |
 | `ISURVEY_PALETTE` | **BANGIS** | Mở hoặc đóng bảng dữ liệu neo bên trái. Bốn tab: Khảo sát, Khung in, UAV, Bản đồ. Chỉ dòng đang chọn in đậm. Chuột phải trên từng mục chỉ hiện lệnh của mục đó |
-| `ISURVEY_TERRAIN_NEW` | **TAOMOHINH** | Tạo mô hình địa hình: tên và lớp lưới. Chưa có tam giác |
-| `ISURVEY_TERRAIN_ADD` | **THEMMOHINH** | Gắn điểm (Point, block, chữ số; Điểm/Block + chữ cao độ cạnh; đường nối điểm nếu bật), đứt gãy, đường đồng mức hoặc đường bao vào mô hình |
-| `ISURVEY_TERRAIN_BUILD` | **XAYMOHINH** | Dựng lưới tam giác, có thanh tiến trình và nút Hủy bỏ. Có đường bao: điểm trong bao; tam giác phải có ba đỉnh, tâm và giữa ba cạnh trong bao (không bắc cầu chỗ lõm) |
+| `ISURVEY_TERRAIN_NEW` | **TAOMOHINH** | Tạo mô hình địa hình: tên và lớp lưới (hộp hẹp). Chưa có tam giác |
+| `ISURVEY_TERRAIN_ADD` | **THEMMOHINH** | Gắn điểm (Point, block, chữ số; Điểm/Block + chữ cao độ cạnh; đường nối điểm nếu bật), đứt gãy, đường đồng mức hoặc đường bao vào mô hình. Đồng mức thiếu Elevation/Z → cảnh báo |
+| `ISURVEY_CONTOUR_ELEV` | **GHISODM** | Ghi Số Đồng Mức: hộp thoại Chữ / Số cố định / Click tuần tự; ghi `Elevation` (DXF 38); Magenta; nhãn `iSurvey_NhanDDM` |
+| `ISURVEY_TERRAIN_BUILD` | **XAYMOHINH** | Dựng lưới TIN (tiến trình thân thiện + Thành công; NOD không Mesh). Có đường bao: điểm trong bao; tam giác phải có ba đỉnh, tâm và giữa ba cạnh trong bao |
 | `ISURVEY_TERRAIN_DETACH` | **GOMOHINH** | Gỡ đối tượng đã chọn khỏi mô hình. Đối tượng trên bản vẽ vẫn giữ. Lưới bị xóa, cần xây dựng lại |
 | `ISURVEY_TERRAIN_CLEAR` | **XOATHANHPHAN** | Xóa toàn bộ điểm, đứt gãy, đồng mức hoặc đường bao khỏi mô hình. Có hộp xác nhận. Đối tượng CAD vẫn giữ |
 | `ISURVEY_TERRAIN_TOGGLE` | **ANTIN** | Ẩn hoặc hiện lưới của mô hình |
