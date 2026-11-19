@@ -6,6 +6,7 @@ Một dòng là một video. Video cũ giữ lại khi có bản mới của cù
 |---|---|---|---|---|
 | D2C | Nhập file DGN | 1.8.15 | Đã ghép, chưa đăng | |
 | D2C | Nhập file DGN (có hộp tiến trình) | 1.8.17 | Chưa quay | |
+| D2C | Nhập file DGN (batch V7 tách ref + fallback DWG) | 1.8.20 | Chưa quay | |
 | RAIMCD | Rải khung mặt cắt dọc | 1.8.16 | Chưa quay | |
 | UAVCLIP | Cắt ảnh UAV | 1.8.16 | Chưa quay | |
 | VEMCD | Vẽ mặt cắt dọc tự nhiên (Zero-Clutter: Z=20; chữ thước=12; CTA 2×2; lưới không Layer; batch Y_min−50) | 1.8.17 | Chưa quay | |

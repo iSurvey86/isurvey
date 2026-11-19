@@ -290,8 +290,8 @@ public sealed class DgnModule : ISurveyModule
     }
 
     /// <summary>
-    /// Thử nhanh: nếu có %TEMP%\isurvey-dgn-progress-seed.flag (dòng 1 = đường dẫn .dgn) thì bỏ hộp thoại chọn file.
-    /// File cờ bị xóa ngay khi đọc.
+    /// Thử nhanh: %TEMP%\isurvey-dgn-progress-seed.flag — mỗi dòng một đường dẫn .dgn (bỏ hộp thoại).
+    /// Nhiều dòng = Batch ghép. File cờ bị xóa ngay khi đọc.
     /// </summary>
     private static DgnImportOptions? TryLoadProgressSeed()
     {
@@ -300,20 +300,27 @@ public sealed class DgnModule : ISurveyModule
             return null;
         try
         {
-            var lines = File.ReadAllLines(flag);
+            var paths = File.ReadAllLines(flag)
+                .Select(l => l.Trim().Trim('"', '\'', ' ', '\t'))
+                .Where(l => l.Length > 0 && !l.StartsWith("#", StringComparison.Ordinal) && File.Exists(l))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
             File.Delete(flag);
-            var path = lines.FirstOrDefault(l => !string.IsNullOrWhiteSpace(l))?.Trim();
-            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+            if (paths.Count == 0)
                 return null;
 
-            var options = DgnImportOptions.FromSettings(UserSettingsStore.Load(null), path);
-            options.FilePath = path;
-            options.BatchFiles = [path];
+            var first = paths[0];
+            var options = DgnImportOptions.FromSettings(UserSettingsStore.Load(null), first);
+            options.FilePath = first;
+            options.BatchFiles = paths;
             options.BatchCombine = true;
             options.PurgeJunk = true;
             options.ZoomToImport = true;
-            options.UseSubUnits = false;
+            options.UseSubUnits = false; // Master — không hỏi người dùng
             options.ImportMode = 2;
+            // path ➔ Default ➔ Master ➔ Standard. Chuỗi rõ ràng, không dựa Enter trống.
+            options.CommandArgs = ["{path}", "Default", "{units}", "{mapping}"];
+            options.MappingSetup = "Standard";
             return options;
         }
         catch

@@ -26,6 +26,7 @@
     <PackageReference Include="MaxRev.Gdal.WindowsRuntime.Minimal" Version="3.13.3.583" />
     <PackageReference Include="System.Text.Json" Version="8.0.5" Condition="'$(TargetFramework)' == 'net48'" />
     <PackageReference Include="PolySharp" Version="1.15.0" Condition="'$(TargetFramework)' == 'net48'" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net48" Version="1.0.3" Condition="'$(TargetFramework)' == 'net48'" PrivateAssets="all" />
     <!-- ExcludeAssets=runtime: API chỉ để biên dịch, AutoCAD cung cấp DLL lúc chạy. -->
     <!-- 24.1 = API 2022. AutoCAD 2023 và 2024 nạp được plugin build từ SDK 2022; chiều ngược lại thì không. -->
     <PackageReference Include="AutoCAD.NET" Version="24.1.51000" Condition="'$(TargetFramework)' == 'net48'" ExcludeAssets="runtime" />
@@ -35,6 +36,8 @@
   <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
     <Reference Include="System.Net.Http" />
     <Reference Include="System.IO.Compression" />
+    <!-- MenuBuilder dùng dynamic (COM MenuBar); net48 cần Microsoft.CSharp. -->
+    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <!-- Tool/smoke test riêng; không biên dịch vào add-in (kể cả obj lồng nhau). -->
   <ItemGroup>

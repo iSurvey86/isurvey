@@ -4,6 +4,14 @@
 
 Bump sau phát hành 1.8.19. **Chưa** chạy `publish-release.ps1` trong phiên này (chỉ bump + đóng gói local).
 
+### DGN ➔ CAD (`D2C`)
+
+- Batch V7 (bộ Phú Cường 30 file): stage mặc định **tách reference** (DC09 = 268 đối tượng; kèm sibling trước đây → 0). Khi vẫn 0 đối tượng: chèn `*-Default*.dwg` do engine tạo; nếu chưa có thì **retry kèm sibling reference** rồi fallback DWG (DC24/DC25). Nghiệm thu AutoCAD 2023: **30/30 OK**, ~68 164 đối tượng, không kẹt Master/Sub.
+
+### Menu khi tắt Ribbon
+
+- Menu cổ điển **iSurvey** trên MenuBar (`MenuBuilder`): nạp cùng Ribbon; `MENUISURVEY` / `ISURVEY_RIBBON` dựng lại cả hai.
+
 ### Mô hình / TIN
 
 - **XAYMOHINH** UX + ổn định sau TIN: chữ tiến trình dễ hiểu; hộp **Thành công** sau khi dựng xong; không lưu tọa độ Mesh vào NOD (chỉ `StoredTriangleCount` + Face trên bản vẽ) — Load/BANGIS/`TAOTUYEN` không đơ vì parse JSON hàng trăm nghìn tam giác. Bản cũ: cắt `"Mesh":[...]` trước khi deserialize; `ReadText` dùng `StringBuilder`.

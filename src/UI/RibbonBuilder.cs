@@ -228,7 +228,7 @@ public static class RibbonBuilder
                     new Btn("Thông Tin & Giấy Phép", "ISURVEY_ABOUT", AuthIcons.Info, true),
                     new Btn("Hướng dẫn", "ISURVEY_HDSD", AuthIcons.Help, true, "Mở hướng dẫn iSurvey trên web"),
                     new Btn("Nạp lại\nMenu", "ISURVEY_RIBBON", AuthIcons.Refresh, true,
-                        "Dựng lại tab Ribbon iSurvey (MENUISURVEY)"),
+                        "Dựng lại tab Ribbon và menu cổ điển iSurvey (MENUISURVEY)"),
                     new Btn("Đăng Xuất / Đổi Máy", LogoutCommand, AuthIcons.Power, true)
                 ],
                 gated: false);

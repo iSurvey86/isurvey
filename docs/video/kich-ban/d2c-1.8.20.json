@@ -1,0 +1,45 @@
+{
+  "id": "d2c-1.8.20",
+  "command": "D2C",
+  "commandFull": "ISURVEY_DGN_TO_CAD",
+  "feature": "Nhập file DGN",
+  "version": "1.8.20",
+  "title": "Nhập file DGN phiên bản 1.8.20",
+  "privacy": "unlisted",
+  "voice": "vi-VN-HoaiMyNeural",
+  "rate": "-8%",
+  "tags": ["iSurvey", "Civil 3D", "DGN", "D2C", "batch"],
+  "description": "Cách nhập nhiều file MicroStation DGN (kể cả V7 có reference) vào CAD bằng iSurvey.\n\nHành vi trong video có từ iSurvey 1.8.20: batch tách reference, fallback DWG khi cần.",
+  "shots": [
+    {
+      "id": "01-mo-dau",
+      "type": "card",
+      "lines": ["Nhập file DGN", "phiên bản 1.8.20"],
+      "narration": "Nhập file D G N, phiên bản một chấm tám chấm hai mươi. Batch ổn định với file V bảy có reference."
+    },
+    {
+      "id": "02-lenh",
+      "type": "screen",
+      "action": "Gõ D2C. Hộp Nhập DGN mở.",
+      "narration": "Gõ D hai C. Hộp nhập D G N mở."
+    },
+    {
+      "id": "03-them-tep",
+      "type": "screen",
+      "action": "Thêm nhiều tệp DGN. Giữ ghép một bản vẽ.",
+      "narration": "Bấm Thêm tệp. Chọn nhiều file D G N. Giữ chế độ ghép vào một bản vẽ."
+    },
+    {
+      "id": "04-nhap",
+      "type": "screen",
+      "action": "Bấm Nhập DGN. Hộp tiến trình đến khi xong, không hỏi Master Sub.",
+      "narration": "Bấm Nhập D G N. Hộp tiến trình chạy từng file. Không bị hỏi Master hay Sub. Đợi đến khi hộp đóng."
+    },
+    {
+      "id": "05-ket",
+      "type": "card",
+      "lines": ["Xong — bản vẽ đã có dữ liệu DGN"],
+      "narration": "Xong. Các tờ bản đồ đã nằm trong bản vẽ hiện hành."
+    }
+  ]
+}

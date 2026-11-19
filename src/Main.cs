@@ -41,7 +41,7 @@ using iSurvey.UI;
 
 namespace iSurvey;
 
-/// <summary>Điểm vào add-in iSurvey — khởi tạo Ribbon khi AutoCAD nạp DLL.</summary>
+/// <summary>Điểm vào add-in iSurvey — khởi tạo Ribbon + menu cổ điển khi AutoCAD nạp DLL.</summary>
 public sealed class Main : IExtensionApplication
 {
     private MapModule? _mapModule;
@@ -49,13 +49,14 @@ public sealed class Main : IExtensionApplication
 
     public void Initialize()
     {
-        // Chỉ đọc license.dat (không mạng, không dialog) — Ribbon dựa vào trạng thái này để khóa/mở nút.
+        // Chỉ đọc license.dat (không mạng, không dialog) — Ribbon/menu dựa vào trạng thái này để khóa/mở nút.
         AuthManager.Initialize();
         _mapModule = new MapModule();
         _mapModule.Initialize();
         _exportModule = new ExportModule();
         _exportModule.Initialize();
         RibbonBuilder.EnsureRibbon();
+        MenuBuilder.EnsureMenu();
         TitleBlockFit.Watch();
         FrameDoubleClick.Watch();
 
@@ -94,8 +95,9 @@ public sealed class Main : IExtensionApplication
                     $"\n[iSurvey] {string.Join(", ", fixedVars)} đang = 0 (làm hộp thoại không hiện) — đã đặt lại 1.");
             }
 
-            // Ribbon đôi khi chưa sẵn lúc Initialize — dựng lại khi đã có bản vẽ.
+            // Ribbon/menu đôi khi chưa sẵn lúc Initialize — dựng lại khi đã có bản vẽ.
             RibbonBuilder.EnsureRibbon();
+            MenuBuilder.EnsureMenu();
 
             iSurvey.Auth.UpdateApplyService.FlushPendingResult();
         }
@@ -115,6 +117,7 @@ public sealed class Main : IExtensionApplication
         _mapModule?.Terminate();
         _mapModule = null;
         RibbonBuilder.Cleanup();
+        MenuBuilder.Cleanup();
         iSurvey.UI.Palette.SurveyPaletteManager.Shutdown();
     }
 }

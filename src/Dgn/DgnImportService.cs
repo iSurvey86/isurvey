@@ -59,7 +59,9 @@ internal static class DgnImportService
     private const double QuietSecondsAfterChange = 2.0;
     private const double QuietSecondsWhenForcedIdle = 10.0;
     private const double QuietSecondsNoObjects = 8.0;
-    private const double TimeoutSeconds = 300.0;
+    /// <summary>Internal Error / File access của AutoCAD trên một số V7: không đợi quá lâu trong batch.</summary>
+    private const double TimeoutSeconds = 90.0;
+    private const double TimeoutNoChangeSeconds = 45.0;
 
     /// <summary>Một lần nhập đang chạy: DGNIMPORT hoàn tất BẤT ĐỒNG BỘ sau khi lệnh của ta đã trả về.</summary>
     private sealed class Job
@@ -102,6 +104,12 @@ internal static class DgnImportService
         public TaskProgressWindow? Progress { get; init; }
 
         public DateTime LastProgressUi { get; set; }
+
+        /// <summary>Thư mục stage (C:\Temp\isurvey-dgn-stage\…) — dùng khi fallback lấy *.dwg do -DGNIMPORT tạo trước khi Internal Error.</summary>
+        public string? StageDirectory { get; set; }
+
+        /// <summary>Đã thử lại lần 2 kèm sibling reference (tránh lặp vô hạn trong Complete).</summary>
+        public bool TriedSiblingRetry { get; set; }
     }
 
     /// <summary>
@@ -126,6 +134,16 @@ internal static class DgnImportService
         if (!File.Exists(options.FilePath))
         {
             report.Error = "Không tìm thấy file DGN.";
+            log.Info(report.Error);
+            log.Dispose();
+            done(report);
+            return;
+        }
+
+        var emptyReason = DescribeUnreadableDgn(options.FilePath);
+        if (emptyReason is not null)
+        {
+            report.Error = emptyReason;
             log.Info(report.Error);
             log.Dispose();
             done(report);
@@ -161,7 +179,9 @@ internal static class DgnImportService
                 job.KnownDocs.Add(d);
 
             ReportProgress(job, 0, 0, "Đang gửi lệnh DGNIMPORT — " + Path.GetFileName(options.FilePath));
-            RunImportCommand(ed, options, log);
+            // Topmost progress ăn focus → Editor.Command không gửi được Enter (kẹt Master/mapping).
+            // Ẩn tạm cửa sổ trong lúc gọi lệnh.
+            RunImportCommand(job);
         }
         catch (System.Exception ex)
         {
@@ -252,22 +272,23 @@ internal static class DgnImportService
                 job.LastChange = now;
             }
 
+            var elapsedSec = (now - job.Started).TotalSeconds;
             if ((now - job.LastProgressUi).TotalSeconds >= 0.4)
             {
                 job.LastProgressUi = now;
                 var grown = Math.Max(0, seedNow - (job.TargetIsNewDoc ? job.BaselineSeed : job.Seed));
-                var elapsed = (now - job.Started).TotalSeconds;
                 ReportProgress(job, 0, 0,
                     grown > 0
-                        ? $"Đang nhập… ~{grown:N0} đối tượng mới ({elapsed:0}s) — {Path.GetFileName(job.Options.FilePath)}"
-                        : $"Đang chờ Civil 3D… ({elapsed:0}s) — {Path.GetFileName(job.Options.FilePath)}");
+                        ? $"Đang nhập… ~{grown:N0} đối tượng mới ({elapsedSec:0}s) — {Path.GetFileName(job.Options.FilePath)}"
+                        : $"Đang chờ Civil 3D… ({elapsedSec:0}s) — {Path.GetFileName(job.Options.FilePath)}");
             }
 
             var active = IsCommandActive();
             var quiet = (now - job.LastChange).TotalSeconds;
             // Bản vẽ mới: Seed=0 (lấy mọi đối tượng) nhưng "đã có thay đổi" chỉ tính khi Handseed vượt mốc lúc tạo.
             var changed = seedNow > (job.TargetIsNewDoc ? job.BaselineSeed : job.Seed);
-            var timeout = (now - job.Started).TotalSeconds > TimeoutSeconds;
+            var timeout = elapsedSec > TimeoutSeconds
+                          || (!changed && elapsedSec > TimeoutNoChangeSeconds);
 
             var ready =
                 (changed && quiet >= QuietSecondsAfterChange && (!active || quiet >= QuietSecondsWhenForcedIdle))
@@ -275,6 +296,9 @@ internal static class DgnImportService
 
             if (!ready && !timeout)
                 return;
+
+            if (timeout && !changed)
+                job.Log.Info($"Hết hạn chờ DGNIMPORT ({elapsedSec:0}s, 0 đối tượng mới) — bỏ file này, tiếp batch.");
 
             // Hậu xử lý cần lệnh trong bản vẽ đang hoạt động.
             if (!timeout && !ReferenceEquals(AcadApp.DocumentManager.MdiActiveDocument, job.Doc))
@@ -323,14 +347,52 @@ internal static class DgnImportService
 
                 if (imported.Count == 0)
                 {
-                    report.Error = "DGNIMPORT không tạo đối tượng nào. Xem prompt trên Command Line " +
-                                   "(trình tự prompt có thể khác) và gửi lại log.";
+                    // Một số V7 (DC24/DC25 Phú Cường) khiến AutoCAD Internal Error sau khi đã
+                    // xuất tạm *-Default*.dwg trong thư mục stage/nguồn. Nhập DWG đó thay vì bỏ file.
+                    var fallback = TryInsertFallbackDwgs(job);
+                    if (fallback > 0)
+                    {
+                        imported = CollectNewModelSpace(db, job.Seed);
+                        report.ImportedEntities = imported.Count;
+                        log.Info($"Fallback DWG: chèn {fallback} file ➔ {imported.Count} đối tượng mới.");
+                        report.Error = null;
+                        report.Warnings.Add(
+                            "DGNIMPORT gặp lỗi (0 đối tượng / Internal Error) — đã nhập từ file DWG tạm do AutoCAD tạo.");
+                    }
+                    else if (!job.TriedSiblingRetry && TryRetryImportWithSiblings(job))
+                    {
+                        // Lần 1 tách reference (DC09 = 268). Một số file cần sibling (DC24/25)
+                        // để engine tạo *-Default*.dwg — thử lại có reference rồi fallback DWG.
+                        imported = CollectNewModelSpace(db, job.Seed);
+                        report.ImportedEntities = imported.Count;
+                        if (imported.Count == 0)
+                        {
+                            fallback = TryInsertFallbackDwgs(job);
+                            if (fallback > 0)
+                            {
+                                imported = CollectNewModelSpace(db, job.Seed);
+                                report.ImportedEntities = imported.Count;
+                                log.Info($"Fallback DWG sau retry sibling: chèn {fallback} file ➔ {imported.Count} đối tượng mới.");
+                                report.Error = null;
+                                report.Warnings.Add(
+                                    "DGNIMPORT 0 đối tượng — đã nhập lại kèm reference rồi lấy DWG tạm.");
+                            }
+                        }
+                        else
+                        {
+                            report.Error = null;
+                            report.Warnings.Add("DGNIMPORT lần 1 = 0 — đã nhập lại kèm reference sibling.");
+                        }
+                    }
+
+                    if (imported.Count == 0 && report.Error is null)
+                    {
+                        report.Error = "DGNIMPORT không tạo đối tượng nào. Xem prompt trên Command Line " +
+                                       "(trình tự prompt có thể khác) và gửi lại log.";
+                    }
                 }
-                else if (IsCancelled(job))
-                {
-                    report.Error = "đã hủy";
-                }
-                else
+
+                if (report.Error is null && imported.Count > 0 && !IsCancelled(job))
                 {
                     // Một nhóm UNDO cho toàn bộ hậu xử lý (bản thân DGNIMPORT là một bước UNDO riêng).
                     try
@@ -345,6 +407,10 @@ internal static class DgnImportService
 
                     ReportProgress(job, 0, 0, $"Đang hậu xử lý {imported.Count:N0} đối tượng…");
                     PostProcess(db, job.Seed, job.TargetIsNewDoc, options, report, log, job);
+                }
+                else if (IsCancelled(job) && report.Error is null)
+                {
+                    report.Error = "đã hủy";
                 }
             }
 
@@ -395,20 +461,78 @@ internal static class DgnImportService
         }
     }
 
-    private static void RunImportCommand(Editor ed, DgnImportOptions options, DgnLog log)
+    private static void RunImportCommand(Job job)
     {
+        var doc = job.Doc;
+        var ed = doc.Editor;
+        var options = job.Options;
+        var log = job.Log;
+        var progress = job.Progress;
         var units = options.UseSubUnits ? "_Sub" : "_Master";
+        var path = ToCommandPath(options.FilePath, log);
+        try { job.StageDirectory = Path.GetDirectoryName(path); } catch { /* ignore */ }
+        // path ➔ Default (model) ➔ units ➔ Standard (mapping).
+        // Prompt model/mapping là chuỗi tự do: space/"" dễ bị nuốt hoặc nhận nhầm (_Master = tên model).
+        // Gửi rõ "Default" / "Standard" — đã xác minh trên AutoCAD 2023 với bộ phu cuong V7.
+        var templates = options.CommandArgs is { Count: > 0 }
+            ? options.CommandArgs
+            : (IReadOnlyList<string>)["{path}", "Default", "{units}", "{mapping}"];
+        if (IsDgnV7(options.FilePath))
+            log.Info("DGN V7 — gửi Default + Standard (tránh prompt model/mapping nuốt Enter).");
+
+        var mapping = string.IsNullOrWhiteSpace(options.MappingSetup) ? "Standard" : options.MappingSetup.Trim();
         var args = new List<object> { options.Command };
-        foreach (var template in options.CommandArgs)
+        foreach (var template in templates)
         {
-            args.Add(template
-                .Replace("{path}", options.FilePath)
+            // Thay "{path}" trước {path} để tránh ""đường dẫn"".
+            var token = template
+                .Replace("\"{path}\"", path)
+                .Replace("{path}", path)
                 .Replace("{units}", units)
-                .Replace("{mapping}", options.MappingSetup));
+                .Replace("{mapping}", mapping);
+            // Token rỗng còn sót (cấu hình cũ) ➔ "Standard" nếu là mapping, còn không thì "Default".
+            if (token.Length == 0)
+                token = "Default";
+            args.Add(token);
         }
 
-        log.Info("Gọi: " + string.Join(" | ", args.Select(a => a is string { Length: 0 } ? "<Enter>" : a.ToString())));
-        ed.Command(args.ToArray());
+        log.Info("Gọi: " + string.Join(" | ", args.Select(a => a is string s && string.IsNullOrWhiteSpace(s) ? "<Enter>" : a.ToString())));
+
+        var hidden = false;
+        try
+        {
+            if (progress is not null)
+            {
+                try
+                {
+                    progress.Topmost = false;
+                    progress.Hide();
+                    hidden = true;
+                }
+                catch { /* ignore */ }
+            }
+
+            try
+            {
+                AcadApp.MainWindow.Focus();
+                doc.Window.Focus();
+            }
+            catch { /* ignore */ }
+
+            ed.Command(args.ToArray());
+        }
+        finally
+        {
+            if (hidden && progress is not null)
+            {
+                try
+                {
+                    progress.Show();
+                    progress.Topmost = true;
+                }
+                catch { /* ignore */ }
+            }
+        }
 
         try
         {
@@ -417,6 +541,374 @@ internal static class DgnImportService
         catch
         {
             // chỉ để đối chiếu
+        }
+    }
+
+    /// <summary>True nếu đầu file là seed MicroStation V7 (08 09 FE 02).</summary>
+    internal static bool IsDgnV7(string path)
+    {
+        try
+        {
+            using var fs = File.OpenRead(path);
+            var buf = new byte[4];
+            var n = fs.Read(buf, 0, 4);
+            return n >= 4 && buf[0] == 0x08 && buf[1] == 0x09 && buf[2] == 0xFE && buf[3] == 0x02;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// File trống / toàn byte 0 / không phải V7–V8: báo lỗi sớm, tránh -DGNIMPORT hỏi lại tên file liên tục.
+    /// </summary>
+    private static string? DescribeUnreadableDgn(string path)
+    {
+        try
+        {
+            var info = new FileInfo(path);
+            if (info.Length == 0)
+                return "File DGN trống (0 byte).";
+
+            // Đọc tối đa 4 KB: seed V7 bắt đầu 08 09 FE 02; V8 có chữ DgGe.
+            var take = (int)Math.Min(info.Length, 4096);
+            var buf = new byte[take];
+            using (var fs = File.OpenRead(path))
+            {
+                var n = fs.Read(buf, 0, take);
+                if (n <= 0)
+                    return "Không đọc được nội dung file DGN.";
+                if (n < take)
+                    Array.Resize(ref buf, n);
+            }
+
+            if (buf.All(b => b == 0))
+                return "File DGN không có dữ liệu (toàn byte 0). Kiểm tra lại nguồn xuất/chép file.";
+
+            if (buf.Length >= 4 && buf[0] == 0x08 && buf[1] == 0x09 && buf[2] == 0xFE && buf[3] == 0x02)
+                return null; // V7
+
+            var ascii = System.Text.Encoding.ASCII.GetString(buf);
+            if (ascii.Contains("DgGe", StringComparison.Ordinal))
+                return null; // V8
+
+            // Còn dữ liệu khác 0 nhưng không nhận ra chữ ký: vẫn để -DGNIMPORT thử (một số V7 lệch đầu file).
+            return null;
+        }
+        catch (System.Exception ex)
+        {
+            return "Không đọc được file DGN: " + ex.Message;
+        }
+    }
+
+    /// <summary>
+    /// Đường dẫn đưa vào <see cref="Editor.Command"/>. Mỗi đối số đã là một token đầy đủ —
+    /// không bọc ngoặc kép (AutoCAD sẽ tìm file có ký tự "). Có khoảng trắng thì dùng đường dẫn ngắn 8.3.
+    /// Mặc định tách reference (DC09 Phú Cường = 268 khi isolate; kèm sibling → 0).
+    /// Truyền <paramref name="copyReferencedSiblings"/>=true khi retry file kiểu DC24/25.
+    /// </summary>
+    internal static string ToCommandPath(string path, DgnLog? log = null, bool copyReferencedSiblings = false)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return path;
+        path = path.Trim().Trim('"');
+
+        try
+        {
+            // Không dùng %LocalAppData% (thường có khoảng trắng trong tên user) —
+            // Editor.Command với path có space → Internal Error / hỏi lại tên file.
+            var root = Path.Combine(Path.GetPathRoot(Path.GetTempPath()) ?? @"C:\", "Temp", "isurvey-dgn-stage");
+            Directory.CreateDirectory(root);
+            // Thư mục riêng theo tên + tick → tránh khóa/reference từ file vừa nhập trước đó.
+            var dir = Path.Combine(root, Path.GetFileNameWithoutExtension(path) + "_" + DateTime.UtcNow.Ticks.ToString("x"));
+            Directory.CreateDirectory(dir);
+            var dest = Path.Combine(dir, Path.GetFileName(path));
+            File.Copy(path, dest, overwrite: true);
+            // Một số V7 (vd. DC24/DC25) gần như chỉ là container reference — cần sibling
+            // để engine tạo *-Default*.dwg. DC09 ngược lại: kèm sibling → 0 đối tượng.
+            var copiedRefs = copyReferencedSiblings ? CopyReferencedSiblings(path, dir, log) : 0;
+            if (dest.IndexOf(' ') >= 0)
+            {
+                var shortDest = TryGetShortPath(dest);
+                if (!string.IsNullOrEmpty(shortDest) && shortDest.IndexOf(' ') < 0)
+                    dest = shortDest;
+            }
+            log?.Info(copiedRefs > 0
+                ? $"Chép tạm (+{copiedRefs} reference cùng thư mục): {dest}"
+                : $"Chép tạm (tách reference): {dest}");
+            return dest;
+        }
+        catch (System.Exception ex)
+        {
+            log?.Info("Không chép được file tạm: " + ex.Message);
+            if (!path.Contains(' '))
+                return path;
+            var shortPath = TryGetShortPath(path);
+            if (!string.IsNullOrEmpty(shortPath) && shortPath.IndexOf(' ') < 0 && File.Exists(shortPath))
+            {
+                log?.Info($"Fallback dạng ngắn: {shortPath}");
+                return shortPath;
+            }
+            return path;
+        }
+    }
+
+    /// <summary>
+    /// Lần 1 tách reference = 0 và không có *-Default*.dwg: nhập lại kèm sibling reference,
+    /// chờ Handseed ổn định (đồng bộ trong Complete — Idle đã gỡ).
+    /// </summary>
+    private static bool TryRetryImportWithSiblings(Job job)
+    {
+        job.TriedSiblingRetry = true;
+        var log = job.Log;
+        var options = job.Options;
+        try
+        {
+            var path = ToCommandPath(options.FilePath, log, copyReferencedSiblings: true);
+            try { job.StageDirectory = Path.GetDirectoryName(path); } catch { /* ignore */ }
+
+            // Không có sibling nào được chép → không đáng thử lại.
+            var stage = job.StageDirectory;
+            if (string.IsNullOrEmpty(stage) || !Directory.Exists(stage))
+                return false;
+            var siblingCount = Directory.EnumerateFiles(stage)
+                .Count(f => !f.Equals(path, StringComparison.OrdinalIgnoreCase));
+            if (siblingCount == 0)
+            {
+                log.Info("Retry sibling: không có reference cùng thư mục — bỏ qua.");
+                return false;
+            }
+
+            log.Info($"Retry DGNIMPORT kèm {siblingCount} file cùng stage…");
+            ReportProgress(job, 0, 0,
+                $"Thử lại kèm reference — {Path.GetFileName(options.FilePath)}");
+
+            var units = options.UseSubUnits ? "_Sub" : "_Master";
+            var mapping = string.IsNullOrWhiteSpace(options.MappingSetup) ? "Standard" : options.MappingSetup.Trim();
+            var args = new List<object> { options.Command, path, "Default", units, mapping };
+            log.Info("Gọi (retry): " + string.Join(" | ", args.Select(a => a.ToString())));
+
+            var ed = job.Doc.Editor;
+            var seedBefore = job.Doc.Database.Handseed.Value;
+            ed.Command(args.ToArray());
+
+            var started = DateTime.UtcNow;
+            var lastSeed = seedBefore;
+            var lastChange = started;
+            while ((DateTime.UtcNow - started).TotalSeconds < TimeoutSeconds)
+            {
+                System.Threading.Thread.Sleep(400);
+                // Bơm message để AutoCAD xử lý DGNIMPORT / dialog Internal Error.
+                System.Windows.Forms.Application.DoEvents();
+                var seedNow = job.Doc.Database.Handseed.Value;
+                if (seedNow != lastSeed)
+                {
+                    lastSeed = seedNow;
+                    lastChange = DateTime.UtcNow;
+                }
+
+                var active = IsCommandActive();
+                var quiet = (DateTime.UtcNow - lastChange).TotalSeconds;
+                var changed = seedNow > seedBefore;
+                if (changed && quiet >= QuietSecondsAfterChange && !active)
+                    break;
+                if (!changed && !active && quiet >= QuietSecondsNoObjects)
+                    break;
+                if (!changed && (DateTime.UtcNow - started).TotalSeconds > TimeoutNoChangeSeconds)
+                    break;
+            }
+
+            log.Info($"Retry sibling xong — Handseed {seedBefore:X} ➔ {job.Doc.Database.Handseed.Value:X}, " +
+                     $"{(DateTime.UtcNow - started).TotalSeconds:0.#}s.");
+            return true;
+        }
+        catch (System.Exception ex)
+        {
+            log.Info("Retry sibling thất bại: " + ex.Message);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Khi -DGNIMPORT Internal Error / 0 đối tượng: tìm file *-Default*.dwg mà engine AutoCAD
+    /// đã ghi cạnh DGN (stage hoặc thư mục nguồn) rồi chèn vào Model Space.
+    /// </summary>
+    private static int TryInsertFallbackDwgs(Job job)
+    {
+        var log = job.Log;
+        var baseName = Path.GetFileNameWithoutExtension(job.Options.FilePath);
+        var dirs = new List<string>();
+        if (!string.IsNullOrEmpty(job.StageDirectory) && Directory.Exists(job.StageDirectory))
+            dirs.Add(job.StageDirectory);
+        var srcDir = Path.GetDirectoryName(job.Options.FilePath);
+        if (!string.IsNullOrEmpty(srcDir) && Directory.Exists(srcDir) &&
+            !dirs.Any(d => d.Equals(srcDir, StringComparison.OrdinalIgnoreCase)))
+            dirs.Add(srcDir);
+
+        var candidates = new List<string>();
+        foreach (var dir in dirs)
+        {
+            try
+            {
+                foreach (var f in Directory.EnumerateFiles(dir, "*.dwg"))
+                {
+                    var name = Path.GetFileNameWithoutExtension(f);
+                    if (name.Contains("Default", StringComparison.OrdinalIgnoreCase) &&
+                        name.Contains(baseName, StringComparison.OrdinalIgnoreCase))
+                        candidates.Add(f);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                log.Info("Quét DWG fallback lỗi ở " + dir + ": " + ex.Message);
+            }
+        }
+
+        // Chỉ lấy 1 file lớn nhất — stage và thư mục nguồn thường cùng một bản Default-Mirror.
+        var best = candidates
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderByDescending(f => new FileInfo(f).Length)
+            .FirstOrDefault();
+        if (best is null)
+        {
+            log.Info("Không thấy file *-Default*.dwg để fallback.");
+            return 0;
+        }
+
+        var inserted = 0;
+        var db = job.Doc.Database;
+        foreach (var dwg in new[] { best })
+        {
+            try
+            {
+                log.Info($"Fallback: chèn {dwg}");
+                using var src = new Database(false, true);
+                src.ReadDwgFile(dwg, FileOpenMode.OpenForReadAndAllShare, true, "");
+                src.CloseInput(true);
+                var ids = new ObjectIdCollection();
+                using (var tr = src.TransactionManager.StartTransaction())
+                {
+                    var ms = (BlockTableRecord)tr.GetObject(
+                        SymbolUtilityServices.GetBlockModelSpaceId(src), OpenMode.ForRead);
+                    foreach (ObjectId id in ms)
+                        ids.Add(id);
+                    tr.Commit();
+                }
+
+                if (ids.Count == 0)
+                {
+                    log.Info("  (DWG không có đối tượng Model Space)");
+                    continue;
+                }
+
+                var map = new IdMapping();
+                db.WblockCloneObjects(
+                    ids, SymbolUtilityServices.GetBlockModelSpaceId(db), map,
+                    DuplicateRecordCloning.Replace, false);
+                inserted++;
+                log.Info($"  ➔ clone {ids.Count} đối tượng.");
+            }
+            catch (System.Exception ex)
+            {
+                log.Info("  Fallback thất bại: " + ex.Message);
+            }
+        }
+
+        return inserted;
+    }
+
+    [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+    private static extern int GetShortPathNameW(string lpszLongPath, System.Text.StringBuilder lpszShortPath, int cchBuffer);
+
+    private static string? TryGetShortPath(string path)
+    {
+        try
+        {
+            var sb = new System.Text.StringBuilder(512);
+            var n = GetShortPathNameW(path, sb, sb.Capacity);
+            return n > 0 ? sb.ToString() : null;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Quét ASCII trong DGN tìm tên file .dgn/.dwg rồi chép những file tồn tại cùng thư mục nguồn
+    /// vào <paramref name="stageDir"/>. Giới hạn kích thước đọc để không chậm trên file lớn.
+    /// </summary>
+    private static int CopyReferencedSiblings(string sourcePath, string stageDir, DgnLog? log)
+    {
+        try
+        {
+            var srcDir = Path.GetDirectoryName(sourcePath);
+            if (string.IsNullOrEmpty(srcDir) || !Directory.Exists(srcDir))
+                return 0;
+
+            var selfName = Path.GetFileName(sourcePath);
+            byte[] bytes;
+            using (var fs = new FileStream(sourcePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                var max = (int)Math.Min(fs.Length, 4 * 1024 * 1024);
+                bytes = new byte[max];
+                _ = fs.Read(bytes, 0, max);
+            }
+
+            var ascii = System.Text.Encoding.ASCII.GetString(bytes);
+            var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (System.Text.RegularExpressions.Match m in
+                     System.Text.RegularExpressions.Regex.Matches(
+                         ascii, @"[A-Za-z0-9_\-]{2,120}\.(?:dgn|dwg)",
+                         System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+            {
+                var name = Path.GetFileName(m.Value);
+                if (string.IsNullOrEmpty(name) || name.Equals(selfName, StringComparison.OrdinalIgnoreCase))
+                    continue;
+                // Bỏ qua DWG tạm do -DGNIMPORT tạo (…-Default…); không phải reference gốc.
+                if (name.EndsWith(".dwg", StringComparison.OrdinalIgnoreCase) &&
+                    name.Contains("Default", StringComparison.OrdinalIgnoreCase))
+                    continue;
+                names.Add(name);
+            }
+
+            var copied = 0;
+            foreach (var name in names)
+            {
+                var src = Path.Combine(srcDir, name);
+                if (!File.Exists(src))
+                {
+                    // Thử khớp không phân biệt hoa/thường trong thư mục nguồn.
+                    var hit = Directory.EnumerateFiles(srcDir, name).FirstOrDefault()
+                              ?? Directory.EnumerateFiles(srcDir, Path.GetFileNameWithoutExtension(name) + ".*")
+                                  .FirstOrDefault(f =>
+                                      Path.GetExtension(f).Equals(Path.GetExtension(name), StringComparison.OrdinalIgnoreCase));
+                    if (hit is null)
+                        continue;
+                    src = hit;
+                }
+
+                var dest = Path.Combine(stageDir, Path.GetFileName(src));
+                if (File.Exists(dest))
+                    continue;
+                try
+                {
+                    File.Copy(src, dest, overwrite: false);
+                    copied++;
+                }
+                catch (System.Exception ex)
+                {
+                    log?.Info($"Không chép reference '{Path.GetFileName(src)}': {ex.Message}");
+                }
+            }
+
+            return copied;
+        }
+        catch (System.Exception ex)
+        {
+            log?.Info("Quét reference thất bại: " + ex.Message);
+            return 0;
         }
     }
 

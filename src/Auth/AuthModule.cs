@@ -48,19 +48,20 @@ public sealed class AuthModule : ISurveyModule
         }
     }
 
-    /// <summary>Dựng lại tab Ribbon iSurvey và kích hoạt. Không cần đăng nhập.</summary>
+    /// <summary>Dựng lại tab Ribbon + menu cổ điển iSurvey. Không cần đăng nhập.</summary>
     [CommandMethod("ISURVEY_RIBBON")]
     public void RibbonCommand()
     {
         try
         {
             RibbonBuilder.ReloadRibbon();
-            AuthManager.Print("\n[iSurvey] Da nap lai menu Ribbon iSurvey.");
+            UI.MenuBuilder.ReloadMenu();
+            AuthManager.Print("\n[iSurvey] Da nap lai Ribbon va menu iSurvey.");
             ActivityLogger.Enqueue("ribbon_reload", "ISURVEY_RIBBON");
         }
         catch (System.Exception ex)
         {
-            AuthManager.Print("\n[iSurvey] Khong nap duoc menu Ribbon: " + ex.Message);
+            AuthManager.Print("\n[iSurvey] Khong nap duoc Ribbon/menu: " + ex.Message);
         }
     }
 

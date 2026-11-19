@@ -361,7 +361,7 @@ internal static class DgnExportService
             {
                 "_.-DGNEXPORT",
                 options.VersionText,
-                options.OutputPath,
+                DgnImportService.ToCommandPath(options.OutputPath),
                 options.UseSubUnits ? "_Sub" : "_Master",
                 options.MappingSetup,
                 "~" // mở hộp thoại Select Seed File — SeedDialogDriver tự điền

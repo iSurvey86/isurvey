@@ -5,6 +5,41 @@
 
 ---
 
+## 2026-11-19 — D2C batch V7 Phú Cường + MenuBar (1.8.20, không bump)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng (AutoCAD 2023). Cuối phiên đầy đủ. **Không bump.** Vẫn **1.8.20** (chưa `publish-release.ps1`).
+
+### Đã chốt / đã làm
+
+- **D2C** batch V7: stage mặc định **tách reference**; fallback `*-Default*.dwg`; retry kèm sibling khi cần. Prompt `Default` / `_Master` / `Standard`. Nghiệm thu bộ Phú Cường **30/30 OK** (~68 164 đối tượng; DC09=268; DC24/25 qua DWG tạm).
+- Menu cổ điển **iSurvey** trên MenuBar khi Ribbon tắt (`MenuBuilder`); `MENUISURVEY` nạp lại Ribbon + menu.
+- Catalog Excel D2C → 1.8.20; README; changelog; kịch bản `d2c-1.8.20` (Chưa quay). Không quay, không đăng. Không bump.
+
+### File chính
+
+| Vai trò | Đường dẫn |
+|---|---|
+| Import DGN | `src/Dgn/DgnImportService.cs` |
+| Batch / seed | `src/Dgn/DgnModule.cs`, `src/Dgn/DgnBatchService.cs` |
+| MenuBar | `src/UI/MenuBuilder.cs` |
+| Build net48 | `iSurvey.csproj` (ReferenceAssemblies.net48) |
+
+### Việc tiếp
+
+- [ ] Phát hành UPD 1.8.20 (`publish-release.ps1`) khi được yêu cầu.
+- [ ] Quay video D2C 1.8.20 / GHISODM / XAYMOHINH khi được yêu cầu.
+- [ ] Cập nhật HDSD web (ksnpsc) theo 1.8.20 sau phát hành.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff đầu. iSurvey vẫn 1.8.20 (không bump). D2C batch V7 Phú Cường 30/30 OK (tách ref + fallback DWG); MenuBar iSurvey khi tắt Ribbon. Chưa phát hành UPD. Tiếp: publish-release khi được yêu cầu, hoặc việc mới.
+```
+
+**Lưu trữ ngày:** [2026-11-19-d2c-batch-v7-menubar.md](./2026-11-19-d2c-batch-v7-menubar.md)
+
+---
+
 ## 2026-11-11 — Bump 1.8.20 (GHISODM + TIN/cọc)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng (Civil 3D 2026 Metric). Cuối phiên đầy đủ. **Bump → 1.8.20.** Chưa `publish-release.ps1`.

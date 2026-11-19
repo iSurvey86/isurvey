@@ -78,10 +78,15 @@ public sealed class DgnImportOptions
 
     public string Command { get; set; } = "_.-DGNIMPORT";
 
-    public IReadOnlyList<string> CommandArgs { get; set; } = ["{path}", "", "{units}", "{mapping}"];
+    /// <summary>
+    /// Trình tự -DGNIMPORT khi FILEDIA=0: tên file ➔ model ➔ đơn vị ➔ mapping.
+    /// Gửi "Default" (không phải Enter/space): prompt model là chuỗi tự do — space/_Master bị nhận
+    /// như tên model. File V7 phu cuong luôn hỏi model; "Default" là lựa chọn chuẩn.
+    /// </summary>
+    public IReadOnlyList<string> CommandArgs { get; set; } = ["{path}", "Default", "{units}", "{mapping}"];
 
-    /// <summary>Rỗng = Enter (lấy &lt;Standard&gt;).</summary>
-    public string MappingSetup { get; set; } = string.Empty;
+    /// <summary>Rỗng ➔ "Standard" khi gọi lệnh (không gửi Enter trống).</summary>
+    public string MappingSetup { get; set; } = "Standard";
 
     public static DgnImportOptions FromSettings(MapUserSettings s, string filePath) => new()
     {
@@ -97,18 +102,21 @@ public sealed class DgnImportOptions
         ZoomToImport = s.DgnZoomToImport,
         ImportMode = s.DgnImportMode,
         Command = string.IsNullOrWhiteSpace(s.DgnCommand) ? "_.-DGNIMPORT" : s.DgnCommand.Trim(),
-        CommandArgs = s.DgnCommandArgs is { Count: > 0 } ? s.DgnCommandArgs.ToList() : ["{path}", "", "{units}", "{mapping}"],
+        CommandArgs = s.DgnCommandArgs is { Count: > 0 }
+            ? s.DgnCommandArgs.ToList()
+            : ["{path}", "Default", "{units}", "{mapping}"],
         MappingSetup = NormalizeMapping(s.DgnMappingSetup)
     };
 
-    /// <summary>Rỗng ➔ Enter. Giá trị cũ "_Standard"/"Standard" cũng quy về Enter (mặc định Standard).</summary>
+    /// <summary>Rỗng / _Standard ➔ "Standard" (gửi rõ tên mapping, không Enter trống).</summary>
     private static string NormalizeMapping(string? value)
     {
         var v = value?.Trim() ?? string.Empty;
-        return v.Equals("_Standard", StringComparison.OrdinalIgnoreCase)
-               || v.Equals("Standard", StringComparison.OrdinalIgnoreCase)
-            ? string.Empty
-            : v;
+        if (v.Length == 0
+            || v.Equals("_Standard", StringComparison.OrdinalIgnoreCase)
+            || v.Equals("Standard", StringComparison.OrdinalIgnoreCase))
+            return "Standard";
+        return v;
     }
 
     public static DgnLayerMode ParseLayerMode(string? text) => text?.Trim().ToLowerInvariant() switch
