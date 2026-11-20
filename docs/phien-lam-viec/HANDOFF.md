@@ -5,6 +5,32 @@
 
 ---
 
+## 2026-11-20 — Phát hành 1.8.20 (không cài máy này)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. **Đã `publish-release.ps1`.** Bundle máy này **cố ý giữ 1.8.17** để thử tự báo cập nhật như máy khách.
+
+### Đã chốt / đã làm
+
+- **VEMCD**: thanh dọc chia cột đầu bảng | thân vẫn 2 đoạn, màu khung (ACI 7) thay vàng/đỏ.
+- Upload `iSurvey-Setup-1.8.20.zip` + `version.json` (latest 1.8.20) lên Storage `isurvey-releases`. Nội dung gói gồm D2C batch V7 / MenuBar, GHISODM, TIN/cọc, VEMCD Zero-Clutter + sửa màu thanh dọc.
+- CHANGELOG / HANDOFF ghi đã phát hành. Không cài `-Install` trên máy này.
+
+### Việc tiếp
+
+- [ ] Máy này (1.8.17): mở Civil → kiểm hộp tự báo cập nhật 1.8.20; `UPD` tay nếu cần.
+- [ ] Quay video D2C 1.8.20 / GHISODM / XAYMOHINH khi được yêu cầu.
+- [ ] Cập nhật HDSD web (ksnpsc) theo 1.8.20 khi được yêu cầu.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff đầu. iSurvey 1.8.20 đã phát hành UPD. Máy văn phòng cố ý còn 1.8.17 để thử tự báo cập nhật. Tiếp: kiểm hộp cập nhật khi mở Civil, hoặc HDSD/video, hoặc việc mới.
+```
+
+**Lưu trữ ngày:** [2026-11-20-phat-hanh-1.8.20.md](./2026-11-20-phat-hanh-1.8.20.md)
+
+---
+
 ## 2026-11-19 — D2C batch V7 Phú Cường + MenuBar (1.8.20, không bump)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng (AutoCAD 2023). Cuối phiên đầy đủ. **Không bump.** Vẫn **1.8.20** (chưa `publish-release.ps1`).

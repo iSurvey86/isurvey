@@ -1,8 +1,12 @@
 # Changelog — iSurvey
 
-## 1.8.20 — 2026-11-11
+## 1.8.20 — 2026-11-20
 
-Bump sau phát hành 1.8.19. **Chưa** chạy `publish-release.ps1` trong phiên này (chỉ bump + đóng gói local).
+Đã phát hành 2026-11-20 (`publish-release.ps1`: Setup zip + `version.json` trên Storage `isurvey-releases`). Gộp bump 11/11 (GHISODM + TIN/cọc) và D2C batch V7 / MenuBar (19/11).
+
+### VEMCD
+
+- Thanh dọc chia cột đầu bảng | thân: vẫn **2 đoạn** (ô sơ họa + thân), màu khung (ACI 7) thay vàng/đỏ.
 
 ### DGN ➔ CAD (`D2C`)
 

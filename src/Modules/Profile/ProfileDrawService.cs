@@ -296,7 +296,7 @@ internal static class ProfileDrawService
             AddLine(tr, space, iSurveyLayers.TdBang, 7, xRight, yCut, xRight, yBandTop, handles);
 
             // Hàng từ trên xuống: rows[0] sát đường đất.
-            // Thanh dọc xSplit (vàng/đỏ) vẽ sau khi biết yGroundMax — xem cuối DrawOneStrip.
+            // Thanh dọc xSplit (2 đoạn, màu khung) vẽ sau khi biết yGroundMax — xem cuối DrawOneStrip.
             var yTop = yBandTop;
             foreach (var row in rows)
             {
@@ -312,7 +312,7 @@ internal static class ProfileDrawService
             }
         }
 
-        // Điểm cắt đầu bảng (đáy sơ họa) | thân — dùng cho 2 polyline vàng/đỏ.
+        // Điểm cắt đầu bảng (đáy sơ họa) | thân — dùng cho 2 polyline cùng màu khung.
         double ySplitHead;
         {
             var yTop = yBandTop;
@@ -491,16 +491,16 @@ internal static class ProfileDrawService
         if (options.InsertLeftScaleBar || options.InsertRightScaleBar || options.FillDatumLabels)
             DrawScaleBars(tr, space, styleId, options, origin.X, xSplit, xRight, labelWidth, yDatum, yGroundMax, datum, phong, textProfile, handles);
 
-        // Thanh dọc chia đầu bảng | thân MCD = 2 polyline riêng.
-        // Pline 1 vàng: đúng chiều cao ô Sơ họa mặt bằng (không kéo lên vùng đất).
-        // Pline 2 đỏ: thân bảng từ đáy sơ họa xuống đáy.
+        // Thanh dọc chia đầu bảng | thân MCD = 2 polyline riêng, màu khung (7).
+        // Pline 1: đúng chiều cao ô Sơ họa mặt bằng (không kéo lên vùng đất).
+        // Pline 2: thân bảng từ đáy sơ họa xuống đáy.
         if (options.DrawBandHeader)
         {
             if (ySplitHead < yBandTop - 1e-9)
-                AddPolyline2(tr, space, iSurveyLayers.TdBang, 2,
+                AddPolyline2(tr, space, iSurveyLayers.TdBang, 7,
                     xSplit, yBandTop, xSplit, ySplitHead, handles);
             if (ySplitHead > yCut + 1e-9)
-                AddPolyline2(tr, space, iSurveyLayers.TdBang, 1,
+                AddPolyline2(tr, space, iSurveyLayers.TdBang, 7,
                     xSplit, ySplitHead, xSplit, yCut, handles);
         }
     }
