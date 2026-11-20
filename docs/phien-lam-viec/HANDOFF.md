@@ -5,6 +5,107 @@
 
 ---
 
+## 2026-11-20 — Cuối phiên: UPD 1.8.22→1.8.26 + HDSD What's New / danh sách lệnh
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. Cuối phiên đầy đủ. Latest phát hành **1.8.26**. HDSD trên repo **ksnpsc** (đã push).
+
+### Đã chốt / đã làm
+
+- **1.8.22:** vá cwd relaunch sau UPD (tránh FATAL ASC).
+- **1.8.23:** notes cắt theo máy `[đang cài … latest]`.
+- **1.8.24:** tối đa 5 khối + link HDSD Tính năng mới.
+- **1.8.25:** không tự mở lại Civil sau cài; hộp thoại VI có dấu.
+- **1.8.26:** notes **mới nhất trước**. Đã `publish-release`.
+- ksnpsc: tab Tính năng mới; bảng danh sách lệnh STT đậm + gạch chân hover/focus.
+- Catalog UPD → 1.8.26; kịch bản video `upd-1.8.26` (Chưa quay).
+- `deploy/sync-hdsd-tinh-nang-moi.ps1` + `Huong_dan_Phat_hanh.md`.
+
+### File chính
+
+| Vai trò | Đường dẫn |
+|---|---|
+| UPD UI / notes | `src/UI/Account/UpdateWindow.xaml(.cs)` |
+| Apply / Install | `deploy/Apply-iSurveyUpdate.ps1`, `Install-iSurvey.ps1` |
+| Sync HDSD | `deploy/sync-hdsd-tinh-nang-moi.ps1` |
+| Version | `iSurvey.csproj`, `PackageContents.xml` → **1.8.26** |
+
+### Việc tiếp
+
+- [ ] Client: `UPD` → 1.8.26; xác nhận notes mới nhất trước + không tự relaunch.
+- [ ] Ctrl+F5 HDSD Giới thiệu / Tính năng mới.
+- [ ] Quay video UPD 1.8.26 khi được yêu cầu.
+
+### Câu mở phiên sau
+
+```text
+git pull (isurvey + ksnpsc). Latest 1.8.26: UPD notes theo máy / max 5 / mới nhất trước / không tự mở Civil; HDSD Tính năng mới + bảng lệnh STT đậm. Tiếp: xác nhận UPD trên client, hoặc việc mới.
+```
+
+**Lưu trữ ngày:** [2026-11-20-upd-whatsnew-hdsd-1.8.26.md](./2026-11-20-upd-whatsnew-hdsd-1.8.26.md)
+
+---
+
+## 2026-11-20 — What's New HDSD + UPD giới hạn + 1.8.24
+
+**Máy / ngữ cảnh:** Chốt: UPD vài bản gần latest; HDSD tab **Tính năng mới** = đủ lịch sử.
+
+### Đã chốt / đã làm
+
+- `UpdateWindow`: `LimitNotesToRecentVersions(5)` + link `.../tinh-nang-moi`.
+- ksnpsc: section `tinh-nang-moi`, file `09-tinh-nang-moi.md` (sync từ CHANGELOG).
+- Phát hành **1.8.24**. Cần deploy ksnpsc lên Vercel để trang live.
+
+### Câu mở phiên sau
+
+```text
+git pull (isurvey + ksnpsc). 1.8.24: UPD giới hạn 5 bản + link What's New HDSD. Tiếp: deploy ksnpsc nếu chưa, xác nhận UPD, hoặc việc mới.
+```
+
+---
+
+## 2026-11-20 — Notes UPD cắt theo máy + 1.8.23
+
+**Máy / ngữ cảnh:** User không đồng ý hiện cả lịch sử từ 1.8.18 khi máy đã 1.8.21.
+
+### Đã chốt / đã làm
+
+- `FilterNotesForClient`: chỉ khối phiên bản trong `[bản đang cài … latest]` (gồm hai đầu).
+- Server `notes` vẫn đầy đủ; docs phát hành cập nhật.
+- Bump + phát hành **1.8.23** (lần UPD đầu từ DLL cũ vẫn hiện đủ notes; sau khi cài 23 mới cắt).
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff đầu. 1.8.23: notes UPD theo máy (từ bản đang cài → latest). Tiếp: xác nhận UPD hoặc việc mới.
+```
+
+---
+
+## 2026-11-20 — Sửa ASC relaunch + phát hành 1.8.22
+
+**Máy / ngữ cảnh:** Cursor — Civil 3D 2026. Sau UPD 1.8.21: cài OK nhưng mở lại Civil → `FATAL ERROR: ASC initialization failed` (`acad.err` trong thư mục stage).
+
+### Đã chốt / đã làm
+
+- Không phải lỗi DLL 1.8.21: helper mở `acad.exe` kế thừa cwd = SetupDir stage.
+- `Apply-iSurveyUpdate.ps1`: set `WorkingDirectory` = thư mục `acad.exe`.
+- `Install-iSurvey.ps1`: mở lại đúng cwd rồi xóa `relaunch.json` (máy helper cũ 1.8.21 → 1.8.22 vẫn OK).
+- `UpdateApplyService`: ưu tiên helper trong gói zip vừa tải.
+- Bump + phát hành **1.8.22** (không `-Install` nếu đang thử client).
+
+### Việc tiếp
+
+- [ ] Máy đã 1.8.21: mở Civil từ Start Menu (nếu ASC), rồi `UPD` → 1.8.22.
+- [ ] Xác nhận sau UPD Civil mở lại không ASC.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff đầu. Đã vá ASC relaunch và phát hành 1.8.22. Tiếp: xác nhận UPD, hoặc việc mới.
+```
+
+---
+
 ## 2026-11-20 — Hộp notes phân cấp + phát hành 1.8.21 (không cài máy này)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. **Bump + `publish-release` 1.8.21.** Bundle máy này **cố ý không cài** (client cũ thử UPD).

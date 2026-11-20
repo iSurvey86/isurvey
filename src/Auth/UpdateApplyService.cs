@@ -78,7 +78,23 @@ public static class UpdateApplyService
                 return new ApplyResult(false, "Không tìm thấy thư mục Setup đã giải nén.");
 
             Directory.CreateDirectory(UpdatesRoot);
-            var helper = EnsureHelperScript();
+            // Ưu tiên script trong gói vừa tải (vá relaunch sớm hơn DLL đang chạy).
+            var packaged = Path.Combine(setupDir, "Apply-iSurveyUpdate.ps1");
+            var helper = File.Exists(packaged) ? packaged : EnsureHelperScript();
+            if (File.Exists(packaged))
+            {
+                try
+                {
+                    File.Copy(packaged, Path.Combine(UpdatesRoot, "Apply-iSurveyUpdate.ps1"), overwrite: true);
+                }
+                catch
+                {
+                    // bản trong UpdatesRoot cũ vẫn được nếu copy lỗi
+                }
+                Trace("helper_from_setup");
+            }
+            else
+                Trace("helper_from_dll");
             var pid = Process.GetCurrentProcess().Id;
             WriteRelaunchInfo();
             WriteLogContext(latest);

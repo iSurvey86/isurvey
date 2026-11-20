@@ -105,6 +105,10 @@
                     <TextBlock x:Name="DetailLink" Text="Chi tiết" Foreground="{StaticResource Accent}" FontSize="12.5"
                                Cursor="Hand" Margin="0,6,0,0" Visibility="Collapsed"
                                MouseLeftButtonUp="Detail_Click"/>
+                    <TextBlock x:Name="WhatsNewLink" Text="Xem toàn bộ tính năng mới trên hướng dẫn →"
+                               Foreground="{StaticResource Accent}" FontSize="12.5"
+                               Cursor="Hand" Margin="0,8,0,0" Visibility="Collapsed" TextWrapping="Wrap"
+                               MouseLeftButtonUp="WhatsNew_Click"/>
 
                     <TextBlock x:Name="MessageText" Foreground="{StaticResource Ink}" FontSize="13" TextWrapping="Wrap"
                                Margin="0,14,0,0"

@@ -1,5 +1,47 @@
 # Changelog — iSurvey
 
+## 1.8.26 — 2026-11-20
+
+Đã phát hành 2026-11-20 (`publish-release.ps1`).
+
+### Cập nhật
+
+- Hộp UPD: xếp **phiên bản mới nhất trước**, bản cũ hơn phía dưới.
+
+## 1.8.25 — 2026-11-20
+
+Đã phát hành 2026-11-20 (`publish-release.ps1`).
+
+### Sửa lỗi / UX
+
+- UPD: **không tự mở lại** AutoCAD/Civil sau cài (tránh FATAL ASC); chỉ hiện hộp thoại bảo người dùng tự mở.
+- Hộp thông báo cập nhật: giao diện đẹp hơn, tiếng Việt có dấu.
+
+## 1.8.24 — 2026-11-20
+
+Đã phát hành 2026-11-20 (`publish-release.ps1`).
+
+### Cập nhật
+
+- Hộp UPD: tối đa **5** khối phiên bản gần latest; link mở HDSD **Tính năng mới** (đủ lịch sử trên ksnpsc).
+- HDSD web: mục lục **Tính năng mới** (`/huong-dan/isurvey/tinh-nang-moi`).
+
+## 1.8.23 — 2026-11-20
+
+Đã phát hành 2026-11-20 (`publish-release.ps1`).
+
+### Cập nhật
+
+- Hộp UPD: `notes` cắt theo máy — chỉ hiện từ **bản đang cài → latest** (vd. máy 1.8.16 không còn thấy 1.8.14…1.8.15). Server vẫn giữ `notes` đầy đủ.
+
+## 1.8.22 — 2026-11-20
+
+Đã phát hành 2026-11-20 (`publish-release.ps1`).
+
+### Sửa lỗi
+
+- UPD sau cài: mở lại Civil với thư mục làm việc = thư mục `acad.exe` (tránh `FATAL ERROR: ASC initialization failed` khi helper kế thừa cwd thư mục stage zip). `Install-iSurvey.ps1` trong gói mới cũng mở lại đúng cwd rồi xóa `relaunch.json` — máy còn helper cũ (1.8.21) cập nhật lên 1.8.22 vẫn an toàn.
+
 ## 1.8.21 — 2026-11-20
 
 Đã phát hành 2026-11-20 (`publish-release.ps1`).

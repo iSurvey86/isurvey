@@ -25,9 +25,85 @@ function Write-Trace([string]$Line) {
     Write-Host $Line
 }
 
-function Show-Msg([string]$Text, [string]$Title) {
-    try { [System.Windows.Forms.MessageBox]::Show($Text, $Title) | Out-Null }
-    catch { Write-Host $Text }
+function Show-Msg([string]$Text, [string]$Title, [string]$Kind = "info") {
+    # Hop thoai WinForms (UTF-8): khong dung MessageBox he thong (mat dau tieng Viet / giao dien don dieu).
+    try {
+        $ink = [System.Drawing.Color]::FromArgb(36, 48, 64)
+        $muted = [System.Drawing.Color]::FromArgb(92, 107, 122)
+        $accent = [System.Drawing.Color]::FromArgb(37, 99, 235)
+        $okBg = [System.Drawing.Color]::FromArgb(27, 122, 58)
+        $warnBg = [System.Drawing.Color]::FromArgb(180, 83, 9)
+        $bar = switch ($Kind) {
+            "ok" { $okBg }
+            "warn" { $warnBg }
+            default { $accent }
+        }
+        $headline = switch ($Kind) {
+            "ok" { "Cập nhật thành công" }
+            "warn" { "Chưa cập nhật" }
+            default { "Thông báo" }
+        }
+
+        $form = New-Object System.Windows.Forms.Form
+        $form.Text = $Title
+        $form.Size = New-Object System.Drawing.Size(460, 260)
+        $form.StartPosition = "CenterScreen"
+        $form.FormBorderStyle = "FixedDialog"
+        $form.MaximizeBox = $false
+        $form.MinimizeBox = $false
+        $form.TopMost = $true
+        $form.BackColor = [System.Drawing.Color]::FromArgb(243, 245, 248)
+        $form.Font = New-Object System.Drawing.Font("Segoe UI", 9.5)
+
+        $card = New-Object System.Windows.Forms.Panel
+        $card.BackColor = [System.Drawing.Color]::White
+        $card.Location = New-Object System.Drawing.Point(16, 16)
+        $card.Size = New-Object System.Drawing.Size(412, 150)
+        $card.BorderStyle = "FixedSingle"
+
+        $stripe = New-Object System.Windows.Forms.Panel
+        $stripe.BackColor = $bar
+        $stripe.Location = New-Object System.Drawing.Point(0, 0)
+        $stripe.Size = New-Object System.Drawing.Size(6, 150)
+
+        $h = New-Object System.Windows.Forms.Label
+        $h.Text = $headline
+        $h.ForeColor = $ink
+        $h.Font = New-Object System.Drawing.Font("Segoe UI", 13, [System.Drawing.FontStyle]::Bold)
+        $h.Location = New-Object System.Drawing.Point(22, 16)
+        $h.Size = New-Object System.Drawing.Size(370, 28)
+
+        $b = New-Object System.Windows.Forms.Label
+        $b.Text = $Text
+        $b.ForeColor = $muted
+        $b.Font = New-Object System.Drawing.Font("Segoe UI", 10)
+        $b.Location = New-Object System.Drawing.Point(22, 52)
+        $b.Size = New-Object System.Drawing.Size(370, 80)
+
+        $card.Controls.Add($stripe)
+        $card.Controls.Add($h)
+        $card.Controls.Add($b)
+
+        $btn = New-Object System.Windows.Forms.Button
+        $btn.Text = "Đóng"
+        $btn.Size = New-Object System.Drawing.Size(120, 34)
+        $btn.Location = New-Object System.Drawing.Point(308, 180)
+        $btn.FlatStyle = "Flat"
+        $btn.BackColor = $accent
+        $btn.ForeColor = [System.Drawing.Color]::White
+        $btn.Font = New-Object System.Drawing.Font("Segoe UI", 9.5, [System.Drawing.FontStyle]::Bold)
+        $btn.FlatAppearance.BorderSize = 0
+        $btn.Cursor = [System.Windows.Forms.Cursors]::Hand
+        $btn.DialogResult = [System.Windows.Forms.DialogResult]::OK
+        $form.AcceptButton = $btn
+        $form.Controls.Add($card)
+        $form.Controls.Add($btn)
+        [void]$form.ShowDialog()
+        $form.Dispose()
+    }
+    catch {
+        try { [System.Windows.Forms.MessageBox]::Show($Text, $Title) | Out-Null } catch { Write-Host $Text }
+    }
 }
 
 function Write-Result($ok, $stage, $message, $code, $relaunch) {
@@ -178,7 +254,7 @@ $bundle = Join-Path $SetupDir "iSurvey.bundle"
 
 if (-not (Test-Path $installPs1) -or -not (Test-Path $bundle)) {
     Write-Result $false "setup" "Thu muc Setup khong hop le" 1 $false
-    Show-Msg "Thu muc Setup khong hop le (thieu Install-iSurvey.ps1 hoac iSurvey.bundle).`n$SetupDir" "iSurvey Cap nhat"
+    Show-Msg "Thư mục Setup không hợp lệ (thiếu Install-iSurvey.ps1 hoặc iSurvey.bundle).`n$SetupDir" "iSurvey — Cập nhật" "warn"
     exit 1
 }
 
@@ -223,7 +299,7 @@ while ($alive -and -not $alive.HasExited) {
             if ((Get-Date) -gt $answerDeadline) {
                 Write-Trace "close_cancelled"
                 Write-Result $false "wait" "Nguoi dung huy dong Civil" 2 $false
-                Show-Msg "Ban da khong dong Civil, nen chua cai dat.`nChay lai UPD khi muon cap nhat." "iSurvey Cap nhat"
+                Show-Msg "Bạn đã không đóng Civil, nên chưa cài đặt.`nChạy lại UPD khi muốn cập nhật." "iSurvey — Cập nhật" "warn"
                 exit 2
             }
             Start-Sleep -Milliseconds 200
@@ -243,7 +319,7 @@ while ($alive -and -not $alive.HasExited) {
     elseif ((Get-Date) -gt $failAt) {
         Write-Trace "close_timeout posts=$posts"
         Write-Result $false "wait" "Khong dong duoc Civil" 2 $false
-        Show-Msg "Khong dong duoc Civil. Hay dong Civil, roi chay Install-iSurvey.bat trong:`n$SetupDir" "iSurvey Cap nhat"
+        Show-Msg "Không đóng được Civil. Hãy đóng Civil, rồi chạy Install-iSurvey.bat trong:`n$SetupDir" "iSurvey — Cập nhật" "warn"
         exit 2
     }
     Start-Sleep -Milliseconds 200
@@ -303,39 +379,21 @@ if ($code -ne 0) {
     $tail = ""
     if (Test-Path $installLog) { $tail = " | " + ((Get-Content $installLog -Encoding UTF8 -ErrorAction SilentlyContinue | Select-Object -Last 4) -join " | ") }
     Write-Result $false "install" ("Cai dat that bai (ma $code) sau $tries lan" + $tail) $code $false
-    Show-Msg "Cai dat that bai (ma $code). Xem %LocalAppData%\iSurvey\updates\install-last.log`n$SetupDir" "iSurvey Cap nhat"
+    Show-Msg "Cài đặt thất bại (mã $code). Xem %LocalAppData%\iSurvey\updates\install-last.log`n$SetupDir" "iSurvey — Cập nhật" "warn"
     exit $code
 }
 
-Set-ProgressForm $form "Cai dat thanh cong" "Dang mo lai AutoCAD/Civil..."
+Set-ProgressForm $form "Cài đặt thành công" "Không tự mở lại Civil — bạn mở thủ công."
 Start-Sleep -Milliseconds 300
 if ($form) { $form.Close() }
 
+# Khong tu mo lai CAD (tranh FATAL ASC). Chi thong bao de nguoi dung tu mo.
 $relaunch = Join-Path $UpdatesRoot "relaunch.json"
-$opened = $false
 if (Test-Path $relaunch) {
-    try {
-        $info = Get-Content $relaunch -Raw -Encoding UTF8 | ConvertFrom-Json
-        if ($info.exe -and (Test-Path $info.exe)) {
-            $psi = New-Object System.Diagnostics.ProcessStartInfo
-            $psi.FileName = [string]$info.exe
-            $psi.Arguments = [string]$info.args
-            $psi.UseShellExecute = $true
-            [System.Diagnostics.Process]::Start($psi) | Out-Null
-            $opened = $true
-            Write-Trace "relaunch_ok"
-        }
-        else {
-            Write-Trace "relaunch_skip exe missing"
-        }
-    }
-    catch {
-        Write-Trace ("relaunch_fail " + $_.Exception.Message)
-    }
+    Remove-Item $relaunch -Force -ErrorAction SilentlyContinue
+    Write-Trace "relaunch_cleared_no_autostart"
 }
 
-Write-Result $true "done" "Cai dat thanh cong" 0 $opened
-if (-not $opened) {
-    Show-Msg "Cap nhat iSurvey xong.`nHay mo lai AutoCAD / Civil 3D 2022-2027." "iSurvey Cap nhat"
-}
+Write-Result $true "done" "Cài đặt thành công" 0 $false
+Show-Msg "Cập nhật iSurvey xong.`nHãy mở lại AutoCAD / Civil 3D (2022–2027) từ Start Menu hoặc lối tắt của bạn." "iSurvey — Cập nhật" "ok"
 exit 0

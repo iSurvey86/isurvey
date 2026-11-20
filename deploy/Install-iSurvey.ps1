@@ -75,3 +75,10 @@ else {
 Write-Host ""
 Write-Host "CAI DAT XONG. Hay DONG va MO LAI AutoCAD / Civil 3D 2022-2027." -ForegroundColor Green
 Write-Host "Tab Ribbon: iSurvey. Dang nhap Gmail (LGI) de kich hoat."
+
+# Khong tu mo lai CAD (tranh FATAL ASC). Chi xoa tin hieu relaunch neu con.
+$updatesRoot = Join-Path $env:LOCALAPPDATA "iSurvey\updates"
+$relaunch = Join-Path $updatesRoot "relaunch.json"
+if (Test-Path $relaunch) {
+    Remove-Item $relaunch -Force -ErrorAction SilentlyContinue
+}

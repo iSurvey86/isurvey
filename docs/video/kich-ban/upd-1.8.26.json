@@ -1,0 +1,39 @@
+{
+  "id": "upd-1.8.26",
+  "command": "UPD",
+  "commandFull": "ISURVEY_UPDATE",
+  "feature": "Kiểm tra cập nhật",
+  "version": "1.8.26",
+  "title": "Kiểm tra cập nhật phiên bản 1.8.26",
+  "privacy": "unlisted",
+  "voice": "vi-VN-HoaiMyNeural",
+  "rate": "-8%",
+  "tags": ["iSurvey", "Civil 3D", "cập nhật", "UPD"],
+  "description": "Cách xem tính năng mới và cập nhật iSurvey.\n\nHành vi trong video có từ iSurvey 1.8.26 (lệnh UPD, lệnh đủ ISURVEY_UPDATE).\nHộp notes chỉ hiện từ bản đang cài tới latest, tối đa năm khối, bản mới nhất trên cùng. Link mở HDSD Tính năng mới. Sau khi cài xong không tự mở lại Civil.",
+  "shots": [
+    {
+      "id": "01-mo-dau",
+      "type": "card",
+      "lines": ["Kiểm tra cập nhật", "phiên bản 1.8.26"],
+      "narration": "Kiểm tra cập nhật, phiên bản một chấm tám chấm hai sáu. Hộp ghi chú gọn theo máy, bản mới nhất ở trên."
+    },
+    {
+      "id": "02-upd-notes",
+      "type": "screen",
+      "action": "Gõ UPD. Chỉ vài khối phiên bản; mới nhất trên cùng; chỉ link Xem toàn bộ trên HDSD.",
+      "narration": "Gõ U P D. Danh sách tính năng mới chỉ vài bản gần đây, bản mới nhất trước. Muốn xem đủ lịch sử thì mở link hướng dẫn trên web."
+    },
+    {
+      "id": "03-sau-cai",
+      "type": "screen",
+      "action": "Bấm Cập nhật ngay (hoặc mô tả bằng thẻ nếu không quay hết bước cài). Sau cài: hộp thoại bảo tự mở Civil.",
+      "narration": "Sau khi cài xong, iSurvey không tự mở lại Civil. Mở Civil từ Start Menu như bình thường."
+    },
+    {
+      "id": "04-ket",
+      "type": "card",
+      "lines": ["Cập nhật xong — tự mở Civil"],
+      "narration": "Cập nhật xong thì tự mở Civil. Đủ lịch sử tính năng mới nằm trên trang hướng dẫn."
+    }
+  ]
+}

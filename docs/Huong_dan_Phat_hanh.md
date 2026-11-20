@@ -45,7 +45,9 @@ D2C: mô tả ngắn tính năng mới.
 "@
 ```
 
-`-Notes` hiện trên hộp cập nhật (máy khách). Quy ước: **liệt kê theo thời gian từ bản cũ → mới**. Mỗi số phiên bản một dòng riêng (vd. `1.8.18`) — hộp tô đậm và đánh `-`; dòng tính năng bên dưới đánh `+`, chữ thường (vd. `VEMCD: …`). Máy khách bỏ qua vài bản rồi cập nhật vẫn **cài thẳng `latest`**; `notes` chỉ để đọc đủ thay đổi đã bỏ qua. Mỗi dòng một ý; xuống dòng (`\n`); không nhồi một dòng bằng dấu `;`.
+`-Notes` trên server: liệt kê theo thời gian (**cũ → mới**), nên **chỉ giữ khoảng vài bản gần `latest`** (vd. 5–10) để file gọn. Mỗi số phiên bản một dòng riêng — hộp tô đậm `-`; tính năng `+` chữ thường. **Máy khách:** cắt `[bản đang cài … latest]`, tối đa **5** khối, rồi **đảo hiện mới nhất trước**; link **Xem toàn bộ…** mở HDSD `/huong-dan/isurvey/tinh-nang-moi`. Cài vẫn **thẳng `latest`**. Mỗi dòng một ý; xuống dòng (`\n`).
+
+Sau mỗi phát hành (nội dung người dùng đổi): chạy `deploy/sync-hdsd-tinh-nang-moi.ps1` rồi commit/push **ksnpsc** (trang Tính năng mới — không lộ ghi chú kỹ thuật/admin từ CHANGELOG).
 
 Script tự build zip, upload zip, kiểm tra zip tải được và đúng dung lượng, rồi mới ghi đè `version.json` (cache 60 giây) và xác nhận lại trên server. Từ chối upload nếu version thấp hơn bản đang có trên server (cần `-Force` để rollback). Tùy chọn: `-SkipBuild` (chỉ upload bản đã build), `-DryRun` (chỉ kiểm tra). Chưa đặt biến môi trường thì script hỏi nhập khóa (ẩn ký tự, chỉ dùng lần đó).
 

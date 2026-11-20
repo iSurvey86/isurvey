@@ -12,6 +12,9 @@ namespace iSurvey.UI.Account;
 public partial class UpdateWindow : Window
 {
     private const int PreviewCount = 4;
+    /// <summary>Số khối phiên bản tối đa trên hộp UPD (gần latest). Đủ lịch sử xem trên HDSD.</summary>
+    internal const int UpdMaxVersionBlocks = 5;
+    internal const string WhatsNewUrl = "https://ksnpsc.vercel.app/huong-dan/isurvey/tinh-nang-moi";
 
     private readonly UpdateCheckService.Manifest _man;
     private readonly IReadOnlyList<ReleaseNote> _notes;
@@ -26,7 +29,11 @@ public partial class UpdateWindow : Window
     {
         _man = man;
         _force = force;
-        _notes = ParseNotes(man.Notes);
+        // UPD: cắt theo máy → vài bản gần latest → đảo thứ tự (mới nhất trước). HDSD giữ full.
+        _notes = ReverseVersionBlocks(
+            LimitNotesToRecentVersions(
+                FilterNotesForClient(ParseNotes(man.Notes), AuthManager.AppVersion, man.Latest),
+                UpdMaxVersionBlocks));
         InitializeComponent();
 
         CurrentText.Text = FormatVersion(AuthManager.AppVersion);
@@ -36,6 +43,8 @@ public partial class UpdateWindow : Window
             ForceText.Text = "Phiên bản hiện tại thấp hơn mức tối thiểu — nên cập nhật ngay.";
             ForceText.Visibility = Visibility.Visible;
         }
+
+        WhatsNewLink.Visibility = Visibility.Visible;
 
         if (_notes.Count > 0)
         {
@@ -124,6 +133,126 @@ public partial class UpdateWindow : Window
         return new ReleaseNote(line, IsVersion: false);
     }
 
+    /// <summary>
+    /// Giữ khối phiên bản trong khoảng [bản đang cài … latest] (gồm hai đầu).
+    /// </summary>
+    internal static IReadOnlyList<ReleaseNote> FilterNotesForClient(
+        IReadOnlyList<ReleaseNote> notes, string? installedVersion, string? latestVersion)
+    {
+        if (notes.Count == 0)
+            return notes;
+
+        var from = NormalizeVer(installedVersion);
+        var to = NormalizeVer(latestVersion);
+        if (from.Length == 0 && to.Length == 0)
+            return notes;
+
+        var hasVersionHeaders = notes.Any(n => n.IsVersion);
+        if (!hasVersionHeaders)
+            return notes;
+
+        var list = new List<ReleaseNote>(notes.Count);
+        var includeSection = false;
+        foreach (var note in notes)
+        {
+            if (note.IsVersion)
+            {
+                includeSection = InClientRange(note.Text, from, to);
+                if (includeSection)
+                    list.Add(note);
+                continue;
+            }
+
+            if (includeSection)
+                list.Add(note);
+        }
+
+        return list;
+    }
+
+    /// <summary>
+    /// Giữ tối đa <paramref name="maxVersionBlocks"/> khối phiên bản mới nhất (cuối danh sách cũ→mới).
+    /// </summary>
+    internal static IReadOnlyList<ReleaseNote> LimitNotesToRecentVersions(
+        IReadOnlyList<ReleaseNote> notes, int maxVersionBlocks)
+    {
+        if (notes.Count == 0 || maxVersionBlocks <= 0)
+            return notes;
+
+        var starts = new List<int>();
+        for (var i = 0; i < notes.Count; i++)
+        {
+            if (notes[i].IsVersion)
+                starts.Add(i);
+        }
+
+        if (starts.Count <= maxVersionBlocks)
+            return notes;
+
+        var from = starts[starts.Count - maxVersionBlocks];
+        var list = new List<ReleaseNote>(notes.Count - from);
+        for (var i = from; i < notes.Count; i++)
+            list.Add(notes[i]);
+        return list;
+    }
+
+    /// <summary>
+    /// Đảo khối phiên bản: mới nhất trước (server notes vẫn cũ→mới).
+    /// </summary>
+    internal static IReadOnlyList<ReleaseNote> ReverseVersionBlocks(IReadOnlyList<ReleaseNote> notes)
+    {
+        if (notes.Count == 0)
+            return notes;
+
+        var starts = new List<int>();
+        for (var i = 0; i < notes.Count; i++)
+        {
+            if (notes[i].IsVersion)
+                starts.Add(i);
+        }
+
+        if (starts.Count <= 1)
+            return notes;
+
+        var list = new List<ReleaseNote>(notes.Count);
+        // Giữ dòng lẻ trước tiêu đề phiên bản đầu (nếu có).
+        for (var i = 0; i < starts[0]; i++)
+            list.Add(notes[i]);
+
+        for (var s = starts.Count - 1; s >= 0; s--)
+        {
+            var begin = starts[s];
+            var end = s + 1 < starts.Count ? starts[s + 1] : notes.Count;
+            for (var i = begin; i < end; i++)
+                list.Add(notes[i]);
+        }
+
+        return list;
+    }
+
+    private static bool InClientRange(string versionText, string from, string to)
+    {
+        var v = NormalizeVer(versionText);
+        if (v.Length == 0)
+            return false;
+        if (from.Length > 0 && UpdateCheckService.CompareSemVer(v, from) < 0)
+            return false;
+        if (to.Length > 0 && UpdateCheckService.CompareSemVer(v, to) > 0)
+            return false;
+        return true;
+    }
+
+    private static string NormalizeVer(string? v)
+    {
+        v = (v ?? "").Trim();
+        if (v.Length == 0)
+            return "";
+        if (v.StartsWith("v", StringComparison.OrdinalIgnoreCase))
+            v = v[1..];
+        var m = Regex.Match(v, @"^\d+(\.\d+){0,3}");
+        return m.Success ? m.Value : v;
+    }
+
     private static string FormatVersion(string v, bool keepPrefix = true)
     {
         v = (v ?? "").Trim();
@@ -181,6 +310,21 @@ public partial class UpdateWindow : Window
     {
         _expanded = !_expanded;
         RenderNotes();
+    }
+
+    private void WhatsNew_Click(object sender, MouseButtonEventArgs e)
+    {
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(WhatsNewUrl)
+            {
+                UseShellExecute = true
+            });
+        }
+        catch
+        {
+            // ignore
+        }
     }
 
     private void Close_Click(object sender, RoutedEventArgs e)
