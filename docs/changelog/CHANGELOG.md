@@ -1,5 +1,13 @@
 # Changelog — iSurvey
 
+## 1.8.21 — 2026-11-20
+
+Đã phát hành 2026-11-20 (`publish-release.ps1`).
+
+### Cập nhật
+
+- Hộp «Tính năng mới»: tiêu đề phiên bản đậm (`- 1.8.x`); dòng tính năng chữ thường, thụt lề (`+ …`). `notes` vẫn liệt kê theo thời gian; cài thẳng `latest`.
+
 ## 1.8.20 — 2026-11-20
 
 Đã phát hành 2026-11-20 (`publish-release.ps1`: Setup zip + `version.json` trên Storage `isurvey-releases`). Gộp bump 11/11 (GHISODM + TIN/cọc) và D2C batch V7 / MenuBar (19/11).

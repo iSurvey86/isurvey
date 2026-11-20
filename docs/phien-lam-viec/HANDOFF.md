@@ -5,6 +5,31 @@
 
 ---
 
+## 2026-11-20 — Hộp notes phân cấp + phát hành 1.8.21 (không cài máy này)
+
+**Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. **Bump + `publish-release` 1.8.21.** Bundle máy này **cố ý không cài** (client cũ thử UPD).
+
+### Đã chốt / đã làm
+
+- **UpdateWindow**: phiên bản đậm (`- 1.8.x`); tính năng chữ thường (`+ …`, thụt lề).
+- `notes` trên Storage liệt kê 1.8.18 → 1.8.21; cài thẳng latest.
+- Trước đó cùng ngày: phát hành 1.8.20 (VEMCD màu khung, D2C/MenuBar/GHISODM…).
+
+### Việc tiếp
+
+- [ ] Máy client: `UPD` lên 1.8.21; lần sau mở hộp cập nhật mới thấy phân cấp notes (lần UPD đầu vẫn UI DLL cũ).
+- [ ] HDSD web / video khi được yêu cầu.
+
+### Câu mở phiên sau
+
+```text
+git pull, đọc handoff đầu. iSurvey 1.8.21 đã phát hành (hộp notes: phiên bản đậm -, tính năng +). Máy văn phòng có thể còn bản cũ để thử UPD. Tiếp: kiểm UPD, HDSD/video, hoặc việc mới.
+```
+
+**Lưu trữ ngày:** [2026-11-20-upd-notes-hierarchy.md](./2026-11-20-upd-notes-hierarchy.md)
+
+---
+
 ## 2026-11-20 — Phát hành 1.8.20 (không cài máy này)
 
 **Máy / ngữ cảnh:** Cursor — máy văn phòng, Civil 3D 2026. **Đã `publish-release.ps1`.** Bundle máy này **cố ý giữ 1.8.17** để thử tự báo cập nhật như máy khách.
@@ -17,9 +42,9 @@
 
 ### Việc tiếp
 
-- [ ] Máy này (1.8.17): mở Civil → kiểm hộp tự báo cập nhật 1.8.20; `UPD` tay nếu cần.
-- [ ] Quay video D2C 1.8.20 / GHISODM / XAYMOHINH khi được yêu cầu.
-- [ ] Cập nhật HDSD web (ksnpsc) theo 1.8.20 khi được yêu cầu.
+- [x] Đã phát hành tiếp 1.8.21 (block trên).
+- [ ] Quay video D2C / GHISODM / XAYMOHINH khi được yêu cầu.
+- [ ] Cập nhật HDSD web (ksnpsc) theo bản mới khi được yêu cầu.
 
 ### Câu mở phiên sau
 

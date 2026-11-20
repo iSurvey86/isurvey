@@ -53,8 +53,12 @@ public partial class UpdateWindow : Window
         };
     }
 
-    /// <summary>Một dòng tính năng: tên lệnh (nếu có) và ý nghĩa cho người dùng.</summary>
-    internal readonly record struct ReleaseNote(string? Command, string Text);
+    /// <summary>
+    /// Một dòng ghi chú cập nhật.
+    /// <see cref="IsVersion"/> = tiêu đề phiên bản (đậm, tiền tố «- »);
+    /// ngược lại = tính năng (không đậm, tiền tố «+ », thụt lề).
+    /// </summary>
+    internal readonly record struct ReleaseNote(string Text, bool IsVersion);
 
     /// <summary>Hiện hộp thoại. Trả về thư mục Setup đã giải nén nếu người dùng bấm Cập nhật ngay và tải xong; null nếu hủy hoặc lỗi.</summary>
     public static string? ShowAvailable(UpdateCheckService.Manifest man, bool force)
@@ -70,7 +74,7 @@ public partial class UpdateWindow : Window
             return [];
 
         var lines = notes.Replace("\r\n", "\n").Split('\n')
-            .Select(l => l.Trim().TrimStart('-', '•', '*', '–').Trim())
+            .Select(l => l.Trim().TrimStart('-', '+', '•', '*', '–').Trim())
             .Where(l => l.Length > 0)
             .ToList();
 
@@ -110,13 +114,14 @@ public partial class UpdateWindow : Window
         return cmd.Value is "AIA" or "AICFG" or "GENOTP" or "ISURVEY_GENOTP";
     }
 
-    /// <summary>Đưa về dạng tên lệnh + ý nghĩa. Dòng không bắt đầu bằng lệnh thì giữ nguyên câu.</summary>
+    /// <summary>Dòng chỉ số phiên bản (1.8.18 / v1.8.18) → tiêu đề; còn lại → tính năng (giữ nguyên câu).</summary>
     private static ReleaseNote ToNote(string line)
     {
-        var m = Regex.Match(line, @"^(?<cmd>[A-Z][A-Z0-9_]{1,24})(?:\s*[:：]\s*|\s+)(?<rest>\S.*)$");
-        if (!m.Success)
-            return new ReleaseNote(null, line);
-        return new ReleaseNote(m.Groups["cmd"].Value, m.Groups["rest"].Value.Trim());
+        var ver = Regex.Match(line, @"^(?:[Bb]ản\s+)?v?(?<v>\d+(?:\.\d+){1,3})\s*$");
+        if (ver.Success)
+            return new ReleaseNote(ver.Groups["v"].Value, IsVersion: true);
+
+        return new ReleaseNote(line, IsVersion: false);
     }
 
     private static string FormatVersion(string v, bool keepPrefix = true)
@@ -143,15 +148,21 @@ public partial class UpdateWindow : Window
                 TextWrapping = TextWrapping.Wrap,
                 FontSize = 13,
                 Foreground = ink,
-                Margin = new Thickness(0, 3, 0, 3)
+                Margin = note.IsVersion
+                    ? new Thickness(0, i == 0 ? 2 : 8, 0, 2)
+                    : new Thickness(14, 2, 0, 2)
             };
-            text.Inlines.Add(new Run("•  ") { Foreground = accent });
-            if (!string.IsNullOrEmpty(note.Command))
+            if (note.IsVersion)
             {
-                text.Inlines.Add(new Run(note.Command) { FontWeight = FontWeights.SemiBold });
-                text.Inlines.Add(new Run(": "));
+                text.Inlines.Add(new Run("-  ") { Foreground = accent });
+                text.Inlines.Add(new Run(note.Text) { FontWeight = FontWeights.SemiBold, Foreground = ink });
             }
-            text.Inlines.Add(new Run(note.Text));
+            else
+            {
+                text.Inlines.Add(new Run("+  ") { Foreground = accent });
+                text.Inlines.Add(new Run(note.Text) { FontWeight = FontWeights.Normal });
+            }
+
             NotesList.Children.Add(text);
         }
 

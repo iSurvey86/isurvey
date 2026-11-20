@@ -45,7 +45,7 @@ D2C: mô tả ngắn tính năng mới.
 "@
 ```
 
-`-Notes` hiện trên hộp cập nhật (máy khách). Quy ước: **liệt kê theo thời gian từ bản cũ → mới** (mỗi số phiên bản một dòng tiêu đề, dưới đó các dòng `LENH: mô tả` hoặc câu tiếng Việt). Máy khách bỏ qua vài bản rồi cập nhật vẫn **cài thẳng `latest`**; `notes` chỉ để đọc đủ thay đổi đã bỏ qua. Mỗi dòng một ý; xuống dòng (`\n`); không nhồi một dòng bằng dấu `;`.
+`-Notes` hiện trên hộp cập nhật (máy khách). Quy ước: **liệt kê theo thời gian từ bản cũ → mới**. Mỗi số phiên bản một dòng riêng (vd. `1.8.18`) — hộp tô đậm và đánh `-`; dòng tính năng bên dưới đánh `+`, chữ thường (vd. `VEMCD: …`). Máy khách bỏ qua vài bản rồi cập nhật vẫn **cài thẳng `latest`**; `notes` chỉ để đọc đủ thay đổi đã bỏ qua. Mỗi dòng một ý; xuống dòng (`\n`); không nhồi một dòng bằng dấu `;`.
 
 Script tự build zip, upload zip, kiểm tra zip tải được và đúng dung lượng, rồi mới ghi đè `version.json` (cache 60 giây) và xác nhận lại trên server. Từ chối upload nếu version thấp hơn bản đang có trên server (cần `-Force` để rollback). Tùy chọn: `-SkipBuild` (chỉ upload bản đã build), `-DryRun` (chỉ kiểm tra). Chưa đặt biến môi trường thì script hỏi nhập khóa (ẩn ký tự, chỉ dùng lần đó).
 
